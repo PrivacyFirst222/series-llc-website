@@ -35,20 +35,19 @@ import { buildPayload } from "../src/components/forms/florida-llc/buildPayload";
 import { memberRowIsBlank } from "../src/components/forms/florida-llc/validation";
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
-import { spawn, type Subprocess } from "bun";
-import { mkdtempSync, rmSync, existsSync, writeFileSync, appendFileSync } from "node:fs";
+import { startIsolatedStack, buildSite } from "./isolated-stack";
+import { existsSync, writeFileSync, appendFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 
-const API_PORT = 3300 + Math.floor(Math.random() * 500);
 /** When set, the walk saves screenshots of the screens it checks there. */
 const SHOT_DIR = process.env.SHOT_DIR;
 const shot = async (page: { screenshot: (o: { path: string; fullPage?: boolean }) => Promise<unknown> }, name: string) => {
   if (SHOT_DIR) await page.screenshot({ path: `${SHOT_DIR}/${name}.png`, fullPage: false });
 };
-const WEB_PORT = 3900 + Math.floor(Math.random() * 500);
-const API = `http://localhost:${API_PORT}`;
+let WEB_PORT: number;
+let API: string;
 
 type RunConfig = {
   key: string;
@@ -764,46 +763,14 @@ function jsonDiff(expected: unknown, actual: unknown, path = ""): string[] {
 }
 
 async function main(): Promise<void> {
-  // 1) Fresh, hermetic backend: empty database, offline integrations.
-  const freshDir = mkdtempSync(join(tmpdir(), "behavioral-pg-"));
-  const api: Subprocess = spawn(["bun", "server/dev.ts"], {
-    // PUBLIC_BASE_URL: the fake checkout's return origin is THIS run's web
-    // server, never a hard-coded port that may belong to another local
-    // instance (audit 16 DEV-ORIGIN-001).
-    env: { ...process.env, DEV_PG_DIR: freshDir, PORT: String(API_PORT), E2E_OFFLINE: "1", PUBLIC_BASE_URL: `http://localhost:${WEB_PORT}` },
-    stdout: "ignore",
-    stderr: "pipe",
-  });
-  for (let i = 0; i < 60; i++) {
-    try {
-      const r = await fetch(`${API}/api/health`);
-      if (r.status === 200) break;
-    } catch { /* not up yet */ }
-    await new Promise((r) => setTimeout(r, 500));
-    if (i === 59) throw new Error("API never became healthy");
-  }
-
-  // 2) The PRODUCTION frontend build, served statically with SPA fallback —
-  //    the gate tests what ships, not the dev server.
-  // `bun run behavioral` builds first; a bare script run reuses an existing
-  // dist only if one exists, and says so.
-  if (!existsSync("dist/index.html")) {
-    const build = spawn(["bunx", "vite", "build"], { stdout: "ignore", stderr: "inherit" });
-    if ((await build.exited) !== 0) throw new Error("vite build failed");
-  } else {
-    console.log("(using existing dist/ — run `bun run behavioral` to rebuild first)");
-  }
-  const web = Bun.serve({
-    port: WEB_PORT,
-    async fetch(req) {
-      const path = new URL(req.url).pathname;
-      const file = Bun.file(join("dist", path === "/" ? "index.html" : path));
-      if (await file.exists()) return new Response(file);
-      return new Response(Bun.file("dist/index.html"));
-    },
-  });
-
-  const browser = await chromium.launch();
+  // Reuse the review runner's owned-process proof and throwaway database.
+  // HTTP 200 alone cannot establish that this run started the answering API.
+  if (!existsSync("dist/index.html")) await buildSite(process.cwd(), resolve("dist"), false);
+  else console.log("(using existing dist/ — run `bun run behavioral` to rebuild first)");
+  const stack = await startIsolatedStack({ serveDir: resolve("dist") });
+  API = stack.api;
+  WEB_PORT = Number(new URL(stack.web).port);
+  const browser = await chromium.launch().catch(error => { stack.stop(); throw error; });
   // The walk is offline in the browser too, not only on the server: every
   // context this browser makes has service workers blocked and aborts every
   // request that is not to this machine, before any handler below sees it —
@@ -811,6 +778,7 @@ async function main(): Promise<void> {
   // Codex's reviews of the fix ledger, revisions 1 and 2). The address lookup
   // and web fonts are the known ones stopped.
   const { blocked: blockedRequests } = isolateBrowser(browser);
+  try {
   const adminLogin = await fetch(`${API}/api/admin/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: "dev-admin" }) });
   const adminCookie = (adminLogin.headers.get("set-cookie") ?? "").split(";")[0];
 
@@ -2944,10 +2912,9 @@ for(const [label,r]of batch05Results)expect(r.ok,label,r.detail);
     expect(correct, "batch19 65: progress matches reachable screens and resumes at certification", observations);
   }
 
-  await browser.close();
-  web.stop();
-  api.kill();
-  rmSync(freshDir, { recursive: true, force: true });
+  } finally {
+    try { await browser.close(); } finally { stack.stop(); }
+  }
 
   console.log(`\nRequests to other machines stopped in the browser: ${blockedRequests.size === 0 ? "none attempted" : [...blockedRequests].join(", ")}`);
   console.log(`\nBehavioral gate: ${checks} checks, ${failures.length} failures.`);

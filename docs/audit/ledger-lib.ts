@@ -655,13 +655,26 @@ export function familyClaim(l: Ledger, ref: PartRef, myBatch: string): string | 
   return null;
 }
 /** What a part still waits on: its own waits, its item's, and — for a
- *  second sighting — its main record's part and item. A wait on a ruling is
- *  satisfied by a ruling on that item; a wait on an item by its release. */
+ *  second sighting — its main record's part and item. An item-wide ruling
+ *  satisfies a wait on that item. A part ruling satisfies only its exact
+ *  part or a sighting of that main part, never a sibling. A cross-item wait
+ *  without a canonical link names no target part, so only an item-wide
+ *  ruling can satisfy it; equal part keys on unrelated items imply nothing.
+ *  A wait on an item (without "ruling:") is satisfied by its release. */
 export function unmetWaits(l: Ledger, item: Item, part: Part): string[] {
-  const main = mainOf(l, { item: item.id, part: part.key });
+  const own = { item: item.id, part: part.key };
+  const main = mainOf(l, own);
   const mi = l.items.find((i) => i.id === main.item), mp = partOf(l, main.item, main.part);
   const all = [...new Set([...item.waitsOn, ...part.waitsOn, ...(mi?.waitsOn ?? []), ...(mp?.waitsOn ?? [])])];
-  return all.filter((w) => (w.startsWith("ruling:") ? !l.rulings.some((r) => rulingKind(r) === "ruling" && r.item === w.slice(7)) : !(l.items.find((i) => i.id === w)?.parts.every((p) => p.status === "released") ?? false)));
+  return all.filter((w) => {
+    if (!w.startsWith("ruling:")) return !(l.items.find((i) => i.id === w)?.parts.every((p) => p.status === "released") ?? false);
+    const target = w.slice(7);
+    return !l.rulings.some((r) => rulingKind(r) === "ruling" && r.item === target && (
+      r.part === undefined
+      || (target === own.item && r.part === own.part)
+      || (target === main.item && r.part === main.part)
+    ));
+  });
 }
 /** Every link must point at an existing part, never at itself, never in a cycle. */
 export function linkProblems(l: Ledger): string[] {

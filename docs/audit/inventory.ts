@@ -25,7 +25,6 @@ export type Area =
 export interface InventoryFile { path: string; lines: number; area: Area }
 
 const EXCLUDED_REASONS: { pattern: RegExp; reason: string }[] = [
-  { pattern: /^webapp\/src\/components\/ui\//, reason: "stock UI widgets (shadcn), not product text" },
   { pattern: /\.test\.tsx?$/, reason: "test file" },
   { pattern: /^webapp\/server\/e2e\.ts$/, reason: "check suite" },
   { pattern: /^webapp\/scripts\//, reason: "check suite" },

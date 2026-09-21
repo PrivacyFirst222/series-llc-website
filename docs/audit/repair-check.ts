@@ -219,6 +219,8 @@ try {
       assert("N1/N2: future ledger progress and approved replacement lifecycle", lifecycle.code === 0, lifecycle);
       const audit = sh(["bun", "run", join(ROOT, "docs/audit/audit-session-check.ts")]);
       assert("audit: exact coverage, reconciliation, evidence and immutable intake", audit.code === 0, audit);
+      const batch21 = sh(["bun", "run", join(ROOT, "docs/audit/batch21-controls.ts")]);
+      assert("Batch 21: scoped rulings, complete inventory, isolation and document sequence", batch21.code === 0, batch21);
     }
   }
   }

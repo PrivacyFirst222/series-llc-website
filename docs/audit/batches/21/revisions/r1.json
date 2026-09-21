@@ -1,0 +1,276 @@
+{
+  "id": "21",
+  "revision": 1,
+  "title": "Audit repair group 1: seven audit and repair safeguards",
+  "model": "Codex",
+  "base": "4a344e22e0d0239481f3182d6528bf84d960ed0d",
+  "items": [
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B1-N05",
+      "part": "all",
+      "scope": "Respect exact part and canonical-target scope of owner rulings; unrelated sibling and cross-item waits stay blocked.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/audit/ruling-scope-check.ts",
+          "text": "B1-N05"
+        },
+        {
+          "kind": "present",
+          "file": "docs/audit/repair-check.ts",
+          "text": "batch21-controls.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B2-04",
+      "part": "all",
+      "scope": "Include customized UI widgets in future inventories; preserve historical manifest bytes. Exclude only verified unchanged stock, otherwise include.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/audit/inventory-check.ts",
+          "text": "B2-04"
+        },
+        {
+          "kind": "present",
+          "file": "docs/audit/repair-check.ts",
+          "text": "batch21-controls.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B2-05",
+      "part": "all",
+      "scope": "Use an owned live child with an isolated database and verified offline proof before the browser walk can mutate.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/isolation-check.ts",
+          "text": "B2-05"
+        },
+        {
+          "kind": "present",
+          "file": "docs/audit/repair-check.ts",
+          "text": "batch21-controls.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B5-E2E-ISOLATION-FAILOPEN",
+      "part": "all",
+      "scope": "Refuse unavailable, unsuccessful, incomplete, malformed or live isolation proof before default API tests mutate; preserve explicit integration override.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/isolation-check.ts",
+          "text": "B5-E2E-ISOLATION-FAILOPEN"
+        },
+        {
+          "kind": "present",
+          "file": "docs/audit/repair-check.ts",
+          "text": "batch21-controls.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B3-04",
+      "part": "all",
+      "scope": "Correct checker description to pooled section existence and mandatory manual form-specific review; no new resolver.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/audit/document-checks-test.py",
+          "text": "B3-04"
+        },
+        {
+          "kind": "present",
+          "file": "docs/audit/repair-check.ts",
+          "text": "batch21-controls.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B6-02",
+      "part": "all",
+      "scope": "Reject reordered articles/sections and sections under the wrong article while preserving valid suffix formats.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/audit/document-checks-test.py",
+          "text": "B6-02"
+        },
+        {
+          "kind": "present",
+          "file": "docs/audit/repair-check.ts",
+          "text": "batch21-controls.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B6-03",
+      "part": "all",
+      "scope": "Correct event-map description to actual failing exit behavior; preserve enforcement.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/audit/document-checks-test.py",
+          "text": "B6-03"
+        },
+        {
+          "kind": "present",
+          "file": "docs/audit/repair-check.ts",
+          "text": "batch21-controls.ts"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/audit/ledger-lib.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/ruling-scope-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/inventory.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/audit-session.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/inventory-policy.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/inventory-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/audit-session-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "webapp/scripts/isolated-stack.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "webapp/scripts/offline-proof.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "webapp/scripts/isolation-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/docs-consistency.py",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/structure.py",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/event-map.py",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/document-checks-test.py",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/batch21-controls.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/repair-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/README.md",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/AUDIT-WORKFLOW.md",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "control": true,
+      "why": "Approved seven control repairs, focused regression evidence, and checked intake of findings; other 24 stay open."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": []
+}

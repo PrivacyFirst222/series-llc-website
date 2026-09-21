@@ -1,3 +1,5 @@
+import { requireEnvironmentProof } from "../scripts/offline-proof";
+import { waitForOwnedApi } from "../scripts/isolated-stack";
 import {batch05Checks} from "./batch05-check";
 import {batch04Checks} from "./batch04-check";
 import {batch03Checks} from "./batch03-check";
@@ -175,18 +177,13 @@ async function adminSession() {
 // the live Blob store, Codex OPS-ENV-001). So before anything else, ask the
 // server what it would talk to, and refuse unless the run is explicitly an
 // integration test.
-{
-  const summary = await fetch(BASE + "/api/dev/env-summary").then((r) => r.json()).catch(() => null);
-  const externals = (summary?.data?.externals ?? {}) as Record<string, boolean>;
-  const active = Object.entries(externals).filter(([, on]) => on).map(([k]) => k);
-  if (active.length > 0 && process.env.E2E_EXTERNAL !== "1") {
-    console.error(
-      `e2e: REFUSING to run — the server at ${BASE} has live external integrations: ${active.join(", ")}.\n` +
-        `Restart it offline (E2E_OFFLINE=1 bun run --watch server/dev.ts) or, to deliberately run an\n` +
-        `integration test against real services, set E2E_EXTERNAL=1 for this run.`,
-    );
-    process.exit(1);
-  }
+try {
+  await requireEnvironmentProof(BASE, { allowExternal: process.env.E2E_EXTERNAL === "1" });
+} catch (error) {
+  console.error(`e2e: REFUSING to run — ${String(error)}.\n` +
+    `Restart the server offline (E2E_OFFLINE=1 bun run --watch server/dev.ts). ` +
+    `E2E_EXTERNAL=1 permits a deliberate integration run only with a complete, successful environment proof.`);
+  process.exit(1);
 }
 
 // OFFLINE-001: the Sunbiz SFTP connector needs no credentials (Florida's
@@ -231,24 +228,17 @@ async function adminSession() {
   const freshDir = mkdtempSync(join(tmpdir(), "e2e-fresh-pg-"));
   const FRESH_PORT = 3200 + Math.floor(Math.random() * 800);
   const boot = () =>
-    Bun.spawn(["bun", "run", "server/dev.ts"], {
+    Bun.spawn([process.execPath, "server/dev.ts"], {
       env: { ...process.env, DEV_PG_DIR: freshDir, PORT: String(FRESH_PORT), E2E_OFFLINE: "1" },
       stdout: "ignore",
       stderr: "pipe",
     });
   const waitReady = async () => {
-    for (let i = 0; i < 60; i += 1) {
-      try {
-        const r = await fetch(`http://localhost:${FRESH_PORT}/api/config`);
-        if (r.ok) return true;
-      } catch {
-        // not up yet
-      }
-      await new Promise((r) => setTimeout(r, 500));
-    }
-    return false;
+    await waitForOwnedApi(proc, FRESH_PORT);
+    return true;
   };
   let proc = boot();
+  try {
   check("fresh database: server boots", await waitReady());
   const freshOrder = await fetch(`http://localhost:${FRESH_PORT}/api/orders`, {
     method: "POST",
@@ -284,9 +274,11 @@ async function adminSession() {
   check("fresh database: API answers after re-init", cfg.ok);
   const afterRestart = await tryLogin();
   check("rate limit SURVIVES the server restart", afterRestart.status === 429, afterRestart.status);
-  proc.kill();
-  await proc.exited;
-  rmSync(freshDir, { recursive: true, force: true });
+  } finally {
+    proc.kill();
+    await proc.exited;
+    rmSync(freshDir, { recursive: true, force: true });
+  }
 }
 
 // 1. Reject garbage

@@ -320,3 +320,23 @@ Every local guard rechecks retained replacement approvals against the frozen
 work orders. CI checks structure, history and exact work orders but cannot
 read Adam's external decisions. These remain procedural controls under the
 same disclosed administrator-access and hook-bypass limits.
+
+## Batch 21 audit-control corrections (20 Sep 2026)
+
+- Current UI widgets are read in full, including custom input validation. The
+  frozen audit workflow uses the candidate commit's inventory policy and retains
+  historical inventories for commits through 4a344e2; old reports are unchanged.
+- A part-specific ruling satisfies only that part or a sighting of its canonical
+  main part. An unrelated cross-item `ruling:<id>` names no specific part and
+  requires an item-wide ruling. Matching part names do not expand authorization.
+- Browser walks start a verified owned offline child with a throwaway database.
+  Both the API checks and review stack require a successful environment-summary
+  response with every recognized external flag present and boolean. Missing
+  evidence refuses before mutation. The explicit integration override permits
+  verified live connections; it does not permit missing or malformed evidence.
+- Structure checks enforce article and section source order and section placement.
+  The guidance reference checker still checks pooled existence, so form-specific
+  claims require manual review. The event map fails for unreached nondefinition
+  provisions; its description now says so.
+- `batch21-controls.ts` runs these regression suites from the existing mandatory
+  `ledger-controls` check. Repairs remain subject to normal owner acceptance.

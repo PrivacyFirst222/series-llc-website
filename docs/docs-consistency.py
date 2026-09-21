@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Every section a guidance document cites must exist in the agreement it cites.
+"""Every section a guidance document cites must exist in at least one master.
 
-The Owner's Manual and the Operating Agreement Instructions describe the five
+The Owner's Manual and the Operating Agreement Instructions describe the eight
 operating agreements. Every "§8.4" in them is a claim about a file in this repo,
 and provisions get renumbered and deleted. On 13 August 2026 five references in
 the Instructions pointed at sections that no longer existed, and two of them were
@@ -9,14 +9,16 @@ worse than dangling — they told the client their agreement required an annual
 review and required them to adopt another form, when both provisions had just
 been deleted.
 
-This resolves every reference and fails on any that no longer exists. It is the
+This checks the reference patterns below against the pooled masters and fails
+when none contains the cited section or paragraph. It is the
 mechanical half of the rule in CLAUDE.md; it cannot read a sentence for meaning,
 and it passing is not evidence that anyone did.
 
 A reference is satisfied if the section exists in ANY master, since
 the guidance documents describe all of them and often name the form in prose
-("§4.6 in the single-member form"). Where a reference names a form, that form is
-checked specifically.
+("§4.6 in the single-member form"). Even when prose names a form, this check
+does not resolve that reference against that specific form. A reviewer must
+open the named form and confirm the reference and the sentence's meaning.
 
     python3 docs/docs-consistency.py            # check
     python3 docs/docs-consistency.py --list     # every reference and where it resolves

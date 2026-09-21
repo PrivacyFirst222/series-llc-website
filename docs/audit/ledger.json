@@ -19807,6 +19807,1007 @@
           }
         }
       ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B1-N01",
+      "tag": "substantive",
+      "area": "Public pages, Terms and Privacy",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B1-N01",
+      "text": "Terms of Service, Add-on refunds; also FAQ “What is the refund policy?” (FAQ.tsx:69). — `webapp/src/content/terms.md:77`\nReads: **(f) Add-on services.** Each add-on service is refundable until we begin work on it. The S corporation election package is not refundable once you submit your details, because the completed package is generated and delivered to your client portal at that moment.\nClaims: Submitting S-election questionnaire details immediately generates and delivers the completed package.\nTrue: routes-portal.ts:2396–2403 explicitly saves answers with an EIN pending, returns awaitingEin:true and documentId:null, and does not build the PDF. Batch13 authorizes this supported waiting state. FAQ.tsx:69 repeats the same immediate-delivery explanation. This differs from prior39, which concerns who can buy the package.\nProposed replacement (not approved): **(f) Add-on services.** Each add-on service is refundable until we begin work on it. The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.\nRechecked by codex-reader-5: Terms77/FAQ69 claim immediate PDF delivery. Actual routes-portal2396–2404 returns awaitingEin true and documentId null when no issued EIN. Replacement preserves the existing refund cutoff and corrects only false delivery rationale. Prior39 concerns purchase eligibility and differs.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B1-N02",
+      "tag": "wording",
+      "area": "Public pages, Terms and Privacy",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B1-N02",
+      "text": "Registered-agent payment page, browser tab title (/agent-checkout). — `webapp/src/components/layout/Layout.tsx:41`\nReads: document.title = PAGE_TITLES[pathname] ?? `Page Not Found \\u2014 ${SITE}`;\nClaims: The fallback classifies every unlisted path as Page Not Found, including the real registered-agent payment page.\nTrue: App.tsx:56 registers /agent-checkout under Layout; AgentCheckout.tsx:24 renders a payment heading. PAGE_TITLES:11–35 lacks that path, so every visit to this valid payment route receives the Page Not Found title. Prior17:amend-title concerns /portal/amend, which is already present; this new payment route is a separate missing entry.\nProposed replacement (not approved): Add the title-map entry: \"/agent-checkout\": `Registered Agent Payment — ${SITE}`,\nRechecked by codex-reader-5: Read Layout full and App44–63: valid /agent-checkout route has no title key; fallback is Page Not Found. Prior17 covers /portal/amend, already present. Specific proposed entry is accurate.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B1-N03",
+      "tag": "wording",
+      "area": "Order form and payment",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B1-N03",
+      "text": "Formation order form, any street-address suggestion box after the client clears or shortens the street. — `webapp/src/components/forms/florida-llc/AddressAutocomplete.tsx:54`\nReads: if (!SMARTY_KEY || text.trim().length < 4) {\nClaims: Clearing/shortening the query closes and clears the suggestions, but leaves the earlier request scheduled.\nTrue: The early return at54–57 runs before clearTimeout at59; pending fetch results at99–100 repopulate/open suggestions without checking current input. Offline execution of the exact extracted query body: type100main, clear input, resolve the pending mock fetch; current value is empty but old100MAINST suggestions reopen. This is distinct from prior69 state coercion and104 unused onBlur.\nProposed replacement (not approved): Cancel the pending debounce timer and abort the active request at the start of every query, before the short-query return. Apply results only if that request is still current and not aborted. Cancel pending work on selection and component unmount as well.\nRechecked by codex-reader-5: Read actual AddressAutocomplete45–129: short-query return precedes timeout cancellation, and completion has no request-current guard. Choosing also leaves scheduled work. Proposed cancellation/current-request protection addresses demonstrated mechanism. Priors69/104 concern state coercion and unused blur prop, not stale results. Severity may be wording/usability rather than substantive data loss.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B1-N04",
+      "tag": "substantive",
+      "area": "Public pages, Terms and Privacy",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B1-N04",
+      "text": "Client portal, S-election questionnaire filing deadline and late-election warning; shared Form2553 deadline helper. — `webapp/src/lib/form2553Timing.ts:38`\nReads: return toISO(addDays(endOfTwoMonths, 15));\nClaims: The raw two-month-plus15day calendar result is the final IRS filing deadline, including weekends and legal holidays.\nTrue: Actual helper returns2026-03-15(Sunday) for a company formed2026-01-01 and declares the election late onMonday03-16. IRS Publication509(2026), “Saturday, Sunday, or legal holiday”, generally moves the tax-act due date to the next nonweekend/nonlegal-holiday day; the root reader opened that rule and the Form2553 entry in the same publication. Preserve owner63’s formation-date starting point: this finding concerns only the ending-day adjustment. Primary source reading and quotation retained in evidence/primary-irs-deadline-read.md.\nProposed replacement (not approved): After computing the ordinary two-month-plus15day deadline, advance it past Saturdays, Sundays and applicable IRS/DC legal holidays. Use that adjusted date consistently for deadline display, the late decision and the preparation runway; keep the owner-approved formation-date starting point.\nRechecked by codex-reader-5: Independently imported real form2553Timing helper; Jan1 deadline is SundayMar15 and nextMondayMar16 is late. Read full relevant helper30–89 and root primary-irs-deadline-read.md. Root current IRS Publication509 evidence establishes weekend/holiday timely-nextday rule; rollover is independent of owner63 startdate decision and65-day purchase cutoff. Proposed adjustment correct, retaining5-day service runway separately.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B1-N05",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B1-N05",
+      "text": "Fix ledger, authorizing work after an owner decision limited to one part of an item. — `docs/audit/ledger-lib.ts:664`\nReads: return all.filter((w) => (w.startsWith(\"ruling:\") ? !l.rulings.some((r) => rulingKind(r) === \"ruling\" && r.item === w.slice(7)) : !(l.items.find((i) => i.id === w)?.parts.every((p) => p.status === \"released\") ?? false)));\nClaims: Any ruling whose item number matches satisfies the wait, even when Adam expressly limited that ruling to a different part.\nTrue: accept.ts supports --part and batch.ts:38–40 copies a ruling with its part intact, but unmetWaits:664 never reads r.part. batch.ts:77 uses unmetWaits to allow authorization. A pure in-memory fixture with independent partsa/b both awaiting ruling:example clears both waits after recording “Only part a approved” with part:a. This is a synthetic resolver reproduction, not evidence of an actual unapproved release.\nProposed replacement (not approved): Resolve a ruling against the specific waiting item and part, including canonical target scope. An item-wide ruling may satisfy its covered parts; a part-scoped ruling must satisfy only that part and its exact linked sightings. Preserve unrelated waits in authorization and the rulings queue.\nRechecked by codex-reader-5: Read ledger-lib canonical resolver/mainOf627–648 and unmetWaits657–664 plus batch ruling copy/authorize path. Independent probe adds canonical sightings of both parts: part-a-only decision clears unrelated main-b and alias-b waits as well; item-wide ruling properly clears all. This is a wait-resolution scope defect, not proof of actual unauthorized acceptance/release. Rule strings currently name item only, so repair must define explicit scope for cross-item dependencies instead of assuming identically named parts cover them. Real ledger currently has no demonstrated effected unrelated part; source/probe establish latent flaw.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T00:02:19.317Z",
+              "event": "assigned",
+              "batch": "21",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T00:08:30.976Z",
+              "event": "implemented",
+              "batch": "21",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "21",
+          "fix": {
+            "batch": "21",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/audit/ruling-scope-check.ts",
+                "text": "B1-N05"
+              },
+              {
+                "kind": "present",
+                "file": "docs/audit/repair-check.ts",
+                "text": "batch21-controls.ts"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B2-01",
+      "tag": "substantive",
+      "area": "Order form and payment",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B2-01",
+      "text": "Order form, Create your protected series, full-name preview after changing to an existing LLC — webapp/src/components/forms/florida-llc/sections/StepSeries.tsx:31 — `webapp/src/components/forms/florida-llc/sections/StepSeries.tsx:31`\nReads:     buildFinalLlcName(data.desiredLlcName, data.llcDesignator) ||\nClaims: The full-name preview identifies the company the client is currently adding series to.\nTrue: StepFilingPath.tsx:67 changes filingPath without clearing a previous desiredLlcName. StepSeries.tsx:30–34 prioritizes that abandoned new-company name before existingLlcName. The preview at190 therefore shows Old Name, LLC for a client now adding series to Existing Holdings, LLC. buildPayload.ts:30–31 already clears the new-name payload; prior101/155 cover payload/seed, not this surviving preview. Pure expression reproduction is retained; rendered recheck pending.\nProposed replacement (not approved): const llcName = (data.filingPath === \"CONVERT\" ? (data.existingLlcName ?? \"\").trim() : buildFinalLlcName(data.desiredLlcName, data.llcDesignator)) || \"[Your LLC Name]\";\nRechecked by codex-reader-5: Read StepSeries30–34, StepFilingPath67 and payload separation: abandoned desired name precedes selected existing name in preview. Replacement branches first and is correct. Related to prior101/155 abandoned-name family, but those exact payload/server fixes do not repair this independent preview expression; report crosslink, not regression of their fixed locations.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B2-02",
+      "tag": "substantive",
+      "area": "Order form and payment",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B2-02",
+      "text": "Order form, Your existing LLC, continuing after abandoning a new-company name — webapp/src/components/forms/florida-llc/stepValidation.ts:425 — `webapp/src/components/forms/florida-llc/stepValidation.ts:425`\nReads:   for (const [field, message] of Object.entries(englishTextProblems(data))) {\nClaims: Only the fields relevant to the selected form path can prevent proceeding on that step.\nTrue: The newly added English-text scan validates every stored string, including hidden abandoned NEW name fields. With CONVERT, a valid existingLlcName and document number, and abandoned desiredLlcName Café, validateStep(\"name\") returns a desiredLlcName error. ConversionName (StepName.tsx:78–131) displays only errors.existingLlcName/errors.sunbizDocumentNumber and no desired-name editor, so the client cannot see or correct the rejected field on this screen. The owner’s English-only rule remains; the defect is validation of discarded fields. Prior58 concerns a different server alternate-name equality check, which is fixed.\nProposed replacement (not approved): Before checking English characters, normalize the data to the active filing path and selected party/management types. Ignore discarded new-company fields when adding series to an existing LLC; continue checking every displayed or submitted business-text field. Show each remaining error beside a field the client can edit.\nRechecked by codex-reader-5: Read stepValidation425–428 and ConversionName30–132. English scan sees hidden desiredLlcName mapped to name step; conversion branch displays no desired-name editor or error. Custom Input permits onChange while marking invalid, so abandoned invalid text/legacy drafts can survive path switch. Preserve owner English-only rule while ignoring discarded fields. Prior58 is alternate-name equality; N2.20 is lossy PDF text handling, not hiddenfield deadend.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B2-03",
+      "tag": "substantive",
+      "area": "Order form and payment",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B2-03",
+      "text": "Order form, Your existing LLC, lookup results while editing the company name — webapp/src/components/forms/florida-llc/sections/StepName.tsx:53 — `webapp/src/components/forms/florida-llc/sections/StepName.tsx:53`\nReads:         setLookup({ forName: typed, available: r.available, matches: r.matches });\nClaims: Lookup results stay associated with the current name and remain available after its request completes.\nTrue: The effect at46–63 clears only its 700ms timer, not an already-started request. If request A starts, then B starts and completes, then A completes last, line53 overwrites the stored B result. current at64 becomes null because forName is A while typed is B, and the [typed]-only effect does not run again. Thus the current company choices disappear until the client edits again. This is a deterministic source race; no network timing was measured by this reader.\nProposed replacement (not approved): Ignore both success and failure completions from superseded lookup requests. Update looking only for the current request. Keep the current name’s matching response visible until that name changes.\nRechecked by codex-reader-5: Read full ConversionName effect46–64: cleanup cancels only timer; success/failure always set state for captured typed; stale A after B hides B through current-name comparison, with no rerun triggered by lookup change. Cancellation/current request guard handles both looking and result. No existing lookup race prior found; not address-state prior69.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B2-04",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B2-04",
+      "text": "Audit inventory, deciding which live product controls must be read — docs/audit/audit-session.ts:35 — `docs/audit/audit-session.ts:35`\nReads:   const exclusions=[[/^webapp\\/src\\/components\\/ui\\//,\"stock UI widgets\"],[/\\.test\\.tsx?$/,\"test file\"],[/^webapp\\/server\\/e2e\\.ts$/,\"check suite\"],[/^docs\\/(coverage-605|event-map|event-map-text-review|oa-map|dependency-audit|db-restore)\\.md$/,\"gate output or operations note\"]] as const;\nClaims: Everything under the ui directory is stock and can be excluded from the whole-product audit.\nTrue: input.tsx:3–13,31–38 and textarea.tsx:3–13,30–36 contain custom English-business-text checks, setCustomValidity and reader-visible warnings added for Batch18. Both were independently read whole as supporting files (45 and42 lines), but neither enters the manifest because of this unconditional exclusion. inventory.ts:28 repeats it. The coverage gate can pass without assigning these live business validation controls.\nProposed replacement (not approved): Include customized UI components, at minimum webapp/src/components/ui/input.tsx and webapp/src/components/ui/textarea.tsx, in both audit inventories. Exclude only verified unchanged stock widgets; changes that add product wording or behavior must enter the next frozen manifest.\nRechecked by codex-reader-5: Read both customized UI input/textarea files and audit-session inventory35 plus supplement42–45; ui exclusion is unconditional and supplement does not add these files. inventory28 repeats exclusion. Their business English checks, validity messages and alerts are plainly product behavior. Proposed inclusion correct; existing generated manifest must remain immutable and report additional read coverage separately.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T00:02:19.317Z",
+              "event": "assigned",
+              "batch": "21",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T00:08:30.976Z",
+              "event": "implemented",
+              "batch": "21",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "21",
+          "fix": {
+            "batch": "21",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/audit/inventory-check.ts",
+                "text": "B2-04"
+              },
+              {
+                "kind": "present",
+                "file": "docs/audit/repair-check.ts",
+                "text": "batch21-controls.ts"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B2-05",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B2-05",
+      "text": "Behavioral review, starting the supposedly isolated test backend — webapp/scripts/behavioral.ts:780 — `webapp/scripts/behavioral.ts:780`\nReads:       if (r.status === 200) break;\nClaims: HTTP200 proves the endpoint is this run’s fresh offline backend.\nTrue: API_PORT is selected from500 local ports at44. After spawning the offline child at769–776, the health loop accepts any status200 without inspecting the offline signal or checking whether that child exited. A pre-existing server on the chosen port can answer while the new child fails to bind; subsequent requests are then sent to the pre-existing server. The health contract and collision reproduction require independent root verification before treating this as a tested exploit. No live server was contacted by this reader.\nProposed replacement (not approved): Require the spawned child to remain running and the health response to affirm offline mode and the expected isolated run/database identity before any mutation. Refuse startup on a port collision or an unverified health response.\nRechecked by codex-reader-5: Read behavioral44/769–785 and real health route routes-payments260–269. Random chosen port can collide; poll accepts any200. Health only returns ordering/database/ok and exposes neither offline mode nor runidentity. Root must retain that distinction: the proposed identity signal does not exist yet and requires adding one. No actual collision/network effects reproduced by this reviewer; static race credible and remedy correct.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T00:02:19.317Z",
+              "event": "assigned",
+              "batch": "21",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T00:08:30.976Z",
+              "event": "implemented",
+              "batch": "21",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "21",
+          "fix": {
+            "batch": "21",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/isolation-check.ts",
+                "text": "B2-05"
+              },
+              {
+                "kind": "present",
+                "file": "docs/audit/repair-check.ts",
+                "text": "batch21-controls.ts"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B3-01",
+      "tag": "substantive",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B3-01",
+      "text": "Client portal, EIN application details for a protected series, Number of members. — `webapp/src/pages/portal/OrdersInProgress.tsx:545`\nReads:                 <Input name=\"memberCount\" inputMode=\"numeric\" autoComplete=\"off\" aria-label=\"Number of members\" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount ?? String(Math.max(1, data.members.length))} />\nClaims: The protected series has the parent company's number of owners.\nTrue: routes-portal.ts:1853–1859 derives data.members from parent OA owners. OrdersInProgress.tsx:545 uses that count for a series EIN too, even though templates-oa-multi.md:120/132 give the Company the entire protected-series interest. Submitted memberCount persists at routes-portal.ts:2198 and reaches ServiceOrdersSection.tsx:328. Source-confirmed; not a claim of observed external IRS submission. The adjacent parent-S-package tax hint is recorded as residual prior N1.07 rather than another new defect.\nProposed replacement (not approved): For a protected-series EIN, derive the initial owner count from that series' ownership. For the company-owned series created by these agreements, prefill 1. Do not count the parent company's members as owners of its series.\nRechecked by codex-reader-5: Actual OrdersInProgress545 seed uses parent data.members and API1853–1859 obtains parent effectiveOwners;2198 persists supplied count; master3.6 gives Company entire series interest. Wrong series member-count seed is new. However portal taxhint547–549 infers series S treatment from parent package: same inference already covered by priorN1.07, whose replacement specifically says not to infer series treatment from parent package. Split into new member-count finding and residual priorN1.07 sighting. Avoid universal tax-classification advice; root IRS review required for any specific tax treatment. A generic entity-specific explanation is supported. Root narrowed this finding to owner count; no tax-classification replacement remains.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B3-02",
+      "tag": "substantive",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B3-02",
+      "text": "Client portal, EIN application details, certification checkbox after closing one order and opening another. — `webapp/src/pages/portal/OrdersInProgress.tsx:707`\nReads:                 checked={einCertified}\nClaims: Certification requires an affirmative action for the EIN application currently displayed.\nTrue: einCertified is component-wide state at53, reset only on successful submission at125. Opening another order restores other values at64–74 but not certification. Closing433 snapshots and clears detailsFor only. Checking order A, closing it and opening B therefore leaves B checked; submitDetails121 always transmits certified:true. Source trace confirmed; no browser reproduction claimed.\nProposed replacement (not approved): Reset the EIN certification to unchecked whenever the application order changes or the dialog closes; require a new affirmative check for the currently displayed application.\nRechecked by codex-reader-5: Read OrdersInProgress state/effect53–74, mutation121–126, close433, checkbox707 andbutton717. setEinCertified(false) occurs only successfulsubmit, so certification carries from A to B without fresh action. Reset on app identity/open/close correct. Priors59/74/75/76/106/N4.07 concern formation certifications/labels or agentagreement, different facts.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B3-03",
+      "tag": "substantive",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B3-03",
+      "text": "Client portal, Your account, changing the sign-in email address, success notice. — `webapp/src/pages/portal/AccountCard.tsx:47`\nReads:       setDone(`Check ${res.pendingEmail} for a confirmation link. Your address changes only after you confirm it.`);\nClaims: The new-address confirmation link was sent; the dialog also promises notice to the old address.\nTrue: routes-portal.ts:2505–2509 starts both sends without awaiting them and catches failures only in logs;2510 returns success regardless. AccountCard.tsx:45–47 displays success when either send fails. Unlike fixed reset/resend flows, no response is tied to mail acceptance. Source-confirmed failure path; injected failure remains pending coordinator probe.\nProposed replacement (not approved): Await confirmation-email acceptance before displaying success. If it fails, preserve retry and show: “We could not send the confirmation link. Please try again.” Report old-address notification failure separately rather than asserting it was sent.\nRechecked by codex-reader-5: Read AccountCard43–51 and routes-portal2495–2511: both sends are fire-and-forget with logging-only catches while API returns success. Await confirmation acceptance and expose retry truthful. Prior200 concerns invalidating pending changes on passwordreset; N4.06 welcome delivery failure is a different endpoint, so not same fixed location. No injected mail failure performed here.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B3-04",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B3-04",
+      "text": "Document consistency checker, explanation of what its reference check verifies. — `docs/docs-consistency.py:18`\nReads: (\"§4.6 in the single-member form\"). Where a reference names a form, that form is\nchecked specifically.\nClaims: The checker selects the named agreement form when guidance names a form.\nTrue: docs/docs-consistency.py:108–113 deliberately resolves against every master and accepts any match; the whole file has no form-specific selector. This establishes an inaccurate check-coverage claim, not a current bad document reference.\nProposed replacement (not approved): Form-specific references are not resolved against the named form by this script. It accepts a section found in any master; a reviewer must check that it exists in the particular form named by the guidance.\nRechecked by codex-reader-5: Read docs-consistency docstring and reference loop99–118. It always builds pool=list(by_form), with no text-to-specific-form resolver, contrary to stated claim. Documentation replacement accurately limits the checker; no bad reference is inferred.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T00:02:19.317Z",
+              "event": "assigned",
+              "batch": "21",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T00:08:30.976Z",
+              "event": "implemented",
+              "batch": "21",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "21",
+          "fix": {
+            "batch": "21",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/audit/document-checks-test.py",
+                "text": "B3-04"
+              },
+              {
+                "kind": "present",
+                "file": "docs/audit/repair-check.ts",
+                "text": "batch21-controls.ts"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B3-05",
+      "tag": "substantive",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B3-05",
+      "text": "Client portal, operating-agreement questionnaire, Owners, adding the twenty-first owner. — `webapp/src/pages/portal/OaOwnersSections.tsx:230`\nReads:                   Add owner\nClaims: The owner editor permits another owner and will save the resulting questionnaire.\nTrue: OaOwnersSections.tsx:227–231 imposes no Add owner limit; OAQuestionnaire.tsx:244 always appends. routes-portal.ts:198–221 caps members at20; contributor arrays also cap at20 at245. A twenty-first owner therefore fails server validation although UI permits it. No inference is made that the formation-form ruling necessarily governs the OA; the direct mismatch is the finding. Runtime save pending.\nProposed replacement (not approved): Choose and apply one supported owner limit throughout the operating-agreement editor, API and contribution allocations. If the approved limit is100, support100 in all three; show the limit before adding an unsupported row instead of rejecting autosave afterward.\nRechecked by codex-reader-5: Read OaOwnersSections227–231 and OAQuestionnaire244 unlimited append against routes-portal198–221 max20 and245 contributor max20. Direct editor/API mismatch confirmed. Do not infer applicable OA ceiling100 from a differently scoped ruling; proposal correctly requires one approved capacity and UI prevention. No prior member-count/20-owner finding found.",
+      "verdict": "open",
+      "waitsOn": [
+        "ruling:AUD-post-batches-2026-09-20-4a344e2-B3-05"
+      ],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-WORD-EXHIBIT-TABLE-ROWS",
+      "tag": "substantive",
+      "area": "Agreements and guidance",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding WORD-EXHIBIT-TABLE-ROWS",
+      "text": "Tracked Word agreement → Exhibit A, rendered Manager-Managed S Corporation p25 — `docs/md-to-docx.py:399`\nReads: while i < len(lines) and lines[i].strip().startswith(\"|\"):\nClaims: All Exhibit A rows are emitted as Word table cells.\nTrue: The converter strips HTML control comments at339 but leaves their standalone lines empty. The table loop stops at the blank left by repeat:member before the first data row (templates-oa-s.md441); the remaining data/total lines fall through as ordinary paragraphs. The tracked Word render p25 shows four header-only grids and raw |...| data rows for members, assets, series allocation and TOD. These are editable Word drafting outputs per docs/README.md1–40; ordinary unfilled placeholders are intentional but the lost table structure is not. This is not a claim about generated client PDFs. Compared ledger original descriptions:261 concerned inventory,265 manager placeholder; no existing prior describes this Word table conversion defect.\nProposed replacement (not approved): Keep intended blank-form data/total rows within their Word tables when removing template-control comment lines, and verify all agreement exhibits by rendering existing outputs. Preserve visible drafting choices and avoid silently selecting a client variant.\nRechecked by codex-coordinator: Reopened converter table loop and paragraph fallthrough; visually inspected retained Word Manager S pages24,25,26. Page25 confirms four header-only grids and literal pipe rows; pages24/26 confirm visible [[indent]] labels. These are editable Word outputs, not a claim of PDF defects. Compared prior261/265 and full prior descriptions.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-WORD-INDENT-CONTROL-LEAK",
+      "tag": "wording",
+      "area": "Agreements and guidance",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding WORD-INDENT-CONTROL-LEAK",
+      "text": "Tracked Word legal forms → entity signature blocks, e.g. Manager-Managed S Corporation pp24,26 — `docs/md-to-docx.py:471`\nReads: stripped,\nClaims: The ordinary paragraph contains only document text after template formatting controls are interpreted.\nTrue: The converter recognizes pagebreak/left/contents controls but has no indent control handling; literal [[indent]] is passed into paragraph output. ManagerS pp24/26 visibly print six tokens before printed-name/title fields. OOXML comparisons show literal indent text in all10 legal Word outputs (4or6 in agreements/amendment,2 in Statement); Instructions/Manual unaffected. This is separate from expected company/name blanks and does not assert client PDF leakage. Original ledger descriptions searched for Word/docx/indent/table/control issues; no matching prior found.\nProposed replacement (not approved): Consume [[indent]] as paragraph formatting in Word generation so signature labels are indented and the control token does not print; render all affected signature blocks to verify.\nRechecked by codex-coordinator: Reopened converter table loop and paragraph fallthrough; visually inspected retained Word Manager S pages24,25,26. Page25 confirms four header-only grids and literal pipe rows; pages24/26 confirm visible [[indent]] labels. These are editable Word outputs, not a claim of PDF defects. Compared prior261/265 and full prior descriptions.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B4-EMAIL-ERROR-EMPTY",
+      "tag": "substantive",
+      "area": "Office",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B4-EMAIL-ERROR-EMPTY",
+      "text": "Office → Clients → Emails, when initial email-history request fails — `webapp/src/pages/admin/AdminDashboard.tsx:129`\nReads: Nothing has been sent to this address since the record began.\nClaims: A completed check found no email history for this address.\nTrue: The query is independent. After its initial request fails without cached data, isPending is false and list.data is undefined. Lines126–129 substitute [] and render this factual empty-history statement; no list.isError branch exists. Individual email-body failure also remains Loading indefinitely at106–123. This is a source-proven failure branch; no claim that a live outage occurred. Compared with priorN3.08 (board completion) andN3.09 (portal legal mail): different screen, dataset, and claim.\nProposed replacement (not approved): Render a retryable error when email history could not be loaded; use the empty-history statement only after a successful empty response. Give an explicit retryable error for an individual email-body request as well.\nRechecked by codex-reader-5: AdminDashboard.tsx:106–129 has neither list nor individual-query error branch. With failed initial list data undefined and pending false, nullish [] yields the factual nothing-sent sentence; individual body remains Loading. Prior174 corrected provider acceptance and500limit; N3.08 concerned board service completion and N3.09 portal legal mail. Different datasets/screens, hence new failure-state defect. No outage reproduced.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B4-EIN-ERROR-MISSING",
+      "tag": "substantive",
+      "area": "Office",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B4-EIN-ERROR-MISSING",
+      "text": "Office → service order → Fulfil EIN dialog, when protected service details fail to load — `webapp/src/pages/admin/ServiceOrdersSection.tsx:306`\nReads: \"— not yet provided —\"\nClaims: The client has not supplied the responsible party SSN/ITIN.\nTrue: The SSN is supplied only by detailQuery at118–122. At303–306 the component distinguishes loading and a truthy tin but never checks query error. A failed initial request with no cached data therefore renders not yet provided even for a submitted EIN application; the IRS assistant answer list at312 also disappears. Unknown retrieval state is presented as a missing client submission. No live outage asserted. PriorN3.05 is the separate series-name fix, andN3.08 concerns board completion.\nProposed replacement (not approved): Show a retryable service-details error when detailQuery fails. Display not yet provided only after a successful response confirms no SSN/ITIN; require loaded details before presenting the IRS-assistant answers as ready.\nRechecked by codex-reader-5: ServiceOrdersSection.tsx:118–122 independently fetches protected details;303–306 uses loading/tin only, and312 gates assistant answers on detail data. Failed initial retrieval without cache renders not yet provided. PriorN3.05 concerns series legal-name row, not retrieval failure; N3.08 is separate board completion. No actual IRS submission or live outage claimed.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B5-ARTICLES-METADATA",
+      "tag": "substantive",
+      "area": "Office",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B5-ARTICLES-METADATA",
+      "text": "Office formation-package Articles replacement — `webapp/server/routes-admin.ts:742`\nReads: VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,\nClaims: The replacement Articles preserve the company document number entered at original upload.\nTrue: Initial /articles stores documentNumber in meta at503. Full formation-package replacement inserts new Articles with empty meta then retires prior Articles. For a self-signed company there is no Statement metadata fallback at407, so the admin detail loses its stored document number even when form.documentNumber was supplied. Source-confirmed; coordinator runtime pending. Compared ledger177 (different frontend validation mismatch),208 (dates),N1.14 (rollback); none covers lost metadata.\nProposed replacement (not approved): Preserve existing validated documentNumber when replacing Articles, or replace it with a newly supplied validated number. Store it on replacement Articles for both signing paths. Verify self-signed and office-signed replacement retain the number.\nRechecked by codex-root-independent: Root independently reopened routes-admin.ts385–414,488–510,724–760. Initial upload stores documentNumber; replacement writes empty JSON. Detail reads Articles then Statement; self-signed replacement lacks fallback. Compared prior177,208,N1.14; distinct metadata loss. Source proof, no external incident claimed.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B5-RENEWAL-OLD-EMAIL",
+      "tag": "substantive",
+      "area": "Emails and jobs",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B5-RENEWAL-OLD-EMAIL",
+      "text": "Registered-agent renewal/resignation notices after account email change — `webapp/server/renewals.ts:128`\nReads: await sendMail({to:o.contact_email,...mail});\nClaims: Notices go to the newly confirmed account email as email.ts193–194 promises.\nTrue: Both portal confirmation2548 and adminoverride1034 update clients.email only. Renewal query104 loads orders.* and sends to original o.contact_email at128/147; paid receipt159–169 and ra-office70 also use ordercontactemail. A client changing email therefore leaves renewal/payment/resignation notices addressed to old inbox. No claim of observed production incident; runtime pending coordinator. Prior200 concerns invalidating pending email-change tokens, a different failure.\nProposed replacement (not approved): Resolve current clients.email through order.client_id for account notices, payment receipts and resignation copies; preserve original intake contact fields as historical records. Test both portalverified and adminoverride address changes before each notice path.\nRechecked by codex-root-independent: Root independently reopened renewals.ts94–176, email.ts187–200, portal2536–2554 and admin1025–1039. Account-change promise expressly includes notices while jobs/receipt read original order.contact_email. Historical intake should remain; resolve active client address for new notices. Distinct prior200 token invalidation.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B5-E2E-ISOLATION-FAILOPEN",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B5-E2E-ISOLATION-FAILOPEN",
+      "text": "E2E external-service isolation preflight — `webapp/server/e2e.ts:180`\nReads: const externals = (summary?.data?.externals ?? {}) as Record<string, boolean>;\nClaims: Unknown or failed environment summary stops a test run before external integrations can be touched.\nTrue: JSON/network errors become null and missing externals becomes {}; active is empty and execution continues. Pure extracted-guard probe confirms null/data={} summaries CONTINUED while a live flag REFUSED. Subsequent checks accumulate failures rather than stopping before mutations. Does not establish an actual external write during this audit. Full prior ledger searched for env-summary/isolation; no same mechanism found.\nProposed replacement (not approved): Require successful response and a complete recognized externals schema before proceeding in default mode; abort on unavailable/malformed summary. Keep explicitly authorized integration-test override separate. Add refusal cases for missing/failed/malformed summary.\nRechecked by codex-root-independent: Root independently reopened e2e.ts170–215 and extracted-guard evidence. Null/missing schema gives empty active list and proceeds to state mutations. Later check() failures do not stop preflight. Independent from behavioral random-port collision; preserve separate explicitly authorized integration mode.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T00:02:19.317Z",
+              "event": "assigned",
+              "batch": "21",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T00:08:30.976Z",
+              "event": "implemented",
+              "batch": "21",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "21",
+          "fix": {
+            "batch": "21",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/isolation-check.ts",
+                "text": "B5-E2E-ISOLATION-FAILOPEN"
+              },
+              {
+                "kind": "present",
+                "file": "docs/audit/repair-check.ts",
+                "text": "batch21-controls.ts"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B4-RESTORE-S-ELECTION-SECRET-STATE",
+      "tag": "substantive",
+      "area": "Agreements and guidance",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B4-RESTORE-S-ELECTION-SECRET-STATE",
+      "text": "Restore an unfinished S-election awaiting the EIN; then Office supplies the issued EIN — `webapp/server/restore.ts:22`\nReads: else if(row.type==='ein'&&row.status==='in_progress')row.status='awaiting_info';\nClaims: Restored unfinished services are in a usable recovery state after transient taxpayer numbers are deliberately excluded. The portal calls the S-election Details saved — waiting for your issued EIN (OrdersInProgress.tsx211).\nTrue: backup.ts128 and restore.ts20 clear every service_orders.ein_secret. The actual empty-target probe restored EIN as awaiting_info but S-election as in_progress with null secret. A valid unfulfilled pending-EIN S-election has einPending/shareholders but no documentId or purgedAt (routes-portal.ts2401–2404). When the EIN arrives, routes-admin.ts1399–1404 skips rows without secret and sends recovery email only if documentId or purgedAt exists. Thus this normal pending case is skipped without package or recovery notice, while the portal still says it is waiting for the EIN. Re-entering via Edit saved details remains possible; not claimed permanently unrecoverable. Fresh restore followed by actual registered Hono EIN-fulfill handler with valid synthetic PDF returned200, rebuiltSElections0, unchanged S-election in_progress/einPending true/secret null/no documentId and unchanged email_log count1→1. Ordinary EIN notice explicitly disabled; recovery notice has no such toggle. This proves the skipped carry/recovery-notice branch locally, with all external fetches blocked. Prior223 is specifically omission of email_log/ra_renewals and is now fixed;179 is backup coverage/status. N1.01 intentionally excludes transient secrets and should not be reversed. No prior identified for restoring pending S-election operational state.\nProposed replacement (not approved): On restore, mark unfinished pending-EIN S-elections as requiring taxpayer-number re-entry and communicate that requirement; also make the EIN-arrival missing-secret branch notify/flag this state even when no package has ever been built. Keep transient secrets excluded from backups.\nRechecked by codex-coordinator: Reopened entire restore.ts and carryEinIntoSElections missing-secret branch, then read the retained actual Hono response and before/after service/email records. Only EIN is reset to awaiting_info; S-election remains in_progress without secret, package or notification. Compared223 omitted-table scope and N1.01 intentional secret exclusions. The repair must preserve exclusion and request re-entry; no claim of irreversible loss of all client information.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-ROOT-NOTES-NOTICE-REVIEW",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding ROOT-NOTES-NOTICE-REVIEW",
+      "text": "Internal statutory reference notes, deemed notice of manager-managed status — `webapp/server/chapter-605-notes.md:198`\nReads: - **s. 605.0103(4)** — a non-member is deemed to know of a limitation on\n  authority to transfer real property under s. 605.0302(7), and to have notice\n  of dissolution, termination, entity transactions, and a manager-managed\n  declaration 90 days after the relevant filing takes effect. A limitation in\n  the articles on authority to transfer real property is NOT notice to a\n  non-member unless recorded in the real property records.\nClaims: Every manager-managed declaration gives a non-member deemed notice only90days after the relevant filing is effective.\nTrue: The2026 statute605.0103(4)(b)4 makes the original articles declaration notice without a90-day wait; its90-day proviso applies when a declaration is added or changed by amendment or amendment and restatement. The grouped90-day summary incorrectly extends that proviso to original articles. Independently opened and read official2026 source.\nProposed replacement (not approved): - **s. 605.0103(4)** — A non-member is deemed to know a limitation on authority to transfer real property as provided in s. 605.0302(7). Dissolution, termination, and the listed entity transactions give deemed notice 90 days after the specified filings become effective. A manager-managed declaration in the original articles gives deemed notice under subsection (4)(b)4. If added or changed by amendment or amendment and restatement, notice of the addition or change may not become effective until 90 days after the effective date of that filing. An articles provision limiting authority to transfer real property does not give notice unless recorded in the real property records.\nRechecked by codex-reader-6: Independent review of parent-discovered candidate: actual2026 Online Sunshine605.0103 in new Safari tab shows original-articles clause followed by amendment-specific90-day proviso. Exact current note197–202 read; priorledger/findings and rulings searched for0103,notice,originalarticles,manager-managed timing. No matching prior;217concerns indemnification and218appraisal.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-ROOT-NOTES-DISTRIBUTION-REVIEW",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding ROOT-NOTES-DISTRIBUTION-REVIEW",
+      "text": "Internal statutory reference notes, liability for improper distributions — `webapp/server/chapter-605-notes.md:384`\nReads: s. 605.0406 — consenting members/managers personally\n  liable for the excess; action barred after 2 years.\nClaims: Members/managers who consent to an improper distribution are personally liable for the excess, without any further duty-breach condition.\nTrue: The2026 statute605.0406(1) requires both consent to a605.0405-violating distribution and failure to comply with605.04091. It applies to members of member-managed companies and managers of manager-managed companies, subject to subsection2express delegation/relief. Subsection3separately addresses knowing recipients. The two-year limitation is correctly summarized. The omitted conjunctive condition changes a liability rule, rather than merely omitting a secondary example.\nProposed replacement (not approved): s. 605.0406 — A member of a member-managed LLC or manager of a manager-managed LLC who consents to a distribution violating s. 605.0405 and, in consenting, fails to comply with s. 605.04091 is personally liable to the company for the excess, subject to the express allocation-of-authority exception in subsection (2). A knowing recipient is separately liable under subsection (3) for the excess received. An action under this section is barred unless begun within 2 years after the distribution.\nRechecked by codex-reader-6: Independent review of parent lead: actual2026 Online Sunshine605.0406(1)-(5) read in Safari. Theand clause explicitly adds04091failure;2delegation and3knowingrecipients are separate. Prior217mentions0406only as a nonindemnifiable category under0105, not this liability trigger; no matching finding/ruling located.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B6-01",
+      "tag": "substantive",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B6-01",
+      "text": "Client portal company selection: operating-agreement generation, consent, amendment and service purchases — `webapp/server/routes-portal.ts:1174`\nReads:   const genCompanyId = await resolveCompanyOrder(session.clientId, c.req.query(\"company\"));\n  const seed = await oaSeed(session.clientId, genCompanyId);\n  if (!seed) return c.json(err(\"We couldn't find a paid order for this company.\", \"NO_LLC\"), 400);\nClaims: A request scoped to a company operates on that company, or refuses an invalid or inaccessible selection.\nTrue: resolveCompanyOrder at390-402 returns null when an explicitly requested UUID is nonexistent or belongs to another client. oaSeed at81-93 interprets null as latest paid company, so generate1174-1176 silently generates against another company in the account. GET1058-1060, consent1572-1574 and amendment1729-1731 repeat the fallback; purchase routes1897,1956,2023,2080 pass null into clientLlcName and then insert an unassociated service order. PUT answers1132-1133 and cancellation2574-2582 already reject failed resolution, showing the inconsistency. This is a statically established wrong-company path, not observed production access to another client data. Independently exercised actual offline HTTP routes: two paid formations under one account returned their own company seeds for valid IDs, but GET /api/portal/oa?company=11111111-1111-4111-8111-111111111111 returned200 and Root Scope Beta, LLC's seed. See root-company-route-proof.\nProposed replacement (not approved): Distinguish omitted company from explicitly supplied invalid/nonowned company. Return400/404 for failed explicit resolution before calling seed/name/profile helpers or writing records. Use a resolved owned company ID for every generated document and purchased service; preserve intended default selection only when no company was supplied. Exercise nonexistent and another-client UUIDs against all company-scoped routes.\nRechecked by codex-reader-5: routes-portal.ts:390–402 resolves explicit nonexistent/nonowned UUID to null. oaSeed81–93 and clientLlcName374–385 interpret null as latest owned paid order. GET1058, generation1174, consent1572, amendment1729 and purchases1897/1956/2023/2080 pass this null onward; PUT1133 refuses. Actual source confirms latent wrong-company fallback WITHIN signed-in account, not access to another client data. PriorN1.04 is service association for tax package addresses; N1.05 extra series scoping; N1.06 company-specific duplicate check. None addresses invalid requested-company fallback. No live route mutation performed.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B6-02",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B6-02",
+      "text": "Agreement structural audit gate, article and section sequence — `docs/structure.py:112`\nReads:     by_article = defaultdict(set)\n    for s in sections:\n        by_article[major(s)].add(minor(s))\nClaims: The gate verifies that articles and sections run from1 throughN in order, as its docstring promises.\nTrue: The implementation groups minor section numbers into sets and article numbers into a sorted set, so it proves existence/uniqueness, not document order or ownership under the current heading. An offline probe swapped complete7.1 and7.2 provisions in the multi-member source, keeping contents and cross-references intact; check() returned[] just as for the unchanged baseline. The promised out-of-order defect is missed.\nProposed replacement (not approved): Inspect article headings and numbered provisions in original source order. Enforce consecutive article/section sequence and require every provision to belong to the immediately governing article, preserving explicitly supported letter suffixes. Add a mutation probe swapping complete adjacent sections and another swapping article blocks, and require the gate to reject them.\nRechecked by codex-reader-5: structure.py:103 sorts article set;112–121 groups section minors by set and asks only whether article number occurs anywhere. Source order and governing heading are not enforced. Independently loaded actual check and swapped complete7.1/7.2 in a separate copy; baseline[] and swapped[] both passed, mutationChanged true (evidence/b5-review-b46-probes.json). Searched all prior finding texts for structure.py/order gate and found no duplicate.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T00:02:19.317Z",
+              "event": "assigned",
+              "batch": "21",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T00:08:30.976Z",
+              "event": "implemented",
+              "batch": "21",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "21",
+          "fix": {
+            "batch": "21",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/audit/document-checks-test.py",
+                "text": "B6-02"
+              },
+              {
+                "kind": "present",
+                "file": "docs/audit/repair-check.ts",
+                "text": "batch21-controls.ts"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B6-03",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B6-03",
+      "text": "Event-map audit command documentation — `docs/event-map.py:22`\nReads: Then two reports, which do not fail:\n\n  gaps          every `none` cell and every note marked GAP, listed in full\n  unreached     every numbered provision in each form that no event names,\n                as a raw count over the total. A provision no event reaches is\n                either boilerplate or something nobody needs; the map cannot\n                tell which, and neither can a count that has been filtered.\nClaims: The unreached-provision report does not cause failure.\nTrue: main at181-186 emits orphaned provisions and immediately returns1 whenever any exists. The current command therefore fails on unreached substantive provisions, contrary to the file-level usage description. This is documentation drift, not an argument to weaken the gate.\nProposed replacement (not approved): Update the docstring to say unreached provisions outside the documented definition exclusions fail the gate and must be mapped or removed; describe any raw coverage/gaps output separately as informational. Preserve current enforcement.\nRechecked by codex-reader-5: event-map.py:22–28 states the two reports do not fail, while main181–186 returns1 for any orphaned provision. Independent call to actual main with controlled check result returned1. Usage-doc drift only; preserve stronger enforcement. No duplicate event-map.py finding in all prior finding texts.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T00:02:19.317Z",
+              "event": "assigned",
+              "batch": "21",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T00:08:30.976Z",
+              "event": "implemented",
+              "batch": "21",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "21",
+          "fix": {
+            "batch": "21",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/audit/document-checks-test.py",
+                "text": "B6-03"
+              },
+              {
+                "kind": "present",
+                "file": "docs/audit/repair-check.ts",
+                "text": "batch21-controls.ts"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B5-MANUAL-TABLE-HEADER-PAGINATION",
+      "tag": "wording",
+      "area": "Agreements and guidance",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B5-MANUAL-TABLE-HEADER-PAGINATION",
+      "text": "Site-generated Owner's Manual tables, physical pages8–9 and15–16 (printed6–7 and13–14) — `webapp/server/manual-pdf.ts:335`\nReads: need(rowH);\nClaims: Table column headings remain with at least the first data row.\nTrue: Actual renderManualPdf of the frozen docs/owners-manual.md produces37pages. Physical page8 ends with only the OA-choice table column headings, with all choices onpage9; page15 ends with only Step/What to do headings, rows onpage16. Both next pages lack repeated headers. The renderer measures and reserves each table row independently at330–335. Enlarged individual pages8/15 confirm the four-up observation. All text remains readable; the issue is pagination and association of headers with data, not missing substantive text.\nProposed replacement (not approved): Before placing a new table, reserve its measured header plus first data row together. Repeat headers on continuation pages when a table spans pages, preserving row integrity. Re-render the actual manual and inspect all pages to ensure no new stranded headings or near-empty pages.\nRechecked by codex-coordinator: Reopened actual frozen renderer source and inspected native pages independently: consent1/2 shows first signature rule separated from Casey name/date; manual8/9 and15/16 show stranded headers and headerless continuation. These are reproduced layout issues, not legal invalidity. Compared original ledger findings including230 and earlier heading/tail fixes; no same defect found. Corrected consent source line to372.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B7-CLIENT-TEXT-AS-SLOT",
+      "tag": "substantive",
+      "area": "Agreements and guidance",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B7-CLIENT-TEXT-AS-SLOT",
+      "text": "Client portal amendment generation and office Statement of Authorized Representative generation for a company name containing an uppercase bracketed phrase — `webapp/server/oa-amendment.ts:141`\nReads: const leftover = (s.match(/\\[[A-Z][A-Z ()/.']*\\]/g) ?? []).filter((x) => !(am.mode === \"typed\" && x === \"[AMENDMENT TEXT]\"));\nClaims: Any uppercase bracketed phrase remaining at this point is an unfilled template slot.\nTrue: The company name is already inserted raw at oa-amendment.ts:98–99, and statement.ts:50 inserts it raw before its same-pattern guard at65–66. Actual orderFormSchema accepts the name [ALPHA] with a matching [ALPHA], LLC, PS A series and englishTextError returns null. Actual assembleOa succeeds for [ALPHA], LLC, but the actual amendment and statement assemblers independently throw unfilled slot(s): [ALPHA]. Amendment route1761 catches this as500 GENERATION_FAILED; issueStatement routes-admin427–434 passes the stored order name directly. These documents can fail for input the application accepts. This is pure-assembler/input-schema reproduction with statically verified route reachability, not observed production failure or a claim that this example name is available at Sunbiz.\nProposed replacement (not approved): Protect all client data before interpolation in the amendment and statement assemblers, validate only template markers, and enable corresponding renderer decoding so original client text prints literally. Preserve typed-amendment paragraph behavior. Verify company and signer values with bracketed phrases in both documents, and verify a genuinely unresolved template slot still fails. Do not ban otherwise accepted punctuation merely to avoid the guard.\nRechecked by codex-reader-5: Independently reopened both full assembler files, document-text.ts, validation schema ranges, source call sites, prior263 andN2.21, and executed actual orderFormSchema/englishTextError/assembleOa/assembleAmendment/assembleStatement. Source and reproduction agree; see evidence/b5-bracket-independent-probe.json.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B5-CONSENT-SIGNATURE-PAGINATION",
+      "tag": "substantive",
+      "area": "Agreements and guidance",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json finding B5-CONSENT-SIGNATURE-PAGINATION",
+      "text": "Generated new-series consent, member signature block, pages1–2 — `webapp/server/pdf-render.ts:372`\nReads: need(lineH);\nClaims: A member signature rule, printed name and date form a usable signature block on one page.\nTrue: Actual assembleNewSeries/renderMarkdownPdf with retained ordinary two-member/two-manager inputs produces four pages. Casey Audit signature rule is at page1 bottom; Casey name and Date line start page2. Renderer recognizes signature line at356 but reserves only one line at373, so it can break before the name. new-series.ts87–101 emits rule/name/date separately. All pages were visually inspected and pages1/2 enlarged. This is a layout/usability defect, not a claim that an executed consent is legally invalid.\nProposed replacement (not approved): Reserve the full measured signature unit before drawing its first rule, including wrapped name and optional date and entity By/name/title variants. Break before the unit if it will not fit. Preserve owner-approved tight signature spacing. Verify this exact normal fixture plus long-name and entity blocks; do not add an unconditional blank signature page.\nRechecked by codex-coordinator: Reopened actual frozen renderer source and inspected native pages independently: consent1/2 shows first signature rule separated from Casey name/date; manual8/9 and15/16 show stranded headers and headerless continuation. These are reproduced layout issues, not legal invalidity. Compared original ledger findings including230 and earlier heading/tail fixes; no same defect found. Corrected consent source line to372.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "open",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T00:00:08.074Z",
+              "event": "recorded from verified audit",
+              "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            }
+          ]
+        }
+      ]
     }
   ],
   "rulings": [
@@ -20686,6 +21687,31 @@
           "event": "implemented"
         }
       ]
+    },
+    {
+      "id": "21",
+      "revision": 1,
+      "frozenHash": "00b96362c08a47d7d3418c86fc757a05317aa4dd03fa5f9a4476fd897cad94e5",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "4a344e22e0d0239481f3182d6528bf84d960ed0d",
+      "history": [
+        {
+          "at": "2026-09-21T00:02:19.318Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-21T00:08:30.976Z",
+          "event": "implemented"
+        }
+      ]
+    }
+  ],
+  "auditImports": [
+    {
+      "path": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json",
+      "sha": "a72a548340ac753ce9f2ae323a7d61699db3d8f12e6ea49ebe54acc6b732edee"
     }
   ]
 }

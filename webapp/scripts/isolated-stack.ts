@@ -30,11 +30,12 @@ import { execFileSync } from "node:child_process";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { requireEnvironmentProof, type EnvironmentProof } from "./offline-proof";
 
 /** What every review and test build and server runs with. */
 export const SANITIZED: Record<string, string> = { E2E_OFFLINE: "1", VITE_SMARTY_EMBEDDED_KEY: "", VITE_BACKEND_URL: "" };
 
-export interface Stack { api: string; web: string; pid: number; proof: { offline: boolean; externals: Record<string, boolean> }; stop: () => void }
+export interface Stack { api: string; web: string; pid: number; proof: EnvironmentProof; stop: () => void }
 
 const freePort = (): Promise<number> => new Promise((resolve, reject) => {
   const s = createServer();
@@ -45,6 +46,31 @@ const freePort = (): Promise<number> => new Promise((resolve, reject) => {
 /** The process ids listening on a TCP port, as the operating system reports them. */
 function listeners(port: number): number[] {
   try { return execFileSync("lsof", ["-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-t"], { encoding: "utf8" }).split("\n").filter(Boolean).map(Number); } catch { return []; }
+}
+
+/** Health initializes the database, so ownership comes before every probe. */
+function requireOwnedProcess(api: Pick<Subprocess, "pid" | "exitCode">, port: number): void {
+  const owners = listeners(port);
+  if (api.exitCode !== null || owners.length === 0 || owners.some(pid => pid !== api.pid)) throw new Error(`REFUSED: port ${port} is answered by process ${owners.join(", ") || "unknown"}, which is not exclusively the live process this review started (${api.pid})`);
+}
+
+/** Shared by the review/browser stack and the API suite's fresh-database
+ * restart test. A failed proof throws before the caller can mutate the API. */
+export async function waitForOwnedApi(api: Pick<Subprocess, "pid" | "exitCode">, port: number): Promise<EnvironmentProof> {
+  const apiUrl = `http://localhost:${port}`;
+  for (let i = 0; ; i++) {
+    if (api.exitCode !== null) throw new Error(`REFUSED: the review server exited (code ${api.exitCode}) before it was ready — nothing on port ${port} is the process under review`);
+    if (listeners(port).length > 0) {
+      requireOwnedProcess(api, port);
+      try { if ((await fetch(`${apiUrl}/api/health`, { redirect: "manual", signal: AbortSignal.timeout(1000) })).status === 200) break; } catch { /* not ready yet */ }
+    }
+    if (i === 80) throw new Error("REFUSED: the owned API never became healthy");
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  requireOwnedProcess(api, port);
+  const proof = await requireEnvironmentProof(apiUrl);
+  requireOwnedProcess(api, port);
+  return proof;
 }
 
 export async function buildSite(cwd: string, outDir: string, quiet = true): Promise<void> {
@@ -61,7 +87,7 @@ export async function startIsolatedStack(opts: { apiPort?: number; webPort?: num
   const webPort = opts.webPort || (await freePort());
   const apiUrl = `http://localhost:${apiPort}`;
   const webUrl = `http://localhost:${webPort}`;
-  if (listeners(apiPort).length > 0) { rmSync(pg, { recursive: true, force: true }); throw new Error(`REFUSED: another process (${listeners(apiPort).join(", ")}) is already listening on port ${apiPort}; the review server did not start, and a server that was already there is not the process under review`); }
+  if (listeners(apiPort).length > 0) { rmSync(pg, { recursive: true, force: true }); if (!opts.serveDir) rmSync(out, { recursive: true, force: true }); throw new Error(`REFUSED: another process (${listeners(apiPort).join(", ")}) is already listening on port ${apiPort}; the review server did not start, and a server that was already there is not the process under review`); }
   const api: Subprocess = spawn(["bun", "server/dev.ts"], {
     cwd,
     env: { ...process.env, ...SANITIZED, DEV_PG_DIR: pg, PORT: String(apiPort), PUBLIC_BASE_URL: webUrl },
@@ -69,23 +95,12 @@ export async function startIsolatedStack(opts: { apiPort?: number; webPort?: num
   });
   const cleanup = () => { try { api.kill(); } catch { /* gone */ } rmSync(pg, { recursive: true, force: true }); if (!opts.serveDir) rmSync(out, { recursive: true, force: true }); };
   try {
-    for (let i = 0; ; i++) {
-      if (api.exitCode !== null) throw new Error(`REFUSED: the review server exited (code ${api.exitCode}) before it was ready — nothing on port ${apiPort} is the process under review`);
-      try { if ((await fetch(`${apiUrl}/api/health`)).status === 200) break; } catch { /* not up yet */ }
-      if (i === 80) throw new Error("the review API never became healthy");
-      await new Promise((r) => setTimeout(r, 500));
-    }
-    const owners = listeners(apiPort);
-    if (api.exitCode !== null || !owners.includes(api.pid)) throw new Error(`REFUSED: port ${apiPort} is answered by process ${owners.join(", ") || "unknown"}, which is not the process this review started (${api.pid})`);
-    const res = await fetch(`${apiUrl}/api/dev/env-summary`);
-    const proof = ((await res.json()) as { data?: Stack["proof"] }).data;
-    if (!proof || proof.offline !== true) throw new Error(`REFUSED: the server did not report offline (${JSON.stringify(proof)})`);
-    const live = Object.entries(proof.externals).filter(([, v]) => v).map(([k]) => k);
-    if (live.length > 0) throw new Error(`REFUSED: the server reports live connections: ${live.join(", ")}`);
+    const proof = await waitForOwnedApi(api, apiPort);
     say(`review server: process ${api.pid}, started by this command from ${cwd}, owns port ${apiPort}; it reports offline = true and no live connections (${Object.keys(proof.externals).join(", ")} all off); database: a throwaway folder`);
 
     if (opts.apiOnly) return { api: apiUrl, web: "", pid: api.pid, proof, stop: cleanup };
     if (!opts.serveDir) await buildSite(cwd, out, opts.quiet ?? false);
+    requireOwnedProcess(api, apiPort);
     const web = Bun.serve({
       port: webPort,
       async fetch(req) {

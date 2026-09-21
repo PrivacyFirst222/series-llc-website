@@ -1,7 +1,7 @@
 /** A frozen audit run. Writes reports only; never starts a server or changes product files. */
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, lstatSync, appendFileSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
-import { ROOT, git, gitBytes, type Ledger } from "./ledger-lib";
+import { ROOT, git, gitOk, gitBytes, type Ledger } from "./ledger-lib";
 import { buckets, type InventoryFile } from "./inventory";
 import { CHECKS, hash, lineCount, safeId, safePath, validateAudit, type Manifest, type AuditData, type FileEntry, type Report } from "./audit-session-lib";
 export const readJson = <T>(path:string):T => JSON.parse(readFileSync(path,"utf8"));
@@ -32,17 +32,29 @@ export function manifestFor(run:string,commit:string,n:number,createdAt=new Date
   const source=(p:string)=>{let t=texts.get(p);if(t===undefined){t=gitBytes(`${commit}:${p}`)!.toString("utf8");texts.set(p,t);}return t;};
   const area=(p:string):InventoryFile["area"]=>/^webapp\/src\/pages\/admin\//.test(p)?"office":/^webapp\/src\/(pages\/portal\/|content\/oaLearnMore)/.test(p)?"client portal":/^webapp\/src\/(components\/forms\/|pages\/(FormLLC|OrderConfirmed)\.tsx$)/.test(p)?"order form and payment":p.startsWith("webapp/src/")?"public pages":/^webapp\/server\/(templates-|(?:oa|oa-amendment|oa-capital|new-series|statement|s-election|order-summary|manual-pdf|pdf-render|filing)\.ts$)/.test(p)?"documents and masters":p.startsWith("webapp/")?"server and emails":"guidance";
   const candidates=tracked.filter(p=>/^(webapp\/(src|server)\/|docs\/)/.test(p)&&/\.(tsx?|md|json)$/.test(p)&&!/(^|\/)(node_modules|dist|\.dev-data|runs|source|word)\//.test(p)&&!p.startsWith("docs/audit/")&&!(p.startsWith("docs/")&&!p.endsWith(".md"))&&!(p.startsWith("webapp/src/")&&p.endsWith(".json"))).concat(["webapp/vercel.json"]);
-  const exclusions=[[/^webapp\/src\/components\/ui\//,"stock UI widgets"],[/\.test\.tsx?$/,"test file"],[/^webapp\/server\/e2e\.ts$/,"check suite"],[/^docs\/(coverage-605|event-map|event-map-text-review|oa-map|dependency-audit|db-restore)\.md$/,"gate output or operations note"]] as const;
+  // B2-04: policy is read from the candidate commit, so historical receipts
+  // keep their original denominator. Unverified widgets are always included
+  // by policy v2. A future commit cannot remove the policy to hide them again.
+  const policyPath="docs/audit/inventory-policy.json";
+  const legacyAnchor="4a344e22e0d0239481f3182d6528bf84d960ed0d";
+  let legacyUi=false;
+  if(tracked.includes(policyPath)){
+    const policy=JSON.parse(source(policyPath));
+    if(policy.version!==2||policy.uiWidgets!=="include-all")throw Error("unsupported inventory policy");
+  }else if(gitOk(["merge-base","--is-ancestor",commit,legacyAnchor]))legacyUi=true;
+  else throw Error("candidate is missing its required inventory policy");
+  const exclusions=[[/\.test\.tsx?$/,"test file"],[/^webapp\/server\/e2e\.ts$/,"check suite"],[/^docs\/(coverage-605|event-map|event-map-text-review|oa-map|dependency-audit|db-restore)\.md$/,"gate output or operations note"]] as const;
   const excluded:{path:string;reason:string}[]=[];
   const input:InventoryFile[]=[];
-  for(const path of candidates){const ex=exclusions.find(([rx])=>rx.test(path));if(ex)excluded.push({path,reason:ex[1]});else input.push({path,lines:lineCount(source(path)),area:area(path)});}
+  for(const path of candidates){if(legacyUi&&path.startsWith("webapp/src/components/ui/")){excluded.push({path,reason:"stock UI widgets"});continue;}const ex=exclusions.find(([rx])=>rx.test(path));if(ex)excluded.push({path,reason:ex[1]});else input.push({path,lines:lineCount(source(path)),area:area(path)});}
   const order=["public pages","order form and payment","client portal","office","server and emails","documents and masters","guidance"];
   input.sort((a,b)=>order.indexOf(a.area)-order.indexOf(b.area)||a.path.localeCompare(b.path));
   const requestedBuckets=n;const primary=buckets(input,n);n=primary.length;
   const files:FileEntry[]=primary.flatMap((fs,i)=>fs.map(f=>({...f,sha:hash(source(f.path)),bucket:i+1,scope:"product" as const})));
   const supplemental=tracked.filter(p=>!files.some(f=>f.path===p)&&(
+    p==="docs/audit/inventory-policy.json"||
     /^webapp\/(index\.html|package\.json|src\/.*\.css|scripts\/.*\.ts|server\/.*\.test\.ts)$/.test(p)||
-    /^webapp\/server\/e2e\.ts$/.test(p)||/^docs\/audit\/[^/]+\.ts$/.test(p)||/^docs\/audit\/batches\/[^/]+\/batch\.md$/.test(p)||/^\.githooks\//.test(p)||/^\.github\/workflows\//.test(p)||/^docs\/(format-check|docs-consistency|provision-map|coverage-605|event-map|structure|drafting-lint|md-to-docx)\.py$/.test(p)));
+    /^webapp\/server\/e2e\.ts$/.test(p)||/^docs\/audit\/[^/]+\.(ts|py)$/.test(p)||/^docs\/audit\/batches\/[^/]+\/batch\.md$/.test(p)||/^\.githooks\//.test(p)||/^\.github\/workflows\//.test(p)||/^docs\/(format-check|docs-consistency|provision-map|coverage-605|event-map|structure|drafting-lint|md-to-docx)\.py$/.test(p)));
   const loads=Array.from({length:n},(_,i)=>files.filter(f=>f.bucket===i+1).reduce((s,f)=>s+f.lines,0));
   for(const path of supplemental){const text=source(path);const bucket=loads.indexOf(Math.min(...loads))+1;const lines=lineCount(text);loads[bucket-1]+=lines;files.push({path,lines,sha:hash(text),bucket,area:"supplemental controls and rendering",scope:"supplement"});}
   const ledger=JSON.parse(gitBytes(`${commit}:docs/audit/ledger.json`)!.toString("utf8")) as Ledger;

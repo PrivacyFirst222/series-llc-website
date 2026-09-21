@@ -19,13 +19,17 @@ The gate:
      be a decision someone wrote down, not an oversight nobody noticed.
   3. TODO fails.
 
-Then two reports, which do not fail:
+  4. An unreached numbered provision fails, except where its heading begins
+     with a double quote (the definition-heading convention). This exemption
+     is based on the heading, not on the article number.
+
+After the gate passes, two informational reports:
 
   gaps          every `none` cell and every note marked GAP, listed in full
   unreached     every numbered provision in each form that no event names,
                 as a raw count over the total. A provision no event reaches is
-                either boilerplate or something nobody needs; the map cannot
-                tell which, and neither can a count that has been filtered.
+                included in this report despite the gate's definition exemption.
+                The raw count includes definitions; it does not judge meaning.
 
     python3 docs/event-map.py            # gate, then both reports
     python3 docs/event-map.py --selftest # break the map, watch the gate fire
@@ -109,9 +113,10 @@ def check(path=None):
                     named[code].add(r)
 
     # A provision no event reaches is a provision nobody asked for. Adding one is
-    # therefore expensive: name the event it answers, or delete it. Article 2 is
-    # exempt — a definition answers no event by itself, it supplies a word to the
-    # provisions that do, and the last row of the map says so.
+    # therefore expensive: name the event it answers, or delete it. Headings
+    # beginning with a double quote are exempt: that is the definition convention,
+    # and definitions supply words to other provisions rather than answer events.
+    # The actual exemption does not depend on the article number.
     orphaned = []
     for code in FORMS:
         for sec in set(known[code]) - named[code]:

@@ -13,9 +13,10 @@ The provision map answers "should this provision exist"; the drafting lint
 answers "is this sentence a covenant"; this answers "does the document still hold
 together as a document". None of the three reads for meaning.
 
-  article      ARTICLE headings run 1..N with no gap and no number used twice
+  article      ARTICLE headings run 1..N in source order, with no gap or reuse
   section      within each article, sections run .1..N with no gap and no reuse,
-               and no provision sits under an article heading that is missing
+               in source order (including letter suffixes), and every provision
+               sits under the ARTICLE heading matching its section number
   paragraph    lettered paragraphs beginning a line run (a), (b), (c)... in
                order, with none skipped and none repeated
   xref         every "Section N.N", "Article N" and "Exhibit X" resolves inside
@@ -101,6 +102,8 @@ def check(path):
             problems.append(f"{name}  ARTICLE {a} appears twice")
         seen.append(a)
     nums = sorted({int(a) for a in articles})
+    if [int(a) for a in articles] != sorted(int(a) for a in articles):
+        problems.append(f"{name}  articles are out of source order: {' '.join(articles)}")
     if nums:
         for want in range(1, nums[-1] + 1):
             if want not in nums:
@@ -119,6 +122,28 @@ def check(path):
         for want in range(1, max(have) + 1):
             if want not in have:
                 problems.append(f"{name}  Section {art}.{want} is missing — Article {art} skips it")
+
+    # Sets above detect omissions, but erase the reader's actual sequence.
+    # Walk headings and provisions together to check both sequence and placement.
+    headings = [(m.start(), "article", m.group(1)) for m in ARTICLE_RE.finditer(text)]
+    headings += [(m.start(), "section", m.group(1)) for m in PROVISION_RE.finditer(text)]
+    current_article, previous_section = None, None
+    for _, kind, number in sorted(headings):
+        if kind == "article":
+            current_article, previous_section = int(number), None
+            continue
+        if current_article is None:
+            problems.append(f"{name}  Section {number} sits before any ARTICLE heading")
+        elif major(number) != current_article:
+            problems.append(f"{name}  Section {number} sits under ARTICLE {current_article}, "
+                            f"not ARTICLE {major(number)}")
+        if previous_section is not None and major(number) == major(previous_section):
+            def order_key(section):
+                return minor(section), re.sub(r"\d", "", section.partition(".")[2])
+            if order_key(number) < order_key(previous_section):
+                problems.append(f"{name}  sections are out of source order: "
+                                f"{previous_section} precedes {number}")
+        previous_section = number
 
     # --- lettered paragraphs -------------------------------------------------
     # Only letters that BEGIN a line are paragraph labels. "(b)" mid-sentence is
