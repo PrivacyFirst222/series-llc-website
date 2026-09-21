@@ -82,6 +82,27 @@ def main():
                          (ROOT / ".claude/hooks/update-word-docs.sh").read_text(), re.M)
     results = []
 
+    # The original Batch 25 proof compared every generated document with the
+    # pre-repair Word text. Later approved wording batches must not make that
+    # proof impossible. Use the latest implemented/released batch as a chain-
+    # of-custody step: its base already passed this check, its work order names
+    # every permitted replacement, and the generator itself must be unchanged.
+    ledger = json.loads((ROOT / "docs/audit/ledger.json").read_text())
+    requested = os.environ.get("FPSLLC_BATCH", "")
+    eligible = [b for b in ledger.get("batches", [])
+                if b.get("status") in ("implemented", "released")]
+    if requested:
+        eligible = [b for b in eligible if str(b.get("id", "")).lower() == requested.lower()]
+    governing = eligible[-1] if eligible else None
+    work_order = None
+    if governing:
+        snapshot = ROOT / "docs/audit/batches" / str(governing["id"]) / "revisions" / f'r{governing["revision"]}.json'
+        if snapshot.exists():
+            work_order = json.loads(snapshot.read_text())
+    reference = work_order.get("base") if work_order else BASELINE
+    default_generator = (ROOT / "docs/md-to-docx.py").resolve()
+    using_default_generator = args.generator.resolve() == default_generator
+
     def check(label, ok, detail):
         row = {"suite": "batch25-word", "label": label, "ok": bool(ok),
                "detail": detail, "commit": os.environ.get("CHECK_COMMIT", ""),
@@ -91,6 +112,17 @@ def main():
         print("CHECK_RESULT " + json.dumps(row))
 
     check("all twelve published Word mappings checked", len(mapping) == 12, len(mapping))
+    generator_unchanged = True
+    if using_default_generator and work_order:
+        try:
+            before_generator = subprocess.check_output(
+                ["git", "show", reference + ":docs/md-to-docx.py"], cwd=ROOT)
+            generator_unchanged = before_generator == default_generator.read_bytes()
+        except subprocess.CalledProcessError:
+            generator_unchanged = False
+        check("Word generator unchanged from the governing batch base",
+              generator_unchanged,
+              {"batch": work_order["id"], "revision": work_order["revision"], "base": reference})
     with tempfile.TemporaryDirectory(prefix="batch25-word-") as temporary:
         tmp = Path(temporary)
         for source, filename in mapping:
@@ -116,12 +148,44 @@ def main():
             check(source + " entity signature controls become indents",
                   control_leaks == 0 and (not expected_indent or got_indent == expected_indent),
                   {"expected": len(expected_indent), "actual": len(indented), "controlLeaks": control_leaks})
-            baseline = tmp / "baseline.docx"
-            baseline.write_bytes(subprocess.check_output([
-                "git", "show", BASELINE + ":docs/word/" + filename], cwd=ROOT))
-            check(source + " all baseline text and drafting choices retained",
-                  content(actual) == content(docxml(baseline)),
-                  {"beforeChars": len(content(docxml(baseline))), "afterChars": len(content(actual))})
+            if using_default_generator and work_order:
+                try:
+                    expected_md = subprocess.check_output(
+                        ["git", "show", reference + ":" + source], cwd=ROOT, text=True)
+                except subprocess.CalledProcessError:
+                    expected_md = ""
+                replacements = [a for item in work_order.get("items", [])
+                                for a in item.get("assertions", [])
+                                if a.get("kind") == "replace" and a.get("file") == source]
+                missing = []
+                for replacement in replacements:
+                    before, after = replacement["before"], replacement["after"]
+                    if before not in expected_md:
+                        missing.append(before[:120])
+                    expected_md = expected_md.replace(before, after)
+                source_exact = not missing and expected_md == md
+                check(source + " source is exactly its batch base plus declared replacements",
+                      source_exact,
+                      {"batch": work_order["id"], "revision": work_order["revision"],
+                       "replacements": len(replacements), "missing": missing,
+                       "expectedChars": len(expected_md), "actualChars": len(md)})
+                expected_source = tmp / "expected" / Path(source).name
+                expected_source.parent.mkdir(parents=True, exist_ok=True)
+                expected_source.write_text(expected_md)
+                expected_word = tmp / ("expected-" + filename)
+                generator.build(str(expected_source), str(expected_word))
+                expected_content = content(docxml(expected_word))
+                check(source + " all baseline text and drafting choices retained",
+                      source_exact and generator_unchanged and content(actual) == expected_content,
+                      {"base": reference, "expectedChars": len(expected_content),
+                       "afterChars": len(content(actual))})
+            else:
+                baseline = tmp / "baseline.docx"
+                baseline.write_bytes(subprocess.check_output([
+                    "git", "show", BASELINE + ":docs/word/" + filename], cwd=ROOT))
+                check(source + " all baseline text and drafting choices retained",
+                      content(actual) == content(docxml(baseline)),
+                      {"beforeChars": len(content(docxml(baseline))), "afterChars": len(content(actual))})
 
         fixture = "| Owner | Share |\n|---|---|\n<!-- repeat:member -->\n| [NAME] | 100% |\n<!-- /repeat -->\n| **Total** | **100%** |\n\nOutside paragraph.\n\n| Other | Value |\n|---|---|\n| A | B |\n"
         xml, _ = generator.body_xml(fixture, generator.PROFILES["agreement"])
