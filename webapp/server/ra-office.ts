@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { getDb } from './db';
 import { requireAdmin, err, looksLikePdf, MAX_UPLOAD_BYTES } from './shared';
 import { putFile, readFileStream } from './storage';
-import { addYears, addDays, isoOf, gaveConsent } from './renewals';
+import { addYears, addDays, isoOf, gaveConsent, currentAgentNoticeEmail } from './renewals';
 import { easternDateIso } from './datetime';
 import { sendMail } from './email';
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(s=>!Number.isNaN(Date.parse(s+'T12:00:00Z'))&&new Date(s+'T12:00:00Z').toISOString().slice(0,10)===s,'Enter a valid calendar date.');
@@ -67,7 +67,7 @@ export function registerAgentOffice(app:Hono) {
   }else{
    const [d]=await db.query<{storage_key:string}>('SELECT storage_key FROM documents WHERE id=$1 AND order_id=$2',[o.ra_resignation_document,o.id]);if(!d)return c.json(err('Choose the resignation PDF first.','FILE_REQUIRED'),400);key=d.storage_key;
   }
-  try{await sendMail({to:o.contact_email,subject:`Registered-agent resignation — ${o.llc_name}`,html:'<p>A copy of the submitted registered-agent resignation is attached and is also available in your portal. Submission does not end the appointment immediately. We will also mail the notice required by Florida law.</p>',attachments:[{filename:'registered-agent-resignation.pdf',content:Buffer.from(await readFileStream(key)).toString('base64')}]});await db.query('UPDATE orders SET ra_resignation_emailed_at=now() WHERE id=$1',[o.id]);}
+  try{await sendMail({to:await currentAgentNoticeEmail(db,o.id),subject:`Registered-agent resignation — ${o.llc_name}`,html:'<p>A copy of the submitted registered-agent resignation is attached and is also available in your portal. Submission does not end the appointment immediately. We will also mail the notice required by Florida law.</p>',attachments:[{filename:'registered-agent-resignation.pdf',content:Buffer.from(await readFileStream(key)).toString('base64')}]});await db.query('UPDATE orders SET ra_resignation_emailed_at=now() WHERE id=$1',[o.id]);}
   catch{return c.json(err('The copy is in the portal, but email failed. Retry sending the existing copy.','EMAIL_FAILED'),503);}
   return c.json({data:{ok:true}});
  });

@@ -1,0 +1,39 @@
+[s-election] taxpayer-number recovery notification failed: a76951b5-2103-411f-85ac-ba65e760dcf1 57 |     }),
+58 |   });
+59 |   if (!res.ok) {
+60 |     const body = await res.text();
+61 |     await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));
+62 |     throw new Error(`Resend ${res.status}: ${body}`);
+                   ^
+error: Resend 503: Fixture refusal
+      at sendMail (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/email.ts:62:15)
+      at async notifyTaxpayerNumbersRequired (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/s-election-recovery.ts:36:11)
+      at async restoreBackup (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/restore.ts:46:38)
+      at async restored (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/batch23-recovery-check.ts:42:21)
+
+[s-election] taxpayer-number recovery notification failed: 5d75a8d6-f985-452b-9ea2-cdcb523a5c53 57 |     }),
+58 |   });
+59 |   if (!res.ok) {
+60 |     const body = await res.text();
+61 |     await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));
+62 |     throw new Error(`Resend ${res.status}: ${body}`);
+                   ^
+error: Resend 503: Fixture refusal
+      at sendMail (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/email.ts:62:15)
+      at async notifyTaxpayerNumbersRequired (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/s-election-recovery.ts:36:11)
+      at async restoreBackup (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/restore.ts:46:38)
+      at async restored (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/batch23-recovery-check.ts:42:21)
+
+[s-election] taxpayer-number recovery notification failed: d9a8d6ab-a5bd-483a-882b-98eedb0f3f59 57 |     }),
+58 |   });
+59 |   if (!res.ok) {
+60 |     const body = await res.text();
+61 |     await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));
+62 |     throw new Error(`Resend ${res.status}: ${body}`);
+                   ^
+error: Resend 503: Fixture refusal
+      at sendMail (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/email.ts:62:15)
+      at async notifyTaxpayerNumbersRequired (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/s-election-recovery.ts:36:11)
+      at async restoreBackup (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/restore.ts:46:38)
+      at async restored (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/batch23-recovery-check.ts:42:21)
+

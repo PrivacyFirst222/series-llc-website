@@ -1730,27 +1730,30 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: servicesQuery runs independently at :233-237. Until it succeeds, or after it fails without cached data, :263 substitutes an empty service list. everythingDone at :282-283 then accepts formed orders with delivered certificates, and :295 places them in Complete even when outstanding services have not been checked. The query has no visible failure state; only ordersQuery errors are shown.
   - Replace with: Require a successfully loaded service list before marking delivery complete. While it is unavailable show: “We could not check the remaining service orders. Try again.”
   - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **AUD-post-batches-2026-09-20-4a344e2-B4-EMAIL-ERROR-EMPTY. [substantive]** — **open**
+- **AUD-post-batches-2026-09-20-4a344e2-B4-EMAIL-ERROR-EMPTY. [substantive]** — **implemented**
   - Office → Clients → Emails, when initial email-history request fails — `webapp/src/pages/admin/AdminDashboard.tsx:129`
   - Reads: Nothing has been sent to this address since the record began.
   - Claims: A completed check found no email history for this address.
   - True: The query is independent. After its initial request fails without cached data, isPending is false and list.data is undefined. Lines126–129 substitute [] and render this factual empty-history statement; no list.isError branch exists. Individual email-body failure also remains Loading indefinitely at106–123. This is a source-proven failure branch; no claim that a live outage occurred. Compared with priorN3.08 (board completion) andN3.09 (portal legal mail): different screen, dataset, and claim.
   - Proposed replacement (not approved): Render a retryable error when email history could not be loaded; use the empty-history statement only after a successful empty response. Give an explicit retryable error for an individual email-body request as well.
   - Rechecked by codex-reader-5: AdminDashboard.tsx:106–129 has neither list nor individual-query error branch. With failed initial list data undefined and pending false, nullish [] yields the factual nothing-sent sentence; individual body remains Loading. Prior174 corrected provider acceptance and500limit; N3.08 concerned board service completion and N3.09 portal legal mail. Different datasets/screens, hence new failure-state defect. No outage reproduced.
-- **AUD-post-batches-2026-09-20-4a344e2-B4-EIN-ERROR-MISSING. [substantive]** — **open**
+  - Fixed: batch 23 revision 1, commit , by Codex; protected by 2 assertion(s).
+- **AUD-post-batches-2026-09-20-4a344e2-B4-EIN-ERROR-MISSING. [substantive]** — **implemented**
   - Office → service order → Fulfil EIN dialog, when protected service details fail to load — `webapp/src/pages/admin/ServiceOrdersSection.tsx:306`
   - Reads: "— not yet provided —"
   - Claims: The client has not supplied the responsible party SSN/ITIN.
   - True: The SSN is supplied only by detailQuery at118–122. At303–306 the component distinguishes loading and a truthy tin but never checks query error. A failed initial request with no cached data therefore renders not yet provided even for a submitted EIN application; the IRS assistant answer list at312 also disappears. Unknown retrieval state is presented as a missing client submission. No live outage asserted. PriorN3.05 is the separate series-name fix, andN3.08 concerns board completion.
   - Proposed replacement (not approved): Show a retryable service-details error when detailQuery fails. Display not yet provided only after a successful response confirms no SSN/ITIN; require loaded details before presenting the IRS-assistant answers as ready.
   - Rechecked by codex-reader-5: ServiceOrdersSection.tsx:118–122 independently fetches protected details;303–306 uses loading/tin only, and312 gates assistant answers on detail data. Failed initial retrieval without cache renders not yet provided. PriorN3.05 concerns series legal-name row, not retrieval failure; N3.08 is separate board completion. No actual IRS submission or live outage claimed.
-- **AUD-post-batches-2026-09-20-4a344e2-B5-ARTICLES-METADATA. [substantive]** — **open**
+  - Fixed: batch 23 revision 1, commit , by Codex; protected by 2 assertion(s).
+- **AUD-post-batches-2026-09-20-4a344e2-B5-ARTICLES-METADATA. [substantive]** — **implemented**
   - Office formation-package Articles replacement — `webapp/server/routes-admin.ts:742`
   - Reads: VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
   - Claims: The replacement Articles preserve the company document number entered at original upload.
   - True: Initial /articles stores documentNumber in meta at503. Full formation-package replacement inserts new Articles with empty meta then retires prior Articles. For a self-signed company there is no Statement metadata fallback at407, so the admin detail loses its stored document number even when form.documentNumber was supplied. Source-confirmed; coordinator runtime pending. Compared ledger177 (different frontend validation mismatch),208 (dates),N1.14 (rollback); none covers lost metadata.
   - Proposed replacement (not approved): Preserve existing validated documentNumber when replacing Articles, or replace it with a newly supplied validated number. Store it on replacement Articles for both signing paths. Verify self-signed and office-signed replacement retain the number.
   - Rechecked by codex-root-independent: Root independently reopened routes-admin.ts385–414,488–510,724–760. Initial upload stores documentNumber; replacement writes empty JSON. Detail reads Articles then Statement; self-signed replacement lacks fallback. Compared prior177,208,N1.14; distinct metadata loss. Source proof, no external incident claimed.
+  - Fixed: batch 23 revision 1, commit , by Codex; protected by 2 assertion(s).
 
 ## Emails and jobs — 37 open of 38
 
@@ -2042,13 +2045,14 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The row is committed at:201–206 BEFORE paymentLinkFor at:208 and sendMail at:220. A failed checkout creates a link_sent row without a link; later jobs skip the !row branch. A failed notice email is caught without retry, while the notice_sent row can proceed to automatic charging at:235–250. This is independent of prior194's45-day schedule.
   - Replace with: Persist a pending-notice state first. Create/reuse the checkout and await successful mail submission before marking notice_sent or link_sent and notice_sent_at. Retry pending failures idempotently and do not charge until the contractual notice timing has been satisfied.
   - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **AUD-post-batches-2026-09-20-4a344e2-B5-RENEWAL-OLD-EMAIL. [substantive]** — **open**
+- **AUD-post-batches-2026-09-20-4a344e2-B5-RENEWAL-OLD-EMAIL. [substantive]** — **implemented**
   - Registered-agent renewal/resignation notices after account email change — `webapp/server/renewals.ts:128`
   - Reads: await sendMail({to:o.contact_email,...mail});
   - Claims: Notices go to the newly confirmed account email as email.ts193–194 promises.
   - True: Both portal confirmation2548 and adminoverride1034 update clients.email only. Renewal query104 loads orders.* and sends to original o.contact_email at128/147; paid receipt159–169 and ra-office70 also use ordercontactemail. A client changing email therefore leaves renewal/payment/resignation notices addressed to old inbox. No claim of observed production incident; runtime pending coordinator. Prior200 concerns invalidating pending email-change tokens, a different failure.
   - Proposed replacement (not approved): Resolve current clients.email through order.client_id for account notices, payment receipts and resignation copies; preserve original intake contact fields as historical records. Test both portalverified and adminoverride address changes before each notice path.
   - Rechecked by codex-root-independent: Root independently reopened renewals.ts94–176, email.ts187–200, portal2536–2554 and admin1025–1039. Account-change promise expressly includes notices while jobs/receipt read original order.contact_email. Historical intake should remain; resolve active client address for new notices. Distinct prior200 token invalidation.
+  - Fixed: batch 23 revision 1, commit , by Codex; protected by 2 assertion(s).
 
 ## Agreements and guidance — 78 open of 81
 
@@ -2587,13 +2591,14 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Require successful response and a complete recognized externals schema before proceeding in default mode; abort on unavailable/malformed summary. Keep explicitly authorized integration-test override separate. Add refusal cases for missing/failed/malformed summary.
   - Rechecked by codex-root-independent: Root independently reopened e2e.ts170–215 and extracted-guard evidence. Null/missing schema gives empty active list and proceeds to state mutations. Later check() failures do not stop preflight. Independent from behavioral random-port collision; preserve separate explicitly authorized integration mode.
   - Fixed: batch 21 revision 1, commit , by Codex; protected by 2 assertion(s).
-- **AUD-post-batches-2026-09-20-4a344e2-B4-RESTORE-S-ELECTION-SECRET-STATE. [substantive]** — **open**
+- **AUD-post-batches-2026-09-20-4a344e2-B4-RESTORE-S-ELECTION-SECRET-STATE. [substantive]** — **implemented**
   - Restore an unfinished S-election awaiting the EIN; then Office supplies the issued EIN — `webapp/server/restore.ts:22`
   - Reads: else if(row.type==='ein'&&row.status==='in_progress')row.status='awaiting_info';
   - Claims: Restored unfinished services are in a usable recovery state after transient taxpayer numbers are deliberately excluded. The portal calls the S-election Details saved — waiting for your issued EIN (OrdersInProgress.tsx211).
   - True: backup.ts128 and restore.ts20 clear every service_orders.ein_secret. The actual empty-target probe restored EIN as awaiting_info but S-election as in_progress with null secret. A valid unfulfilled pending-EIN S-election has einPending/shareholders but no documentId or purgedAt (routes-portal.ts2401–2404). When the EIN arrives, routes-admin.ts1399–1404 skips rows without secret and sends recovery email only if documentId or purgedAt exists. Thus this normal pending case is skipped without package or recovery notice, while the portal still says it is waiting for the EIN. Re-entering via Edit saved details remains possible; not claimed permanently unrecoverable. Fresh restore followed by actual registered Hono EIN-fulfill handler with valid synthetic PDF returned200, rebuiltSElections0, unchanged S-election in_progress/einPending true/secret null/no documentId and unchanged email_log count1→1. Ordinary EIN notice explicitly disabled; recovery notice has no such toggle. This proves the skipped carry/recovery-notice branch locally, with all external fetches blocked. Prior223 is specifically omission of email_log/ra_renewals and is now fixed;179 is backup coverage/status. N1.01 intentionally excludes transient secrets and should not be reversed. No prior identified for restoring pending S-election operational state.
   - Proposed replacement (not approved): On restore, mark unfinished pending-EIN S-elections as requiring taxpayer-number re-entry and communicate that requirement; also make the EIN-arrival missing-secret branch notify/flag this state even when no package has ever been built. Keep transient secrets excluded from backups.
   - Rechecked by codex-coordinator: Reopened entire restore.ts and carryEinIntoSElections missing-secret branch, then read the retained actual Hono response and before/after service/email records. Only EIN is reset to awaiting_info; S-election remains in_progress without secret, package or notification. Compared223 omitted-table scope and N1.01 intentional secret exclusions. The repair must preserve exclusion and request re-entry; no claim of irreversible loss of all client information.
+  - Fixed: batch 23 revision 1, commit , by Codex; protected by 2 assertion(s).
 - **AUD-post-batches-2026-09-20-4a344e2-ROOT-NOTES-NOTICE-REVIEW. [housekeeping]** — **open** — housekeeping
   - Internal statutory reference notes, deemed notice of manager-managed status — `webapp/server/chapter-605-notes.md:198`
   - Reads: - **s. 605.0103(4)** — a non-member is deemed to know of a limitation on

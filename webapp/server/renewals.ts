@@ -14,6 +14,18 @@ import { easternDateIso } from "./datetime";
 /** How the money is written everywhere the client reads it. */
 export const raRenewalFeeWords = (): string => `$${(RA_RENEWAL_FEE_CENTS / 100).toFixed(RA_RENEWAL_FEE_CENTS % 100 === 0 ? 0 : 2)}`;
 
+/** Documents and notices follow the current account address, never the
+ * historical contact recorded on the formation order. Resolve at send time so
+ * both client confirmation and office corrections apply without rewriting it. */
+export async function currentAgentNoticeEmail(db: Db, orderId: string): Promise<string> {
+  const [client] = await db.query<{ email: string }>(
+    "SELECT c.email FROM orders o JOIN clients c ON c.id = o.client_id WHERE o.id = $1",
+    [orderId],
+  );
+  if (!client?.email?.trim()) throw new Error("No current client email is available for this registered-agent notice");
+  return client.email;
+}
+
 /* ------------------------------- dates -------------------------------- */
 
 const toIso = (d: Date): string => d.toISOString().slice(0, 10);
@@ -125,7 +137,7 @@ export async function runRenewals(today:string):Promise<{notices:number;charged:
     const late=row.purpose==='renewal'&&today>addDays(date,-RA_NOTICE_DAYS);
     const mail=row.purpose==='resignation'?{subject:`Registered-agent resignation due — ${o.llc_name}`,html:`<p>Your timely cancellation has reached its renewal date without replacement proof. A $99 charge for state filing fees and processing is due. This does not purchase another service year. The office must submit the resignation; this notice does not confirm filing.</p><p><a href="${link}">Pay now</a></p>`}:raRenewalNoticeEmail({name:o.contact_name,llcName:o.llc_name,renewalDate:longDate(date),amount:raRenewalFeeWords(),last4:hasCard?o.card_last4:null,chargeDate:longDate(addDays(date,-RA_CHARGE_DAYS)),cancelBy:longDate(addDays(date,-RA_CANCEL_DAYS)),linkUrl:link,giftCard:false,billingHold:late});
     try {
-     await sendMail({to:o.contact_email,...mail});
+     await sendMail({to:await currentAgentNoticeEmail(db,o.id),...mail});
      await db.query("UPDATE ra_renewals SET status=$2,notice_sent_at=$3,billing_hold=$4,notice_error=NULL,link_url=$5 WHERE id=$1",[row.id,hasCard?'notice_sent':'link_sent',`${today}T12:00:00Z`,late,link]);out.notices++;
      row={...row,status:hasCard?'notice_sent':'link_sent',notice_sent_at:`${today}T12:00:00Z`,billing_hold:late};
     }catch(e){await db.query('UPDATE ra_renewals SET notice_error=$2 WHERE id=$1',[row.id,String(e).slice(0,300)]);}
@@ -144,7 +156,7 @@ export async function runRenewals(today:string):Promise<{notices:number;charged:
     await db.query("UPDATE ra_renewals SET status='declined',retries=$2,retry_after=$3,decline_code=$4 WHERE id=$1 AND status='charging'",[row.id,attempt,retryAfter,result.code]);
     const link=await agentCheckoutLink('renewal',row.id);
     const mail=raRenewalDeclinedEmail({name:o.contact_name,llcName:o.llc_name,last4:o.card_last4??'',renewalDate:longDate(date),linkUrl:link,willRetry:!!retryAfter,retryDate:retryAfter?longDate(retryAfter):null,resignation:row.purpose==='resignation'});
-    await sendMail({to:o.contact_email,...mail}).catch(e=>console.error('[renewal] decline notice failed',e));out.declined++;if(retry)out.retried++;
+    await currentAgentNoticeEmail(db,o.id).then(to=>sendMail({to,...mail})).catch(e=>console.error('[renewal] decline notice failed',e));out.declined++;if(retry)out.retried++;
    }
   } catch(e){console.error('[renewal] company needs attention',o.id,e);await db.query('UPDATE ra_renewals SET notice_error=$2 WHERE id=$1',[row.id,String(e).slice(0,300)]);}
   finally {await db.query('UPDATE ra_renewals SET lock_until=NULL WHERE id=$1',[row.id]);}
@@ -166,5 +178,5 @@ export async function fulfillPaidRenewal(renewalId:string,paymentId:string|null,
  const done=await db.query(`WITH paid AS (UPDATE ra_renewals SET status=$3,charged_at=now(),square_payment_id=$2,retries=GREATEST(retries,(SELECT count(*)::int FROM ra_payment_attempts a WHERE a.target_id=$1 AND a.automatic)),retry_after=NULL,updated_at=now() WHERE id=$1 AND status NOT IN ('charged','paid_by_link','cancelled') RETURNING order_id,purpose) UPDATE orders o SET ra_renewal_date=CASE WHEN paid.purpose='renewal' THEN $4::date ELSE o.ra_renewal_date END FROM paid WHERE o.id=paid.order_id RETURNING o.id`,[renewalId,paymentId,automatic?'charged':'paid_by_link',through]);
  if(!done.length)return;
  const mail=row.purpose==='resignation'?{subject:`Registered-agent resignation payment — ${row.llc_name}`,html:'<p>We received $99 for state filing fees and processing of the registered-agent resignation. This does not purchase another year of service. Your portal shows the actual resignation status.</p>'}:raRenewalReceiptEmail({name:row.contact_name,llcName:row.llc_name,amount:`$${(row.amount_cents/100).toFixed(2)}`,last4:'',throughDate:longDate(through)});
- await sendMail({to:row.contact_email,...mail}).catch(e=>console.error('[renewal] receipt failed',e));
+ await currentAgentNoticeEmail(db,row.order_id).then(to=>sendMail({to,...mail})).catch(e=>console.error('[renewal] receipt failed',e));
 }

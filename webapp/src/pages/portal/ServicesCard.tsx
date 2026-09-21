@@ -37,6 +37,7 @@ export interface ServiceOrder {
     tinLast4?: string;
     ein?: string;
     einPending?: boolean;
+    taxpayerNumbersRequired?: boolean;
     dateIncorporated?: string;
     effectiveDate?: string;
     officerName?: string;

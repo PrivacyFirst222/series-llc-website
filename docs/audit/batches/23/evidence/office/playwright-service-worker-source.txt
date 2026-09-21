@@ -1,0 +1,40 @@
+51293:           await this._exposeConsoleApi();
+51294:         if (this._options.serviceWorkers === "block")
+51295:           await this.addInitScript(nullProgress, `
+51296: if (navigator.serviceWorker) navigator.serviceWorker.register = async () => { console.warn('Service Worker registration blocked by Playwright'); };
+51297: `);
+51298:         if (this._options.permissions)
+51299:           await this.grantPermissions(this._options.permissions);
+51300:       }
+69006:   });
+69007: }
+69008: async function bootstrapSnapshotPage(swUrl, snapshotUrl) {
+69009:   await navigator.serviceWorker.register(swUrl, { scope: "/" });
+69010:   await navigator.serviceWorker.ready;
+69011:   if (!navigator.serviceWorker.controller)
+69012:     await new Promise((resolve) => navigator.serviceWorker.addEventListener("controllerchange", resolve, { once: true }));
+69013:   location.replace(snapshotUrl);
+69007: }
+69008: async function bootstrapSnapshotPage(swUrl, snapshotUrl) {
+69009:   await navigator.serviceWorker.register(swUrl, { scope: "/" });
+69010:   await navigator.serviceWorker.ready;
+69011:   if (!navigator.serviceWorker.controller)
+69012:     await new Promise((resolve) => navigator.serviceWorker.addEventListener("controllerchange", resolve, { once: true }));
+69013:   location.replace(snapshotUrl);
+69014: }
+69008: async function bootstrapSnapshotPage(swUrl, snapshotUrl) {
+69009:   await navigator.serviceWorker.register(swUrl, { scope: "/" });
+69010:   await navigator.serviceWorker.ready;
+69011:   if (!navigator.serviceWorker.controller)
+69012:     await new Promise((resolve) => navigator.serviceWorker.addEventListener("controllerchange", resolve, { once: true }));
+69013:   location.replace(snapshotUrl);
+69014: }
+69015: async function runCommandOnSnapshot(server, browserArgs) {
+69009:   await navigator.serviceWorker.register(swUrl, { scope: "/" });
+69010:   await navigator.serviceWorker.ready;
+69011:   if (!navigator.serviceWorker.controller)
+69012:     await new Promise((resolve) => navigator.serviceWorker.addEventListener("controllerchange", resolve, { once: true }));
+69013:   location.replace(snapshotUrl);
+69014: }
+69015: async function runCommandOnSnapshot(server, browserArgs) {
+69016:   const browser = await playwright.chromium.launch({ headless: true });

@@ -1,0 +1,4 @@
+365/365 item identities preserved; 360 unchanged records.
+All 32 prior batch records identical; rulings and audit imports identical.
+Changed items: AUD-post-batches-2026-09-20-4a344e2-B4-EMAIL-ERROR-EMPTY, AUD-post-batches-2026-09-20-4a344e2-B4-EIN-ERROR-MISSING, AUD-post-batches-2026-09-20-4a344e2-B5-ARTICLES-METADATA, AUD-post-batches-2026-09-20-4a344e2-B5-RENEWAL-OLD-EMAIL, AUD-post-batches-2026-09-20-4a344e2-B4-RESTORE-S-ELECTION-SECRET-STATE
+New-audit part states: {'open': 10, 'implemented': 21}

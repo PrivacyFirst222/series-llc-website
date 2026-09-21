@@ -1,0 +1,10 @@
+[renewal] receipt failed 20 | export async function currentAgentNoticeEmail(db: Db, orderId: string): Promise<string> {
+21 |   const [client] = await db.query<{ email: string }>(
+22 |     "SELECT c.email FROM orders o JOIN clients c ON c.id = o.client_id WHERE o.id = $1",
+23 |     [orderId],
+24 |   );
+25 |   if (!client?.email?.trim()) throw new Error("No current client email is available for this registered-agent notice");
+                                             ^
+error: No current client email is available for this registered-agent notice
+      at currentAgentNoticeEmail (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/renewals.ts:25:41)
+

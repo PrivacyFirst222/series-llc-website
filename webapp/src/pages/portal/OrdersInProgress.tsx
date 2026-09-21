@@ -211,7 +211,7 @@ export function OrdersInProgress({
                 <div className="text-xs text-muted-foreground">
                   {money(o.amount_cents)} ·{" "}
                   <span className={o.status === "awaiting_info" ? "font-medium text-amber-700" : ""}>
-                    {o.type === "s-election" && o.status === "in_progress" && o.details.einPending ? "Details saved — waiting for your issued EIN" : STATUS_LABEL[o.status]}
+                    {o.type === "s-election" && o.details.taxpayerNumbersRequired ? "Action needed — re-enter taxpayer numbers" : o.type === "s-election" && o.status === "in_progress" && o.details.einPending ? "Details saved — waiting for your issued EIN" : STATUS_LABEL[o.status]}
                   </span>
                 </div>
 
@@ -242,7 +242,7 @@ export function OrdersInProgress({
                     }}
                   >
                     <Lock className="mr-1.5 h-3.5 w-3.5" />
-                    {o.type === "s-election" && o.status === "in_progress" && o.details.einPending ? "Edit saved details" : "Provide details securely"}
+                    {o.type === "s-election" && o.details.taxpayerNumbersRequired ? "Re-enter taxpayer numbers" : o.type === "s-election" && o.status === "in_progress" && o.details.einPending ? "Edit saved details" : "Provide details securely"}
                   </Button>
                 ) : null}
                 {data.dev && o.status === "pending_payment" ? (
@@ -292,7 +292,9 @@ export function OrdersInProgress({
               todayEastern={data.todayEastern}
               companyEin={data.companyEin ?? undefined}
               einServiceOrdered={data.einCompanyOrdered}
-              draft={selDrafts[detailsFor.id]}
+              draft={detailsFor.details.taxpayerNumbersRequired && selDrafts[detailsFor.id]
+                ? {...selDrafts[detailsFor.id], rows: selDrafts[detailsFor.id].rows.map(r => ({...r, ssnLast4: undefined, ssnLast4Second: undefined}))}
+                : selDrafts[detailsFor.id]}
               onDraftChange={(d) => {
                 setSelDrafts((prev) => ({ ...prev, [detailsFor.id]: d }));
                 saveDraft("sel", detailsFor.id, { ...d, rows: d.rows.map((r) => ({ ...r, ssn: "", ssn2: "" })) });

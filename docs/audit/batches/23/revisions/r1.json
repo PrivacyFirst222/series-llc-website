@@ -1,0 +1,194 @@
+{
+  "id": "23",
+  "revision": 1,
+  "title": "Audit repair group3: office, notices and backup recovery",
+  "model": "Codex",
+  "base": "3577d25d6c452215171683deb3f5ffc5e0c9636b",
+  "items": [
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B4-EMAIL-ERROR-EMPTY",
+      "part": "all",
+      "scope": "Show retryable office email-history and individual-email load errors; empty history only after successful empty response.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch23-office-check.ts",
+          "text": "B4-EMAIL-ERROR-EMPTY"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch23-office-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B4-EIN-ERROR-MISSING",
+      "part": "all",
+      "scope": "Distinguish failed EIN details retrieval from missing client numbers; retry and show assistant answers only after successful retrieval.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch23-office-check.ts",
+          "text": "B4-EIN-ERROR-MISSING"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch23-office-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B5-ARTICLES-METADATA",
+      "part": "all",
+      "scope": "Preserve the Florida document number on replacement Articles for both signing paths, or use a supplied validated correction.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/batch23-recovery-check.ts",
+          "text": "B5-ARTICLES-METADATA"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "server/batch23-recovery-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B5-RENEWAL-OLD-EMAIL",
+      "part": "all",
+      "scope": "Send registered-agent notices, receipts and resignation copies to the current account email; preserve original intake contact fields.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/batch23-notices-check.ts",
+          "text": "B5-RENEWAL-OLD-EMAIL"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "server/batch23-notices-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B4-RESTORE-S-ELECTION-SECRET-STATE",
+      "part": "all",
+      "scope": "Mark restored unfinished S elections needing taxpayer-number re-entry, display the required portal action and automatically notify; handle missing secret when EIN arrives even without a prior package. Keep temporary secrets excluded from backups.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/batch23-recovery-check.ts",
+          "text": "B4-RESTORE-S-ELECTION-SECRET-STATE"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "server/batch23-recovery-check.ts"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/pages/admin/AdminDashboard.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "webapp/src/pages/admin/ServiceOrdersSection.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "webapp/server/restore.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "webapp/server/s-election-recovery.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "webapp/src/pages/portal/ServicesCard.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "webapp/server/renewals.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "webapp/server/ra-office.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "webapp/scripts/batch23-office-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "webapp/server/batch23-recovery-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "webapp/server/batch23-notices-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "webapp/package.json",
+      "mode": "code",
+      "control": true,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement and verify the five approved Batch23 findings only; preserve prior fixes, billing rules, client decisions and backup secret exclusions."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": []
+}

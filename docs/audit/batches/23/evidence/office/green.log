@@ -1,0 +1,31 @@
+{"label":"B4-EMAIL-ERROR-EMPTY failed history names retrieval error","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY failed history never claims no mail sent","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY history Retry is available","ok":true}
+{"label":"email history failure and retry: setup/runtime completed","ok":false,"detail":"TimeoutError: isDisabled: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('dialog').getByRole('button', { name: 'Retrying…', exact: true })\u001b[22m\n"}
+{"label":"B4-EMAIL-ERROR-EMPTY body failure names retrieval error","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY body failure is not endless loading","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY body Retry is available","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY body retry restores actual email","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY successful body remains sandboxed","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY body failure does not trap office in detail","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY successful empty lookup keeps correct empty message","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY successful empty lookup has no error or Retry","ok":true}
+{"label":"B4-EMAIL-ERROR-EMPTY cached empty history does not mask failed refresh","ok":true}
+{"label":"B4-EIN-ERROR-MISSING failed detail names retrieval error","ok":true}
+{"label":"B4-EIN-ERROR-MISSING failed detail never claims TIN not provided","ok":true}
+{"label":"B4-EIN-ERROR-MISSING assistant hidden until successful retrieval","ok":true}
+{"label":"B4-EIN-ERROR-MISSING detail Retry is available","ok":true}
+{"label":"B4-EIN-ERROR-MISSING retry loads supplied TIN and actual assistant","ok":true}
+{"label":"B4-EIN-ERROR-MISSING successful lookup has real responsible party","ok":true}
+{"label":"B4-EIN-ERROR-MISSING successful assistant preserves all21 answer rows","ok":true}
+{"label":"B4-EIN-ERROR-MISSING failed refresh hides cached assistant and TIN","ok":true}
+{"label":"B4-EIN-ERROR-MISSING failed refresh exposes Retry","ok":true}
+{"label":"B4-EIN-ERROR-MISSING assistant progress survives retry","ok":true}
+{"label":"B4-EIN-ERROR-MISSING successful lookup of absent TIN says not yet provided","ok":true}
+{"label":"B4-EIN-ERROR-MISSING absent TIN is not a transport error","ok":true}
+{"label":"B4-EIN-ERROR-MISSING loading does not claim missing TIN","ok":true}
+{"label":"B4-EIN-ERROR-MISSING assistant hidden while initial load pending","ok":true}
+{"label":"B4 office no browser runtime errors","ok":false,"detail":["SecurityError: Failed to read the 'serviceWorker' property from 'Navigator': Service worker is disabled because the context is sandboxed and lacks the 'allow-same-origin' flag."]}
+{"label":"B4 office no unexpected API calls","ok":true,"detail":[]}
+{"label":"B4 office requests remained local","ok":true,"detail":[]}
+Batch23 office: 28/30 checks passed

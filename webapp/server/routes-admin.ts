@@ -1,4 +1,5 @@
 import { addYears, isoOf as agentIso } from "./renewals";
+import { recoveryDetails, notifyTaxpayerNumbersRequired } from "./s-election-recovery";
 import { associateLegacyServices, serviceCompanyId } from "./company-scope";
 // Split from app.ts on 29 Aug 2026 — one domain per file, code moved
 // verbatim (the two dev test flags became shared.testHooks so they stay
@@ -596,7 +597,14 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   const form = await c.req.parseBody({ all: true });
   const maybeArticles = form.articles;
   const articles = maybeArticles instanceof File ? maybeArticles : null;
-  const formedDocNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
+  const suppliedDocNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
+  if (suppliedDocNumber && !/^L\d{11}$/.test(suppliedDocNumber)) {
+    return c.json(err("A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.", "DOCUMENT_NUMBER_SHAPE"), 400);
+  }
+  const existingNumbers = articles ? await db.query<{meta: unknown}>(
+    "SELECT meta FROM documents WHERE order_id=$1 AND kind IN ('articles','statement') ORDER BY CASE WHEN kind='articles' THEN 0 ELSE 1 END, created_at DESC", [o.id]) : [];
+  const priorDocNumber = existingNumbers.map(d => String(metaOf(d).documentNumber ?? "")).find(n => /^L\d{11}$/.test(n)) ?? "";
+  const formedDocNumber = suppliedDocNumber || priorDocNumber;
   const formedWeSigned = appointedUs(o.payload);
   if (articles && formedWeSigned && !formedDocNumber) {
     return c.json(err(DOC_NUMBER_NEEDED, "DOCUMENT_NUMBER_REQUIRED"), 400);
@@ -739,7 +747,7 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
       );
       const artRow = await db.query<{ id: string }>(
         `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-         VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
+         VALUES ($1, $2, 'articles', $3, $4, $5, $6, $7) RETURNING id`,
         [
           o.client_id,
           o.id,
@@ -747,6 +755,7 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
           storedArticles.storageKey,
           articles.type || "application/pdf",
           storedArticles.sizeBytes,
+          JSON.stringify(formedDocNumber ? {documentNumber: formedDocNumber} : {}),
         ],
       );
       newRows.push(artRow[0].id);
@@ -1397,7 +1406,13 @@ async function carryEinIntoSElections(args: { clientId: string; companyOrderId: 
     const appliedFor = Boolean(d.einPending) || !d.ein;
     if (!appliedFor || !d.shareholders?.length) continue; // nothing built yet, or the number was already on it
     if (!row.ein_secret) {
-      if (d.documentId || d.purgedAt) {
+      const needed = recoveryDetails(row);
+      if (needed) {
+        const changed = await db.query<{id: string}>(
+          "UPDATE service_orders SET status='awaiting_info', details=$2 WHERE id=$1 AND ein_secret IS NULL AND status IN ('awaiting_info','in_progress') RETURNING id",
+          [row.id, JSON.stringify({...needed, ein: args.ein, einPending: false, einSource: "letter"})]);
+        if (changed.length) await notifyTaxpayerNumbersRequired(db, row);
+      } else if (d.documentId || d.purgedAt) {
         const mail = sElectionEinArrivedLateEmail({ llcName: row.llc_name, einDisplay, portalUrl: `${env.PUBLIC_BASE_URL}/portal`, supportEmail: "support@myfloridaseriesllc.com" });
         sendMail({ to, ...mail }).catch((e) => console.error("[admin] ein-late email failed:", e));
       }

@@ -6707,7 +6707,7 @@ var require_parse = __commonJS({
     "use strict";
     var path = __require("path");
     var resolveCommand = require_resolveCommand();
-    var escape = require_escape();
+    var escape2 = require_escape();
     var readShebang = require_readShebang();
     var isWin = process.platform === "win32";
     var isExecutableRegExp = /\.(?:com|exe)$/i;
@@ -6731,8 +6731,8 @@ var require_parse = __commonJS({
       if (parsed.options.forceShell || needsShell) {
         const needsDoubleEscapeMetaChars = isCmdShimRegExp.test(commandFile);
         parsed.command = path.normalize(parsed.command);
-        parsed.command = escape.command(parsed.command);
-        parsed.args = parsed.args.map((arg) => escape.argument(arg, needsDoubleEscapeMetaChars));
+        parsed.command = escape2.command(parsed.command);
+        parsed.args = parsed.args.map((arg) => escape2.argument(arg, needsDoubleEscapeMetaChars));
         const shellCommand = [parsed.command].concat(parsed.args).join(" ");
         parsed.args = ["/d", "/s", "/c", `"${shellCommand}"`];
         parsed.command = process.env.comspec || "cmd.exe";
@@ -35164,7 +35164,7 @@ var require_body = __commonJS({
         const boundary = `----formdata-undici-0${`${random(1e11)}`.padStart(11, "0")}`;
         const prefix = `--${boundary}\r
 Content-Disposition: form-data`;
-        const escape = (str) => str.replace(/\n/g, "%0A").replace(/\r/g, "%0D").replace(/"/g, "%22");
+        const escape2 = (str) => str.replace(/\n/g, "%0A").replace(/\r/g, "%0D").replace(/"/g, "%22");
         const normalizeLinefeeds = (value) => value.replace(/\r?\n|\r/g, "\r\n");
         const blobParts = [];
         const rn = new Uint8Array([13, 10]);
@@ -35172,14 +35172,14 @@ Content-Disposition: form-data`;
         let hasUnknownSizeValue = false;
         for (const [name, value] of object) {
           if (typeof value === "string") {
-            const chunk2 = textEncoder.encode(prefix + `; name="${escape(normalizeLinefeeds(name))}"\r
+            const chunk2 = textEncoder.encode(prefix + `; name="${escape2(normalizeLinefeeds(name))}"\r
 \r
 ${normalizeLinefeeds(value)}\r
 `);
             blobParts.push(chunk2);
             length += chunk2.byteLength;
           } else {
-            const chunk2 = textEncoder.encode(`${prefix}; name="${escape(normalizeLinefeeds(name))}"` + (value.name ? `; filename="${escape(value.name)}"` : "") + `\r
+            const chunk2 = textEncoder.encode(`${prefix}; name="${escape2(normalizeLinefeeds(name))}"` + (value.name ? `; filename="${escape2(value.name)}"` : "") + `\r
 Content-Type: ${value.type || "application/octet-stream"}\r
 \r
 `);
@@ -100702,6 +100702,14 @@ function easternDateIso(d2 = /* @__PURE__ */ new Date()) {
 
 // server/renewals.ts
 var raRenewalFeeWords = () => `$${(RA_RENEWAL_FEE_CENTS / 100).toFixed(RA_RENEWAL_FEE_CENTS % 100 === 0 ? 0 : 2)}`;
+async function currentAgentNoticeEmail(db, orderId) {
+  const [client] = await db.query(
+    "SELECT c.email FROM orders o JOIN clients c ON c.id = o.client_id WHERE o.id = $1",
+    [orderId]
+  );
+  if (!client?.email?.trim()) throw new Error("No current client email is available for this registered-agent notice");
+  return client.email;
+}
 var toIso = (d2) => d2.toISOString().slice(0, 10);
 var parse2 = (iso) => /* @__PURE__ */ new Date(`${iso}T12:00:00Z`);
 var addDays = (iso, n) => {
@@ -100798,7 +100806,7 @@ async function runRenewals(today) {
         const late2 = row.purpose === "renewal" && today > addDays(date2, -RA_NOTICE_DAYS);
         const mail = row.purpose === "resignation" ? { subject: `Registered-agent resignation due \u2014 ${o.llc_name}`, html: `<p>Your timely cancellation has reached its renewal date without replacement proof. A $99 charge for state filing fees and processing is due. This does not purchase another service year. The office must submit the resignation; this notice does not confirm filing.</p><p><a href="${link}">Pay now</a></p>` } : raRenewalNoticeEmail({ name: o.contact_name, llcName: o.llc_name, renewalDate: longDate(date2), amount: raRenewalFeeWords(), last4: hasCard ? o.card_last4 : null, chargeDate: longDate(addDays(date2, -RA_CHARGE_DAYS)), cancelBy: longDate(addDays(date2, -RA_CANCEL_DAYS)), linkUrl: link, giftCard: false, billingHold: late2 });
         try {
-          await sendMail({ to: o.contact_email, ...mail });
+          await sendMail({ to: await currentAgentNoticeEmail(db, o.id), ...mail });
           await db.query("UPDATE ra_renewals SET status=$2,notice_sent_at=$3,billing_hold=$4,notice_error=NULL,link_url=$5 WHERE id=$1", [row.id, hasCard ? "notice_sent" : "link_sent", `${today}T12:00:00Z`, late2, link]);
           out.notices++;
           row = { ...row, status: hasCard ? "notice_sent" : "link_sent", notice_sent_at: `${today}T12:00:00Z`, billing_hold: late2 };
@@ -100822,7 +100830,7 @@ async function runRenewals(today) {
         await db.query("UPDATE ra_renewals SET status='declined',retries=$2,retry_after=$3,decline_code=$4 WHERE id=$1 AND status='charging'", [row.id, attempt, retryAfter, result.code]);
         const link = await agentCheckoutLink("renewal", row.id);
         const mail = raRenewalDeclinedEmail({ name: o.contact_name, llcName: o.llc_name, last4: o.card_last4 ?? "", renewalDate: longDate(date2), linkUrl: link, willRetry: !!retryAfter, retryDate: retryAfter ? longDate(retryAfter) : null, resignation: row.purpose === "resignation" });
-        await sendMail({ to: o.contact_email, ...mail }).catch((e) => console.error("[renewal] decline notice failed", e));
+        await currentAgentNoticeEmail(db, o.id).then((to) => sendMail({ to, ...mail })).catch((e) => console.error("[renewal] decline notice failed", e));
         out.declined++;
         if (retry2) out.retried++;
       }
@@ -100847,7 +100855,7 @@ async function fulfillPaidRenewal(renewalId, paymentId, simulate, cardAlreadySav
   const done = await db.query(`WITH paid AS (UPDATE ra_renewals SET status=$3,charged_at=now(),square_payment_id=$2,retries=GREATEST(retries,(SELECT count(*)::int FROM ra_payment_attempts a WHERE a.target_id=$1 AND a.automatic)),retry_after=NULL,updated_at=now() WHERE id=$1 AND status NOT IN ('charged','paid_by_link','cancelled') RETURNING order_id,purpose) UPDATE orders o SET ra_renewal_date=CASE WHEN paid.purpose='renewal' THEN $4::date ELSE o.ra_renewal_date END FROM paid WHERE o.id=paid.order_id RETURNING o.id`, [renewalId, paymentId, automatic2 ? "charged" : "paid_by_link", through]);
   if (!done.length) return;
   const mail = row.purpose === "resignation" ? { subject: `Registered-agent resignation payment \u2014 ${row.llc_name}`, html: "<p>We received $99 for state filing fees and processing of the registered-agent resignation. This does not purchase another year of service. Your portal shows the actual resignation status.</p>" } : raRenewalReceiptEmail({ name: row.contact_name, llcName: row.llc_name, amount: `$${(row.amount_cents / 100).toFixed(2)}`, last4: "", throughDate: longDate(through) });
-  await sendMail({ to: row.contact_email, ...mail }).catch((e) => console.error("[renewal] receipt failed", e));
+  await currentAgentNoticeEmail(db, row.order_id).then((to) => sendMail({ to, ...mail })).catch((e) => console.error("[renewal] receipt failed", e));
 }
 
 // server/sunbiz.ts
@@ -109900,7 +109908,7 @@ function registerAgentOffice(app2) {
       key = d2.storage_key;
     }
     try {
-      await sendMail({ to: o.contact_email, subject: `Registered-agent resignation \u2014 ${o.llc_name}`, html: "<p>A copy of the submitted registered-agent resignation is attached and is also available in your portal. Submission does not end the appointment immediately. We will also mail the notice required by Florida law.</p>", attachments: [{ filename: "registered-agent-resignation.pdf", content: Buffer.from(await readFileStream(key)).toString("base64") }] });
+      await sendMail({ to: await currentAgentNoticeEmail(db, o.id), subject: `Registered-agent resignation \u2014 ${o.llc_name}`, html: "<p>A copy of the submitted registered-agent resignation is attached and is also available in your portal. Submission does not end the appointment immediately. We will also mail the notice required by Florida law.</p>", attachments: [{ filename: "registered-agent-resignation.pdf", content: Buffer.from(await readFileStream(key)).toString("base64") }] });
       await db.query("UPDATE orders SET ra_resignation_emailed_at=now() WHERE id=$1", [o.id]);
     } catch {
       return c.json(err("The copy is in the portal, but email failed. Retry sending the existing copy.", "EMAIL_FAILED"), 503);
@@ -111782,6 +111790,43 @@ var Hono2 = class extends Hono {
   }
 };
 
+// server/s-election-recovery.ts
+init_env();
+function recoveryDetails(row, newRestore = false) {
+  const details = (typeof row.details === "string" ? JSON.parse(row.details) : row.details) || {};
+  if (row.type && row.type !== "s-election" || !["awaiting_info", "in_progress"].includes(row.status) || row.ein_secret || details.documentDeletedAt || !Array.isArray(details.shareholders) || !details.shareholders.length) return null;
+  const next = {
+    ...details,
+    taxpayerNumbersRequired: true,
+    shareholders: details.shareholders.map((s) => ({ ...s, ssnLast4: "", ssnLast4Second: "" }))
+  };
+  if (newRestore) delete next.taxpayerNumbersNoticeAt;
+  return next;
+}
+var escape = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+async function notifyTaxpayerNumbersRequired(db, row) {
+  const [current] = await db.query(
+    "SELECT status, details, ein_secret FROM service_orders WHERE id=$1",
+    [row.id]
+  );
+  if (!current || !current.details.taxpayerNumbersRequired || current.ein_secret || !["awaiting_info", "in_progress"].includes(current.status)) return true;
+  if (current.details.taxpayerNumbersNoticeAt) return true;
+  const [client] = await db.query("SELECT email FROM clients WHERE id=$1", [row.client_id]);
+  try {
+    if (!client?.email) throw new Error("The client email address is unavailable");
+    await sendMail({
+      to: client.email,
+      subject: `Action needed for your S election \u2014 ${row.llc_name}`,
+      html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px"><p><strong>MyFloridaSeriesLLC</strong></p><p>We need the owners\u2019 Social Security numbers again to complete the S corporation election package for <strong>${escape(row.llc_name)}</strong>. Your other saved answers remain available.</p><p>Sign in to your client portal, select this company, and open <strong>Re-enter taxpayer numbers</strong> under <strong>Orders in progress</strong>. Enter each owner\u2019s number and submit the form securely.</p><p>Do not send Social Security numbers by email.</p><p><a href="${escape(env.PUBLIC_BASE_URL + "/portal")}">Open your client portal</a></p></div>`
+    });
+    await db.query("UPDATE service_orders SET details=details||jsonb_build_object('taxpayerNumbersNoticeAt',$2::text) WHERE id=$1 AND ein_secret IS NULL AND details->>'taxpayerNumbersRequired'='true'", [row.id, (/* @__PURE__ */ new Date()).toISOString()]);
+    return true;
+  } catch (e) {
+    console.error("[s-election] taxpayer-number recovery notification failed:", row.id, e);
+    return false;
+  }
+}
+
 // server/routes-admin.ts
 init_db();
 
@@ -112333,7 +112378,16 @@ function registerAdminRoutes(app2) {
     const form = await c.req.parseBody({ all: true });
     const maybeArticles = form.articles;
     const articles = maybeArticles instanceof File ? maybeArticles : null;
-    const formedDocNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
+    const suppliedDocNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
+    if (suppliedDocNumber && !/^L\d{11}$/.test(suppliedDocNumber)) {
+      return c.json(err("A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.", "DOCUMENT_NUMBER_SHAPE"), 400);
+    }
+    const existingNumbers = articles ? await db.query(
+      "SELECT meta FROM documents WHERE order_id=$1 AND kind IN ('articles','statement') ORDER BY CASE WHEN kind='articles' THEN 0 ELSE 1 END, created_at DESC",
+      [o.id]
+    ) : [];
+    const priorDocNumber = existingNumbers.map((d2) => String(metaOf(d2).documentNumber ?? "")).find((n) => /^L\d{11}$/.test(n)) ?? "";
+    const formedDocNumber = suppliedDocNumber || priorDocNumber;
     const formedWeSigned = appointedUs(o.payload);
     if (articles && formedWeSigned && !formedDocNumber) {
       return c.json(err(DOC_NUMBER_NEEDED, "DOCUMENT_NUMBER_REQUIRED"), 400);
@@ -112437,14 +112491,15 @@ function registerAdminRoutes(app2) {
           );
           const artRow = await db.query(
             `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-         VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
+         VALUES ($1, $2, 'articles', $3, $4, $5, $6, $7) RETURNING id`,
             [
               o.client_id,
               o.id,
               `Articles of Organization \u2014 ${o.llc_name}`,
               storedArticles.storageKey,
               articles.type || "application/pdf",
-              storedArticles.sizeBytes
+              storedArticles.sizeBytes,
+              JSON.stringify(formedDocNumber ? { documentNumber: formedDocNumber } : {})
             ]
           );
           newRows.push(artRow[0].id);
@@ -112966,7 +113021,14 @@ function registerAdminRoutes(app2) {
       const appliedFor = Boolean(d2.einPending) || !d2.ein;
       if (!appliedFor || !d2.shareholders?.length) continue;
       if (!row.ein_secret) {
-        if (d2.documentId || d2.purgedAt) {
+        const needed = recoveryDetails(row);
+        if (needed) {
+          const changed = await db.query(
+            "UPDATE service_orders SET status='awaiting_info', details=$2 WHERE id=$1 AND ein_secret IS NULL AND status IN ('awaiting_info','in_progress') RETURNING id",
+            [row.id, JSON.stringify({ ...needed, ein: args.ein, einPending: false, einSource: "letter" })]
+          );
+          if (changed.length) await notifyTaxpayerNumbersRequired(db, row);
+        } else if (d2.documentId || d2.purgedAt) {
           const mail2 = sElectionEinArrivedLateEmail({ llcName: row.llc_name, einDisplay, portalUrl: `${env.PUBLIC_BASE_URL}/portal`, supportEmail: "support@myfloridaseriesllc.com" });
           sendMail({ to, ...mail2 }).catch((e) => console.error("[admin] ein-late email failed:", e));
         }

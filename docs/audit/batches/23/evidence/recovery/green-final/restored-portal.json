@@ -1,0 +1,233 @@
+{
+  "data": {
+    "llcName": "Recovery Recovery LLC",
+    "oaSElection": false,
+    "dev": true,
+    "members": [
+      {
+        "name": "Recovery Client",
+        "address": "100 Main Street, Miami, FL, 33101"
+      }
+    ],
+    "pricing": {
+      "seriesCents": 5000,
+      "einCents": 5000,
+      "sElectionCents": 9500,
+      "certStatusCents": 1500,
+      "certifiedCopyCents": 4000
+    },
+    "sElection": {
+      "eligible": false,
+      "reason": "already_ordered",
+      "orderBy": "2026-11-25T01:52:50.000Z",
+      "formationPaidAt": "2026-09-21T01:52:50.000Z"
+    },
+    "series": [],
+    "llcFormed": true,
+    "todayEastern": "2026-09-20",
+    "companyEin": null,
+    "einCompanyOrdered": true,
+    "orders": [
+      {
+        "id": "17a509e8-a7f2-465a-8624-31b3c7788c52",
+        "type": "s-election",
+        "status": "awaiting_info",
+        "llc_name": "Recovery LLC",
+        "details": {},
+        "amount_cents": 0,
+        "created_at": "2026-09-21T01:52:50.270Z",
+        "paid_at": "2026-09-21T01:52:50.270Z",
+        "fulfilled_at": null,
+        "editableUntil": null,
+        "editable": false,
+        "documentId": null
+      },
+      {
+        "id": "61996fb4-4cd7-4db1-98a5-279a731c092d",
+        "type": "ein",
+        "status": "awaiting_info",
+        "llc_name": "Recovery LLC",
+        "details": {},
+        "amount_cents": 0,
+        "created_at": "2026-09-21T01:52:50.270Z",
+        "paid_at": "2026-09-21T01:52:50.270Z",
+        "fulfilled_at": null
+      },
+      {
+        "id": "78a4a909-b0d5-4934-9288-131a27be4a8c",
+        "type": "s-election",
+        "status": "in_progress",
+        "llc_name": "Recovery LLC",
+        "details": {
+          "ein": "",
+          "phone": "3055550100",
+          "einPending": true,
+          "officerName": "Recovery Client",
+          "officerTitle": "Member",
+          "shareholders": [
+            {
+              "name": "Recovery Client",
+              "joint": "tbe",
+              "name2": "Second Owner",
+              "address": "100 Main Street, Miami FL 33101",
+              "ssnLast4": "6789",
+              "percentage": 100,
+              "dateAcquired": "2026-09-16",
+              "ssnLast4Second": "4321"
+            }
+          ],
+          "effectiveDate": "2026-09-16",
+          "dateIncorporated": "2026-09-16",
+          "documentDeletedAt": "2026-09-16"
+        },
+        "amount_cents": 0,
+        "created_at": "2026-09-21T01:52:50.269Z",
+        "paid_at": "2026-09-21T01:52:50.269Z",
+        "fulfilled_at": null,
+        "editableUntil": null,
+        "editable": false,
+        "documentId": null
+      },
+      {
+        "id": "7f3fc7f6-11dd-4d62-a693-94d24c232e35",
+        "type": "s-election",
+        "status": "fulfilled",
+        "llc_name": "Recovery LLC",
+        "details": {
+          "ein": "",
+          "phone": "3055550100",
+          "einPending": true,
+          "officerName": "Recovery Client",
+          "officerTitle": "Member",
+          "shareholders": [
+            {
+              "name": "Recovery Client",
+              "joint": "tbe",
+              "name2": "Second Owner",
+              "address": "100 Main Street, Miami FL 33101",
+              "ssnLast4": "6789",
+              "percentage": 100,
+              "dateAcquired": "2026-09-16",
+              "ssnLast4Second": "4321"
+            }
+          ],
+          "effectiveDate": "2026-09-16",
+          "dateIncorporated": "2026-09-16"
+        },
+        "amount_cents": 0,
+        "created_at": "2026-09-21T01:52:50.269Z",
+        "paid_at": "2026-09-21T01:52:50.269Z",
+        "fulfilled_at": "2026-09-21T01:52:50.269Z",
+        "editableUntil": "2026-10-05T01:52:50.000Z",
+        "editable": true,
+        "documentId": null
+      },
+      {
+        "id": "5d75a8d6-f985-452b-9ea2-cdcb523a5c53",
+        "type": "s-election",
+        "status": "awaiting_info",
+        "llc_name": "Recovery LLC",
+        "details": {
+          "ein": "",
+          "phone": "3055550100",
+          "einPending": true,
+          "officerName": "Recovery Client",
+          "officerTitle": "Member",
+          "shareholders": [
+            {
+              "name": "Recovery Client",
+              "joint": "tbe",
+              "name2": "Second Owner",
+              "address": "100 Main Street, Miami FL 33101",
+              "ssnLast4": "",
+              "percentage": 100,
+              "dateAcquired": "2026-09-16",
+              "ssnLast4Second": ""
+            }
+          ],
+          "effectiveDate": "2026-09-16",
+          "dateIncorporated": "2026-09-16",
+          "taxpayerNumbersNoticeAt": "2026-09-21T01:52:51.080Z",
+          "taxpayerNumbersRequired": true
+        },
+        "amount_cents": 0,
+        "created_at": "2026-09-21T01:52:50.269Z",
+        "paid_at": "2026-09-21T01:52:50.269Z",
+        "fulfilled_at": null,
+        "editableUntil": null,
+        "editable": false,
+        "documentId": null
+      },
+      {
+        "id": "9645aa9d-95b7-4fa3-a731-7f156bda961f",
+        "type": "s-election",
+        "status": "cancelled",
+        "llc_name": "Recovery LLC",
+        "details": {
+          "ein": "",
+          "phone": "3055550100",
+          "einPending": true,
+          "officerName": "Recovery Client",
+          "officerTitle": "Member",
+          "shareholders": [
+            {
+              "name": "Recovery Client",
+              "joint": "tbe",
+              "name2": "Second Owner",
+              "address": "100 Main Street, Miami FL 33101",
+              "ssnLast4": "6789",
+              "percentage": 100,
+              "dateAcquired": "2026-09-16",
+              "ssnLast4Second": "4321"
+            }
+          ],
+          "effectiveDate": "2026-09-16",
+          "dateIncorporated": "2026-09-16"
+        },
+        "amount_cents": 0,
+        "created_at": "2026-09-21T01:52:50.269Z",
+        "paid_at": "2026-09-21T01:52:50.269Z",
+        "fulfilled_at": null,
+        "editableUntil": null,
+        "editable": false,
+        "documentId": null
+      },
+      {
+        "id": "a76951b5-2103-411f-85ac-ba65e760dcf1",
+        "type": "s-election",
+        "status": "awaiting_info",
+        "llc_name": "Recovery LLC",
+        "details": {
+          "ein": "",
+          "phone": "3055550100",
+          "einPending": true,
+          "officerName": "Recovery Client",
+          "officerTitle": "Member",
+          "shareholders": [
+            {
+              "name": "Recovery Client",
+              "joint": "tbe",
+              "name2": "Second Owner",
+              "address": "100 Main Street, Miami FL 33101",
+              "ssnLast4": "",
+              "percentage": 100,
+              "dateAcquired": "2026-09-16",
+              "ssnLast4Second": ""
+            }
+          ],
+          "effectiveDate": "2026-09-16",
+          "dateIncorporated": "2026-09-16",
+          "taxpayerNumbersNoticeAt": "2026-09-21T01:52:51.079Z",
+          "taxpayerNumbersRequired": true
+        },
+        "amount_cents": 0,
+        "created_at": "2026-09-21T01:52:50.268Z",
+        "paid_at": "2026-09-21T01:52:50.268Z",
+        "fulfilled_at": null,
+        "editableUntil": null,
+        "editable": false,
+        "documentId": null
+      }
+    ]
+  }
+}

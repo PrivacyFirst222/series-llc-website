@@ -1,0 +1,11 @@
+The bundle contains these 5 refs:
+3577d25d6c452215171683deb3f5ffc5e0c9636b refs/heads/audit/batch-22
+3577d25d6c452215171683deb3f5ffc5e0c9636b refs/heads/audit/batch-23
+ac78b63e8819a490271b13cc94079fe933af9af6 refs/tags/pre-provision-sweep
+73ce03d0d7e4ffc7a2bb0937dc513767a15f61a9 refs/tags/pre-word-generation
+3577d25d6c452215171683deb3f5ffc5e0c9636b HEAD
+The bundle records a complete history.
+The bundle uses this hash algorithm: sha1
+/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/return-point-3577d25.bundle is okay
+
+Restored bundle into fresh temporary clone; clean HEAD exactly 3577d25d6c452215171683deb3f5ffc5e0c9636b. Temporary clone removed after verification.

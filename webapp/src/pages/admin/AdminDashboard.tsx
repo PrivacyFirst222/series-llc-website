@@ -103,7 +103,14 @@ function EmailsDialog({ client }: { client: AdminClient }) {
             <Button type="button" variant="ghost" size="sm" className="rounded-full" onClick={() => setSelected(null)}>
               ← Back to the list
             </Button>
-            {one.data ? (
+            {one.isError ? (
+              <div role="alert" className="space-y-2 text-sm">
+                <p className="text-destructive">We couldn’t load this email. Please try again.</p>
+                <Button type="button" variant="outline" size="sm" className="min-h-[44px]" disabled={one.isFetching} onClick={() => void one.refetch()}>
+                  {one.isFetching ? "Retrying…" : "Retry"}
+                </Button>
+              </div>
+            ) : one.data ? (
               <>
                 <div className="text-sm">
                   <div className="font-medium">{one.data.subject}</div>
@@ -122,6 +129,13 @@ function EmailsDialog({ client }: { client: AdminClient }) {
             ) : (
               <p className="text-sm text-muted-foreground">Loading…</p>
             )}
+          </div>
+        ) : list.isError ? (
+          <div role="alert" className="space-y-2 text-sm">
+            <p className="text-destructive">We couldn’t load the email history. Please try again.</p>
+            <Button type="button" variant="outline" size="sm" className="min-h-[44px]" disabled={list.isFetching} onClick={() => void list.refetch()}>
+              {list.isFetching ? "Retrying…" : "Retry"}
+            </Button>
           </div>
         ) : list.isPending ? (
           <p className="text-sm text-muted-foreground">Loading…</p>

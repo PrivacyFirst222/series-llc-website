@@ -4,10 +4,11 @@ import { deletionJournal } from './document-retention';
 import { readMirror, hashBytes } from './dropbox';
 import { replaceStoredFile } from './storage';
 import { isEncrypted, unseal } from './encryption';
+import { recoveryDetails, notifyTaxpayerNumbersRequired, type RecoverableElection } from './s-election-recovery';
 /** Actual recovery path, also exercised with an empty disposable database.
  * Delete decisions are read from outside the snapshot, before restoring any
  * document. A failed read aborts restoration rather than guessing no deletions. */
-export async function restoreBackup(db:Db, dump:BackupDump):Promise<{tables:number;files:number;excludedDeleted:number}>{
+export async function restoreBackup(db:Db, dump:BackupDump):Promise<{tables:number;files:number;excludedDeleted:number;recoveryNotifications:{sent:number;failed:number}}>{
  if(dump.version!==1||dump.fileManifestVersion!==1||!Array.isArray(dump.files))throw new Error('This restore requires a verified backup with a complete file manifest');
  for(const t of BACKUP_TABLES)if(!Array.isArray(dump.tables[t]))throw new Error(`Backup is missing table ${t}`);
  for(const table of BACKUP_TABLES){const [existing]=await db.query<{n:string}>(`SELECT count(*) AS n FROM ${table}`);if(Number(existing.n))throw new Error(`Restore target is not empty: ${table}`);}
@@ -16,10 +17,13 @@ export async function restoreBackup(db:Db, dump:BackupDump):Promise<{tables:numb
  const removedIds=new Set([...tombstones.map(d=>d.documentId),...tables.documents.filter(d=>deleted.has(String(d.storage_key))||d.deleted_at).map(d=>d.id)]);
  tables.documents=tables.documents.filter(d=>!removedIds.has(d.id));
  tables.oa_generations=tables.oa_generations.map(d=>removedIds.has(d.document_id)?{...d,document_id:null}:d);
+ const recovery: RecoverableElection[] = [];
  for(const row of tables.service_orders){
   row.ein_secret=null;const details=(row.details||{}) as Record<string,unknown>;
   if(removedIds.has(details.documentId)){details.documentDeletedAt=new Date().toISOString();}
   else if(row.type==='ein'&&row.status==='in_progress')row.status='awaiting_info';
+  const needed = recoveryDetails(row as unknown as RecoverableElection, true);
+  if(needed){row.status='awaiting_info';row.details=needed;recovery.push(row as unknown as RecoverableElection);}
  }
  // Verify every required file and encryption key before writing database rows.
  const bytes=new Map<string,Buffer>();
@@ -38,5 +42,7 @@ export async function restoreBackup(db:Db, dump:BackupDump):Promise<{tables:numb
   }
  }
  for(const d of tombstones)await db.query('INSERT INTO document_deletions(storage_key,document_id,mirror_path,requested_at) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING',[d.storageKey,d.documentId,d.mirrorPath,d.requestedAt]);
- return {tables:BACKUP_TABLES.length,files:bytes.size,excludedDeleted:removedIds.size};
+ const recoveryNotifications={sent:0,failed:0};
+ for(const row of recovery){if(await notifyTaxpayerNumbersRequired(db,row))recoveryNotifications.sent++;else recoveryNotifications.failed++;}
+ return {tables:BACKUP_TABLES.length,files:bytes.size,excludedDeleted:removedIds.size,recoveryNotifications};
 }

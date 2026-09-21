@@ -1,0 +1,14 @@
+ 5 | import {gunzipSync} from 'node:zlib';
+ 6 | import {PDFDocument} from '@cantoo/pdf-lib';
+ 7 | const prefix='B23R:';
+ 8 | const evidence=process.env.BATCH23_RECOVERY_EVIDENCE_DIR;
+ 9 | const report=(label:string,ok:boolean,detail?:unknown)=>console.log(prefix+JSON.stringify({label:`batch23 ${label}`,ok,detail}));
+10 | const retain=(name:string,text:string)=>{if(evidence){mkdirSync(evidence,{recursive:true});writeFileSync(join(evidence,name),text);}};
+                                                                                                ^
+TypeError: The "data" argument must be of type string or an instance of Buffer, TypedArray, or DataView
+ code: "ERR_INVALID_ARG_TYPE"
+
+      at retain (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/batch23-recovery-check.ts:10:92)
+      at restored (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-3-2026-09-20/repo/webapp/server/batch23-recovery-check.ts:48:423)
+
+Bun v1.3.14 (macOS arm64)

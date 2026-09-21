@@ -1,0 +1,1 @@
+Removing XFA form data as pdf-lib does not support reading or writing XFA. Set preserveXFA: true in load options to keep XFA data.

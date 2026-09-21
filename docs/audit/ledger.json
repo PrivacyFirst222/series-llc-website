@@ -20642,15 +20642,47 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-21T00:00:08.074Z",
               "event": "recorded from verified audit",
               "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T01:44:33.515Z",
+              "event": "assigned",
+              "batch": "23",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T01:56:56.961Z",
+              "event": "implemented",
+              "batch": "23",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "23",
+          "fix": {
+            "batch": "23",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/batch23-office-check.ts",
+                "text": "B4-EMAIL-ERROR-EMPTY"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "scripts/batch23-office-check.ts"
+              }
+            ]
+          }
         }
       ]
     },
@@ -20667,15 +20699,47 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-21T00:00:08.074Z",
               "event": "recorded from verified audit",
               "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T01:44:33.515Z",
+              "event": "assigned",
+              "batch": "23",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T01:56:56.961Z",
+              "event": "implemented",
+              "batch": "23",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "23",
+          "fix": {
+            "batch": "23",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/batch23-office-check.ts",
+                "text": "B4-EIN-ERROR-MISSING"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "scripts/batch23-office-check.ts"
+              }
+            ]
+          }
         }
       ]
     },
@@ -20692,15 +20756,47 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-21T00:00:08.074Z",
               "event": "recorded from verified audit",
               "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T01:44:33.515Z",
+              "event": "assigned",
+              "batch": "23",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T01:56:56.961Z",
+              "event": "implemented",
+              "batch": "23",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "23",
+          "fix": {
+            "batch": "23",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/batch23-recovery-check.ts",
+                "text": "B5-ARTICLES-METADATA"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "server/batch23-recovery-check.ts"
+              }
+            ]
+          }
         }
       ]
     },
@@ -20717,15 +20813,47 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-21T00:00:08.074Z",
               "event": "recorded from verified audit",
               "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T01:44:33.515Z",
+              "event": "assigned",
+              "batch": "23",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T01:56:56.961Z",
+              "event": "implemented",
+              "batch": "23",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "23",
+          "fix": {
+            "batch": "23",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/batch23-notices-check.ts",
+                "text": "B5-RENEWAL-OLD-EMAIL"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "server/batch23-notices-check.ts"
+              }
+            ]
+          }
         }
       ]
     },
@@ -20799,15 +20927,47 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-21T00:00:08.074Z",
               "event": "recorded from verified audit",
               "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T01:44:33.515Z",
+              "event": "assigned",
+              "batch": "23",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T01:56:56.961Z",
+              "event": "implemented",
+              "batch": "23",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "23",
+          "fix": {
+            "batch": "23",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/batch23-recovery-check.ts",
+                "text": "B4-RESTORE-S-ELECTION-SECRET-STATE"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "server/batch23-recovery-check.ts"
+              }
+            ]
+          }
         }
       ]
     },
@@ -22026,6 +22186,25 @@
         },
         {
           "at": "2026-09-21T01:06:19.865Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "23",
+      "revision": 1,
+      "frozenHash": "375932138ef4743c032d58e5f0ffdc605d202fee6683ccc8881837959fef9c72",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "3577d25d6c452215171683deb3f5ffc5e0c9636b",
+      "history": [
+        {
+          "at": "2026-09-21T01:44:33.516Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-21T01:56:56.961Z",
           "event": "implemented"
         }
       ]

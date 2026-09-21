@@ -295,12 +295,23 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
                 <div><span className="text-muted-foreground">EIN for:</span>{" "}
                   {viewing.details.target === "series" ? viewing.details.seriesName : viewing.llc_name}
                 </div>
+                {detailQuery.isError ? (
+                  <div role="alert" className="space-y-2">
+                    <p className="text-destructive">We couldn’t load the EIN application details. Please try again.</p>
+                    <Button type="button" variant="outline" size="sm" className="min-h-[44px]" disabled={detailQuery.isFetching} onClick={() => void detailQuery.refetch()}>
+                      {detailQuery.isFetching ? "Retrying…" : "Retry"}
+                    </Button>
+                  </div>
+                ) : detailQuery.isPending ? (
+                  <p className="text-muted-foreground">Loading EIN application details…</p>
+                ) : detailQuery.isSuccess && detailQuery.data ? (
+                <>
                 <div><span className="text-muted-foreground">Responsible party:</span>{" "}
-                  {detailQuery.data?.details.responsibleName ?? viewing.details.responsibleName ?? "— not yet provided —"}
+                  {detailQuery.data.details.responsibleName ?? "— not yet provided —"}
                 </div>
                 <div>
                   <span className="text-muted-foreground">SSN/ITIN:</span>{" "}
-                  {detailQuery.isLoading ? "…" : detailQuery.data?.tin ? (
+                  {detailQuery.data.tin ? (
                     <span className="font-mono-feature">{detailQuery.data.tin}</span>
                   ) : (
                     "— not yet provided —"
@@ -357,6 +368,8 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
                       ));
                     })()}
                   </ol>
+                ) : null}
+                </>
                 ) : null}
               </>
             )}
