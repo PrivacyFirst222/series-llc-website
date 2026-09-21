@@ -9,42 +9,42 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
 ## Public pages, Terms and Privacy — 45 open of 51
 
-- **1. [A30]** — **implemented**
+- **1. [A30]** — **open**
   - FAQ hero: "Drawn from real client questions about Florida's Protected Series LLC statute." No clients yet. Replace: "The questions people ask before forming a Florida Protected Series LLC, answered."
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
-- **2. [A31]** — **implemented**
+  - 2026-09-21 rejected r2: proceed with revision 3
+- **2. [A31]** — **open**
   - How It Works step 03: "…we send you the filed Articles … along with a form Operating Agreement completed from your questionnaire answers…". The agreement exists only after the portal questionnaire. Replace: posted documents and Manual; "A short questionnaire in the portal then completes your form Operating Agreement".
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
-- **3. [A32]** — **implemented**
+  - 2026-09-21 rejected r2: proceed with revision 3
+- **3. [A32]** — **open**
   - How It Works "Optional add-ons" calls the agent service an add-on; first year included. Replace: "Add-ons and choices".
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 4 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **4. [A33]** — **implemented**
   - Terms s. 1 assigns 9(c)–(g) and 11(e) to Filing Services; they are Agent Services matters. Replace: assign them to Agent Services.
   - **Codex rejected the proposed replacement:** Reassigning those clauses alone leaves the additional conflicts documented in linked item 29. Produce one complete section-allocation revision.
   - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **5. [A34]** — **implemented**
+- **5. [A34]** — **open**
   - Terms "Last updated: August 13, 2026" and Privacy "Last updated: August 4, 2026" predate the last edits (Sep 15; Aug 9). Replace the dates.
   - **Codex rejected the proposed replacement:** Use the actual effective/publication dates of the revised policies. A commit date establishes an edit, not by itself the legally effective date.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **6. [A35]** — **dropped** — waits on Adam's ruling
   - Benefits "Side by side": "One state filing covers 10 series". Each series is its own filing. Ruling needed (a Benefits row was ruled correct on 15 Sep).
   - Codex (disputed): Benefits.tsx still contains "One state filing covers 10 series", but rulings.md expressly protects the Benefits Side by side row. The user prohibits flagging ruled wording.
   - **Codex rejected the proposed replacement:** Retain the ruled wording; no replacement is authorized by this audit.
   - Outcome: The Benefits 'Side by side' row is in rulings.md (15 Sep 2026); a ruled wording is not flagged.
-- **7. [A36]** — **implemented**
+- **7. [A36]** — **open**
   - Benefits "Use multiple LLCs if… You only ever own 1 asset". Replace eyebrow: "Use a regular LLC if…".
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **8. [A37]** — **open**
   - Benefits footnote "State fees only" over a line including the $99 agent fee. Replace: "State fees and registered agent only".
-- **9. [A38]** — **implemented**
+- **9. [A38]** — **open**
   - Benefits "Paid once" row "(3 of 10 covered by the fee)". Replace: "covered by our service fee".
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **10. [A39]** — **implemented**
   - Asset Protection: "vote his shares" (no shares in an LLC); "two entirely different directions … addresses all of them". Replace: "vote it"; "addresses both".
   - Fixed: batch 17 revision 2, commit , by Codex; protected by 3 assertion(s).
@@ -80,22 +80,22 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): RecordkeepingApp.tsx grades provision of an operating agreement, while WhyOnlyUs.tsx says "generic LLC agreement, if any". A generic operating agreement is still an operating agreement; the quotations do not establish a contradiction.
   - **Codex rejected the proposed replacement:** Changing the criterion to a protected-series-specific agreement and marking competitors no requires new competitor evidence; none is supplied by the finding.
   - Outcome: No contradiction: a generic operating agreement is still an operating agreement. Changing the grade needs competitor evidence the finding does not have.
-- **17. [A46]** — **implemented**
+- **17. [A46]** — **amend-title: implemented; contact-wording: open**
   - Contact page "please contact us" on the contact page; Amend Agreement tab title reads "Page Not Found". Replace: "send them using the form below."; add the title.
   - Part "amend-title" — implemented: The Amendment page's browser title reads 'Page Not Found'; give it its proper title.
   - Fixed (amend-title): batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
-  - Part "contact-wording" — implemented: The Contact page says 'please contact us' on the contact page itself.
-  - Fixed (contact-wording): batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Part "contact-wording" — open: The Contact page says 'please contact us' on the contact page itself.
   - 2026-09-21 rejected r1: proceed with revision 2
-- **18. [B1]** — **implemented**
+  - 2026-09-21 rejected r2: proceed with revision 3
+- **18. [B1]** — **open**
   - Home page and Benefits page, the benefits grid, card 03 'One filing, one franchise relationship' — `webapp/src/components/home/BenefitsGrid.tsx:26`
   - Reads: Pay the $125 Florida formation fee once. Your first three protected series are covered by the formation fee; each one after that is $50 — $25 to prepare plus the $25 state filing fee.
   - Claims: That the $125 state fee covers the first three protected series.
   - True: The $125 is $100 for the Articles plus $25 to designate the registered agent (docs/facts.md:39-40; s. 605.0213(2) and (7), opened). The three designations and their $25 state fees are covered by the $499 service fee (Pricing.tsx:90-91 'Covers up to 3 Protected Series Designations, including their state filing fees.'; FAQ.tsx:38). The StatBar ruling of 15 Sep covers the $125 stat bar, not this card.
   - Replace with: Pay the $125 Florida state filing fee once. Our $499 service fee covers your first three Protected Series Designations, state fees included; each one after that is $50 — $25 to prepare plus the $25 state filing fee.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
-- **19. [B2]** — **implemented**
+  - 2026-09-21 rejected r2: proceed with revision 3
+- **19. [B2]** — **open**
   - Home page and Benefits page, the benefits grid, card 03 title — `webapp/src/components/home/BenefitsGrid.tsx:25`
   - Reads: One filing, one franchise relationship
   - Claims: That forming here creates one 'franchise relationship'.
@@ -104,16 +104,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): BenefitsGrid.tsx:25 reads "One filing, one franchise relationship". Replacing it with "One state fee, one annual report" still wrongly collapses the Articles, agent-designation and series-designation state fees documented in facts.md.
   - **Codex rejected the proposed replacement:** Use a heading such as "One annual report for the company and its series". The original finding’s universal no-franchise-tax explanation is not established by section 605.0212.
   - Corrected after Codex's review: 'One state fee' is also wrong (Articles, agent designation and each series designation are separate state fees). Use 'One annual report for the company and its series'.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
-- **20. [B3]** — **implemented**
+  - 2026-09-21 rejected r2: proceed with revision 3
+- **20. [B3]** — **open**
   - Home page hero, the trust line under the buttons — `webapp/src/components/home/HomeHero.tsx:87`
   - Reads: Florida registered agent service included
   - Claims: That registered agent service is included, without limit.
   - True: Only the first year is included; it renews at $99 (Pricing.tsx:11 'Florida registered agent service — first year included ($99/yr after)'; terms.md:46).
   - Replace with: Florida registered agent service — first year included
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **21. [B4]** — **dropped**
   - Home page, the dark 'Formed in Florida' teaser above the link to The Statute page — `webapp/src/components/home/StatuteTeaser.tsx:17`
   - Reads: Two sections do most of the day-to-day work: how a protected series holds property, and how a court reads a series when the chapter applies.
@@ -132,15 +132,15 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): Benefits.tsx:61 does display 10 returns versus 1 return, but the proposed note "A sole owner’s LLC files none either way" is false for a sole-owner LLC electing S-corporation taxation, an option this product supports.
   - **Codex rejected the proposed replacement:** Qualify the illustration by tax classification and income-tax-return type; a sole-owner disregarded entity differs from a sole-owner S corporation. Do not equate owner count with tax classification.
   - Corrected after Codex's review: 'A sole owner's LLC files none either way' is false for a sole-owner S corporation (Form 1120-S). Qualify the row by tax classification, not owner count.
-- **23. [B6]** — **implemented**
+- **23. [B6]** — **open**
   - Benefits page, the footnote under 'The math' table — `webapp/src/pages/Benefits.tsx:182`
   - Reads: Registered agent pricing is held at $99/yr on both sides, so the comparison turns on the number of entities rather than on what any agent charges.
   - Claims: That both columns are priced at $99 a year for the agent.
   - True: In the first-year figure the ten LLCs are charged $990 of agent fees and the Protected Series LLC $0 (:52-53 '$990/yr' / '$99/yr' with the note :51 'Your first year is included in the service fee'; the ≈ $1,940 at :168 is 1,250 + 990 − (125 + 175)). The sides are held equal only from year two.
   - Replace with: Registered agent pricing is held at $99/yr on both sides after the first year; the first-year figure counts the year our service fee includes, so the comparison turns on the number of entities rather than on what any agent charges.
   - **Codex rejected the proposed replacement:** Explicitly distinguish equal renewal rates from the first-year inclusion. The conclusion that the entire comparison turns only on entity count remains too broad after the proposed edit.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **24. [B7]** — **implemented**
   - Contact page, the 'Message' box and the Send button — `webapp/src/pages/Contact.tsx:119`
   - Reads: <Label htmlFor="message">Message</Label>
@@ -148,14 +148,14 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The server refuses a blank message: routes-payments.ts:638 'message: z.string().trim().min(1).max(5000)' and :647 returns 'Please provide your name, a valid email, and a message.' A visitor who leaves it blank is refused after Send with a message about three boxes.
   - Replace with: Label 'Message *'; pre-check 'if (!form.name || !form.email || !form.message.trim())' with the toast 'Please add your name, email, and a message so we can reply.'
   - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **25. [B8]** — **implemented**
+- **25. [B8]** — **open**
   - Contact page, the small line beside the Send button — `webapp/src/pages/Contact.tsx:132`
   - Reads: Document preparation service only.
   - Claims: That the business is a document preparation service only.
   - True: The footer on the same screen (Footer.tsx:79-80) says 'MyFloridaSeriesLLC.com is a document preparation and registered agent service.' and Terms s. 4 sells registered agent service. Two wordings for one fact.
   - Replace with: Document preparation and registered agent service — not legal advice.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **26. [B9]** — **implemented**
   - Privacy Policy, section 3 'Payment Information' — `webapp/src/content/privacy.md:19`
   - Reads: Payments are processed by **Square, Inc.** We never receive or store your full card number, CVV, or bank credentials. Square provides us a confirmation of payment and limited details (such as the last four digits and the name on the order). Square's handling of your information is governed by Square's own privacy policy.
@@ -226,21 +226,21 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): RecordkeepingApp.tsx:34 promises to "Record transfers of assets ... with supporting notes." It does not recommend making transfers routinely. The cited Manual exception itself calls for a Transfer Log when a transfer occurs.
   - **Codex rejected the proposed replacement:** An optional caution may be helpful, but no contradiction is proved by supporting records for an exceptional transaction.
   - Outcome: No contradiction: the app records a transfer when one happens, which the Manual itself calls for.
-- **33. [B16]** — **implemented**
+- **33. [B16]** — **open**
   - Client portal, the 'taxed as' label beside each agreement (source of the label) — `webapp/src/lib/datetime.ts:53`
   - Reads: single: "Single-Member",
   - Claims: That 'Single-Member' is how the single-member agreements are taxed (the comment at :38 says 'How the agreement is taxed, in the words a client would use').
   - True: 'Single-Member' names the number of owners, not a tax treatment; the FAQ (FAQ.tsx:56) calls it 'a disregarded entity'. The label is shown at PortalDashboard.tsx:506 and OAQuestionnaire.tsx:846. Same at :54 for 'member-single'.
   - Replace with: single: "Disregarded entity",  and  "member-single": "Disregarded entity",
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **34. [B17]** — **open**
   - Client portal, S election form, the eligibility acknowledgment, part (I) — `webapp/src/lib/form2553Timing.ts:109`
   - Reads: I understand that (I) only U.S. residents can be S corporation shareholders, and an election with a nonresident alien shareholder will be rejected;
   - Claims: That only U.S. residents may hold S corporation stock.
   - True: The file's own source note (:105-107) states the IRS test as 'no nonresident alien shareholders'; a U.S. citizen living abroad is not a nonresident alien and is eligible, so 'only U.S. residents' excludes an eligible person. Adam's wording of 6 Sep 2026 — flagged for his decision.
   - Replace with: I understand that (I) a nonresident alien cannot be an S corporation shareholder, and an election that lists one will be rejected;
-- **35. [B23]** — **optional — implemented**
+- **35. [B23]** — **optional — open**
   - How It Works page, step 01 — `webapp/src/pages/HowItWorks.tsx:24`
   - Reads: It saves as you go, so you can stop and come back.
   - Claims: That the form's progress is saved and can be resumed.
@@ -248,16 +248,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: It saves as you go in your browser, so you can stop and come back on the same device.
   - Codex (disputed): HowItWorks.tsx:24 reads "It saves as you go, so you can stop and come back." FloridaLLCFormationForm.tsx:181-197 does autosave and loadDraft restores it. The sentence makes no cross-device promise.
   - Outcome: The sentence makes no cross-device promise; 'in your browser' is a clarification.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
-- **36. [B24]** — **implemented**
+  - 2026-09-21 rejected r2: proceed with revision 3
+- **36. [B24]** — **open**
   - Home page comparison table, the 'Recordkeeping app' row (and the Pricing page strip at :114 'Built around §605.2301 — free with formation') — `webapp/src/components/home/WhyOnlyUs.tsx:24`
   - Reads: us: "Free with formation",
   - Claims: That the app is available with formation today.
   - True: It is not released: Pricing.tsx:12 'Free iOS app (available end of year)'; RecordkeepingApp.tsx:129-130 'the recordkeeping app is currently in development'. The table row carries no such note.
   - Replace with: us: "Free with formation (iPhone app, coming end of year)",  and on :114  d: "Built around §605.2301 — free with formation, coming end of year"
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 4 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **37. [B25]** — **dropped**
   - Home page comparison table and Pricing strip, the footnote — `webapp/src/components/home/WhyOnlyUs.tsx:37`
   - Reads: "Comparison based on our review of leading national formation services' published offerings (August 2026).";
@@ -276,15 +276,15 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): MothershipDiagram.tsx:98 says "... a single tax filing and operating agreement from your perspective." The proposed "one EIN" is not universal: the site and portal explicitly contemplate separate series EINs.
   - **Codex rejected the proposed replacement:** Qualify tax treatment rather than substituting a new unconditional EIN claim. Owner-level income reporting does not establish that the diagram promises a separate entity return.
   - Corrected after Codex's review: Same as 15: do not substitute an unconditional 'one EIN'. 'A single tax filing' is wrong for a sole-owner LLC that is disregarded, which files no return of its own; a sole-owner LLC taxed as an S corporation does file one (see item 22). Qualify by tax classification, not by owner count.
-- **39. [B27]** — **implemented**
+- **39. [B27]** — **open**
   - FAQ, 'What's the federal tax treatment?', the S election sentence — `webapp/src/pages/FAQ.tsx:56`
   - Reads: If you decide on an S corporation election, we offer a $95 package that prepares IRS Form 2553 for you to sign and file.
   - Claims: That the package is available to any reader, including the converting client the FAQ addresses two answers earlier.
   - True: It is sold only for new formations: Pricing.tsx:140 'Available for new LLCs we form, ordered within 65 days of paying for your formation.'; buildPayload.ts:133 'sElection: data.orderSElection && data.filingPath !== "CONVERT"'.
   - Replace with: If you decide on an S corporation election for an LLC we form, we offer a $95 package that prepares IRS Form 2553 for you to sign and file.
   - **Codex rejected the proposed replacement:** Add both restrictions: new LLCs we form, ordered within 65 days of formation payment. The proposed replacement omits the second.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **40. [B28]** — **dropped**
   - Site header, the Learn menu, the line under 'The Florida Statute' — `webapp/src/components/layout/Header.tsx:18`
   - Reads: { to: "/the-statute", label: "The Florida Statute", sub: "Ch. 605 highlights" },
@@ -294,14 +294,14 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): Header.tsx:18 reads "Ch. 605 highlights". TheStatute.tsx cites 605.2103, 605.2104, 605.0109, 605.2202, 605.2404, 605.2402 and 605.04074 as well as 605.2301; the premise that it covers only one section is false.
   - **Codex rejected the proposed replacement:** Keep the broader accurate navigation label or use a neutral descriptive subtitle.
   - Outcome: The Statute page cites seven sections beyond s. 605.2301, so 'Ch. 605 highlights' is accurate.
-- **41. [B29]** — **implemented**
+- **41. [B29]** — **open**
   - Home page comparison table, the last row — `webapp/src/components/home/WhyOnlyUs.tsx:29`
   - Reads: label: "Registered agent + legal-mail client portal",     us: "First year included",
   - Claims: That the portal, like the agent, is a first-year inclusion.
   - True: Only the agent service is a first-year inclusion (Pricing.tsx:11); the portal is the client's for as long as the account exists (terms.md:83).
   - Replace with: label: "Registered agent, with legal mail posted to your portal", us: "First year of agent service included",
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **42. [B30]** — **implemented** — housekeeping
   - FAQ sidebar 'Authoritative sources' and the What Is sidebar, the Chapter 605 link — `webapp/src/pages/FAQ.tsx:143`
   - Reads: href="https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html&StatuteYear=2025&Title=%2D%3E2025%2D%3EChapter%20605"
@@ -338,15 +338,15 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: At the end of that period we remove the Social Security numbers from the active service-order record and replace the portal form with a record copy showing only the last four digits. Encrypted copies remain in archived database backups. [To preserve the existing permanent-deletion promise instead, exclude live secrets from backups or expire their independent encryption keys, and remove already retained copies.]
   - Ruling, 2026-09-19: Approved revised Batch 03: retain completed S-election forms and EIN letters encrypted until the client deletes them; remove underlying EIN numbers when fulfillment is recorded and S-election questionnaire numbers after the 14-day editing window; exclude transient taxpayer numbers from backups, prevent restoration from resurrecting deleted documents, and do not clean up existing test backups.
   - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **N1.09. [substantive]** — **implemented** — waits on Adam's ruling
+- **N1.09. [substantive]** — **open** — waits on Adam's ruling
   - Terms of Service, section16, license to use purchased documents — `webapp/src/content/terms.md:92`
   - Reads: You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC formed through the Services, and no other rights.
   - Claims: The licensed LLC must have been formed through this service.
   - True: Pricing.tsx:32–40 sells deliverables for an existing Florida LLC, and buildPayload.ts:21–29 supports CONVERT. Such a buyer's company was not formed through the Services, so the written license omits a product the site sells.
   - Replace with: You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC for which you purchased the Services, and no other rights.
   - Ruling, 2026-09-20: Adam approved Batch 11 item 19 with "I approve all other items", followed by "Go": "You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC for which you purchased the Services, and no other rights."
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **N1.10. [substantive]** — **open** — waits on Adam's ruling
   - Home and Benefits pages, Horizontal shield card; Asset Protection page, series example — `webapp/src/components/home/BenefitsGrid.tsx:16`
   - Reads: A creditor of Series A cannot reach Series B's assets, or the parent LLC's. Each series' debts stay with that series under §605.2401.
@@ -765,7 +765,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: message: 'Series names must include "PS", "P.S.", or "protected series" (s. 605.2202, Fla. Stat.).',  — and the same form at routes-portal.ts:1977, stepValidation.ts:189, StepSeries.tsx:72.
   - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
-- **100. [A30h]** — **implemented** — housekeeping
+- **100. [A30h]** — **review-rows: implemented; unused-code: implemented; fact-ledger: open** — housekeeping
   - Housekeeping: review rows printing codes or "—" for a self-agent's email/phone; no "exact name only" row on the Review name card; dead duplicate-member check; dead conversion branch in the formation sheet; member fields typed but never asked; ledger lacks the $99 renewal, 15/30-day rules and the four optional prices.
   - Codex (disputed): The compound item mixes code-only leftovers with visible Review rows and missing exact-name information (ReviewStep.tsx:113–124,157–169,225–228). It cannot all be classified housekeeping-only; the “capacity code” branch is itself unreachable in normal SELF UI.
   - **Codex rejected the proposed replacement:** Split visible wording/record defects from unused code. No concrete unified replacement is supplied, and ledger omissions are not false customer claims.
@@ -776,9 +776,9 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Part "unused-code" — implemented: The dead duplicate-member check, the dead conversion branch in the formation sheet, and member fields typed but never asked. Item 112 is the same dead check.
   - Fixed (unused-code): batch 19 revision 2, commit , by Codex; protected by 3 assertion(s).
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
-  - Part "fact-ledger" — implemented: The fact ledger lacks the $99 renewal, the 15- and 30-day rules and the four optional prices.
-  - Fixed (fact-ledger): batch 27 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Part "fact-ledger" — open: The fact ledger lacks the $99 renewal, the 15- and 30-day rules and the four optional prices.
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **101. [B18]** — **implemented** — housekeeping
   - Order form, the payload built at submit (conversion branch) — `webapp/src/components/forms/florida-llc/buildPayload.ts:29`
   - Reads: ? { desiredName: "", designator: "", finalName, alternateNames: [], exactNameOnly: false }
@@ -1077,10 +1077,10 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - S corporation warning (mine) cites Section 12.1 on forms where 12.1 is Amendments. Replace: "…its admission section admits only an eligible shareholder."
   - Fixed: batch 15 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
-- **127. [A59]** — **implemented**
+- **127. [A59]** — **open**
   - Sole-owner S title "Single-Member S Corporation…" vs pill "S Corporation"; "Amended & Restated (No. 2)" vs the document's full title. Replace: one label table; full title.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **128. [A60]** — **implemented**
   - Default dates from the device's UTC day (consent, questionnaire, amendment); two dates rendered in the viewer's zone. Replace: Florida's date from the server; formatDate.
   - Part "florida-date" — implemented: The consent, questionnaire and amendment forms default their dates from Florida's date given by the server, not the device's UTC day.
@@ -1974,16 +1974,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (housekeeping-only): chapter-605-notes.md:275 labels the annual-report total unverified. Opened2026 s.607.193(1)–(2):88.75 supplemental fee and400 late charge, added to605.0213(5)50, establish138.75/538.75.
   - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
-- **217. [B127]** — **implemented**
+- **217. [B127]** — **open**
   - Chapter 605 notes, General act, the s. 605.0105(3) bullet, item (p) — `webapp/server/chapter-605-notes.md:173`
   - Reads: (p) may not indemnify for bad faith, willful or intentional misconduct, improper personal benefit, or s. 605.0406 liability.
   - Claims: That list is the whole of (p).
   - True: s. 605.0105(3)(p) has a fourth item: '4. A breach of duties or obligations under s. 605.04091, taking into account a restriction, an expansion, or an elimination of such duties and obligations provided for in the operating agreement to the extent allowed by subsection (4).' It matters to the Indemnification sections, which A80 is already about.
   - Replace with: (p) may not indemnify for bad faith, willful or intentional misconduct, improper personal benefit, s. 605.0406 liability, or a breach of the s. 605.04091 duties as the agreement has shaped them.
   - Codex (housekeeping-only): chapter-605-notes.md:173 omits605.0105(3)(p)4 from the internal indemnification summary. The missing category is breach of605.04091 duties as permissibly shaped by the agreement.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
-- **218. [B128]** — **implemented**
+  - 2026-09-21 rejected r2: proceed with revision 3
+- **218. [B128]** — **open**
   - Chapter 605 notes, Appraisal rights bullet — `webapp/server/chapter-605-notes.md:508`
   - Reads: s. 605.1006(1) — a member has appraisal rights on a merger, conversion, interest exchange, a sale of substantially all the assets where the member could vote on it, and certain amendments to the organic rules.
   - Claims: Every voted sale of substantially all the assets carries appraisal rights.
@@ -1991,8 +1991,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: …a sale of substantially all the assets where the member could vote on it (unless by court order, or for cash with the proceeds distributed within a year)…
   - Codex (housekeeping-only): chapter-605-notes.md:508 omits exceptions from the internal summary of605.1006(1)(d). The statute distinguishes court-ordered sales and qualifying cash-sale distribution plans.
   - **Codex rejected the proposed replacement:** Say cash pursuant to a plan distributing all or substantially all NET proceeds to interest holders within one year; not merely any proceeds distributed within a year.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **219. [B106]** — **implemented** — housekeeping
   - Welcome email, the portal paragraph — `webapp/server/email.ts:86`
   - Reads: Your Owner's Manual — the plain-English guide to running your protected series LLC — is already in your portal's library, ready to download.
@@ -2065,7 +2065,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: /** Shared secret for the nightly crons (renewals, library refresh, Sunbiz sync, purge, backup, mirror). Required in production. */
   - Codex (housekeeping-only): env.ts:35 describes CRON_SECRET as the daily purge secret; routes-ops.ts:257–328 uses it for six jobs. The original description is incomplete rather than exclusive, and no reader-facing text changes.
   - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **228. [B122]** — **implemented** — housekeeping; same defect as 127
+- **228. [B122]** — **open** — housekeeping; same defect as 127
   - Taxation label helper (the label A59 says disagrees with the portal pill) — `webapp/server/datetime.ts:44`
   - Reads: if (version === "single-s" || version === "member-single-s") return "Single-Member S Corporation";
   - Claims: Nothing new — this is where A59's 'Single-Member S Corporation…' label comes from.
@@ -2074,8 +2074,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (duplicate): Same tax-label inconsistency as item127, repeated in server/datetime.ts:44; the finding itself says Nothing new but was not marked same defect as in findings-open.
   - **Codex rejected the proposed replacement:** Use one shared label mapping imported by both client and server; editing only server/datetime.ts does not update the separate src/lib/datetime.ts mapping.
   - Corrected after Codex's review: Both label tables change together: src/lib/datetime.ts and server/datetime.ts.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **N1.02. [substantive]** — **implemented** — waits on Adam's ruling
   - S-election package, what happens to the offsite copy after the edit window — `webapp/server/dropbox.ts:9`
   - Reads: * Vercel Blob. Copies are only ever added or overwritten — a deletion on the
@@ -2106,18 +2106,18 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
 ## Agreements and guidance — 78 open of 81
 
-- **229. [A80]** — **implemented**
+- **229. [A80]** — **open**
   - Manager-managed forms (4), Indemnification: "an act exceeding the authority conferred by Section 5.4"; 5.4 is the approval list, 5.3 the authority. Replace: "an act taken without the approval Section 5.4 requires" (both places).
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 4 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
-- **230. [A81]** — **implemented**
+  - 2026-09-21 rejected r2: proceed with revision 3
+- **230. [A81]** — **open**
   - All eight forms: "Effective Date" defined, never used; signature page "effective as of the date(s) set forth below". Amendment likewise. Replace: "executed this Agreement as of the Effective Date"; amendment "as of the date stated above".
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 9 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
-- **231. [A82]** — **implemented**
+  - 2026-09-21 rejected r2: proceed with revision 3
+- **231. [A82]** — **open**
   - Four multi-member forms, Tax Matters: "No member … all members" uncapitalised. Replace: "No Member … all Members."
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 4 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **232. [A83]** — **optional — open**
   - Two manager-managed single-owner forms, Amendments (b): circular. Replace: "(b) no amendment may impose new obligations on the Manager without the Manager's written consent."
   - Codex (disputed): The actual sentence is “(b) any amendment changing the rights or obligations of the Manager may not impose new obligations on the Manager without the Manager's written consent.” (single:256; single-s:289). It is redundant, not circular: changing rights does not itself require consent, whereas imposing new obligations does. No contradictory or indeterminate rule follows.
@@ -2164,11 +2164,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - **Codex rejected the proposed replacement:** “Replace as proposed” is incomplete. Say “Keep your contact information current so notices reach you.” Do not invent an operating-agreement covenant.
   - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
-- **242. [A93]** — **implemented**
+- **242. [A93]** — **open**
   - Manual s. 28 Example 1 "($75 total)" for three series. Replace: "($25 state fee each)" or "$150 through us".
   - **Codex rejected the proposed replacement:** “($25 state fee each)” is correct. “$150 through us” is wrong for the first three included in a formation package; clarify whether the example describes initial or later designations.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **243. [A94]** — **optional — open**
   - Manual s. 4 "(s. 605.2602)" alone. Replace: "ss. 605.2602 and 605.2605–605.2607".
   - Codex (disputed): Manual:77 cites §605.2602 for restrictions on series entity transactions. That section itself states the restrictions and points to §§605.2605–605.2607 for exceptions. A citation to it alone is not a false statement of the law; the proposed longer citation is optional.
@@ -2226,14 +2226,14 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: This Section varies s. 605.2304(2), Florida Statutes — a provision s. 605.2107(1)(n) leaves an operating agreement free to vary — so that the Protected Series Managers are the Manager or Managers of the Company rather than the Company itself.
   - Codex (disputed): The actual clause says “As permitted by s. 605.2107(1)(n) ... this Section varies s. 605.2304(2)”. Online Sunshine 2026 §605.2107(1)(n) makes only (3) and (6) non-variable, leaving (2) variable with §605.2106. The finding concedes precisely that result. Describing what the restriction permits is not an incorrect legal claim.
   - Outcome: The sentence is true: s. 605.2107(1)(n) leaves s. 605.2304(2) variable. The longer explanation is optional.
-- **252. [B152]** — **implemented**
+- **252. [B152]** — **open**
   - Manager-managed and member-managed multi-member agreements, s. 5.4(d) / s. 5.5(d); every form's s. 1.9 Filings — `webapp/server/templates-oa-multi.md:176`
   - Reads: (d) merge the Company as permitted by the Act — the consent of **all Members**; or file a statement of dissolution of a Protected Series — the approval required by Section 14.1;
   - Claims: The filing that dissolves a protected series is a 'statement of dissolution'.
   - True: s. 605.2502(2), opened on Online Sunshine: 'the company may deliver to the department for filing its articles of protected series dissolution'; s. 605.2502(3): after winding up, 'a statement of designation cancellation'. The Manual uses the statutory name (owners-manual.md:353 'articles of protected series dissolution', :402 'File the **articles of protected series dissolution**'); the agreements do not (multi.md:42 and every form's 1.9 'statements of dissolution'; s.md:176, member.md:182, member-s.md:182 same as here). Two names for one filing.
   - Replace with: (d) merge the Company as permitted by the Act — the consent of **all Members**; or file articles of protected series dissolution or a statement of designation cancellation for a Protected Series — the approval required by Section 14.1;
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 12 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **253. [B153]** — **implemented**
   - Owner's Manual, s. 23 — Death, the TOD designation — `docs/owners-manual.md:386`
   - Reads: **Death — the TOD designation.** Every form of the agreement lets each member register a transfer-on-death beneficiary — anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule — on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50–711.512).
@@ -2242,14 +2242,14 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: **Death — the TOD designation.** Every form of the agreement lets a member who is an individual (not a company or trust, and not co-owners holding as tenants in common) register a transfer-on-death beneficiary — anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule — on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50–711.512).
   - Fixed: batch 15 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
-- **254. [B154]** — **implemented** — same defect as 242
+- **254. [B154]** — **open** — same defect as 242
   - Owner's Manual, s. 4 'Why use a series LLC' — Use it for — `docs/owners-manual.md:72`
   - Reads: **Use it for:** multiple rental properties; a portfolio you are growing (add a $25 series per property instead of a $125+ LLC per property); separating a risky operating business from valuable equipment; or separating brands or projects.
   - Claims: A new series costs $25.
   - True: docs/facts.md:19: 'Price of an additional series — value: $50 — $25 to prepare and the $25 state filing fee'; the Manual's own lines 403, 521 and 523 say '$50 through us'. $25 is the state fee alone (the same slip A93 flagged at line 425).
   - Replace with: **Use it for:** multiple rental properties; a portfolio you are growing (add a series per property — $50 through us, $25 of it the state fee — instead of a $125+ LLC per property); separating a risky operating business from valuable equipment; or separating brands or projects.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **255. [B155]** — **implemented**
   - Owner's Manual, ss. 9, 14, 24 and 27 — statute citations written '§605.…' where the rest of the manual writes 's. 605.…' — `docs/owners-manual.md:160`
   - Reads: Get the name right and the record makes itself; get it wrong and you are proving association the hard way, out of ledgers, with the burden on you (§605.2404(4)).
@@ -2314,7 +2314,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - **Codex rejected the proposed replacement:** Add the consent to the source inventory; explicitly decide/document its Word-output status. The report cannot require an unverified Word deliverable to be generated during this read-only audit.
   - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
-- **262. [B161]** — **implemented** — housekeeping
+- **262. [B161]** — **open** — housekeeping
   - Operating agreement assembler — the Amended & Restated recital and title — `webapp/server/oa.ts:534`
   - Reads: `D. This Agreement amends, restates, and supersedes in its entirety ${supersede}, which shall be of no further force or effect from the Effective Date.\n\nNOW, THEREFORE,`,
   - Claims: Part of the agreement's recitals; a client receives this sentence (and, at line 526-527, the title 'AMENDED AND RESTATED' and preamble 'THIS AMENDED AND RESTATED OPERATING AGREEMENT').
@@ -2323,8 +2323,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): oa.ts:534 does compose the restatement recital, contrary to its local source-text rule, but the proposed “ten masters” is wrong: there are eight operating-agreement masters. Moreover single-s:20 and member-single-s:20 already have RecitalD; inserting anotherD as proposed creates duplicate lettering.
   - **Codex rejected the proposed replacement:** Move the variant-specific recital to all eight OA masters and useE in the two single-member S forms, D in the other six. Moving otherwise identical text is housekeeping; duplicateD in delivered restatements is separately reported as new.
   - Corrected after Codex's review: There are eight agreement masters, not ten, and the two single-owner S forms already have a Recital D (N2.06). Use markers in all eight, lettered E in those two.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 9 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **263. [B162]** — **implemented** — housekeeping
   - Operating agreement assembler — final checks — `webapp/server/oa.ts:740`
   - Reads: if (/Form document —|v1 draft/.test(s)) {
@@ -2370,29 +2370,29 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (housekeeping-only): single-s:191–192 contains the two source blank lines. oa.ts:738 collapses three or more newlines, and pdf-render.ts:63–65 ignores blank lines, so deleting one changes no delivered reader text.
   - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
-- **N2.01. [wording]** — **implemented**
+- **N2.01. [wording]** — **open**
   - Every operating agreement, Formation (§1.2) and definition of Act (§2.1) — webapp/server/templates-oa-multi.md:28 — `webapp/server/templates-oa-multi.md:28`
   - Reads: **1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
   - Claims: The governing chapter is named the Florida Revised Uniform Limited Liability Company Act.
   - True: 2026 §605.0101 names it Florida Revised Limited Liability Company Act (https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html). All eight masters repeat the extra Uniform in §§1.2 and2.1. This is distinct from prior248's protected-series-provisions title.
   - Replace with: **1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 16 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.02. [substantive]** — **open** — waits on Adam's ruling
   - Member-managed multi-owner agreement, Limited Liability; No Agency (§4.5) — webapp/server/templates-oa-member.md:136 — `webapp/server/templates-oa-member.md:136`
   - Reads: **4.5 Limited Liability; No Agency.** No Member shall be personally liable for any debt, obligation, or liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely by reason of being a Member. No Member is an agent of the Company or of any Protected Series solely by reason of being a member.
   - Claims: Membership does not make an owner an agent, even in the member-managed form.
   - True: The same master §5.4 (:166) says each Member is an agent; member-s repeats both clauses at136/166. Section605.04074(1) governs members acting as agents in a member-managed company. The manager-managed sentence was carried into the member-managed forms.
   - Replace with: **4.5 Limited Liability; Agency.** No Member shall be personally liable for any debt, obligation, or liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely by reason of being a Member. A Member's authority to act for the Company or a Protected Series is governed by Section 5.4 and the Act.
-- **N2.03. [substantive]** — **implemented** — waits on Adam's ruling
+- **N2.03. [substantive]** — **open** — waits on Adam's ruling
   - All four member-managed agreements, Management (§5.1), compared with Management of Each Protected Series (§5.2) — webapp/server/templates-oa-member.md:160 — `webapp/server/templates-oa-member.md:160`
   - Reads: **5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.
   - Claims: Nobody may be designated or hold out as manager of any Protected Series.
   - True: The next section expressly designates the Members as Protected Series Managers (member/member-s:162; member-single:138; member-single-s:144). §5.1 in those same four forms prohibits the title it immediately confers.
   - Replace with: **5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager of the Company; the Members serve as Protected Series Managers as provided in Section 5.2.
   - Ruling, 2026-09-20: Batch 16 item 10 approved: distinguish company management from protected-series managers; retain who manages.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 7 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.04. [substantive]** — **open** — waits on Adam's ruling
   - Every agreement, Statutory Shields (§3.3) and creditor recourse during winding up (§14.2/§11.2 and §14.5/§11.5) — webapp/server/templates-oa-multi.md:106 — `webapp/server/templates-oa-multi.md:106`
   - Reads: (a) A debt, obligation, or other liability of the Company is solely the debt, obligation, or liability of the Company, and is enforceable only against the Associated Assets of the Company;
@@ -2404,7 +2404,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 
   - (c) Neither the Company nor a Protected Series is liable for another silo's debt solely by reason of their relationship within this structure. Nothing in this Section or the winding-up Article restricts remedies preserved by ss. 605.2402 and 605.2404, Florida Statutes, or liability independently undertaken or imposed by law.
   - Ruling, 2026-09-20: Batch 17 review item 9 rejected. Keep the existing agreement creditor/recourse clauses and matching liability descriptions as is. This does not reject the separately approved Manual recordkeeping and dissolution corrections.
-- **N2.05. [substantive]** — **implemented** — waits on Adam's ruling
+- **N2.05. [substantive]** — **open** — waits on Adam's ruling
   - Multi-owner S corporation agreements, savings clause §9.4(d) and company winding up §14.4 — webapp/server/templates-oa-s.md:280 — `webapp/server/templates-oa-s.md:280`
   - Reads: **(d) Pro rata in all events.** Notwithstanding any other provision of this Agreement or of any Series Exhibit, all allocations and distributions — including distributions in liquidation of the Company or of any Protected Series — shall be made strictly pro rata in accordance with Percentage Interests, and every Membership Interest confers identical rights to distributions and liquidation proceeds.
   - Claims: Every series distribution, including its liquidation distributions, goes pro rata by the owners' Percentage Interests.
@@ -2413,16 +2413,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 
   - All distributions by the Company to its Members in winding up shall be made in proportion to Percentage Interests, so that every Membership Interest confers identical rights to liquidation proceeds. Distributions by a Protected Series are made solely to the Company under Section 14.2.
   - Ruling, 2026-09-20: Batch 16 item 11 approved: series distributions go solely to the Company; Company distributions to Members remain pro rata.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 4 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
-- **N2.06. [wording]** — **implemented**
+  - 2026-09-21 rejected r2: proceed with revision 3
+- **N2.06. [wording]** — **open**
   - Amended and Restated single-member S corporation agreement, Recitals — webapp/server/oa.ts:534 — `webapp/server/oa.ts:534`
   - Reads:       `D. This Agreement amends, restates, and supersedes in its entirety ${supersede}, which shall be of no further force or effect from the Effective Date.\n\nNOW, THEREFORE,`,
   - Claims: The new supersession recital is always RecitalD.
   - True: Both single-s and member-single-s masters already have RecitalD at line20; oa.ts:534 unconditionally inserts anotherD immediately before NOW, THEREFORE. The other six masters end atC. Prior262 objects to text location but does not identify this delivered duplicate lettering.
   - Replace with: E. This Agreement amends, restates, and supersedes in its entirety [PRIOR AGREEMENT], which shall be of no further force or effect from the Effective Date.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 3 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.07. [substantive]** — **implemented** — waits on Adam's ruling
   - Owner's Manual, Why the Mothership Should Stay Asset-Light (§8); also the non-associated-assets discussion at line70 — docs/owners-manual.md:151 — `docs/owners-manual.md:151`
   - Reads: **Second, your agreement's standing association rules make the mothership the default bucket.** Any asset you fail to associate with a series lands, by standing rule, in the company's silo. That is deliberately protective — it means a sloppy record never creates a *non-associated* free-for-all asset — but it also means **sloppiness collects in the mothership**. If the mothership is asset-light, a record you missed exposes little.
@@ -2432,7 +2432,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Ruling, 2026-09-20: Batch 17 review item 10 approved: explain that standing association rules work alongside required records and missing records can leave an asset non-associated; keep the agreement's allocation rules unchanged.
   - Fixed: batch 17 revision 2, commit , by Codex; protected by 3 assertion(s).
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
-- **N2.08. [substantive]** — **implemented** — waits on Adam's ruling
+- **N2.08. [substantive]** — **open** — waits on Adam's ruling
   - Owner's Manual, The EIN Question (§18), counterparties and W-9s — docs/owners-manual.md:344 — `docs/owners-manual.md:344`
   - Reads: - **A counterparty demands a taxpayer number for the named entity** — a lender, title company, insurer, or property manager. Giving them the company's EIN for a series' business stitches the two identities together on paper, the opposite of the separateness you are documenting.
   - Claims: Using the parent's EIN for series business undermines separateness, and line340 says every company supplies its own EIN on W-9s.
@@ -2441,8 +2441,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 
   - **The company's EIN and W-9.** Obtain the EIN needed for the company's banking and applicable tax filings. For income-tax reporting, a disregarded company generally uses its tax owner's TIN on Form W-9; a company taxed as a partnership or corporation uses its own EIN.
   - Ruling, 2026-09-20: Batch 12: Adam approved the proposed fix and then said Go. Approved scope: Correct only W-9 taxpayer identity and separate it from account/contract naming. Exact wording: and an EIN identifies the company for those purposes. **A W-9 identifies the taxpayer.** For a disregarded entity, use the tax owner's name and taxpayer identification number as the W-9 instructions require, and identify the disregarded entity on line 2. / **A counterparty requires an EIN for its records** — a lender, title company, insurer, or property manager. Distinguish that request from a W-9: a W-9 identifies the tax owner under the form's instructions. That tax identification is different from the series' name on its contracts and bank accounts.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 3 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.09. [substantive]** — **implemented** — waits on Adam's ruling
   - Owner's Manual, State Filings, Year After Year (§19), reinstatement — docs/owners-manual.md:354 — `docs/owners-manual.md:354`
   - Reads: - **Reinstatement, if you let it lapse:** $100 plus every missed year's annual report fee — on top of losing the shields in the interim.
@@ -2472,24 +2472,24 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Ruling, 2026-09-20: Batch 17 review item 13 approved: include documented loans, repayments and legitimate expense reimbursements alongside contributions and distributions.
   - Fixed: batch 17 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
-- **N2.12. [substantive]** — **implemented** — waits on Adam's ruling
+- **N2.12. [substantive]** — **open** — waits on Adam's ruling
   - Owner's Manual, Maintaining the Agreement (§7), adding a second owner — docs/owners-manual.md:147 — `docs/owners-manual.md:147`
   - Reads: 3. **When you add a second owner to a single-member company, change agreements.** Your agreement does not require it — nothing in it does — but the single-member form is built for one owner: it has no voting rules, no capital-call machinery, no transfer restrictions among owners, and none of the multi-owner bankruptcy armor, and its tax treatment changes the moment a second member is admitted. Move to the multi-member form at the same time, not later. (The portal does this for you: add the new owner in the operating agreement questionnaire, and the regenerated agreement is built on the multi-owner form automatically.)
   - Claims: Admitting a second member always immediately changes tax treatment.
   - True: The Manual covers both disregarded and S corporation single-member forms. A second eligible shareholder does not by itself end an existing S election; IRS instructions say it remains effective until terminated or revoked. https://www.irs.gov/instructions/i2553, End of Election; https://www.irs.gov/businesses/small-businesses-self-employed/single-member-limited-liability-companies
   - Replace with: 3. **When you add a second owner to a single-member company, change agreements.** Your agreement does not require it — nothing in it does — but the single-member form is built for one owner: it has no voting rules, no capital-call machinery, no transfer restrictions among owners, and none of the multi-owner bankruptcy armor, and a disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner is admitted. Move to the multi-member form at the same time, not later. (The portal does this for you: add the new owner in the operating agreement questionnaire, and the regenerated agreement is built on the multi-owner form automatically.)
   - Ruling, 2026-09-20: Batch 12: Adam approved the proposed fix and then said Go. Approved scope: Adding a second eligible owner does not itself terminate an existing S election; retain the agreement recommendation. Exact wording: . A disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner joins.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
-- **N2.13. [substantive]** — **implemented** — waits on Adam's ruling
+  - 2026-09-21 rejected r2: proceed with revision 3
+- **N2.13. [substantive]** — **open** — waits on Adam's ruling
   - Owner's Manual, tax-return table (§18); repeated at346 — docs/owners-manual.md:314 — `docs/owners-manual.md:314`
   - Reads: | One owner, no election | Nothing of its own. Everything on your Form 1040, each property or business as its own Schedule E or C activity |
   - Claims: Every single-owner disregarded company reports on Form1040.
   - True: The masters expressly support entity owners (oa.ts:680–691); the IRS says an LLC owned by a corporation or partnership reports as part of that owner's return. Form1040 applies to an individual owner, not every permitted owner. https://www.irs.gov/businesses/small-businesses-self-employed/single-member-limited-liability-companies
   - Replace with: | One owner, no election | No separate federal income-tax return. Activity appears on the tax owner's return; for an individual, usually Schedule C, E, or F of Form 1040 or 1040-SR. Entity owners use the applicable return for that entity. |
   - Ruling, 2026-09-20: Batch 12: Adam approved the proposed fix and then said Go. Approved scope: Correct both universal Form 1040 statements to include company and trust tax owners. Exact wording: No separate federal income-tax return for the disregarded LLC. Its activity is reported through its tax owner. An individual generally uses the applicable schedules of Form 1040 or 1040-SR; other owners use their applicable reporting rules. / (where the company itself is disregarded, its activity is reported through its tax owner; an individual generally uses the applicable schedules of Form 1040 or 1040-SR, while other owners use their applicable reporting rules)
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 3 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.14. [substantive]** — **open** — waits on Adam's ruling
   - Owner's Manual, S corporation safeguards (§18), uneven distributions under “Three things will end an election” — docs/owners-manual.md:332 — `docs/owners-manual.md:332`
   - Reads: 2. **Uneven distributions.** Paying one owner more than their percentage — even briefly, even as a "loan" nobody papers — is the most common way small S corporations get into trouble. Distribute pro rata, every time, and write it down.
@@ -2570,15 +2570,15 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: Encode client table-cell text before inserting it into Markdown, and decode it only after the renderer has identified the structural cells. Preserve vertical bars and line breaks inside their original cell. Apply the same encoding and decoding to the series-consent contribution cell.
   - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
-- **N2.22. [substantive]** — **implemented** — waits on Adam's ruling
+- **N2.22. [substantive]** — **open** — waits on Adam's ruling
   - Professional LLC operating agreement, Transfer on Death (§4.6), family transfers/admission and purpose — webapp/server/templates-oa-single.md:134 — `webapp/server/templates-oa-single.md:134`
   - Reads: **4.6 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50–711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. The Member, if an individual, may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
   - Claims: A professional LLC may admit any chosen beneficiary after agreement to be bound, without a professional-eligibility qualification.
   - True: oa.ts:389–397 changes only professional cover/preamble/recital; it leaves the ordinary admission and transfer clauses unchanged. 2026 §§621.09(2),621.11(2) restrict membership/transfers to eligible licensed individuals or professional entities;621.08 also limits the business purpose despite the ordinary §1.4 any-lawful-business wording. Entirechapter opened: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0621/0621.html
   - Replace with: For a professional limited liability company, every transfer and admission under this Agreement, including a transfer on death, is subject to Chapter 621, Florida Statutes. A proposed recipient may be admitted only if eligible under s. 621.09(2), and no transfer may violate s. 621.11(2). The Company's business is limited as s. 621.08 requires, notwithstanding the general-purpose wording of Section 1.4.
   - Ruling, 2026-09-20: Batch 16 item 13 approved: professional-only Chapter 621 purpose, transfer, admission and TOD eligibility restrictions; retain permitted investments and cumulative S-corporation eligibility.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 19 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.23. [housekeeping]** — **implemented** — housekeeping
   - Statement generator, source comment — webapp/server/statement.ts:7 — `webapp/server/statement.ts:7`
   - Reads:  * carries every word; this fills its six slots and nothing else.
@@ -2609,7 +2609,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Ruling, 2026-09-20: Batch 15 approved, including Adam's clarification: a 60% owner cannot override unanimous approval, so unequal ownership can still deadlock. Correct Instructions, Manual and portal help; preserve Section 13.2's covered matters, exclusions, written-notice period and 25% initiating threshold. No agreement-clause change.
   - Fixed: batch 15 revision 2, commit , by Codex; protected by 7 assertion(s).
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
-- **N2.26. [wording]** — **implemented** — waits on Adam's ruling
+- **N2.26. [wording]** — **open** — waits on Adam's ruling
   - Owner’s Manual, federal beneficial ownership reporting (§20) and source colophon — docs/owners-manual.md:358 — `docs/owners-manual.md:358`
   - Reads: The Corporate Transparency Act briefly required most small LLCs to file beneficial ownership reports with FinCEN. **As of this edition, U.S.-formed companies are exempt:** FinCEN's March 2025 interim final rule narrowed "reporting company" to entities formed under *foreign* law that register to do business here. A Florida series LLC formed in Florida currently files nothing with FinCEN, and its owners report nothing.
   - Claims: The current exemption is presented using the March 2025 interim final rule as its authority; the colophon at536 likewise lists only that interim rule.
@@ -2617,17 +2617,17 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: The Corporate Transparency Act briefly required most small LLCs to file beneficial ownership reports with FinCEN. **As of this edition, U.S.-formed companies are exempt:** FinCEN’s final rule, effective August 14, 2026, retained the exemption introduced by its March 2025 interim final rule. A Florida series LLC formed in Florida currently files no federal beneficial ownership report, and its owners do not report beneficial ownership information for that company.
   - Corrected after Codex's review: Verified: FinCEN's page says the rule is final (alert updated 11 Aug 2026). NOT verified by Claude: the effective date of 14 Aug 2026.
   - Ruling, 2026-09-20: Batch 12: Adam approved the proposed fix and then said Go. Approved scope: Update the FinCEN rule and source reference to the verified final rule; no Florida filing change. Exact wording: FinCEN’s final rule, effective August 14, 2026, retained the exemption for U.S.-formed companies. A Florida LLC formed in Florida does not file a federal beneficial ownership report under that rule, and its owners do not submit one for that company. / FinCEN final rule (effective Aug. 14, 2026; fincen.gov/boi)
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 3 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
-- **N2.27. [substantive]** — **implemented** — waits on Adam's ruling
+  - 2026-09-21 rejected r2: proceed with revision 3
+- **N2.27. [substantive]** — **open** — waits on Adam's ruling
   - Multi-member operating agreements, bankruptcy protections (§11.2); Owner’s Manual §23 — webapp/server/templates-oa-multi.md:298 — `webapp/server/templates-oa-multi.md:298`
   - Reads: **11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member and the Manager, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. §365(c)(1) without the prior written consent of the other Members.
   - Claims: Soderstrom prevents assumption or assignment of the debtor Member’s entire interest without the other Members’ consent.
   - True: The actual opinion distinguishes management from economic interests: the court held the trustee could not assume the management interest but affirmed the sale of the debtors’ 50% economic interest. See 484 B.R.874,880–881, https://gassmanlaw.com/wp-content/uploads/2013/04/In_Re_Sodestrom.pdf . The same overbroad sentence appears in templates-oa-member.md:300, templates-oa-s.md:312 and templates-oa-member-s.md:314; Manual:383 likewise says “interest” without the management qualification. Section365(c)(1) is conditional on applicable law excusing the other party’s performance and lack of consent; it does not create a blanket bar to sale of economic rights. Statutory text opened at https://usc-cdn.house.gov/view.xhtml?req=granuleid%3AUSC-prelim-title11-section365&num=0&edition=prelim .
   - Replace with: **11.2 Personal Service Agreement; Assumption and Assignment.** The managerial and governance duties under this Agreement are personal to those who owe them. The parties intend that, to the extent applicable law and 11 U.S.C. §365(c)(1) permit, a trustee may not assume or assign a debtor Member’s management rights without the required consent of the other Members. This does not prohibit a transfer of economic rights merely because management rights cannot be transferred. In re Soderstrom, 484 B.R.874 (M.D. Fla. 2013), upheld the sale of the debtor-members’ economic interest while preventing assumption and sale of their management interest.
   - Ruling, 2026-09-20: Batch 16 item 14: Use this exact paragraph and update the manual and instructions: The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. § 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member’s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate’s interest in a Member’s transferable (economic) interest to the extent permitted by applicable law.
-  - Fixed: batch 27 revision 2, commit , by Codex; protected by 7 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
+  - 2026-09-21 rejected r2: proceed with revision 3
 - **AUD-post-batches-2026-09-20-4a344e2-B1-N05. [housekeeping]** — **implemented** — housekeeping
   - Fix ledger, authorizing work after an owner decision limited to one part of an item. — `docs/audit/ledger-lib.ts:664`
   - Reads: return all.filter((w) => (w.startsWith("ruling:") ? !l.rulings.some((r) => rulingKind(r) === "ruling" && r.item === w.slice(7)) : !(l.items.find((i) => i.id === w)?.parts.every((p) => p.status === "released") ?? false)));
