@@ -2177,7 +2177,7 @@ async function main(): Promise<void> {
       {
         // The public pages after the 14 Sep 2026 audit, as Adam ruled them.
         const home = await read("/");
-        expect(/Not offered/.test(home) && !/None offered, anywhere/.test(home) && /Florida registered agent service included/.test(home) && !/FL Division of Corporations registered agent/.test(home), "words: the home page's comparison rows read Not offered and the trust line names our agent service", home.match(/Not offered|None offered[^\n]{0,20}|Florida registered agent service included/g));
+        expect(/Not offered/.test(home) && !/None offered, anywhere/.test(home) && /First year of registered-agent service included\./.test(home) && !/FL Division of Corporations registered agent/.test(home), "words: the home page's comparison rows read Not offered and the trust line names our agent service", home.match(/Not offered|None offered[^\n]{0,20}|First year of registered-agent service included\./g));
         const whatIsText = await read("/what-is");
         expect(!/fl-protected-series-llc\.diagram/.test(whatIsText) && !/Distinct membership interests/.test(whatIsText) && /Separate books, records, and asset ledger per series/.test(whatIsText), "words: the What Is diagram has no file name and no per-series ownership bullet", whatIsText.match(/fl-protected[^\n]{0,30}|Distinct membership[^\n]{0,40}/g));
         expect(!/one Florida filing/.test(whatIsText) && (whatIsText.match(/one operating agreement, and one annual report/g) ?? []).length === 2, "words: the What Is page says one annual report, not one Florida filing, in the paragraph and the bullet (15 Sep 2026)", whatIsText.match(/one Florida filing|one annual report/g));
@@ -2203,7 +2203,7 @@ async function main(): Promise<void> {
       const benefits = await read("/benefits");
       expect(/One state filing covers 10 series/.test(benefits) && !/unlimited series/.test(benefits), "words: Benefits says one filing covers 10 series");
       const how = await read("/how-it-works");
-      expect(/completed from your questionnaire answers/.test(how) && !/to adapt to your own situation/.test(how) && /when it is released, expected by the end of the year/.test(how), "words: How It Works no longer offers an agreement to adapt or an app that is not out", how.match(/form Operating Agreement[^.]*\./)?.[0]);
+      expect(/Complete the operating-agreement questionnaire in your portal and select Generate to create your form Operating Agreement\./.test(how) && !/to adapt to your own situation/.test(how) && /when it is released, expected by the end of the year/.test(how), "words: How It Works no longer offers an agreement to adapt or an app that is not out", how.match(/Complete the operating-agreement questionnaire[^.]*\./)?.[0]);
       const pricing = await read("/pricing");
       expect(/completed from your questionnaire answers/.test(pricing) && !/review and adapt/.test(pricing), "words: Pricing no longer offers an agreement to adapt");
       const statute = await read("/the-statute");

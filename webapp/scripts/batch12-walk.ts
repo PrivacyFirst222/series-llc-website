@@ -69,7 +69,7 @@ export async function batch12Walk(browser: Browser, web: string, check: Check) {
       const row = page.getByTestId('document-row').filter({ has: page.locator('a[href="/api/portal/documents/d12/download"]') });
       await row.waitFor();
       // Wait for the independent OA metadata query as well as the document query.
-      await row.getByText('Current', { exact: true }).waitFor();
+      await row.getByText('Most recently generated', { exact: true }).waitFor();
       const documentText = await row.innerText();
       if (process.env.SHOT_DIR) await row.screenshot({ path: join(process.env.SHOT_DIR, `document-${version}.png`) });
       const taxOk = clientTax(version) === tax && serverTax(version) === tax && historyText.includes(tax) && documentText.includes(tax)

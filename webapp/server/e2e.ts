@@ -4038,8 +4038,10 @@ for(const [label,r]of batch05Results)check(label,r.ok,r.detail);
     for(const name of fs18.readdirSync(import.meta.dir).filter(n=>/^templates-oa-.*\.md$/.test(n) || ["oa.ts","datetime.ts","document-text.ts"].includes(n))){
       fs18.copyFileSync(path18.join(import.meta.dir,name),path18.join(copy,"server",name));
     }
-    const english=path18.join(import.meta.dir,"../src/lib/englishText.ts");
-    if(fs18.existsSync(english))fs18.copyFileSync(english,path18.join(copy,"src/lib/englishText.ts"));
+    for (const helper of ["englishText.ts", "agreementLabels.ts"]) {
+      const source=path18.join(import.meta.dir,"../src/lib",helper);
+      if(fs18.existsSync(source))fs18.copyFileSync(source,path18.join(copy,"src/lib",helper));
+    }
     const master=path18.join(copy,"server/templates-oa-single.md");
     fs18.writeFileSync(master,fs18.readFileSync(master,"utf8").replace("\n","\n\n[UNFILLED_BATCH18_PROBE]\n"));
     const code='import {assembleOa} from "./server/oa.ts"; const input=JSON.parse(process.env.BATCH18_FIXTURE!); try { const r=assembleOa(input); console.log(JSON.stringify({assembled:true,containsSlot:r.markdown.includes("[UNFILLED_BATCH18_PROBE]")})); } catch(e) { console.log(JSON.stringify({assembled:false,error:String(e)})); }';
