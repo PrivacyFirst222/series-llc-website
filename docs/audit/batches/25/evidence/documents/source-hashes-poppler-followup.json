@@ -1,0 +1,11 @@
+{
+  "webapp/server/oa-amendment.ts": "545e52911f67adb578bab683409b2395d275bf255cee661668e56c0a5dc0f1b1",
+  "webapp/server/statement.ts": "0ef98eb17a7ba049dc16fda69fb2a6b130adbb0cf00278346b9c80e1038c94c6",
+  "webapp/server/document-text.ts": "59565161ad8e047cf3cc486d4ad9010bbed40091f4b31a2db150333c4356b51a",
+  "webapp/server/pdf-render.ts": "f68175515fc6baf675287af862c5a160261f10441e432c6f9f07b6620bafdca7",
+  "webapp/server/new-series.ts": "d6804ce2b7819e663e06cee60a41cf3d150f7e7b773c4872d01f9bb7868b34e0",
+  "webapp/server/templates-oa-amendment.md": "23ec2bc6e44197d4ad469a943707e7857121a1d9b34f2d945df84d6bb73678bd",
+  "webapp/server/templates-statement-of-authorized-representative.md": "92e28fb58b10948a867d99b2509ea708ae9186f728cdebd6574a7619281b0e69",
+  "webapp/server/templates-new-series.md": "b7054a10f3b1c4900cfbfcff8d80d8883ed59c56dc40b60307bb2d1603528b51",
+  "webapp/scripts/batch25-documents-check.ts": "d8b5213bc133a18c396e17adeeb9a5a8c1d0da0bfc4f9c9e26f75af13d7f611a"
+}

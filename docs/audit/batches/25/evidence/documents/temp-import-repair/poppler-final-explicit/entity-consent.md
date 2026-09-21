@@ -1,0 +1,78 @@
+# UNANIMOUS WRITTEN CONSENT OF THE MEMBERS
+
+## OF Audit Coastal Holdings, LLC
+
+### ESTABLISHING A NEW PROTECTED SERIES
+
+---
+
+The undersigned, being **all** of the members of **Audit Coastal Holdings, LLC**, a Florida protected series limited liability company (the "Company"), acting by written consent without a meeting as permitted by the Company's operating agreement (the "Agreement"), adopt the following as of **September 25, 2026**:
+
+**1. Approval of the new Protected Series.** Under s. 605.2201(1), Florida Statutes, a limited liability company may establish a protected series with the affirmative vote or consent of all of its members, and Section 3.1 of the Agreement requires that consent. The Members, constituting all members of the Company, approve the establishment of a protected series to be named:
+
+**Audit Coastal Holdings, LLC - PS Bay Equipment**
+
+**2. Purpose.** The purpose of the new Protected Series is any lawful purpose, including, without limitation, Own and lease business equipment..
+
+**3. Ownership.** The new Protected Series is established without associated members. The Company owns all of its protected-series transferable interests, and no member of the Company holds any interest in it except indirectly, through that member's interest in the Company (ss. 605.2302(1), 605.2303(2), Fla. Stat.).
+
+**4. Authority to file.** The Members authorize the Manager to sign and file the Protected Series Designation for the new Protected Series with the Florida Department of State, Division of Corporations, as provided in s. 605.2201(2), Florida Statutes, and Section 3.1 of the Agreement. The protected series is established when its Protected Series Designation takes effect (ss. 605.2201(3) and 605.0207, Florida Statutes).
+
+**5. Series Exhibit.** The Series Exhibit set forth below is adopted as part of the Agreement for the new Protected Series, as Section 3.1 of the Agreement requires at or before the filing of the Protected Series Designation.
+
+**6. Records.** The Company shall create and maintain, for the new Protected Series, the records required by s. 605.2301, Florida Statutes, and by Article 8 of the Agreement.
+
+**7. Effect.** This consent has the same effect as a vote taken at a meeting and shall be retained with the records of the Company.
+
+**MEMBERS:**
+
+Casey Family Holdings Company LLC
+
+By: _____________________________
+[[indent]]Casey Longname Longname Longname Longname Longname Longname Longname Longname Longname Longname Longname Longname Longname Longname Longname Longname Longname Longname Audit
+[[indent]]President Executive Executive Executive Executive Executive Executive Executive Executive Executive Executive Executive Executive Executive Executive Executive Officer
+Date: _____________________________
+
+_____________________________
+Blair Audit
+Date: _____________________________
+
+[[pagebreak]]
+
+## SERIES EXHIBIT PS-3
+
+**Protected Series name (exactly as filed with the Department):**
+**Audit Coastal Holdings, LLC - PS Bay Equipment**
+
+| Item | Terms |
+|---|---|
+| Purpose of this Protected Series | Any lawful purpose, including, without limitation, Own and lease business equipment. |
+| Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
+| Protected Series Manager | Same as Company Manager |
+| Contributions to this Protected Series | By the Company: $20,000 cash |
+| Initial Associated Assets | As set forth on the Asset Schedule attached to this Series Exhibit and completed by the Member(s), together with the records maintained under Article 8. |
+| Special terms (if any) | Keep records of equipment maintenance. |
+
+**Adopted effective September 25, 2026 by the Company, acting through its Managers:**
+
+_____________________________
+Casey Audit, Protected Series Manager
+
+_____________________________
+Blair Audit, Protected Series Manager
+
+[[pagebreak]]
+
+## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-3 (Audit Coastal Holdings, LLC - PS Bay Equipment)
+
+*Complete this schedule for each asset of this Protected Series. Describe each asset so that a stranger could identify it without asking you anything: real property — street address AND legal description, date acquired, and grantor; deposit account — institution, account title, last four digits, and date opened; vehicle — year, make, model, and VIN; equipment — description and serial number; contract — parties and date. For any asset acquired from the Company or from another Protected Series, also state the consideration paid, the payor, and the payee. Add pages as needed; keep this schedule current as assets are acquired and disposed of.*
+
+| Asset description | Date acquired | Acquired from | Consideration / payor / payee (if from the Company or another series) |
+|---|---|---|---|
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+
+*Consent & Series Exhibit — Audit Coastal Holdings, LLC - PS Bay Equipment — generated by MyFloridaSeriesLLC · Master First Edition — August 2026*

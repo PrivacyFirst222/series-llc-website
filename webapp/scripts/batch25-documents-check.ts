@@ -9,23 +9,59 @@ import { assembleNewSeries, type NewSeriesInput } from '../server/new-series';
 import { renderMarkdownPdf } from '../server/pdf-render';
 import { englishTextError } from '../src/lib/englishText';
 import type { OaInputs } from '../server/oa';
+import { PDFDocument, PDFArray, PDFRawStream, decodePDFRawStream } from '@cantoo/pdf-lib';
 
-const inspect = String.raw`import json,sys,pdfplumber
-out=[]
-with pdfplumber.open(sys.argv[1]) as pdf:
- for p in pdf.pages:
-  text=p.extract_text() or ''
-  words=p.extract_words()
-  rules=[l for l in p.lines if abs(l['top']-l['bottom'])<.1 and abs(l['x1']-324)<.1 and l['x1']-l['x0']>100]
-  sig=[]
-  for l in rules:
-   label=[w['text'] for w in words if abs(w['bottom']-l['top'])<5 and w['x0']<l['x0']]
-   if abs(l['x0']-72)<.1 or 'By:' in label:
-    following=[w for w in words if 1<w['top']-l['top']<21 and w['x0']<400]
-    sig.append({'top':l['top'],'x0':l['x0'],'following':[w['text'] for w in following]})
-  ink=[c for c in p.chars if c['top']<735 and not c['text'].isspace()]
-  out.append({'text':text,'signatures':sig,'rules':len(rules),'inBounds':all(71<=c['x0'] and c['x1']<=541 and c['bottom']<=722 for c in ink)})
-print(json.dumps(out))`;
+// Read actual PDF text/boxes with the project's existing Poppler dependency.
+// Read actual stroked signature paths with the already-installed PDF library.
+// No Python environment or additional package is needed in CI.
+function xmlText(text:string):string {
+ return text.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos);/gi,(_,entity:string)=>{
+  if(entity.startsWith('#'))return String.fromCodePoint(parseInt(entity.slice(entity[1].toLowerCase()==='x'?2:1),entity[1].toLowerCase()==='x'?16:10));
+  return ({amp:'&',lt:'<',gt:'>',quot:'"',apos:"'"} as Record<string,string>)[entity.toLowerCase()];
+ });
+}
+async function inspectPdf(bytes:Uint8Array):Promise<Page[]> {
+ const proc=Bun.spawn(['pdftotext','-bbox','-','-'],{stdin:'pipe',stdout:'pipe',stderr:'pipe'});
+ proc.stdin.write(bytes);proc.stdin.end();
+ const [bbox,err,code]=await Promise.all([new Response(proc.stdout).text(),new Response(proc.stderr).text(),proc.exited]);
+ if(code)throw Error('PDF inspection failed: '+err);
+ const doc=await PDFDocument.load(bytes), pages=[...bbox.matchAll(/<page\b[^>]*>([\s\S]*?)<\/page>/g)];
+ if(pages.length!==doc.getPageCount())throw Error('PDF inspection page count mismatch');
+ return pages.map((match,index)=>{
+  const page=doc.getPages()[index];
+  const words=[...match[1].matchAll(/<word xMin="([^"]+)" yMin="([^"]+)" xMax="([^"]+)" yMax="([^"]+)">([\s\S]*?)<\/word>/g)].map(m=>({x0:Number(m[1]),top:Number(m[2]),x1:Number(m[3]),bottom:Number(m[4]),text:xmlText(m[5])}));
+  const contents=page.node.Contents(), refs=contents instanceof PDFArray?contents.asArray():contents?[contents]:[];
+  const streams=refs.map(ref=>{const stream=doc.context.lookup(ref);if(!(stream instanceof PDFRawStream))throw Error('Unsupported PDF content stream');return new TextDecoder().decode(decodePDFRawStream(stream).decode());}).join('\n');
+  if(page.getRotation().angle!==0)throw Error('Unsupported rotated PDF geometry');
+  // Respect each graphics-state transform: table borders use translated/flipped
+  // paths even though the signature rules themselves use page coordinates.
+  type Matrix=[number,number,number,number,number,number];
+  type Point={x:number;y:number};
+  let matrix:Matrix=[1,0,0,1,0,0],point:Point|null=null;
+  const stack:Matrix[]=[], pending:{from:Point;to:Point}[]=[],lines:{x0:number;top:number;x1:number;bottom:number}[]=[];
+  const transformed=(x:number,y:number):Point=>({x:matrix[0]*x+matrix[2]*y+matrix[4],y:matrix[1]*x+matrix[3]*y+matrix[5]});
+  for(const raw of streams.split('\n')) {
+   const tokens=raw.trim().split(/\s+/),op=tokens.pop(),v=tokens.map(Number);
+   if(op==='q')stack.push([...matrix]);
+   else if(op==='Q'){const restored=stack.pop();if(!restored)throw Error('Unbalanced PDF graphics state');matrix=restored;}
+   else if(op==='cm'){
+    if(v.length!==6||v.some(n=>!Number.isFinite(n)))throw Error('Invalid PDF transform');
+    const [a,b,c,d,e,f]=matrix,[g,h,i,j,k,l]=v;
+    matrix=[a*g+c*h,b*g+d*h,a*i+c*j,b*i+d*j,a*k+c*l+e,b*k+d*l+f];
+   }else if(op==='m')point=transformed(v[0],v[1]);
+   else if(op==='l'){const next=transformed(v[0],v[1]);if(point)pending.push({from:point,to:next});point=next;}
+   else if(op==='S'){
+    for(const segment of pending)lines.push({x0:segment.from.x,top:page.getHeight()-segment.from.y,x1:segment.to.x,bottom:page.getHeight()-segment.to.y});
+    pending.length=0;point=null;
+   }else if(['n','f','f*','B','B*','b','b*'].includes(op??'')){pending.length=0;point=null;}
+  }
+  if(stack.length)throw Error('Unbalanced PDF graphics state');
+  const rules=lines.filter(l=>Math.abs(l.top-l.bottom)<.1&&Math.abs(l.x1-324)<.1&&l.x1-l.x0>100);
+  const signatures=rules.filter(l=>Math.abs(l.x0-72)<.1||words.some(w=>Math.abs(w.bottom-l.top)<5&&w.x0<l.x0&&w.text==='By:')).map(l=>({top:l.top,x0:l.x0,following:words.filter(w=>1<w.top-l.top&&w.top-l.top<21&&w.x0<400).map(w=>w.text)}));
+  const ink=words.filter(w=>w.top<735&&w.text.trim());
+  return {text:words.map(w=>w.text).join(' '),signatures,rules:rules.length,inBounds:ink.every(w=>71<=w.x0&&w.x1<=541&&w.bottom<=722)};
+ });
+}
 type Page = {text:string;signatures:{top:number;x0:number;following:string[]}[];rules:number;inBounds:boolean};
 const normal: NewSeriesInput = {companyName:'Audit Coastal Holdings, LLC',seriesName:'Audit Coastal Holdings, LLC - PS Bay Equipment',seriesNumber:'3',purpose:'Own and lease business equipment.',specialTerms:'Keep records of equipment maintenance.',contribution:'$20,000 cash',effectiveDate:'September 25, 2026',memberNames:['Casey Audit','Blair Audit'],managerNames:['Casey Audit','Blair Audit'],memberManaged:false};
 const oa: OaInputs = {version:'multi',companyName:'[ALPHA], LLC',principalAddress:'1 Main Street',managerNames:['[MANAGEMENT], LLC'],managerEntitySigners:[{manager:'[MANAGEMENT], LLC',name:'Morgan [MANAGER]',title:'President [ACTING]'}],effectiveDate:'September 1, 2026',amendedRestated:false,priorAgreementDate:null,members:[{name:'[MEMBER], LLC',entitySigner:{name:'Alex [SIGNER]',title:'Member [AUTHORIZED]'},address:'1 Main Street',percentage:100,contribution:'',todBeneficiary:''}],series:[]};
@@ -33,9 +69,9 @@ const amendment = {number:1,agreementDate:'September 1, 2026',effectiveDate:'Sep
 const statement = {companyName:'[ALPHA], LLC',documentNumber:'L26000123456',signerName:'Alex [SIGNER]',signerTitle:'Manager [ACTING]',date:'September 21, 2026',memberManaged:true};
 
 export async function batch25DocumentsCheck(check:(ok:boolean,label:string,detail?:unknown)=>void, output=process.env.BATCH25_DOCUMENTS_EVIDENCE) {
- const root=resolve(import.meta.dir,'..'), own=!output, dir=output?resolve(output):mkdtempSync(join(tmpdir(),'batch25-documents-'));mkdirSync(dir,{recursive:true});writeFileSync(join(dir,'pdf_geometry.py'),inspect);writeFileSync(join(dir,'ordinary-consent-input.json'),JSON.stringify(normal,null,2)+'\n');
+ const root=resolve(import.meta.dir,'..'), own=!output, dir=output?resolve(output):mkdtempSync(join(tmpdir(),'batch25-documents-'));mkdirSync(dir,{recursive:true});writeFileSync(join(dir,'ordinary-consent-input.json'),JSON.stringify(normal,null,2)+'\n');
  const emit=(name:string,ok:boolean,detail?:unknown)=>check(ok,'batch25 documents '+name,detail);
- async function pdf(name:string,assembled:{markdown:string;title:string;encodedClientText?:boolean}):Promise<Page[]>{const bytes=await renderMarkdownPdf({...assembled,watermark:null});const path=join(dir,name+'.pdf');writeFileSync(path,bytes);writeFileSync(join(dir,name+'.md'),assembled.markdown);const proc=Bun.spawn(['python3',join(dir,'pdf_geometry.py'),path],{stdout:'pipe',stderr:'pipe'});const [text,err,code]=await Promise.all([new Response(proc.stdout).text(),new Response(proc.stderr).text(),proc.exited]);if(code)throw Error('PDF inspection failed: '+err);writeFileSync(join(dir,name+'.json'),text+'\n');return JSON.parse(text);}
+ async function pdf(name:string,assembled:{markdown:string;title:string;encodedClientText?:boolean}):Promise<Page[]>{const bytes=await renderMarkdownPdf({...assembled,watermark:null});const path=join(dir,name+'.pdf');writeFileSync(path,bytes);writeFileSync(join(dir,name+'.md'),assembled.markdown);const pages=await inspectPdf(bytes);writeFileSync(join(dir,name+'.json'),JSON.stringify(pages)+'\n');return pages;}
  async function attempt(label:string,fn:()=>Promise<void>){try{await fn();}catch(e){const labels:Record<string,string[]>={'amendment accepted bracket values render':['amendment accepted bracket values render','amendment typed punctuation literal','amendment typed paragraphs preserved','amendment title decoded','amendment no encoded entities leak'],'statement accepted bracket values render':['statement accepted bracket values render','statement title decoded','statement no encoded entities leak']};for(const name of labels[label]??[label])emit(name,false,String(e));}}
  try {
   emit('bracketed names satisfy existing alphabet policy',englishTextError(oa.companyName)===null&&englishTextError(statement.signerName)===null);

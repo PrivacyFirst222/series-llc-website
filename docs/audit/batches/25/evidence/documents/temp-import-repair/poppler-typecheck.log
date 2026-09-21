@@ -1,0 +1,11 @@
+server/new-series.ts(23,22): error TS2307: Cannot find module './templates-new-series.md' or its corresponding type declarations.
+server/oa-amendment.ts(18,34): error TS2307: Cannot find module './templates-oa-amendment.md' or its corresponding type declarations.
+server/oa.ts(9,31): error TS2307: Cannot find module './templates-oa-single.md' or its corresponding type declarations.
+server/oa.ts(10,30): error TS2307: Cannot find module './templates-oa-multi.md' or its corresponding type declarations.
+server/oa.ts(11,30): error TS2307: Cannot find module './templates-oa-s.md' or its corresponding type declarations.
+server/oa.ts(12,31): error TS2307: Cannot find module './templates-oa-member.md' or its corresponding type declarations.
+server/oa.ts(13,36): error TS2307: Cannot find module './templates-oa-member-s.md' or its corresponding type declarations.
+server/oa.ts(14,36): error TS2307: Cannot find module './templates-oa-single-s.md' or its corresponding type declarations.
+server/oa.ts(15,37): error TS2307: Cannot find module './templates-oa-member-single.md' or its corresponding type declarations.
+server/oa.ts(16,42): error TS2307: Cannot find module './templates-oa-member-single-s.md' or its corresponding type declarations.
+server/statement.ts(11,26): error TS2307: Cannot find module './templates-statement-of-authorized-representative.md' or its corresponding type declarations.

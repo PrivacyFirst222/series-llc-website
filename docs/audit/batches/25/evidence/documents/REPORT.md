@@ -46,3 +46,7 @@ The PDF skill artifact-operation marker ran successfully before first PDF genera
 ## Full-review harness follow-up
 
 The exact-commit review at 1dc6c72 exposed a fresh-temp-directory module-resolution failure in this check script, after the amendment fault probe. Only the harness was corrected to write both fault bundles before either dynamic import. Three fresh default-mode runs and one explicit-evidence run now pass43/43; the identical updated baseline harness still reports19/43 with the same labels and verdicts. All24 PDF readback/geometry records and all product-source hashes are unchanged. See temp-import-repair/REPORT.md, verification.json and source-hashes-followup.json; the failed run and earlier evidence remain retained.
+
+## CI dependency follow-up
+
+The harness’s undeclared Python pdfplumber dependency was removed. PDF inspection now uses existing Poppler and @cantoo/pdf-lib, with no product or workflow change. Three fresh default runs and one explicit-output run pass43/43; the identical baseline harness remains19/43 with all labels/verdicts unchanged. All24 files retain the same page/rule/signature counts, following words and bounds verdicts; signature coordinates match within0.000001pt. Extracted non-whitespace text matches, with some improved word separation from Poppler. See temp-import-repair/POPPLER-REPORT.md and poppler-comparison.json; latest hashes are source-hashes-poppler-followup.json.
