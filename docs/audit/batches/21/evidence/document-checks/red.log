@@ -1,0 +1,127 @@
+Baseline: 4a344e22e0d0239481f3182d6528bf84d960ed0d
+Command: ['python3', 'docs/audit/document-checks-test.py', '--root', '/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo']
+Exit: 1
+test_all_eight_current_masters (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/webapp/server/templates-oa-single.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/webapp/server/templates-oa-multi.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/webapp/server/templates-oa-s.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/webapp/server/templates-oa-member.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/webapp/server/templates-oa-member-s.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/webapp/server/templates-oa-single-s.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/webapp/server/templates-oa-member-single.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/webapp/server/templates-oa-member-single-s.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_complete_articles_swapped (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-8o09iw5r/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+FAIL
+test_complete_sections_swapped (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-qfu7uumv/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+FAIL
+test_consecutive_sections_and_articles (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-xmmtt88w/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_existing_duplicate_detection (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-ugcoc1cr/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_existing_missing_article_detection (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-y85djb2i/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_existing_missing_section_detection (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-0184k98y/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_letter_suffixes_out_of_order (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-19olwavx/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+FAIL
+test_letter_suffixes_remain_supported (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-4j5lawy8/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_numeric_sort_not_lexical_sort (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-5pquj5vo/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_section_before_any_article (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-ou8nel6i/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+FAIL
+test_section_moved_under_wrong_article (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-mechanism-2026-09-20/repo/docs/structure.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-m3j9lf59/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+FAIL
+
+======================================================================
+FAIL: test_complete_articles_swapped (__main__.DocumentChecks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/audit/document-checks-test.py", line 65, in test_complete_articles_swapped
+    self.rejects(changed, "articles are out of source order")
+  File "/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/audit/document-checks-test.py", line 51, in rejects
+    self.assertTrue(any(expected in p for p in problems), f"expected {expected!r}; got {problems}")
+AssertionError: False is not true : expected 'articles are out of source order'; got []
+
+======================================================================
+FAIL: test_complete_sections_swapped (__main__.DocumentChecks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/audit/document-checks-test.py", line 61, in test_complete_sections_swapped
+    self.rejects(changed, "sections are out of source order")
+  File "/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/audit/document-checks-test.py", line 51, in rejects
+    self.assertTrue(any(expected in p for p in problems), f"expected {expected!r}; got {problems}")
+AssertionError: False is not true : expected 'sections are out of source order'; got []
+
+======================================================================
+FAIL: test_letter_suffixes_out_of_order (__main__.DocumentChecks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/audit/document-checks-test.py", line 86, in test_letter_suffixes_out_of_order
+    self.rejects("## ARTICLE 1\n**1.1 First.** Text.\n**1.1B Added.** Text.\n"
+  File "/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/audit/document-checks-test.py", line 51, in rejects
+    self.assertTrue(any(expected in p for p in problems), f"expected {expected!r}; got {problems}")
+AssertionError: False is not true : expected 'sections are out of source order'; got []
+
+======================================================================
+FAIL: test_section_before_any_article (__main__.DocumentChecks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/audit/document-checks-test.py", line 75, in test_section_before_any_article
+    self.rejects("**1.1 First.** Text.\n\n## ARTICLE 1\n", "Section 1.1 sits before any ARTICLE heading")
+  File "/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/audit/document-checks-test.py", line 51, in rejects
+    self.assertTrue(any(expected in p for p in problems), f"expected {expected!r}; got {problems}")
+AssertionError: False is not true : expected 'Section 1.1 sits before any ARTICLE heading'; got []
+
+======================================================================
+FAIL: test_section_moved_under_wrong_article (__main__.DocumentChecks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/audit/document-checks-test.py", line 72, in test_section_moved_under_wrong_article
+    self.rejects(changed, "Section 7.2 sits under ARTICLE 8")
+  File "/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/audit/document-checks-test.py", line 51, in rejects
+    self.assertTrue(any(expected in p for p in problems), f"expected {expected!r}; got {problems}")
+AssertionError: False is not true : expected 'Section 7.2 sits under ARTICLE 8'; got []
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.074s
+
+FAILED (failures=5)

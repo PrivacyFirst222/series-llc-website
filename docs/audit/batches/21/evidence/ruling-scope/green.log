@@ -1,0 +1,29 @@
+B1-N05 implementation: working ledger-lib.ts over 4a344e22e0d0239481f3182d6528bf84d960ed0d; synthetic decisions only; no remote or pushes.
+PASS no decision leaves alpha blocked: {"expected":["ruling:100"],"actual":["ruling:100"]}
+PASS no decision leaves beta blocked: {"expected":["ruling:100"],"actual":["ruling:100"]}
+PASS part decision unblocks exact own part: {"expected":[],"actual":[]}
+PASS part decision does not unblock sibling: {"expected":["ruling:100"],"actual":["ruling:100"]}
+PASS main part decision unblocks linked sighting: {"expected":[],"actual":[]}
+PASS main part decision does not unblock sibling sighting: {"expected":["ruling:100"],"actual":["ruling:100"]}
+PASS main part decision unblocks chained sighting: {"expected":[],"actual":[]}
+PASS same part key on unrelated item does not supply dependency scope: {"expected":["ruling:100"],"actual":["ruling:100"]}
+PASS ruling queue retains sibling and cross-item wait without approved part: "- 100 — unblocks 100 (beta), 102, 104: Synthetic fixture only."
+PASS unknown part decision cannot unblock alpha: {"expected":["ruling:100"],"actual":["ruling:100"]}
+PASS sighting decision cannot satisfy main item's distinct wait: {"expected":["ruling:100"],"actual":["ruling:100"]}
+PASS item-wide decision covers 100:alpha: {"expected":[],"actual":[]}
+PASS item-wide decision covers 100:beta: {"expected":[],"actual":[]}
+PASS item-wide decision covers 101:all: {"expected":[],"actual":[]}
+PASS item-wide decision covers 102:all: {"expected":[],"actual":[]}
+PASS item-wide decision covers 104:alpha: {"expected":[],"actual":[]}
+PASS part-level wait is satisfied for exact part: {"expected":[],"actual":[]}
+PASS part-level sibling wait remains: {"expected":["ruling:105"],"actual":["ruling:105"]}
+PASS migration is not an owner ruling: {"expected":["ruling:100"],"actual":["ruling:100"]}
+PASS item release wait remains while all parts are open: {"expected":["100"],"actual":["100"]}
+PASS item release wait remains with one unreleased part: {"expected":["100"],"actual":["100"]}
+PASS item release wait ends after all parts release: {"expected":[],"actual":[]}
+PASS real authorize refuses sibling on scoped ruling: {"code":1,"output":"batch: REFUSED — item 100 (beta) waits on Adam's ruling on item 100\n"}
+PASS refused authorize writes neither ledger nor revision snapshot: {"ledgerUnchanged":true}
+PASS real authorize allows exact approved part only: {"code":0,"output":"batch scope-right r1 authorized: 1 item(s) assigned, batch file frozen as a4c0c6066620, snapshot kept at revisions/r1.json\n"}
+PASS reader still sees sibling ruling after approved part assigned: "# Waiting on Adam's ruling — 2\n\nEvery part of every live item that is not released was checked — 9 parts — for a wait on a ruling, its own or inherited through its main record. Nothing unfinished is outside this queue.\n\n- 100 — unblocks 100 (beta), 102, 104: Synthetic fixture only.\n- 105 — unblocks 105 (alpha), 105 (beta): Synthetic fixture only.\n"
+CURRENT LEDGER IMPACT {"partsChecked":383,"changedParts":[]}
+Ruling scope: 26/26 checks passed.

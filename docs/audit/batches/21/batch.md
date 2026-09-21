@@ -117,9 +117,9 @@ Publication remains deferred.
 
 ## Implementation and focused verification
 
-All seven approved controls are implemented. The API suite's secondary fresh-database/restart server now uses the same ownership-first proof as the browser/review server. This closes another entry path of the approved isolation repair; it preserves the same-database restart and rate-limit assertions. Ownership is checked before health requests because health initializes the database.
+All seven approved controls are implemented. The API suite's secondary fresh-database/restart server now uses the same ownership-first proof as the browser/review server. This closes another entry path of the approved isolation repair; it preserves the same-database restart and rate-limit assertions. Ownership and complete offline proof are checked before health requests because health initializes the database.
 
-Focused results: 26/26 ruling tests, 16/16 inventory tests, 12/12 document tests (all eight masters), and 27/27 isolation probes. All baseline failures and positive controls are retained under evidence/. Two documentation-only changes retain identical executable ASTs. The existing audit mechanism passes 69/69 cases; the completed audit still validates its original coverage.
+Focused results: 26/26 ruling tests, 16/16 inventory tests, 12/12 document tests (all eight masters), and 28/28 isolation probes. All baseline failures and positive controls are retained under evidence/. Two documentation-only changes retain identical executable ASTs. The existing audit mechanism passes 69/69 cases; the completed audit still validates its original coverage.
 
 The future inventory includes all 18 UI widget files (1,056 lines), because no current widget exclusion has independent evidence that it is unchanged stock. Existing historical audit files are unchanged. No client-facing source, agreement, generated Word document, price, email or live server route was edited.
 

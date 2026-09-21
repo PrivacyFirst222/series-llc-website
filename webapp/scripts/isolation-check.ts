@@ -55,6 +55,7 @@ function fixture(name: string, summary: unknown, status = 200, exitEarly = false
 import { writeFileSync, appendFileSync, existsSync } from "node:fs";
 writeFileSync("child.json", JSON.stringify({pid:process.pid, pg:process.env.DEV_PG_DIR, offline:process.env.E2E_OFFLINE, pgExists:existsSync(process.env.DEV_PG_DIR ?? "")}));
 ${exitEarly ? "process.exit(37);" : `Bun.serve({port:Number(process.env.PORT), fetch(req) {
+ appendFileSync("requests.txt", req.method+" "+new URL(req.url).pathname+"\\n");
  if(req.method !== "GET") appendFileSync("mutations.txt", req.method+" "+new URL(req.url).pathname+"\\n");
  if(new URL(req.url).pathname === "/api/dev/env-summary") return Response.json(${JSON.stringify(summary)}, {status:${status}});
  return Response.json({data:{}});
@@ -83,6 +84,8 @@ async function behavioralProbe() {
     const logs = (await output).join("\n");
     const mutations = existsSync(join(dir, "mutations.txt")) ? readFileSync(join(dir, "mutations.txt"), "utf8") : "";
     record("Behavioral command: malformed owned server refuses before admin login", exit !== 0 && !timedOut && !mutations && /REFUSED.*environment proof/s.test(logs), { exit, timedOut, mutations, logs });
+    const requests = existsSync(join(dir, "requests.txt")) ? readFileSync(join(dir, "requests.txt"), "utf8") : "";
+    record("Behavioral command: offline proof precedes health database initialization", requests === "GET /api/dev/env-summary\n" && exit !== 0 && !timedOut, { requests, exit, timedOut });
   } finally { clearTimeout(timer); clearInterval(watch); child.kill(); removeFixtureChild(dir); }
 }
 

@@ -1,0 +1,29 @@
+B1-N05 implementation: 4a344e22e0d0239481f3182d6528bf84d960ed0d; synthetic decisions only; no remote or pushes.
+PASS no decision leaves alpha blocked: {"expected":["ruling:100"],"actual":["ruling:100"]}
+PASS no decision leaves beta blocked: {"expected":["ruling:100"],"actual":["ruling:100"]}
+PASS part decision unblocks exact own part: {"expected":[],"actual":[]}
+FAIL part decision does not unblock sibling: {"expected":["ruling:100"],"actual":[]}
+PASS main part decision unblocks linked sighting: {"expected":[],"actual":[]}
+FAIL main part decision does not unblock sibling sighting: {"expected":["ruling:100"],"actual":[]}
+PASS main part decision unblocks chained sighting: {"expected":[],"actual":[]}
+FAIL same part key on unrelated item does not supply dependency scope: {"expected":["ruling:100"],"actual":[]}
+FAIL ruling queue retains sibling and cross-item wait without approved part: undefined
+FAIL unknown part decision cannot unblock alpha: {"expected":["ruling:100"],"actual":[]}
+PASS sighting decision cannot satisfy main item's distinct wait: {"expected":["ruling:100"],"actual":["ruling:100"]}
+PASS item-wide decision covers 100:alpha: {"expected":[],"actual":[]}
+PASS item-wide decision covers 100:beta: {"expected":[],"actual":[]}
+PASS item-wide decision covers 101:all: {"expected":[],"actual":[]}
+PASS item-wide decision covers 102:all: {"expected":[],"actual":[]}
+PASS item-wide decision covers 104:alpha: {"expected":[],"actual":[]}
+PASS part-level wait is satisfied for exact part: {"expected":[],"actual":[]}
+FAIL part-level sibling wait remains: {"expected":["ruling:105"],"actual":[]}
+PASS migration is not an owner ruling: {"expected":["ruling:100"],"actual":["ruling:100"]}
+PASS item release wait remains while all parts are open: {"expected":["100"],"actual":["100"]}
+PASS item release wait remains with one unreleased part: {"expected":["100"],"actual":["100"]}
+PASS item release wait ends after all parts release: {"expected":[],"actual":[]}
+FAIL real authorize refuses sibling on scoped ruling: {"code":0,"output":"batch scope-wrong r1 authorized: 1 item(s) assigned, batch file frozen as fd28a206fe49, snapshot kept at revisions/r1.json\n"}
+FAIL refused authorize writes neither ledger nor revision snapshot: {"ledgerUnchanged":false}
+PASS real authorize allows exact approved part only: {"code":0,"output":"batch scope-right r1 authorized: 1 item(s) assigned, batch file frozen as a4c0c6066620, snapshot kept at revisions/r1.json\n"}
+FAIL reader still sees sibling ruling after approved part assigned: "# Waiting on Adam's ruling — 1\n\nEvery part of every live item that is not released was checked — 9 parts — for a wait on a ruling, its own or inherited through its main record. Nothing unfinished is outside this queue.\n\n- 105 — unblocks 105 (alpha), 105 (beta): Synthetic fixture only.\n"
+CURRENT LEDGER IMPACT {"partsChecked":383,"changedParts":[]}
+Ruling scope: 17/26 checks passed.

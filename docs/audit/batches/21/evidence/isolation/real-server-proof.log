@@ -1,0 +1,2 @@
+review server: process 22216, started by this command from /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/webapp, owns port 60963; it reports offline = true and no live connections (database, square, blob, resend, dropbox, smarty, sunbiz all off); database: a throwaway folder
+{"api":"http://localhost:60963","pid":22216,"proof":{"offline":true,"externals":{"database":false,"square":false,"blob":false,"resend":false,"dropbox":false,"smarty":false,"sunbiz":false}}}

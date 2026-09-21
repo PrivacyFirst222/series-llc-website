@@ -62,15 +62,17 @@ export async function waitForOwnedApi(api: Pick<Subprocess, "pid" | "exitCode">,
     if (api.exitCode !== null) throw new Error(`REFUSED: the review server exited (code ${api.exitCode}) before it was ready — nothing on port ${port} is the process under review`);
     if (listeners(port).length > 0) {
       requireOwnedProcess(api, port);
-      try { if ((await fetch(`${apiUrl}/api/health`, { redirect: "manual", signal: AbortSignal.timeout(1000) })).status === 200) break; } catch { /* not ready yet */ }
+      // env-summary is read-only; health can initialize/migrate the database.
+      // A healthy owned child is insufficient if offline mode is not proven.
+      const proof = await requireEnvironmentProof(apiUrl);
+      requireOwnedProcess(api, port);
+      let healthy = false;
+      try { healthy = (await fetch(`${apiUrl}/api/health`, { redirect: "manual", signal: AbortSignal.timeout(1000) })).status === 200; } catch { /* not ready yet */ }
+      if (healthy) { requireOwnedProcess(api, port); return proof; }
     }
     if (i === 80) throw new Error("REFUSED: the owned API never became healthy");
     await new Promise((r) => setTimeout(r, 500));
   }
-  requireOwnedProcess(api, port);
-  const proof = await requireEnvironmentProof(apiUrl);
-  requireOwnedProcess(api, port);
-  return proof;
 }
 
 export async function buildSite(cwd: string, outDir: string, quiet = true): Promise<void> {

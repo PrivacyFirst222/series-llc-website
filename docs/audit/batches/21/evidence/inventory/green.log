@@ -1,0 +1,17 @@
+PASS B2-04 working inventory includes customized input
+PASS B2-04 working inventory includes customized textarea
+PASS historical manifest unchanged byte for byte
+PASS future frozen manifest includes input
+PASS future disk inventory includes input
+PASS widget input is never mislabeled stock
+PASS future frozen manifest includes textarea
+PASS future disk inventory includes textarea
+PASS widget textarea is never mislabeled stock
+PASS future frozen manifest includes future-custom-widget
+PASS future disk inventory includes future-custom-widget
+PASS widget future-custom-widget is never mislabeled stock
+PASS future audit reads the inventory policy
+PASS future audit reads Python control tests
+PASS invalid policy cannot hide widgets
+PASS missing future policy cannot reactivate legacy exclusion
+16/16 inventory checks passed

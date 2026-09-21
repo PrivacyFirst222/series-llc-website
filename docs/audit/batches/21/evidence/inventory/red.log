@@ -1,0 +1,14 @@
+FAIL B2-04 working inventory includes customized input
+FAIL B2-04 working inventory includes customized textarea
+PASS historical manifest unchanged byte for byte
+FAIL future frozen manifest includes input
+FAIL future disk inventory includes input
+FAIL widget input is never mislabeled stock
+FAIL future frozen manifest includes textarea
+FAIL future disk inventory includes textarea
+FAIL widget textarea is never mislabeled stock
+FAIL future frozen manifest includes future-custom-widget
+FAIL future disk inventory includes future-custom-widget
+FAIL widget future-custom-widget is never mislabeled stock
+FAIL future audit reads the inventory policy
+1/13 inventory checks passed

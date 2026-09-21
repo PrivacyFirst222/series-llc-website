@@ -1,0 +1,1 @@
+docs/docs-consistency.py and docs/event-map.py: executable ASTs match baseline 4a344e2 after excluding module docstrings; inline comments ignored by parser.

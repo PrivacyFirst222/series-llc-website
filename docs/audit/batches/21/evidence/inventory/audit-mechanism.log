@@ -1,0 +1,70 @@
+PASS complete evidence fixture passes
+PASS short line count refused
+PASS overstated line count refused
+PASS non-number line count refused
+PASS NaN line count refused
+PASS negative line count refused
+PASS duplicate file refused
+PASS missing file refused
+PASS missing entire report refused
+PASS wrong commit refused
+PASS changed source hash refused
+PASS wrong reader receipts refused
+PASS unread first line refused
+PASS receipt tampering refused
+PASS every prior part required
+PASS duplicate prior refused
+PASS unknown prior refused
+PASS not verified prior refuses completion
+PASS manifest cannot omit a prior part
+PASS retained decision requires quote
+PASS unknown duplicate target refused
+PASS false no-findings declaration refused
+PASS quote at wrong line refused
+PASS unknown source file refused
+PASS unsupported severity refused
+PASS finding rechecked by its author refused
+PASS missing prior comparison refused
+PASS missing replacement refused
+PASS duplicate defect with new key refused
+PASS missing checklist entry refused
+PASS unverified source refuses completion
+PASS missing evidence bytes refused
+PASS evidence hash mismatch refused
+PASS evidence traversal refused
+PASS evidence commit mismatch refused
+PASS runtime evidence needs offline proof
+PASS statute check requires Sunshine source
+PASS render obligation cannot use source evidence
+PASS render evidence requires every page
+PASS comparison needs expected and observed text
+PASS multiple complete read ranges pass
+PASS checked source appends open item without changing prior
+PASS unproven new record refused
+PASS changed import hash refused
+PASS edited imported finding refused
+PASS removed prior item refused
+PASS duplicate import ref refused
+PASS new intake cannot publish as records-only
+PASS retained intake reference immutable
+PASS source loss detected on clean later ledger
+PASS same exact defect in another run refused
+PASS real init command succeeds
+PASS actual current ledger has every part assigned
+PASS all eight masters and twelve Word outputs scheduled
+PASS real read command emits actual source and receipt
+PASS real gate refuses empty reports and evidence
+PASS partial report is explicitly incomplete
+PASS real gate rejects altered manifest denominator
+PASS existing run never overwritten
+PASS source inventory includes server and browser expectation checks
+PASS historical generated report remains identical at e630541
+PASS historical generated report remains identical at fffd6567
+PASS real completion gate accepts complete synthetic run
+PASS real intake preview leaves ledger untouched
+PASS real intake applies verified open finding
+PASS real intake preserves prior records and leaves new work open
+PASS real commit guard accepts exact retained intake
+PASS real intake refuses importing a run twice
+PASS real guard refuses changed retained audit source
+69/69 audit mechanism checks passed; fixture evidence is not a product audit.

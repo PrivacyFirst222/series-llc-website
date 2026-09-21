@@ -1,0 +1,123 @@
+Command: python3 docs/audit/document-checks-test.py
+Exit: 0
+test_all_eight_current_masters (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/webapp/server/templates-oa-single.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/webapp/server/templates-oa-multi.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/webapp/server/templates-oa-s.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/webapp/server/templates-oa-member.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/webapp/server/templates-oa-member-s.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/webapp/server/templates-oa-single-s.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/webapp/server/templates-oa-member-single.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/webapp/server/templates-oa-member-single-s.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_complete_articles_swapped (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-a7qi21b_/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_complete_sections_swapped (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-npwckhlv/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_consecutive_sections_and_articles (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-dl37vayb/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_existing_duplicate_detection (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-nuk62jd2/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_existing_missing_article_detection (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-01rxh7u0/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_existing_missing_section_detection (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-w2ie45h0/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_letter_suffixes_out_of_order (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-3n62_3mp/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_letter_suffixes_remain_supported (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-wu3228s8/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_numeric_sort_not_lexical_sort (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-qqq1u9f9/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_section_before_any_article (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-rjr4rvtj/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_section_moved_under_wrong_article (__main__.DocumentChecks) ... /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-1-2026-09-20/repo/docs/structure.py:90: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/document-check-xsfjiel6/fixture.md' mode='r' encoding='UTF-8'>
+  text = open(path).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.092s
+
+OK
+
+Command: python3 docs/structure.py
+Exit: 0
+  ok    templates-oa-single.md
+  ok    templates-oa-multi.md
+  ok    templates-oa-s.md
+  ok    templates-oa-member.md
+  ok    templates-oa-member-s.md
+  ok    templates-oa-single-s.md
+  ok    templates-oa-member-single.md
+  ok    templates-oa-member-single-s.md
+
+Command: python3 docs/structure.py --selftest
+Exit: 0
+  ok    article missing
+  ok    article twice
+  ok    article heading deleted
+  ok    section number reused
+  ok    section number skipped
+  ok    lettered paragraph skipped
+  ok    reference to a deleted section
+  ok    reference to a missing article
+  ok    reference to a missing exhibit
+  ok    provision cut off mid-sentence
+  ok    term defined twice
+  ok    definitions out of alphabetical order
+  12 checks each caught the defect it exists for
+
+Command: python3 docs/docs-consistency.py
+Exit: 0
+  ok    93 references in 2 guidance documents all resolve
+
+Command: python3 docs/event-map.py --quiet
+Exit: 0
+  ok    66 events, each answered in all 8 forms
+
+Command: python3 docs/event-map.py --selftest
+Exit: 0
+  ok    an event left unanswered for one form
+  ok    silence with no reason given
+  ok    an event answered by a provision that form does not have
+  ok    a cell that is not a section list
+  4 checks each caught the defect it exists for
+
+docs/docs-consistency.py: executable AST unchanged; module docstring only.
+
+docs/event-map.py: executable AST unchanged; module docstring only.
