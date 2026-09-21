@@ -1,0 +1,1 @@
+Bundle restored into a fresh temporary clone. Verified clean exact HEAD 2559e18f5094b70c8eba1eb64e3c3519aa609f3e. Temporary clone removed.

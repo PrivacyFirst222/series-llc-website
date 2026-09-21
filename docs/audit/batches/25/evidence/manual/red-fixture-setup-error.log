@@ -1,0 +1,3 @@
+error: Cannot find module '../src/lib/englishText' from '/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-5-2026-09-21/evidence-manual/baseline/webapp/server/document-text.ts'
+
+Bun v1.3.14 (macOS arm64)

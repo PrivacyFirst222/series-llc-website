@@ -1,0 +1,11 @@
+48 | fficer'}]}] as [string,NewSeriesInput][]) await attempt(name+' signature units',async()=>{const pages=await pdf(name,ass
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ^
+error: Expected "]" but found ")"
+    at /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-5-2026-09-21/repo/webapp/scripts/batch25-documents-check.ts:48:454
+
+48 | icer'}]}] as [string,NewSeriesInput][]) await attempt(name+' signature units',async()=>{const pages=await pdf(name,assem
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ^
+error: Expected ")" but found "await"
+    at /Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-5-2026-09-21/repo/webapp/scripts/batch25-documents-check.ts:48:456
+
+Bun v1.3.14 (macOS arm64)

@@ -1,0 +1,80 @@
+mapping the provisions
+  ok    310 provisions, every one mapped to a beneficiary
+provisions: +0 / -0    words: +0
+reading back the changed provisions
+  no provision text differs from HEAD
+checking the masters hold together
+  ok    article missing
+  ok    article twice
+  ok    article heading deleted
+  ok    section number reused
+  ok    section number skipped
+  ok    lettered paragraph skipped
+  ok    reference to a deleted section
+  ok    reference to a missing article
+  ok    reference to a missing exhibit
+  ok    provision cut off mid-sentence
+  ok    term defined twice
+  ok    definitions out of alphabetical order
+  12 checks each caught the defect it exists for
+  ok    templates-oa-single.md
+  ok    templates-oa-multi.md
+  ok    templates-oa-s.md
+  ok    templates-oa-member.md
+  ok    templates-oa-member-s.md
+  ok    templates-oa-single-s.md
+  ok    templates-oa-member-single.md
+  ok    templates-oa-member-single-s.md
+answering the events
+  ok    an event left unanswered for one form
+  ok    silence with no reason given
+  ok    an event answered by a provision that form does not have
+  ok    a cell that is not a section list
+  4 checks each caught the defect it exists for
+  ok    66 events, each answered in all 8 forms
+answering Chapter 605
+  ok    a section of the chapter loses its row
+  ok    a row for something that is not in the chapter
+  ok    a section answered twice
+  ok    a disposition outside the vocabulary
+  ok    a disposition with no reason
+  ok    varied, but nothing varies it
+  ok    a citation to a provision since deleted
+  7 checks each caught the defect it exists for
+  ok    191 of 191 sections of Chapter 605 answered  (n/a 84, non-variable 40, relied 45, varied 22)
+resolving the guidance documents' references
+  ok    93 references in 2 guidance documents all resolve
+linting the agreement masters
+  ok    templates-oa-amendment.md
+  ok    templates-oa-member-s.md
+  ok    templates-oa-member-single-s.md
+  ok    templates-oa-member-single.md
+  ok    templates-oa-member.md
+  ok    templates-oa-multi.md
+  ok    templates-oa-s.md
+  ok    templates-oa-single-s.md
+  ok    templates-oa-single.md
+tracing every generated paragraph to a master
+breaking the pagination checks on purpose
+  ok    line spacing back to single
+  ok    heading space-below back to 0
+  ok    page breaks removed
+  ok    widow control switched off
+  ok    keepNext stripped from every heading
+
+  5 of 5 pagination checks caught the defect they exist for
+checking 12 documents against docs/source/
+PART  FPSLLC Amendment to Operating Agreement - FORM.docx — no baseline entry; pagination checked, formatting not
+ok    FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx  (63% justified, 27% keepLines, 23 headings, Times New Roman 12pt)
+ok    FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx  (62% justified, 28% keepLines, 23 headings, Times New Roman 12pt)
+ok    FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx  (62% justified, 27% keepLines, 23 headings, Times New Roman 12pt)
+ok    FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx  (61% justified, 28% keepLines, 23 headings, Times New Roman 12pt)
+ok    FPSLLC Operating Agreement Instructions - DRAFT.docx  (50% justified, 32% keepLines, 9 headings, Times New Roman 12pt)
+PART  FPSLLC Statement of Authorized Representative - FORM.docx — no baseline entry; pagination checked, formatting not
+ok    SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx  (58% justified, 30% keepLines, 20 headings, Times New Roman 12pt)
+ok    SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx  (61% justified, 28% keepLines, 20 headings, Times New Roman 12pt)
+ok    SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx  (60% justified, 29% keepLines, 20 headings, Times New Roman 12pt)
+ok    SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx  (62% justified, 27% keepLines, 20 headings, Times New Roman 12pt)
+ok    Series LLC Owners Manual - REVISED DRAFT.docx  (54% justified, 47% keepLines, 61 headings, Georgia 11pt, page numbers)
+regenerated 12 Word documents -> docs/word/
+Dropbox is updated at release, after Adam's acceptance — not by this script (/Users/adam/Library/CloudStorage/Dropbox/00 SharedWithMac/FPSLLC Operating Agreement untouched)

@@ -1774,6 +1774,7 @@ app.post("/portal/oa/amend", async (c) => {
     title = assembled.title;
     pdf = await renderMarkdownPdf({
       markdown: assembled.markdown,
+      encodedClientText: assembled.encodedClientText,
       watermark: {
         name: client?.name || oa.members[0]?.name || "",
         email: client?.email ?? "",

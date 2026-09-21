@@ -1,0 +1,96 @@
+{
+  "reviewer": "coordinator",
+  "view": "individual readable full-page PNGs",
+  "pagesInspected": 22,
+  "pages": [
+    {
+      "file": "evidence-documents/green-final/pages/literal-amendment-_SIGNER_NAME_-2.png",
+      "sha256": "f8d111744596eeea6e8652191bddb27ad8d0bef469a312150b59b66b9bcca173"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/literal-amendment-__91_FAKE__93_-1.png",
+      "sha256": "9143b51fde9a0935077f707e99c8a264f4d0098e884328a2d47b5d52b32fa9c1"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/literal-amendment-__91_FAKE__93_-2.png",
+      "sha256": "64b3b55d7378d78d0aac6523322e57af64d1ed4b961f50ff6c0b3368abcd0a16"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/literal-amendment-__indent__-1.png",
+      "sha256": "b3a0f84a2b6c491e71991526dc221b81682ff794238380251b355c7c51c1df48"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/literal-amendment-__indent__-2.png",
+      "sha256": "0f967387f4b84d694dc77bf4a9e41127539018aaed52cfc1131ee13ef232ccec"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/literal-amendment-__pagebreak__-1.png",
+      "sha256": "b7bb370655b48494884225cbdb00ff51ff20daf4cd7ba3098d7b16850f984777"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/literal-amendment-__pagebreak__-2.png",
+      "sha256": "d3ca70d378cddc8fbc4f2e57d26b1481938a63afac3e04011bb83446c48c51fd"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/literal-statement-By____________-1.png",
+      "sha256": "1394df793b71a430721e7eb2fd3327c11e5cfcabbf3f53a3d71c1e2c29d077b4"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/literal-statement-Form_document-1.png",
+      "sha256": "821307e613c8b41399b413afefe9b58a6dc081cb3e10fa23930ab1fb30c01d21"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/literal-statement-_COMPANY_NAME_-1.png",
+      "sha256": "9514748293ca9c650233af32bebb6ad418fb087cbcc94fe0b686c78055c7bcb3"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/literal-statement-_SIGNER_NAME_-1.png",
+      "sha256": "21b790abc8ed1a96f185a49756745fe2459888667803c50b419fb166f1ecf7d5"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/literal-statement-__91_FAKE__93_-1.png",
+      "sha256": "0abdf9a57b49a1e5fab3fabfbaee6bc45cccd285835a6df07c9e61aabdaf9e63"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/literal-statement-__indent__-1.png",
+      "sha256": "5dc0ebb1771429c90f675b2acff5dc70cc8bed0f66ca8e35ac6524beccb3fa2d"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/literal-statement-__pagebreak__-1.png",
+      "sha256": "4597132812a9c195bd8db7573e5019f0c394160e41a929102d32b7fdc0a415d4"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/long-person-consent-1.png",
+      "sha256": "85433d9fb13cb58c052c1075f69d30cb6be165ed2009797aa835233a56b861a3"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/long-person-consent-2.png",
+      "sha256": "dbb5d34e086d14a981adc85f6024b023cd44f6e48d52c019682f6e4ca1168dd3"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/long-person-consent-3.png",
+      "sha256": "8bca9b4b41b94618459551e37724edae61309f0c67b33665d0867aa94b159d59"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/long-person-consent-4.png",
+      "sha256": "cab2163ba40ad38a5429b222efe03883fc2331fd4fc70f79cd09721855191687"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/ordinary-consent-1.png",
+      "sha256": "2834f0164d693cbafaf3d35c6b198dfd7c9861b9274951b03014862179022d27"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/ordinary-consent-2.png",
+      "sha256": "e662ca0f0d59f9a998e12da0186f94f0fdaad233053fdc5a2499599923a15e42"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/ordinary-consent-3.png",
+      "sha256": "b6e3ff33ab8b847e3db3120e90dc00f765675ac2570d534295330f7957bdf20b"
+    },
+    {
+      "file": "evidence-documents/green-final/pages/statement-brackets-1.png",
+      "sha256": "ccf37718b996d23b19c095b0d978c15abdf66c28a4dc7feefa50973b463f22c5"
+    }
+  ],
+  "observations": "No new clipping, overlap or separated signature units observed. Literal control-looking client inputs stay text. Long-name consent has a complete second signature on page2 before the intentional master exhibit break; ordinary consent has3pages. Existing duplicate terminal purpose punctuation belongs to the unchanged fixture/master and was not edited."
+}

@@ -1,0 +1,248 @@
+{
+  "id": "25",
+  "revision": 1,
+  "title": "Word tables and signature formatting, Manual pagination, and literal client text in documents",
+  "model": "Codex",
+  "base": "2559e18f5094b70c8eba1eb64e3c3519aa609f3e",
+  "items": [
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-WORD-EXHIBIT-TABLE-ROWS",
+      "part": "all",
+      "scope": "Keep all editable Word agreement exhibit data and total rows within their tables, preserving drafting choices and text.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/batch25-word-check.py",
+          "text": "WORD-EXHIBIT-TABLE-ROWS"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "../docs/batch25-word-check.py"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-WORD-INDENT-CONTROL-LEAK",
+      "part": "all",
+      "scope": "Interpret indent formatting controls in Word signature blocks without printing control tokens; preserve intended signature layout.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/batch25-word-check.py",
+          "text": "WORD-INDENT-CONTROL-LEAK"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "../docs/batch25-word-check.py"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B5-MANUAL-TABLE-HEADER-PAGINATION",
+      "part": "all",
+      "scope": "Keep Owner's Manual table headers with first data row and repeat headers on continuation pages, preserving rows and content.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch25-manual-check.ts",
+          "text": "B5-MANUAL-TABLE-HEADER-PAGINATION"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch25-manual-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B7-CLIENT-TEXT-AS-SLOT",
+      "part": "all",
+      "scope": "Protect accepted client text during amendment and Statement assembly so bracketed phrases print literally; preserve genuine missing-slot rejection and typed amendment paragraphs.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch25-documents-check.ts",
+          "text": "B7-CLIENT-TEXT-AS-SLOT"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch25-documents-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B5-CONSENT-SIGNATURE-PAGINATION",
+      "part": "all",
+      "scope": "Keep measured signature line, wrapped printed name, title and optional date together; retain approved tight spacing and avoid blank signature pages.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch25-documents-check.ts",
+          "text": "B5-CONSENT-SIGNATURE-PAGINATION"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch25-documents-check.ts"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/md-to-docx.py",
+      "mode": "code",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/batch25-word-check.py",
+      "mode": "code",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "webapp/server/manual-pdf.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "webapp/server/oa-amendment.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "webapp/server/statement.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "webapp/server/pdf-render.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "webapp/server/document-text.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "webapp/scripts/batch25-manual-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "webapp/scripts/batch25-documents-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "webapp/package.json",
+      "mode": "code",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/word/FPSLLC Amendment to Operating Agreement - FORM.docx",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement Instructions - DRAFT.docx",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/word/FPSLLC Statement of Authorized Representative - FORM.docx",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/word/SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/word/SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/word/SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/word/SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    },
+    {
+      "path": "docs/word/Series LLC Owners Manual - REVISED DRAFT.docx",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement only the five approved Batch25 document generation and formatting fixes, with preserved master text and regression evidence."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": []
+}

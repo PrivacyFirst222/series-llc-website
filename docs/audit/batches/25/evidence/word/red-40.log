@@ -1,0 +1,81 @@
+PASS all twelve published Word mappings checked: 12
+CHECK_RESULT {"suite": "batch25-word", "label": "all twelve published Word mappings checked", "ok": true, "detail": 12, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-single.md complete table cell matrix: {'expectedRows': [8, 2, 7, 6], 'actualRows': [8, 1, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single.md complete table cell matrix", "ok": false, "detail": {"expectedRows": [8, 2, 7, 6], "actualRows": [8, 1, 7, 6]}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-single.md entity signature controls become indents: {'expected': 6, 'actual': 0, 'controlLeaks': 6}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single.md entity signature controls become indents", "ok": false, "detail": {"expected": 6, "actual": 0, "controlLeaks": 6}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-single.md all baseline text and drafting choices retained: {'beforeChars': 46540, 'afterChars': 46540}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 46540, "afterChars": 46540}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-multi.md complete table cell matrix: {'expectedRows': [3, 2, 3, 2, 7, 6], 'actualRows': [1, 1, 1, 1, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-multi.md complete table cell matrix", "ok": false, "detail": {"expectedRows": [3, 2, 3, 2, 7, 6], "actualRows": [1, 1, 1, 1, 7, 6]}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-multi.md entity signature controls become indents: {'expected': 6, 'actual': 0, 'controlLeaks': 6}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-multi.md entity signature controls become indents", "ok": false, "detail": {"expected": 6, "actual": 0, "controlLeaks": 6}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-multi.md all baseline text and drafting choices retained: {'beforeChars': 70948, 'afterChars': 70948}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-multi.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 70948, "afterChars": 70948}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-s.md complete table cell matrix: {'expectedRows': [3, 2, 3, 2, 7, 6], 'actualRows': [1, 1, 1, 1, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-s.md complete table cell matrix", "ok": false, "detail": {"expectedRows": [3, 2, 3, 2, 7, 6], "actualRows": [1, 1, 1, 1, 7, 6]}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-s.md entity signature controls become indents: {'expected': 6, 'actual': 0, 'controlLeaks': 6}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-s.md entity signature controls become indents", "ok": false, "detail": {"expected": 6, "actual": 0, "controlLeaks": 6}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-s.md all baseline text and drafting choices retained: {'beforeChars': 73672, 'afterChars': 73672}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-s.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 73672, "afterChars": 73672}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-member.md complete table cell matrix: {'expectedRows': [3, 2, 3, 2, 7, 6], 'actualRows': [1, 1, 1, 1, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member.md complete table cell matrix", "ok": false, "detail": {"expectedRows": [3, 2, 3, 2, 7, 6], "actualRows": [1, 1, 1, 1, 7, 6]}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-member.md entity signature controls become indents: {'expected': 4, 'actual': 0, 'controlLeaks': 4}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member.md entity signature controls become indents", "ok": false, "detail": {"expected": 4, "actual": 0, "controlLeaks": 4}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member.md all baseline text and drafting choices retained: {'beforeChars': 68877, 'afterChars': 68877}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 68877, "afterChars": 68877}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-member-s.md complete table cell matrix: {'expectedRows': [3, 2, 3, 2, 7, 6], 'actualRows': [1, 1, 1, 1, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-s.md complete table cell matrix", "ok": false, "detail": {"expectedRows": [3, 2, 3, 2, 7, 6], "actualRows": [1, 1, 1, 1, 7, 6]}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-member-s.md entity signature controls become indents: {'expected': 4, 'actual': 0, 'controlLeaks': 4}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-s.md entity signature controls become indents", "ok": false, "detail": {"expected": 4, "actual": 0, "controlLeaks": 4}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-s.md all baseline text and drafting choices retained: {'beforeChars': 71546, 'afterChars': 71546}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-s.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 71546, "afterChars": 71546}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-single-s.md complete table cell matrix: {'expectedRows': [8, 2, 7, 6], 'actualRows': [8, 1, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single-s.md complete table cell matrix", "ok": false, "detail": {"expectedRows": [8, 2, 7, 6], "actualRows": [8, 1, 7, 6]}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-single-s.md entity signature controls become indents: {'expected': 6, 'actual': 0, 'controlLeaks': 6}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single-s.md entity signature controls become indents", "ok": false, "detail": {"expected": 6, "actual": 0, "controlLeaks": 6}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-single-s.md all baseline text and drafting choices retained: {'beforeChars': 51883, 'afterChars': 51883}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single-s.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 51883, "afterChars": 51883}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-member-single.md complete table cell matrix: {'expectedRows': [8, 2, 7, 6], 'actualRows': [8, 1, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single.md complete table cell matrix", "ok": false, "detail": {"expectedRows": [8, 2, 7, 6], "actualRows": [8, 1, 7, 6]}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-member-single.md entity signature controls become indents: {'expected': 4, 'actual': 0, 'controlLeaks': 4}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single.md entity signature controls become indents", "ok": false, "detail": {"expected": 4, "actual": 0, "controlLeaks": 4}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-single.md all baseline text and drafting choices retained: {'beforeChars': 41682, 'afterChars': 41682}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 41682, "afterChars": 41682}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-member-single-s.md complete table cell matrix: {'expectedRows': [8, 2, 7, 6], 'actualRows': [8, 1, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single-s.md complete table cell matrix", "ok": false, "detail": {"expectedRows": [8, 2, 7, 6], "actualRows": [8, 1, 7, 6]}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-member-single-s.md entity signature controls become indents: {'expected': 4, 'actual': 0, 'controlLeaks': 4}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single-s.md entity signature controls become indents", "ok": false, "detail": {"expected": 4, "actual": 0, "controlLeaks": 4}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-single-s.md all baseline text and drafting choices retained: {'beforeChars': 46795, 'afterChars': 46795}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single-s.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 46795, "afterChars": 46795}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-amendment.md complete table cell matrix: {'expectedRows': [], 'actualRows': []}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-amendment.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [], "actualRows": []}, "commit": "", "run": ""}
+FAIL webapp/server/templates-oa-amendment.md entity signature controls become indents: {'expected': 4, 'actual': 0, 'controlLeaks': 4}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-amendment.md entity signature controls become indents", "ok": false, "detail": {"expected": 4, "actual": 0, "controlLeaks": 4}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-amendment.md all baseline text and drafting choices retained: {'beforeChars': 2110, 'afterChars': 2110}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-amendment.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 2110, "afterChars": 2110}, "commit": "", "run": ""}
+PASS docs/owners-manual.md complete table cell matrix: {'expectedRows': [14, 5, 12, 5, 5, 4, 5, 7, 5], 'actualRows': [14, 5, 12, 5, 5, 4, 5, 7, 5]}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/owners-manual.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [14, 5, 12, 5, 5, 4, 5, 7, 5], "actualRows": [14, 5, 12, 5, 5, 4, 5, 7, 5]}, "commit": "", "run": ""}
+PASS docs/owners-manual.md entity signature controls become indents: {'expected': 0, 'actual': 116, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/owners-manual.md entity signature controls become indents", "ok": true, "detail": {"expected": 0, "actual": 116, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS docs/owners-manual.md all baseline text and drafting choices retained: {'beforeChars': 100463, 'afterChars': 100463}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/owners-manual.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 100463, "afterChars": 100463}, "commit": "", "run": ""}
+PASS webapp/server/templates-statement-of-authorized-representative.md complete table cell matrix: {'expectedRows': [], 'actualRows': []}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-statement-of-authorized-representative.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [], "actualRows": []}, "commit": "", "run": ""}
+FAIL webapp/server/templates-statement-of-authorized-representative.md entity signature controls become indents: {'expected': 2, 'actual': 0, 'controlLeaks': 2}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-statement-of-authorized-representative.md entity signature controls become indents", "ok": false, "detail": {"expected": 2, "actual": 0, "controlLeaks": 2}, "commit": "", "run": ""}
+PASS webapp/server/templates-statement-of-authorized-representative.md all baseline text and drafting choices retained: {'beforeChars': 3035, 'afterChars': 3035}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-statement-of-authorized-representative.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 3035, "afterChars": 3035}, "commit": "", "run": ""}
+PASS docs/oa-instructions.md complete table cell matrix: {'expectedRows': [5, 7], 'actualRows': [5, 7]}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/oa-instructions.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [5, 7], "actualRows": [5, 7]}, "commit": "", "run": ""}
+PASS docs/oa-instructions.md entity signature controls become indents: {'expected': 0, 'actual': 0, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/oa-instructions.md entity signature controls become indents", "ok": true, "detail": {"expected": 0, "actual": 0, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS docs/oa-instructions.md all baseline text and drafting choices retained: {'beforeChars': 16310, 'afterChars': 16310}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/oa-instructions.md all baseline text and drafting choices retained", "ok": true, "detail": {"beforeChars": 16310, "afterChars": 16310}, "commit": "", "run": ""}
+FAIL comment-wrapped data and totals remain in first table; blank separates second table: [[['Owner', 'Share']], [['Other', 'Value'], ['A', 'B']]]
+CHECK_RESULT {"suite": "batch25-word", "label": "comment-wrapped data and totals remain in first table; blank separates second table", "ok": false, "detail": [[["Owner", "Share"]], [["Other", "Value"], ["A", "B"]]], "commit": "", "run": ""}
+FAIL intervening ordinary paragraph stays outside tables: ['| [NAME] | 100% |', '| Total | 100% |', 'Outside paragraph.']
+CHECK_RESULT {"suite": "batch25-word", "label": "intervening ordinary paragraph stays outside tables", "ok": false, "detail": ["| [NAME] | 100% |", "| Total | 100% |", "Outside paragraph."], "commit": "", "run": ""}
+PASS table header repeat and body row no-split survive: all fixture rows
+CHECK_RESULT {"suite": "batch25-word", "label": "table header repeat and body row no-split survive", "ok": true, "detail": "all fixture rows", "commit": "", "run": ""}
+Batch 25 Word: 20/40 checks passed

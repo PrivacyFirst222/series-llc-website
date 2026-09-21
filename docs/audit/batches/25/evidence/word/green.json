@@ -1,0 +1,687 @@
+[
+  {
+    "suite": "batch25-word",
+    "label": "all twelve published Word mappings checked",
+    "ok": true,
+    "detail": 12,
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-single.md tracked Word contains the current generator output",
+    "ok": true,
+    "detail": [],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-single.md complete table cell matrix",
+    "ok": true,
+    "detail": {
+      "expectedRows": [
+        8,
+        2,
+        7,
+        6
+      ],
+      "actualRows": [
+        8,
+        2,
+        7,
+        6
+      ]
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-single.md entity signature controls become indents",
+    "ok": true,
+    "detail": {
+      "expected": 6,
+      "actual": 6,
+      "controlLeaks": 0
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-single.md all baseline text and drafting choices retained",
+    "ok": true,
+    "detail": {
+      "beforeChars": 46540,
+      "afterChars": 46540
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-multi.md tracked Word contains the current generator output",
+    "ok": true,
+    "detail": [],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-multi.md complete table cell matrix",
+    "ok": true,
+    "detail": {
+      "expectedRows": [
+        3,
+        2,
+        3,
+        2,
+        7,
+        6
+      ],
+      "actualRows": [
+        3,
+        2,
+        3,
+        2,
+        7,
+        6
+      ]
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-multi.md entity signature controls become indents",
+    "ok": true,
+    "detail": {
+      "expected": 6,
+      "actual": 6,
+      "controlLeaks": 0
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-multi.md all baseline text and drafting choices retained",
+    "ok": true,
+    "detail": {
+      "beforeChars": 70948,
+      "afterChars": 70948
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-s.md tracked Word contains the current generator output",
+    "ok": true,
+    "detail": [],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-s.md complete table cell matrix",
+    "ok": true,
+    "detail": {
+      "expectedRows": [
+        3,
+        2,
+        3,
+        2,
+        7,
+        6
+      ],
+      "actualRows": [
+        3,
+        2,
+        3,
+        2,
+        7,
+        6
+      ]
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-s.md entity signature controls become indents",
+    "ok": true,
+    "detail": {
+      "expected": 6,
+      "actual": 6,
+      "controlLeaks": 0
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-s.md all baseline text and drafting choices retained",
+    "ok": true,
+    "detail": {
+      "beforeChars": 73672,
+      "afterChars": 73672
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member.md tracked Word contains the current generator output",
+    "ok": true,
+    "detail": [],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member.md complete table cell matrix",
+    "ok": true,
+    "detail": {
+      "expectedRows": [
+        3,
+        2,
+        3,
+        2,
+        7,
+        6
+      ],
+      "actualRows": [
+        3,
+        2,
+        3,
+        2,
+        7,
+        6
+      ]
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member.md entity signature controls become indents",
+    "ok": true,
+    "detail": {
+      "expected": 4,
+      "actual": 4,
+      "controlLeaks": 0
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member.md all baseline text and drafting choices retained",
+    "ok": true,
+    "detail": {
+      "beforeChars": 68877,
+      "afterChars": 68877
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member-s.md tracked Word contains the current generator output",
+    "ok": true,
+    "detail": [],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member-s.md complete table cell matrix",
+    "ok": true,
+    "detail": {
+      "expectedRows": [
+        3,
+        2,
+        3,
+        2,
+        7,
+        6
+      ],
+      "actualRows": [
+        3,
+        2,
+        3,
+        2,
+        7,
+        6
+      ]
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member-s.md entity signature controls become indents",
+    "ok": true,
+    "detail": {
+      "expected": 4,
+      "actual": 4,
+      "controlLeaks": 0
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member-s.md all baseline text and drafting choices retained",
+    "ok": true,
+    "detail": {
+      "beforeChars": 71546,
+      "afterChars": 71546
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-single-s.md tracked Word contains the current generator output",
+    "ok": true,
+    "detail": [],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-single-s.md complete table cell matrix",
+    "ok": true,
+    "detail": {
+      "expectedRows": [
+        8,
+        2,
+        7,
+        6
+      ],
+      "actualRows": [
+        8,
+        2,
+        7,
+        6
+      ]
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-single-s.md entity signature controls become indents",
+    "ok": true,
+    "detail": {
+      "expected": 6,
+      "actual": 6,
+      "controlLeaks": 0
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-single-s.md all baseline text and drafting choices retained",
+    "ok": true,
+    "detail": {
+      "beforeChars": 51883,
+      "afterChars": 51883
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member-single.md tracked Word contains the current generator output",
+    "ok": true,
+    "detail": [],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member-single.md complete table cell matrix",
+    "ok": true,
+    "detail": {
+      "expectedRows": [
+        8,
+        2,
+        7,
+        6
+      ],
+      "actualRows": [
+        8,
+        2,
+        7,
+        6
+      ]
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member-single.md entity signature controls become indents",
+    "ok": true,
+    "detail": {
+      "expected": 4,
+      "actual": 4,
+      "controlLeaks": 0
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member-single.md all baseline text and drafting choices retained",
+    "ok": true,
+    "detail": {
+      "beforeChars": 41682,
+      "afterChars": 41682
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member-single-s.md tracked Word contains the current generator output",
+    "ok": true,
+    "detail": [],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member-single-s.md complete table cell matrix",
+    "ok": true,
+    "detail": {
+      "expectedRows": [
+        8,
+        2,
+        7,
+        6
+      ],
+      "actualRows": [
+        8,
+        2,
+        7,
+        6
+      ]
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member-single-s.md entity signature controls become indents",
+    "ok": true,
+    "detail": {
+      "expected": 4,
+      "actual": 4,
+      "controlLeaks": 0
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-member-single-s.md all baseline text and drafting choices retained",
+    "ok": true,
+    "detail": {
+      "beforeChars": 46795,
+      "afterChars": 46795
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-amendment.md tracked Word contains the current generator output",
+    "ok": true,
+    "detail": [],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-amendment.md complete table cell matrix",
+    "ok": true,
+    "detail": {
+      "expectedRows": [],
+      "actualRows": []
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-amendment.md entity signature controls become indents",
+    "ok": true,
+    "detail": {
+      "expected": 4,
+      "actual": 4,
+      "controlLeaks": 0
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-oa-amendment.md all baseline text and drafting choices retained",
+    "ok": true,
+    "detail": {
+      "beforeChars": 2110,
+      "afterChars": 2110
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "docs/owners-manual.md tracked Word contains the current generator output",
+    "ok": true,
+    "detail": [],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "docs/owners-manual.md complete table cell matrix",
+    "ok": true,
+    "detail": {
+      "expectedRows": [
+        14,
+        5,
+        12,
+        5,
+        5,
+        4,
+        5,
+        7,
+        5
+      ],
+      "actualRows": [
+        14,
+        5,
+        12,
+        5,
+        5,
+        4,
+        5,
+        7,
+        5
+      ]
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "docs/owners-manual.md entity signature controls become indents",
+    "ok": true,
+    "detail": {
+      "expected": 0,
+      "actual": 116,
+      "controlLeaks": 0
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "docs/owners-manual.md all baseline text and drafting choices retained",
+    "ok": true,
+    "detail": {
+      "beforeChars": 100463,
+      "afterChars": 100463
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-statement-of-authorized-representative.md tracked Word contains the current generator output",
+    "ok": true,
+    "detail": [],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-statement-of-authorized-representative.md complete table cell matrix",
+    "ok": true,
+    "detail": {
+      "expectedRows": [],
+      "actualRows": []
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-statement-of-authorized-representative.md entity signature controls become indents",
+    "ok": true,
+    "detail": {
+      "expected": 2,
+      "actual": 2,
+      "controlLeaks": 0
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "webapp/server/templates-statement-of-authorized-representative.md all baseline text and drafting choices retained",
+    "ok": true,
+    "detail": {
+      "beforeChars": 3035,
+      "afterChars": 3035
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "docs/oa-instructions.md tracked Word contains the current generator output",
+    "ok": true,
+    "detail": [],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "docs/oa-instructions.md complete table cell matrix",
+    "ok": true,
+    "detail": {
+      "expectedRows": [
+        5,
+        7
+      ],
+      "actualRows": [
+        5,
+        7
+      ]
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "docs/oa-instructions.md entity signature controls become indents",
+    "ok": true,
+    "detail": {
+      "expected": 0,
+      "actual": 0,
+      "controlLeaks": 0
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "docs/oa-instructions.md all baseline text and drafting choices retained",
+    "ok": true,
+    "detail": {
+      "beforeChars": 16310,
+      "afterChars": 16310
+    },
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "comment-wrapped data and totals remain in first table; blank separates second table",
+    "ok": true,
+    "detail": [
+      [
+        [
+          "Owner",
+          "Share"
+        ],
+        [
+          "[NAME]",
+          "100%"
+        ],
+        [
+          "Total",
+          "100%"
+        ]
+      ],
+      [
+        [
+          "Other",
+          "Value"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ]
+    ],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "intervening ordinary paragraph stays outside tables",
+    "ok": true,
+    "detail": [
+      "Outside paragraph."
+    ],
+    "commit": "",
+    "run": ""
+  },
+  {
+    "suite": "batch25-word",
+    "label": "table header repeat and body row no-split survive",
+    "ok": true,
+    "detail": "all fixture rows",
+    "commit": "",
+    "run": ""
+  }
+]

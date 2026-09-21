@@ -17,8 +17,9 @@ import { drawnWidth } from "./pdf-render";
 /** Bump when a change alters the LAYOUT of the rendered manual. The published
  *  copy is hash-gated on the master's text, so without this a renderer fix
  *  never reaches a client — they keep downloading the previous PDF forever.
- *  v2: keep-with-next for headings, chapter-end floor (26 Aug 2026). */
-export const MANUAL_RENDERER_VERSION = 2;
+ *  v2: keep-with-next for headings, chapter-end floor (26 Aug 2026).
+ *  v3: keep table headers with data and repeat them on continuation pages. */
+export const MANUAL_RENDERER_VERSION = 3;
 
 const PAGE_W = 612;
 const PAGE_H = 792;
@@ -326,22 +327,61 @@ export async function renderManualPdf(md: string): Promise<{ pdf: Uint8Array; pa
       const size = 9.5;
       const lineH = size + 2.5;
       const pad = 4;
-      for (let ri = 0; ri < block.rows.length; ri++) {
-        const row = block.rows[ri];
-        const cellLines = row.map((cell) =>
+      const rows = block.rows.map((row, ri) => {
+        const cells = row.map((cell) =>
           wrap(parseInline(cell).map((s) => (ri === 0 ? { ...s, bold: true } : s)), colW - 2 * pad, size),
         );
-        const rowH = Math.max(1, ...cellLines.map((c) => c.length)) * lineH + 2 * pad;
-        need(rowH);
+        return { cells, lines: Math.max(1, ...cells.map(c => c.length)) };
+      });
+      const height = (lines: number) => lines * lineH + 2 * pad;
+      const header = rows[0], headerH = height(header.lines);
+      const capacity = PAGE_H - MARGIN - FLOOR;
+      // A repeated header must leave room for at least one data line. Refuse
+      // impossible headers rather than creating empty pages or clipping text.
+      if (headerH + (rows.length > 1 ? height(1) : 0) > capacity) {
+        throw new Error("Owner's Manual table header is too tall to fit with its data.");
+      }
+      const drawRow = (row: typeof header, offset = 0, count = row.lines) => {
+        const rowH = height(count);
         page.drawRectangle({ x: MARGIN, y: y - rowH, width, height: rowH, borderColor: rgb(0.6, 0.62, 0.66), borderWidth: 0.5 });
         for (let ci = 1; ci < cols; ci++) {
           page.drawLine({ start: { x: MARGIN + ci * colW, y }, end: { x: MARGIN + ci * colW, y: y - rowH }, color: rgb(0.6, 0.62, 0.66), thickness: 0.5 });
         }
-        for (let ci = 0; ci < row.length; ci++) {
+        for (let ci = 0; ci < row.cells.length; ci++) {
           let cellY = y - pad;
-          for (const ln of cellLines[ci]) { drawLine(page, ln, MARGIN + ci * colW + pad, cellY - size, size); cellY -= lineH; }
+          for (const ln of row.cells[ci].slice(offset, offset + count)) { drawLine(page, ln, MARGIN + ci * colW + pad, cellY - size, size); cellY -= lineH; }
         }
+        linesOnPage += count;
         y -= rowH;
+      };
+      // Measure before drawing: the initial header may never stand alone.
+      const firstRowH = rows[1] ? height(rows[1].lines) : 0;
+      // An overheight first row starts with whatever usable fragment fits;
+      // demanding a full page would strand its preceding chapter heading.
+      const firstH = firstRowH > capacity - headerH ? height(1) : firstRowH;
+      need(headerH + firstH);
+      drawRow(header);
+      for (const row of rows.slice(1)) {
+        const rowH = height(row.lines);
+        if (rowH <= capacity - headerH) {
+          if (y - rowH < FLOOR) { newPage(); drawRow(header); }
+          drawRow(row);
+          continue;
+        }
+        // Only a row taller than an entire usable page is split. Consume a
+        // positive number of wrapped lines each time, repeating the header.
+        let offset = 0;
+        while (offset < row.lines) {
+          let count = Math.floor((y - FLOOR - 2 * pad) / lineH);
+          if (count < 1) {
+            newPage(); drawRow(header);
+            count = Math.floor((y - FLOOR - 2 * pad) / lineH);
+          }
+          count = Math.min(count, row.lines - offset);
+          drawRow(row, offset, count);
+          offset += count;
+          if (offset < row.lines) { newPage(); drawRow(header); }
+        }
       }
       y -= 8;
       continue;

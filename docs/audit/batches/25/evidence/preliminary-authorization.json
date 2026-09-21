@@ -1,0 +1,15 @@
+{
+  "id": "25",
+  "revision": 1,
+  "frozenHash": "c5fd6da97742ef202b68dfbc28f560d40bb3df0a84cd5f8fce033a75ee5a05ab",
+  "status": "authorized",
+  "model": "Codex",
+  "base": "2559e18f5094b70c8eba1eb64e3c3519aa609f3e",
+  "history": [
+    {
+      "at": "2026-09-21T05:55:48.573Z",
+      "event": "authorized",
+      "note": "Adam's Go; batch file frozen and its snapshot kept"
+    }
+  ]
+}

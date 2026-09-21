@@ -1,0 +1,122 @@
+[
+  {
+    "path": "webapp/server/templates-oa-single.md",
+    "lines": 393,
+    "readLines": 393,
+    "reader": "batch25_word",
+    "sourceUnchangedFromBaseline": true,
+    "sha256": "f56d687b4407b73119b9d66bdb52683d1a3d1453fc3dafd2df68afb36d35562a",
+    "wordFile": "SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx",
+    "wordSha256": "33ecab19c713e12bd4ab9783b2aa468874d39f7f475457dc6ff10866ea779ed2"
+  },
+  {
+    "path": "webapp/server/templates-oa-multi.md",
+    "lines": 507,
+    "readLines": 507,
+    "reader": "batch25_word",
+    "sourceUnchangedFromBaseline": true,
+    "sha256": "cc8bdd907ff9ed48f3495da94adfb01bb14933384547f3573c8d2a45f064fe4a",
+    "wordFile": "FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx",
+    "wordSha256": "2543d4a4b6a1782b8a6aa971b2748c7b22d0186fb2c6feaa31f1dec0d6e82bbd"
+  },
+  {
+    "path": "webapp/server/templates-oa-s.md",
+    "lines": 523,
+    "readLines": 523,
+    "reader": "batch25_word",
+    "sourceUnchangedFromBaseline": true,
+    "sha256": "590e15b8549b44fcf6f9cf92635da31b63f1e243d04787bc09077c9c44b080d9",
+    "wordFile": "FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
+    "wordSha256": "118e1992a29489ee639ff600c07bd34199c6b79f9bd3c4faeec88ba5d5bed48c"
+  },
+  {
+    "path": "webapp/server/templates-oa-member.md",
+    "lines": 493,
+    "readLines": 493,
+    "reader": "batch25_word",
+    "sourceUnchangedFromBaseline": true,
+    "sha256": "7f30788f4c235dd8f8f0ce0e507a1c5b368acbf30795423c8bc650cb8bc1d391",
+    "wordFile": "FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
+    "wordSha256": "7ac92c8fbca33b5e2eb48f688403333d703d950fa4b4ccb0d85a6f2842b457d5"
+  },
+  {
+    "path": "webapp/server/templates-oa-member-s.md",
+    "lines": 509,
+    "readLines": 509,
+    "reader": "batch25_word",
+    "sourceUnchangedFromBaseline": true,
+    "sha256": "15a3661ad930bc60de92a4266da1a46fba007b4b1065b5b38a5f40458948a41a",
+    "wordFile": "FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
+    "wordSha256": "bad21a047d18da28c8e1ca5f09a5e5c4922151c9c1e7a8def322a94484c33d3e"
+  },
+  {
+    "path": "webapp/server/templates-oa-single-s.md",
+    "lines": 425,
+    "readLines": 425,
+    "reader": "batch25_word",
+    "sourceUnchangedFromBaseline": true,
+    "sha256": "e73fe925fcf51919593a103686969fd6e7c528b70171afe8340ed809fabc848f",
+    "wordFile": "SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx",
+    "wordSha256": "9aef6b4043b4a129332b1af63dfa18f792dad3bc25d544f2f415efa8f17339a4"
+  },
+  {
+    "path": "webapp/server/templates-oa-member-single.md",
+    "lines": 363,
+    "readLines": 363,
+    "reader": "batch25_word",
+    "sourceUnchangedFromBaseline": true,
+    "sha256": "3ca0f287ec5cee9c4d4e32e5be00f40a0297c427c97305de6a6a7e8154388e1b",
+    "wordFile": "SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx",
+    "wordSha256": "1e162f7e6bb557f6a22a3eb999eb532bd7f2fd5bfa75dbdfc15e6eb54de8c656"
+  },
+  {
+    "path": "webapp/server/templates-oa-member-single-s.md",
+    "lines": 395,
+    "readLines": 395,
+    "reader": "batch25_word",
+    "sourceUnchangedFromBaseline": true,
+    "sha256": "d8960b248d92deccd2eab1a424cfcdc7b1b9dbac66f979b82cf9899929322fef",
+    "wordFile": "SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx",
+    "wordSha256": "dd8a28e94f77e143c8ae31085fdd07e027df3619bad7447ff41e503f01947a75"
+  },
+  {
+    "path": "webapp/server/templates-oa-amendment.md",
+    "lines": 74,
+    "readLines": 74,
+    "reader": "batch25_word",
+    "sourceUnchangedFromBaseline": true,
+    "sha256": "23ec2bc6e44197d4ad469a943707e7857121a1d9b34f2d945df84d6bb73678bd",
+    "wordFile": "FPSLLC Amendment to Operating Agreement - FORM.docx",
+    "wordSha256": "f855339aeb8b2185a15a2a0f94f8b33b5c11c67cc4f83096fd332ad290204ca6"
+  },
+  {
+    "path": "docs/owners-manual.md",
+    "lines": 535,
+    "readLines": 535,
+    "reader": "batch25_manual",
+    "sourceUnchangedFromBaseline": true,
+    "sha256": "bfae413198c9a52eb922edb79b89590a70e4482e68cfca274715c7fa4f285586",
+    "wordFile": "Series LLC Owners Manual - REVISED DRAFT.docx",
+    "wordSha256": "81e018a0fb1220aee0e9e0f91bb3c17516ef1ae1425a6aaed5ebea95b9db4b53"
+  },
+  {
+    "path": "webapp/server/templates-statement-of-authorized-representative.md",
+    "lines": 40,
+    "readLines": 40,
+    "reader": "batch25_word",
+    "sourceUnchangedFromBaseline": true,
+    "sha256": "92e28fb58b10948a867d99b2509ea708ae9186f728cdebd6574a7619281b0e69",
+    "wordFile": "FPSLLC Statement of Authorized Representative - FORM.docx",
+    "wordSha256": "d76c83082637f6bdb4d421e1f55e523604d9fe7651c4fc835e113ab4ffd4dcf0"
+  },
+  {
+    "path": "docs/oa-instructions.md",
+    "lines": 75,
+    "readLines": 75,
+    "reader": "batch25_word",
+    "sourceUnchangedFromBaseline": true,
+    "sha256": "f8119a5bf6cb037adaccb2cc4503dd90500a13cd0288f2fc88aee432b92ab357",
+    "wordFile": "FPSLLC Operating Agreement Instructions - DRAFT.docx",
+    "wordSha256": "41fdb5d2fbb4c455957865e57dbaa4772d0f72505e598cedce8321c389d5917e"
+  }
+]

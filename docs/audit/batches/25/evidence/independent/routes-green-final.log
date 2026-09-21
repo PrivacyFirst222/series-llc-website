@@ -1,0 +1,36 @@
+{"label":"actual amendment route accepts bracketed company and signer","ok":true,"detail":{"status":200,"body":{"data":{"documentId":"0d07d65d-6dac-4daf-a887-92d1d39dc5eb","title":"Amendment No. 1 to Operating Agreement — [ALPHA], LLC","number":1}}}}
+{"label":"amendment client download succeeds","ok":true,"detail":{"status":200}}
+{"label":"downloaded amendment preserves all original bracket text","ok":true}
+[email:dev] to=batch25@example.test subject="[ALPHA], LLC is formed"
+
+<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1c2530;max-width:560px;margin:0 auto;padding:24px">
+  <p style="font-weight:700;font-size:18px;margin:0 0 16px">MyFloridaSeriesLLC</p>
+  
+      <p>Dear Client Probe,</p>
+      <p>Congratulations, your Florida Protected Series LLC,
+      <strong>[ALPHA], LLC</strong>, has been officially formed
+      with the Florida Division of Corporations!</p>
+      <p>Your documents are waiting in your portal, ready to download:</p>
+      <ul>
+        <li>Your <strong>Articles of Organization</strong>, as filed</li>
+        <li>Your <strong>Protected Series Designation</strong>,
+            as filed, covering:
+          <ul></ul>
+        </li>
+        <li>Your <strong>Statement of Authorized Representative</strong>, as issued</li>
+      </ul>
+      <p>Keep these with your company records — a bank, a title company, or a
+      closing agent will ask for them.</p>
+      <p>The next step is to create your operating agreement. You can do that
+      in your personal portal (<a href="http://localhost:8000/portal">Click here to open</a>).</p>
+      
+      
+      <p>Thank you for doing business with MyFloridaSeriesLLC!</p>
+      <p>support@myfloridaseriesllc.com</p>
+    
+  <p style="color:#8a8f98;font-size:12px;margin-top:28px">MyFloridaSeriesLLC — support@myfloridaseriesllc.com</p>
+</div>
+{"label":"actual office upload creates Statement for bracketed company","ok":true,"detail":{"status":200,"body":{"data":{"ok":true,"notified":true,"documents":2}}}}
+{"label":"Statement stored for correct company","ok":true}
+{"label":"statement client download succeeds","ok":true,"detail":{"status":200}}
+{"label":"downloaded Statement preserves company literal without encoded leakage","ok":true}

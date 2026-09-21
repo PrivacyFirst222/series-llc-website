@@ -1,3 +1,4 @@
+import { documentInputs, decodeDocumentText, assertTemplateComplete } from "./document-text";
 /**
  * Statement of Authorized Representative (Adam, 13 Sep 2026: "It appears
  * automatically when the articles are uploaded"). Furnished when the client
@@ -32,11 +33,12 @@ function must(haystack: string, needle: string, label: string): void {
   if (!haystack.includes(needle)) throw new Error(`Statement template marker missing: ${label}`);
 }
 
-export function assembleStatement(inp: StatementInputs): { markdown: string; title: string } {
+export function assembleStatement(inp: StatementInputs): { markdown: string; title: string; encodedClientText: true } {
   for (const [k, v] of Object.entries(inp)) {
     if (typeof v === "boolean") continue;
     if (!String(v ?? "").trim()) throw new Error(`Statement: ${k} is required`);
   }
+  inp = documentInputs(inp);
   let s = statementTemplate;
   s = resolveIf(s, "membermanaged", inp.memberManaged);
   s = resolveIf(s, "managermanaged", !inp.memberManaged);
@@ -62,8 +64,6 @@ export function assembleStatement(inp: StatementInputs): { markdown: string; tit
   s = s.split("[DATE]").join(inp.date);
   must(s, "[EDITION]", "edition");
   s = s.split("[EDITION]").join(OA_TEMPLATE_VERSION);
-  const leftover = s.match(/\[[A-Z][A-Z ()/.']*\]/g);
-  if (leftover) throw new Error(`Statement: unfilled slot(s): ${[...new Set(leftover)].join(", ")}`);
-  if (/Form document/.test(s)) throw new Error("Statement: draft colophon left in the document");
-  return { markdown: s.trimEnd() + "\n", title: `Statement of Authorized Representative — ${inp.companyName}` };
+  assertTemplateComplete(s);
+  return { markdown: s.trimEnd() + "\n", encodedClientText: true, title: `Statement of Authorized Representative — ${decodeDocumentText(inp.companyName)}` };
 }

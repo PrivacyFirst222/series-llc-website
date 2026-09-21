@@ -1,3 +1,4 @@
+import { decodeDocumentText } from "./document-text";
 /**
  * Amendment to Operating Agreement (Adam, 12 Sep 2026): recitals that refer to
  * the agreement's own amendment provision, the changes typed or set forth in
@@ -92,7 +93,7 @@ check("sections: the four single-member forms cite 12.1", (["single", "single-s"
 
 // ---- the client's bracketed words do not fail the slot check ----
 const brackets = assembleAmendment(base, { number: 1, agreementDate: "August 5, 2026", effectiveDate: "September 12, 2026", mode: "typed", text: "Section 13.2 is replaced with [RESERVED]." }).markdown;
-check("a client's own bracketed phrase is printed as typed", brackets.includes("Section 13.2 is replaced with [RESERVED]."));
+check("a client's own bracketed phrase is printed as typed", decodeDocumentText(brackets).includes("Section 13.2 is replaced with [RESERVED]."));
 
 // ---- the agreement is identified by the date the client confirmed, not the stored one ----
 const confirmed = assembleAmendment(base, { number: 1, agreementDate: "March 3, 2025", effectiveDate: "September 12, 2026", mode: "attached" }).markdown;

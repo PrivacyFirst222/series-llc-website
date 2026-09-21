@@ -4,11 +4,11 @@ import { assertEnglishText } from "../src/lib/englishText";
  * Entities survive Markdown structure and template-slot checks, and are decoded
  * once, only inside parsed text. Escaping ampersands prevents entity injection. */
 export function encodeDocumentText(text: string): string {
-  return text.replace(/\$(?=[$&`'])|[&|[\]<>*#\r\n]/g, c => `&#${c.charCodeAt(0)};`)
+  return text.replace(/\$(?=[$&`'])|[&|[\]<>*#_\r\n]/g, c => `&#${c.charCodeAt(0)};`)
     .replace(/Form document/g, "&#70;orm document").replace(/v1 draft/g, "v&#49; draft");
 }
 export function decodeDocumentText(text: string): string {
-  return text.replace(/&#(35|36|38|124|91|93|60|62|42|13|10|70|49);/g, (_, n: string) => String.fromCharCode(Number(n)));
+  return text.replace(/&#(35|36|38|124|91|93|95|60|62|42|13|10|70|49);/g, (_, n: string) => String.fromCharCode(Number(n)));
 }
 export function documentInputs<T>(value: T): T {
   assertEnglishText(value);

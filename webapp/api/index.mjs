@@ -93144,10 +93144,10 @@ var init_englishText = __esm({
 
 // server/document-text.ts
 function encodeDocumentText(text) {
-  return text.replace(/\$(?=[$&`'])|[&|[\]<>*#\r\n]/g, (c) => `&#${c.charCodeAt(0)};`).replace(/Form document/g, "&#70;orm document").replace(/v1 draft/g, "v&#49; draft");
+  return text.replace(/\$(?=[$&`'])|[&|[\]<>*#_\r\n]/g, (c) => `&#${c.charCodeAt(0)};`).replace(/Form document/g, "&#70;orm document").replace(/v1 draft/g, "v&#49; draft");
 }
 function decodeDocumentText(text) {
-  return text.replace(/&#(35|36|38|124|91|93|60|62|42|13|10|70|49);/g, (_, n) => String.fromCharCode(Number(n)));
+  return text.replace(/&#(35|36|38|124|91|93|95|60|62|42|13|10|70|49);/g, (_, n) => String.fromCharCode(Number(n)));
 }
 function documentInputs(value) {
   assertEnglishText(value);
@@ -93214,7 +93214,7 @@ function parseMarkdown(md, encodedClientText = false) {
       i++;
       continue;
     }
-    for (const part of linesOf(line2.trim())) blocks.push({ kind: "para", segs: parseInline(part, encodedClientText) });
+    for (const part of linesOf(line2.trim())) blocks.push({ kind: "para", sourceText: part, segs: parseInline(part, encodedClientText) });
     i++;
   }
   return blocks;
@@ -93344,11 +93344,11 @@ async function renderMarkdownPdf(opts) {
     let h = 0;
     for (let k = from; k < blocks.length && k < from + 6; k++) {
       const b2 = blocks[k];
-      if (b2.kind === "para" && b2.segs.length === 1 && b2.segs[0].text.trim() === "[[pagebreak]]") {
+      if (b2.kind === "para" && b2.segs.length === 1 && b2.sourceText.trim() === "[[pagebreak]]") {
         return h;
       }
       if (b2.kind === "para") {
-        const t = b2.segs[0]?.text.trim();
+        const t = b2.sourceText.trim();
         if (t === "[[left]]") continue;
         const ls = wrapSegs(fonts, b2.segs.map((sg) => ({ ...sg })), width, BODY_SIZE);
         h += ls.length * (BODY_SIZE + LINE_GAP) + 6;
@@ -93362,10 +93362,97 @@ async function renderMarkdownPdf(opts) {
     return null;
   };
   let tailPulled = false;
+  const paraTextAt = (i) => blocks[i]?.kind === "para" ? blocks[i].sourceText.trim() : "";
+  const isRule = (t) => /^_{5,}$/.test(t);
+  const isBy = (t) => /^By:\s*(?:_{3,}|\/s\/ .+)$/.test(t);
+  const isDate = (t) => /^Date:/.test(t);
+  const signatureLines = (segs, available) => {
+    const lines = [];
+    let line2 = [], used = 0;
+    const flush = () => {
+      if (line2.length) lines.push(line2);
+      line2 = [];
+      used = 0;
+    };
+    const add = (seg, text) => {
+      if (!text) return;
+      const last2 = line2.at(-1);
+      if (last2 && last2.bold === seg.bold && last2.italic === seg.italic) last2.text += text;
+      else line2.push({ ...seg, text });
+      used += segWidth({ ...seg, text }, BODY_SIZE);
+    };
+    for (const seg of segs) for (const word of seg.text.split(/(\s+)/).filter(Boolean)) {
+      const w = segWidth({ ...seg, text: word }, BODY_SIZE);
+      if (used + w > available && word.trim()) flush();
+      if (!line2.length && !word.trim()) continue;
+      if (w <= available) add(seg, word);
+      else for (const ch of word) {
+        if (used + segWidth({ ...seg, text: ch }, BODY_SIZE) > available) flush();
+        add(seg, ch);
+      }
+    }
+    flush();
+    return lines;
+  };
+  const signatureEnd = (from) => {
+    let at = from;
+    if (isBy(paraTextAt(at + 1)) && paraTextAt(at)) at++;
+    if (isBy(paraTextAt(at))) {
+      if (!paraTextAt(at + 1).startsWith("[[indent]]")) return null;
+      at++;
+      while (paraTextAt(at).startsWith("[[indent]]")) at++;
+    } else if (isRule(paraTextAt(at))) {
+      if (!paraTextAt(at + 1) || isDate(paraTextAt(at + 1)) || isRule(paraTextAt(at + 1))) return null;
+      at += 2;
+    } else return null;
+    if (isDate(paraTextAt(at))) at++;
+    return at;
+  };
+  const drawSignature = (from, end) => {
+    const lineH = BODY_SIZE + LINE_GAP;
+    const rows = blocks.slice(from, end).map((b2, i) => {
+      if (b2.kind !== "para") throw new Error("Signature block contains a non-paragraph");
+      const source = b2.sourceText.trim(), rule = isRule(source) || /^By:\s*_{3,}$/.test(source) || /^Date:\s*_{3,}$/.test(source);
+      const by = isBy(source), date2 = isDate(source), indent = source.startsWith("[[indent]]");
+      const offset = indent ? segWidth({ text: "By: ", bold: false, italic: false }, BODY_SIZE) : 0;
+      const segs = b2.segs.map((sg, n) => n === 0 && indent ? { ...sg, text: sg.text.replace(/^\s*\[\[indent\]\]/, "") } : { ...sg });
+      const lines = signatureLines(segs, width - offset);
+      const before = isRule(source) || /^By:\s*_{3,}$/.test(source) ? 10 : 0;
+      const after = i === end - from - 1 || !rule && !indent && !by && i === 0 && isBy(paraTextAt(from + 1)) ? 6 : 0;
+      return { rule, by, date: date2, offset, lines, before, after, height: before + (rule ? 1 : lines.length) * lineH + after };
+    });
+    const height = rows.reduce((total, r) => total + r.height, 0);
+    if (height > TEXT_H) throw new Error("Signature block is too tall to fit on one page");
+    need(height);
+    inTitle = false;
+    for (const row of rows) {
+      y -= row.before;
+      if (row.rule) {
+        let x2 = MARGIN;
+        if (row.by || row.date) {
+          const label = { text: row.date ? "Date: " : "By: ", bold: false, italic: false };
+          drawSegLine(page, [label], x2, y - BODY_SIZE, BODY_SIZE);
+          x2 += segWidth(label, BODY_SIZE);
+        }
+        page.drawLine({ start: { x: x2, y: y - BODY_SIZE }, end: { x: MARGIN + SIG_W, y: y - BODY_SIZE }, thickness: 0.8, color: rgb(0, 0, 0) });
+        y -= lineH;
+      } else for (const line2 of row.lines) {
+        drawSegLine(page, line2, MARGIN + row.offset, y - BODY_SIZE, BODY_SIZE);
+        y -= lineH;
+      }
+      y -= row.after;
+    }
+  };
   for (let bi2 = 0; bi2 < blocks.length; bi2++) {
     const block = blocks[bi2];
+    const signatureTo = block.kind === "para" ? signatureEnd(bi2) : null;
+    if (signatureTo !== null) {
+      drawSignature(bi2, signatureTo);
+      bi2 = signatureTo - 1;
+      continue;
+    }
     if (block.kind === "para" && !tailPulled) {
-      const t0 = block.segs[0]?.text.trim();
+      const t0 = block.sourceText.trim();
       if (t0 !== "[[pagebreak]]" && t0 !== "[[left]]") {
         const tail = tailHeightBeforeBreak(bi2);
         if (tail !== null && tail > 0 && y - tail < MARGIN && tail <= TAIL_MAX_LINES * (BODY_SIZE + LINE_GAP)) {
@@ -93374,7 +93461,7 @@ async function renderMarkdownPdf(opts) {
         }
       }
     }
-    if (block.kind === "para" && block.segs.length === 1 && block.segs[0].text.trim() === "[[pagebreak]]") {
+    if (block.kind === "para" && block.segs.length === 1 && block.sourceText.trim() === "[[pagebreak]]") {
       tailPulled = false;
     }
     if (block.kind === "heading") {
@@ -93395,11 +93482,11 @@ async function renderMarkdownPdf(opts) {
       continue;
     }
     if (block.kind === "para") {
-      if (block.segs.length === 1 && block.segs[0].text.trim() === "[[left]]") {
+      if (block.segs.length === 1 && block.sourceText.trim() === "[[left]]") {
         inTitle = false;
         continue;
       }
-      if (block.segs.length === 1 && block.segs[0].text.trim() === "[[pagebreak]]") {
+      if (block.segs.length === 1 && block.sourceText.trim() === "[[pagebreak]]") {
         markBlankSpace();
         newPage();
         continue;
@@ -93407,12 +93494,12 @@ async function renderMarkdownPdf(opts) {
       const size = BODY_SIZE;
       const lineH = size + LINE_GAP;
       const lines = wrapSegs(fonts, block.segs.map((s) => ({ ...s })), width, size);
-      const plainText = block.segs.map((s) => s.text).join("").trim();
+      const plainText = block.sourceText.trim();
       const isSignatureLine = /^_{5,}$/.test(plainText);
       const isByLine = /^By:\s*_{3,}$/.test(plainText);
       const isIndented = plainText.startsWith("[[indent]]");
       const nextBlock = blocks[bi2 + 1];
-      const nextPlain = nextBlock?.kind === "para" ? nextBlock.segs.map((s) => s.text).join("").trim() : "";
+      const nextPlain = nextBlock?.kind === "para" ? nextBlock.sourceText.trim() : "";
       const nextIsDate = /^Date:/.test(nextPlain);
       const nextIsIndented = nextPlain.startsWith("[[indent]]");
       if (isSignatureLine || isByLine) y -= 10;
@@ -93943,25 +94030,64 @@ async function renderManualPdf(md) {
       const size = 9.5;
       const lineH = size + 2.5;
       const pad = 4;
-      for (let ri = 0; ri < block.rows.length; ri++) {
-        const row = block.rows[ri];
-        const cellLines = row.map(
+      const rows = block.rows.map((row, ri) => {
+        const cells = row.map(
           (cell2) => wrap2(parseInline2(cell2).map((s) => ri === 0 ? { ...s, bold: true } : s), colW - 2 * pad, size)
         );
-        const rowH = Math.max(1, ...cellLines.map((c) => c.length)) * lineH + 2 * pad;
-        need(rowH);
+        return { cells, lines: Math.max(1, ...cells.map((c) => c.length)) };
+      });
+      const height = (lines) => lines * lineH + 2 * pad;
+      const header = rows[0], headerH = height(header.lines);
+      const capacity = PAGE_H2 - MARGIN2 - FLOOR;
+      if (headerH + (rows.length > 1 ? height(1) : 0) > capacity) {
+        throw new Error("Owner's Manual table header is too tall to fit with its data.");
+      }
+      const drawRow = (row, offset = 0, count = row.lines) => {
+        const rowH = height(count);
         page.drawRectangle({ x: MARGIN2, y: y - rowH, width, height: rowH, borderColor: rgb(0.6, 0.62, 0.66), borderWidth: 0.5 });
         for (let ci = 1; ci < cols; ci++) {
           page.drawLine({ start: { x: MARGIN2 + ci * colW, y }, end: { x: MARGIN2 + ci * colW, y: y - rowH }, color: rgb(0.6, 0.62, 0.66), thickness: 0.5 });
         }
-        for (let ci = 0; ci < row.length; ci++) {
+        for (let ci = 0; ci < row.cells.length; ci++) {
           let cellY = y - pad;
-          for (const ln2 of cellLines[ci]) {
+          for (const ln2 of row.cells[ci].slice(offset, offset + count)) {
             drawLine2(page, ln2, MARGIN2 + ci * colW + pad, cellY - size, size);
             cellY -= lineH;
           }
         }
+        linesOnPage += count;
         y -= rowH;
+      };
+      const firstRowH = rows[1] ? height(rows[1].lines) : 0;
+      const firstH = firstRowH > capacity - headerH ? height(1) : firstRowH;
+      need(headerH + firstH);
+      drawRow(header);
+      for (const row of rows.slice(1)) {
+        const rowH = height(row.lines);
+        if (rowH <= capacity - headerH) {
+          if (y - rowH < FLOOR) {
+            newPage();
+            drawRow(header);
+          }
+          drawRow(row);
+          continue;
+        }
+        let offset = 0;
+        while (offset < row.lines) {
+          let count = Math.floor((y - FLOOR - 2 * pad) / lineH);
+          if (count < 1) {
+            newPage();
+            drawRow(header);
+            count = Math.floor((y - FLOOR - 2 * pad) / lineH);
+          }
+          count = Math.min(count, row.lines - offset);
+          drawRow(row, offset, count);
+          offset += count;
+          if (offset < row.lines) {
+            newPage();
+            drawRow(header);
+          }
+        }
       }
       y -= 8;
       continue;
@@ -94033,7 +94159,7 @@ var init_manual_pdf = __esm({
   "server/manual-pdf.ts"() {
     init_es();
     init_pdf_render();
-    MANUAL_RENDERER_VERSION = 2;
+    MANUAL_RENDERER_VERSION = 3;
     PAGE_W2 = 612;
     PAGE_H2 = 792;
     MARGIN2 = 72;
@@ -106511,6 +106637,7 @@ function followUpOk(category, answer) {
 }
 
 // server/oa-amendment.ts
+init_document_text();
 import { readFileSync as readFileSync2 } from "node:fs";
 
 // server/templates-oa-amendment.md
@@ -106531,9 +106658,13 @@ function paragraphsOf(text) {
   return text.replace(/\r\n?/g, "\n").split("\n").map((l) => l.trim()).filter(Boolean).join("\n\n");
 }
 function assembleAmendment(oa, am) {
+  if (am.mode === "typed" && !(am.text ?? "").trim()) throw new Error("Amendment: typed changes are empty");
+  if (!am.agreementDate.trim()) throw new Error("Amendment: the agreement's effective date is required");
+  const typedText = am.text;
+  oa = documentInputs(oa);
+  am = documentInputs(am);
   const isSingle = oa.version === "single" || oa.version === "single-s" || oa.version === "member-single" || oa.version === "member-single-s";
   const isMemberManaged = oa.version === "member" || oa.version === "member-s" || oa.version === "member-single" || oa.version === "member-single-s";
-  if (am.mode === "typed" && !(am.text ?? "").trim()) throw new Error("Amendment: typed changes are empty");
   if (!Number.isInteger(am.number) || am.number < 1) throw new Error("Amendment: number must be 1 or more");
   let s = amendmentTemplate;
   const co = oa.companyName;
@@ -106554,7 +106685,6 @@ function assembleAmendment(oa, am) {
   must3(s, "[AMENDMENT DATE]", "amendment date");
   s = s.split("[AMENDMENT DATE]").join(am.effectiveDate);
   must3(s, "[AGREEMENT DATE]", "agreement date");
-  if (!am.agreementDate.trim()) throw new Error("Amendment: the agreement's effective date is required");
   s = s.split("[AGREEMENT DATE]").join(am.agreementDate);
   must3(s, "[AMENDMENT SECTION]", "amendment section");
   s = s.split("[AMENDMENT SECTION]").join(amendmentSection(oa.version));
@@ -106584,14 +106714,12 @@ function assembleAmendment(oa, am) {
   const footer = FOOTER_LINE.replace("[TITLE]", title).replace("[COMPANY NAME], LLC", co).replace("[EDITION]", OA_TEMPLATE_VERSION);
   s = s.trimEnd() + "\n\n" + footer + "\n";
   s = s.replace(/\n{3,}/g, "\n\n");
-  const leftover = (s.match(/\[[A-Z][A-Z ()/.']*\]/g) ?? []).filter((x2) => !(am.mode === "typed" && x2 === "[AMENDMENT TEXT]"));
-  if (leftover.length > 0) throw new Error(`Amendment: unfilled slot(s): ${[...new Set(leftover)].join(", ")}`);
-  if (/<!--/.test(s)) throw new Error("Amendment: template marker left in the document");
   if (am.mode === "typed") {
     must3(s, "[AMENDMENT TEXT]", "amendment text");
-    s = s.replace("[AMENDMENT TEXT]", () => paragraphsOf(am.text ?? ""));
+    s = s.replace("[AMENDMENT TEXT]", () => paragraphsOf(typedText ?? "").split("\n\n").map(encodeDocumentText).join("\n\n"));
   }
-  return { markdown: s, title: `${title} \u2014 ${co}` };
+  assertTemplateComplete(s);
+  return { markdown: s, encodedClientText: true, title: `${title} \u2014 ${decodeDocumentText(co)}` };
 }
 
 // server/routes-portal.ts
@@ -108259,6 +108387,7 @@ function registerPortalRoutes(app2) {
       title = assembled.title;
       pdf = await renderMarkdownPdf({
         markdown: assembled.markdown,
+        encodedClientText: assembled.encodedClientText,
         watermark: {
           name: client?.name || oa.members[0]?.name || "",
           email: client?.email ?? "",
@@ -111880,6 +112009,7 @@ function sortDocuments(docs) {
 }
 
 // server/statement.ts
+init_document_text();
 import { readFileSync as readFileSync3 } from "node:fs";
 
 // server/templates-statement-of-authorized-representative.md
@@ -111938,6 +112068,7 @@ function assembleStatement(inp) {
     if (typeof v2 === "boolean") continue;
     if (!String(v2 ?? "").trim()) throw new Error(`Statement: ${k} is required`);
   }
+  inp = documentInputs(inp);
   let s = statementTemplate;
   s = resolveIf(s, "membermanaged", inp.memberManaged);
   s = resolveIf(s, "managermanaged", !inp.memberManaged);
@@ -111957,10 +112088,8 @@ function assembleStatement(inp) {
   s = s.split("[DATE]").join(inp.date);
   must4(s, "[EDITION]", "edition");
   s = s.split("[EDITION]").join(OA_TEMPLATE_VERSION);
-  const leftover = s.match(/\[[A-Z][A-Z ()/.']*\]/g);
-  if (leftover) throw new Error(`Statement: unfilled slot(s): ${[...new Set(leftover)].join(", ")}`);
-  if (/Form document/.test(s)) throw new Error("Statement: draft colophon left in the document");
-  return { markdown: s.trimEnd() + "\n", title: `Statement of Authorized Representative \u2014 ${inp.companyName}` };
+  assertTemplateComplete(s);
+  return { markdown: s.trimEnd() + "\n", encodedClientText: true, title: `Statement of Authorized Representative \u2014 ${decodeDocumentText(inp.companyName)}` };
 }
 
 // server/routes-admin.ts
@@ -112266,7 +112395,7 @@ function registerAdminRoutes(app2) {
   }
   const DOC_NUMBER_NEEDED = "This client appointed us to sign. Enter the Florida document number so the Statement of Authorized Representative can name the company.";
   async function issueStatement(db, o, documentNumber, put2 = putFile, retirePrior = true) {
-    const { markdown, title } = assembleStatement({
+    const { markdown, title, encodedClientText } = assembleStatement({
       companyName: o.llc_name,
       documentNumber: documentNumber.trim(),
       signerName: AR_SIGNER.name,
@@ -112274,7 +112403,7 @@ function registerAdminRoutes(app2) {
       memberManaged: (typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload)?.management?.structure !== "MANAGER_MANAGED",
       date: (/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { timeZone: "America/New_York", year: "numeric", month: "long", day: "numeric" })
     });
-    const pdf = await renderMarkdownPdf({ markdown, watermark: null, title });
+    const pdf = await renderMarkdownPdf({ markdown, encodedClientText, watermark: null, title });
     const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
     const stored = await put2(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
     const prior = await db.query(

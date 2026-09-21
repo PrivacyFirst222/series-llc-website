@@ -425,7 +425,7 @@ async function issueStatement(
   put: (name: string, data: ArrayBuffer, type: string) => Promise<{ storageKey: string; sizeBytes: number }> = putFile,
   retirePrior = true,
 ): Promise<{ id: string; storageKey: string }> {
-  const { markdown, title } = assembleStatement({
+  const { markdown, title, encodedClientText } = assembleStatement({
     companyName: o.llc_name,
     documentNumber: documentNumber.trim(),
     signerName: AR_SIGNER.name,
@@ -434,7 +434,7 @@ async function issueStatement(
     date: new Date().toLocaleDateString("en-US", { timeZone: "America/New_York", year: "numeric", month: "long", day: "numeric" }),
   });
   // Our own statement, not a licensed deliverable: page numbers only.
-  const pdf = await renderMarkdownPdf({ markdown, watermark: null, title });
+  const pdf = await renderMarkdownPdf({ markdown, encodedClientText, watermark: null, title });
   const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
   const stored = await put(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
   const prior = await db.query<{ id: string; storage_key: string }>(

@@ -54,7 +54,7 @@ function parseInline(line: string, encodedClientText = false): Seg[] {
 
 type Block =
   | { kind: "heading"; level: number; text: string }
-  | { kind: "para"; segs: Seg[] }
+  | { kind: "para"; segs: Seg[]; sourceText: string }
   | { kind: "table"; rows: string[][] }
   | { kind: "pagebreak" };
 
@@ -90,7 +90,7 @@ export function parseMarkdown(md: string, encodedClientText = false): Block[] {
       i++;
       continue;
     }
-    for (const part of linesOf(line.trim())) blocks.push({ kind: "para", segs: parseInline(part, encodedClientText) });
+    for (const part of linesOf(line.trim())) blocks.push({ kind: "para", sourceText: part, segs: parseInline(part, encodedClientText) });
     i++;
   }
   return blocks;
@@ -273,11 +273,11 @@ export async function renderMarkdownPdf(opts: {
     let h = 0;
     for (let k = from; k < blocks.length && k < from + 6; k++) {
       const b = blocks[k];
-      if (b.kind === "para" && b.segs.length === 1 && b.segs[0].text.trim() === "[[pagebreak]]") {
+      if (b.kind === "para" && b.segs.length === 1 && b.sourceText.trim() === "[[pagebreak]]") {
         return h;
       }
       if (b.kind === "para") {
-        const t = b.segs[0]?.text.trim();
+        const t = b.sourceText.trim();
         if (t === "[[left]]") continue;
         const ls = wrapSegs(fonts, b.segs.map((sg) => ({ ...sg })), width, BODY_SIZE);
         h += ls.length * (BODY_SIZE + LINE_GAP) + 6;
@@ -292,10 +292,94 @@ export async function renderMarkdownPdf(opts: {
   };
   let tailPulled = false;
 
+  // Detect house signature controls from the original Markdown, BEFORE client
+  // entities are decoded. A client's literal [[pagebreak]] is data, not a command.
+  const paraTextAt = (i: number): string => blocks[i]?.kind === "para" ? blocks[i].sourceText.trim() : "";
+  const isRule = (t: string) => /^_{5,}$/.test(t);
+  const isBy = (t: string) => /^By:\s*(?:_{3,}|\/s\/ .+)$/.test(t);
+  const isDate = (t: string) => /^Date:/.test(t);
+  // Signature names can be long even without spaces. Unlike body paragraphs,
+  // these are kept as one measured unit, with oversized words wrapped by glyph.
+  const signatureLines = (segs: Seg[], available: number): Seg[][] => {
+    const lines: Seg[][] = [];
+    let line: Seg[] = [], used = 0;
+    const flush = () => { if (line.length) lines.push(line); line = []; used = 0; };
+    const add = (seg: Seg, text: string) => {
+      if (!text) return;
+      const last = line.at(-1);
+      if (last && last.bold === seg.bold && last.italic === seg.italic) last.text += text;
+      else line.push({ ...seg, text });
+      used += segWidth({ ...seg, text }, BODY_SIZE);
+    };
+    for (const seg of segs) for (const word of seg.text.split(/(\s+)/).filter(Boolean)) {
+      const w = segWidth({ ...seg, text: word }, BODY_SIZE);
+      if (used + w > available && word.trim()) flush();
+      if (!line.length && !word.trim()) continue;
+      if (w <= available) add(seg, word);
+      else for (const ch of word) {
+        if (used + segWidth({ ...seg, text: ch }, BODY_SIZE) > available) flush();
+        add(seg, ch);
+      }
+    }
+    flush();
+    return lines;
+  };
+  const signatureEnd = (from: number): number | null => {
+    let at = from;
+    if (isBy(paraTextAt(at + 1)) && paraTextAt(at)) at++; // entity's name
+    if (isBy(paraTextAt(at))) {
+      if (!paraTextAt(at + 1).startsWith("[[indent]]")) return null;
+      at++;
+      while (paraTextAt(at).startsWith("[[indent]]")) at++;
+    } else if (isRule(paraTextAt(at))) {
+      if (!paraTextAt(at + 1) || isDate(paraTextAt(at + 1)) || isRule(paraTextAt(at + 1))) return null;
+      at += 2; // rule and printed name
+    } else return null;
+    if (isDate(paraTextAt(at))) at++;
+    return at;
+  };
+  const drawSignature = (from: number, end: number) => {
+    const lineH = BODY_SIZE + LINE_GAP;
+    const rows = blocks.slice(from, end).map((b, i) => {
+      if (b.kind !== "para") throw new Error("Signature block contains a non-paragraph");
+      const source = b.sourceText.trim(), rule = isRule(source) || /^By:\s*_{3,}$/.test(source) || /^Date:\s*_{3,}$/.test(source);
+      const by = isBy(source), date = isDate(source), indent = source.startsWith("[[indent]]");
+      const offset = indent ? segWidth({ text: "By: ", bold: false, italic: false }, BODY_SIZE) : 0;
+      const segs = b.segs.map((sg, n) => n === 0 && indent ? { ...sg, text: sg.text.replace(/^\s*\[\[indent\]\]/, "") } : { ...sg });
+      const lines = signatureLines(segs, width - offset);
+      const before = isRule(source) || /^By:\s*_{3,}$/.test(source) ? 10 : 0;
+      const after = i === end - from - 1 || (!rule && !indent && !by && i === 0 && isBy(paraTextAt(from + 1))) ? 6 : 0;
+      return {rule, by, date, offset, lines, before, after, height: before + (rule ? 1 : lines.length) * lineH + after};
+    });
+    const height = rows.reduce((total, r) => total + r.height, 0);
+    if (height > TEXT_H) throw new Error("Signature block is too tall to fit on one page");
+    need(height);
+    inTitle = false;
+    for (const row of rows) {
+      y -= row.before;
+      if (row.rule) {
+        let x = MARGIN;
+        if (row.by || row.date) {
+          const label = { text: row.date ? "Date: " : "By: ", bold: false, italic: false };
+          drawSegLine(page, [label], x, y - BODY_SIZE, BODY_SIZE);
+          x += segWidth(label, BODY_SIZE);
+        }
+        page.drawLine({ start: { x, y: y - BODY_SIZE }, end: { x: MARGIN + SIG_W, y: y - BODY_SIZE }, thickness: 0.8, color: rgb(0, 0, 0) });
+        y -= lineH;
+      } else for (const line of row.lines) {
+        drawSegLine(page, line, MARGIN + row.offset, y - BODY_SIZE, BODY_SIZE);
+        y -= lineH;
+      }
+      y -= row.after;
+    }
+  };
+
   for (let bi = 0; bi < blocks.length; bi++) {
     const block = blocks[bi];
+    const signatureTo = block.kind === "para" ? signatureEnd(bi) : null;
+    if (signatureTo !== null) { drawSignature(bi, signatureTo); bi = signatureTo - 1; continue; }
     if (block.kind === "para" && !tailPulled) {
-      const t0 = block.segs[0]?.text.trim();
+      const t0 = block.sourceText.trim();
       if (t0 !== "[[pagebreak]]" && t0 !== "[[left]]") {
         const tail = tailHeightBeforeBreak(bi);
         if (tail !== null && tail > 0 && y - tail < MARGIN && tail <= TAIL_MAX_LINES * (BODY_SIZE + LINE_GAP)) {
@@ -304,7 +388,7 @@ export async function renderMarkdownPdf(opts: {
         }
       }
     }
-    if (block.kind === "para" && block.segs.length === 1 && block.segs[0].text.trim() === "[[pagebreak]]") {
+    if (block.kind === "para" && block.segs.length === 1 && block.sourceText.trim() === "[[pagebreak]]") {
       tailPulled = false;
     }
     if (block.kind === "heading") {
@@ -329,7 +413,7 @@ export async function renderMarkdownPdf(opts: {
       // Sentinel: a paragraph of exactly "[[left]]" ends the centered title
       // block (used by business letters, where no ARTICLE-style heading ever
       // appears). It renders nothing.
-      if (block.segs.length === 1 && block.segs[0].text.trim() === "[[left]]") {
+      if (block.segs.length === 1 && block.sourceText.trim() === "[[left]]") {
         inTitle = false;
         continue;
       }
@@ -339,7 +423,7 @@ export async function renderMarkdownPdf(opts: {
       // says so, centered in the space, so a reader knows nothing is missing
       // (Adam, 9 Sep 2026: "[INTENTIONALLY LEFT BLANK] … centered in the
       // middle of the blank space").
-      if (block.segs.length === 1 && block.segs[0].text.trim() === "[[pagebreak]]") {
+      if (block.segs.length === 1 && block.sourceText.trim() === "[[pagebreak]]") {
         markBlankSpace();
         newPage();
         continue;
@@ -351,7 +435,7 @@ export async function renderMarkdownPdf(opts: {
       // signature line, and the name beneath it and the "Date:" line beneath
       // that sit tight, with no paragraph gap between them; the gap goes
       // before the signature line instead, so signers are set apart.
-      const plainText = block.segs.map((s) => s.text).join("").trim();
+      const plainText = block.sourceText.trim();
       const isSignatureLine = /^_{5,}$/.test(plainText);
       // An entity's block (Adam, 13 Sep 2026): "By:" over a rule, and the
       // printed name and title beneath, flush with the rule's left end. The
@@ -359,7 +443,7 @@ export async function renderMarkdownPdf(opts: {
       const isByLine = /^By:\s*_{3,}$/.test(plainText);
       const isIndented = plainText.startsWith("[[indent]]");
       const nextBlock = blocks[bi + 1];
-      const nextPlain = nextBlock?.kind === "para" ? nextBlock.segs.map((s) => s.text).join("").trim() : "";
+      const nextPlain = nextBlock?.kind === "para" ? nextBlock.sourceText.trim() : "";
       const nextIsDate = /^Date:/.test(nextPlain);
       const nextIsIndented = nextPlain.startsWith("[[indent]]");
       if (isSignatureLine || isByLine) y -= 10;

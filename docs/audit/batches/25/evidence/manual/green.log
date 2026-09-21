@@ -1,0 +1,15 @@
+{"ok":true,"label":"batch25 manual actual 9 tables and 53 source rows retained once"}
+{"ok":true,"label":"batch25 manual actual first data rows have headings on same page"}
+{"ok":true,"label":"batch25 manual actual continued tables repeat headings"}
+{"ok":true,"label":"batch25 manual all narrative blocks retained in source order"}
+{"ok":true,"label":"batch25 manual table-only pages contribute to pagination accounting"}
+{"ok":true,"label":"batch25 manual layout revision invalidates cached manual"}
+{"ok":true,"label":"batch25 manual 90-row table repeats headings on every page"}
+{"ok":true,"label":"batch25 manual 90-row table preserves all rows once in order"}
+{"ok":true,"label":"batch25 manual overheight first row does not strand chapter heading"}
+{"ok":true,"label":"batch25 manual overheight row preserves all cell words once in order"}
+{"ok":true,"label":"batch25 manual overheight row continues with headers"}
+{"ok":true,"label":"batch25 manual overheight row stays inside body bounds"}
+{"ok":true,"label":"batch25 manual impossible table header fails clearly"}
+{"ok":true,"label":"batch25 manual header-only table remains supported"}
+14/14 Batch25 Manual checks passed

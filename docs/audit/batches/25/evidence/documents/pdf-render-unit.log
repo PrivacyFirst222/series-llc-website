@@ -1,0 +1,152 @@
+✅ drawnWidth: 'AV' measures as A + V (no kerning)
+✅ drawnWidth: a whole string is not shorter than its glyphs
+✅ drawnWidth: a trailing space counts
+✅ preamble parses as one paragraph
+✅ first line: the regular run ends with the space before the name
+✅ first line: the bold name follows on the same line
+✅ label: '3.6 Company as Owner.' is a label paragraph
+✅ label: a bold lead-in with body text is not
+✅ label: a heading-shaped plain paragraph is not
+✅ single: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: single is a PDF
+✅ read back: single preamble reads "of E2E Coastal"
+✅ read back: single has no template marker
+✅ read back: single preamble starts at the body margin, like Recital A
+✅ read back: single title line stays centered
+✅ read back: single no page ends on a bare subsection label
+✅ single: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: single (professional) is a PDF
+✅ read back: single (professional) preamble reads "of E2E Coastal"
+✅ read back: single (professional) has no template marker
+✅ read back: single (professional) preamble starts at the body margin, like Recital A
+✅ read back: single (professional) title line stays centered
+✅ read back: single (professional) no page ends on a bare subsection label
+✅ single-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: single-s is a PDF
+✅ read back: single-s preamble reads "of E2E Coastal"
+✅ read back: single-s has no template marker
+✅ read back: single-s preamble starts at the body margin, like Recital A
+✅ read back: single-s title line stays centered
+✅ read back: single-s no page ends on a bare subsection label
+✅ single-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: single-s (professional) is a PDF
+✅ read back: single-s (professional) preamble reads "of E2E Coastal"
+✅ read back: single-s (professional) has no template marker
+✅ read back: single-s (professional) preamble starts at the body margin, like Recital A
+✅ read back: single-s (professional) title line stays centered
+✅ read back: single-s (professional) no page ends on a bare subsection label
+✅ member-single: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: member-single is a PDF
+✅ read back: member-single preamble reads "of E2E Coastal"
+✅ read back: member-single has no template marker
+✅ read back: member-single preamble starts at the body margin, like Recital A
+✅ read back: member-single title line stays centered
+✅ read back: member-single no page ends on a bare subsection label
+✅ member-single: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: member-single (professional) is a PDF
+✅ read back: member-single (professional) preamble reads "of E2E Coastal"
+✅ read back: member-single (professional) has no template marker
+✅ read back: member-single (professional) preamble starts at the body margin, like Recital A
+✅ read back: member-single (professional) title line stays centered
+✅ read back: member-single (professional) no page ends on a bare subsection label
+✅ member-single-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: member-single-s is a PDF
+✅ read back: member-single-s preamble reads "of E2E Coastal"
+✅ read back: member-single-s has no template marker
+✅ read back: member-single-s preamble starts at the body margin, like Recital A
+✅ read back: member-single-s title line stays centered
+✅ read back: member-single-s no page ends on a bare subsection label
+✅ member-single-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: member-single-s (professional) is a PDF
+✅ read back: member-single-s (professional) preamble reads "of E2E Coastal"
+✅ read back: member-single-s (professional) has no template marker
+✅ read back: member-single-s (professional) preamble starts at the body margin, like Recital A
+✅ read back: member-single-s (professional) title line stays centered
+✅ read back: member-single-s (professional) no page ends on a bare subsection label
+✅ multi: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: multi is a PDF
+✅ read back: multi preamble reads "of E2E Coastal"
+✅ read back: multi has no template marker
+✅ read back: multi preamble starts at the body margin, like Recital A
+✅ read back: multi title line stays centered
+✅ read back: multi no page ends on a bare subsection label
+✅ multi: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: multi (professional) is a PDF
+✅ read back: multi (professional) preamble reads "of E2E Coastal"
+✅ read back: multi (professional) has no template marker
+✅ read back: multi (professional) preamble starts at the body margin, like Recital A
+✅ read back: multi (professional) title line stays centered
+✅ read back: multi (professional) no page ends on a bare subsection label
+✅ s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: s is a PDF
+✅ read back: s preamble reads "of E2E Coastal"
+✅ read back: s has no template marker
+✅ read back: s preamble starts at the body margin, like Recital A
+✅ read back: s title line stays centered
+✅ read back: s no page ends on a bare subsection label
+✅ s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: s (professional) is a PDF
+✅ read back: s (professional) preamble reads "of E2E Coastal"
+✅ read back: s (professional) has no template marker
+✅ read back: s (professional) preamble starts at the body margin, like Recital A
+✅ read back: s (professional) title line stays centered
+✅ read back: s (professional) no page ends on a bare subsection label
+✅ member: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: member is a PDF
+✅ read back: member preamble reads "of E2E Coastal"
+✅ read back: member has no template marker
+✅ read back: member preamble starts at the body margin, like Recital A
+✅ read back: member title line stays centered
+✅ read back: member no page ends on a bare subsection label
+✅ member: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: member (professional) is a PDF
+✅ read back: member (professional) preamble reads "of E2E Coastal"
+✅ read back: member (professional) has no template marker
+✅ read back: member (professional) preamble starts at the body margin, like Recital A
+✅ read back: member (professional) title line stays centered
+✅ read back: member (professional) no page ends on a bare subsection label
+✅ member-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: member-s is a PDF
+✅ read back: member-s preamble reads "of E2E Coastal"
+✅ read back: member-s has no template marker
+✅ read back: member-s preamble starts at the body margin, like Recital A
+✅ read back: member-s title line stays centered
+✅ read back: member-s no page ends on a bare subsection label
+✅ member-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)
+✅ renders: member-s (professional) is a PDF
+✅ read back: member-s (professional) preamble reads "of E2E Coastal"
+✅ read back: member-s (professional) has no template marker
+✅ read back: member-s (professional) preamble starts at the body margin, like Recital A
+✅ read back: member-s (professional) title line stays centered
+✅ read back: member-s (professional) no page ends on a bare subsection label
+✅ all 16 variants rendered
+✅ signatures: the preamble refers to the dates set forth below
+✅ signatures: the solo owner's name, then Date
+✅ signatures: no typed underscores remain
+✅ signatures: the couple is headed by both names and their holding
+✅ signatures: each spouse then signs on their own line with a Date
+✅ signatures: no 'entireties'
+✅ signatures: every rule ends at one right edge
+✅ signatures: every signature rule is three and a half inches from the margin
+✅ entity: the trust's block in the markdown
+✅ entity: the Manager's block in the markdown
+✅ entity: read back — the trust's name, then By:, the trustee's name, title, Date
+✅ entity: read back — the Manager's name, then By:, the signer's name, title, Date
+✅ entity: no [[indent]] marker or underscores in the text
+✅ entity: the printed name and title start flush with the left end of a By: rule that ends at the shared right edge
+✅ entity: the By: label sits at the margin
+✅ Exhibit A lists the capital the Company allocated to the series and what it kept
+✅ licensed agreement renders
+✅ the blank space before a forced break carries the notice
+✅ the encrypted text still reads (streams decrypt)
+✅ the form declares its font where readers look (DR) and a document default appearance
+✅ the licensed agreement is encrypted
+✅ the title decrypts cleanly for a compliant reader
+✅ the Asset Schedule has 20 typeable fields for one series (5 rows × 4 columns)
+✅ every cell's appearance string decrypts and auto-sizes (0 Tf)
+✅ every cell is multiline (wraps)
+✅ instruction sheet: the title and the company name are centered
+✅ instruction sheet: the first section heading is at the margin, not centered
+✅ instruction sheet: list items and body are at the margin
+
+150 checks, 0 failures

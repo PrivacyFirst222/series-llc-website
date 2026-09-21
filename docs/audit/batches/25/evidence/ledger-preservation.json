@@ -1,0 +1,19 @@
+{
+  "records": 365,
+  "unchangedRecords": 360,
+  "changedExactlyApproved": [
+    "AUD-post-batches-2026-09-20-4a344e2-WORD-EXHIBIT-TABLE-ROWS",
+    "AUD-post-batches-2026-09-20-4a344e2-WORD-INDENT-CONTROL-LEAK",
+    "AUD-post-batches-2026-09-20-4a344e2-B5-MANUAL-TABLE-HEADER-PAGINATION",
+    "AUD-post-batches-2026-09-20-4a344e2-B7-CLIENT-TEXT-AS-SLOT",
+    "AUD-post-batches-2026-09-20-4a344e2-B5-CONSENT-SIGNATURE-PAGINATION"
+  ],
+  "priorBatchRecordsUnchanged": 34,
+  "rulingsUnchanged": 42,
+  "allOtherLedgerFieldsUnchanged": true,
+  "latestAuditFindings": 31,
+  "latestAuditPartStatus": {
+    "implemented": 29,
+    "open": 2
+  }
+}

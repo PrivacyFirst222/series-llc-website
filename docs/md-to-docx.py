@@ -25,6 +25,7 @@ Markdown the masters use:
   > x                     set-off block (manual)
   | a | b |               table
   [[pagebreak]]           page break
+  [[indent]]text          entity signer's printed name/title under the By: rule
 
     python3 docs/md-to-docx.py <input.md> <output.docx>
 """
@@ -336,9 +337,14 @@ def body_xml(md, P):
     m = re.search(r"<!--\s*titlepage\s*(.+?)-->", md, flags=re.S)
     if m:
         tp = m.group(1)
-    md = re.sub(r"<!--.*?-->", "", md, flags=re.S)
-
-    lines = md.split("\n")
+    # A comment-only template-control line is not a paragraph break. Retain
+    # real blank lines but discard lines emptied by comment removal; otherwise
+    # repeat:member/asset controls cut a table off immediately after its header.
+    # The sentinel also handles multiline comments without removing any text
+    # between adjacent inline alternatives in these editable drafting forms.
+    commented = re.sub(r"<!--.*?-->", "\x00", md, flags=re.S)
+    lines = ["\x00" if "\x00" in line and not line.replace("\x00", "").strip()
+             else line.replace("\x00", "") for line in commented.split("\n")]
 
     # Headings, collected first so [[contents]] can be built from them.
     headings = []
@@ -365,7 +371,7 @@ def body_xml(md, P):
         line = lines[i].rstrip()
         stripped = line.strip()
 
-        if not stripped:
+        if not stripped or stripped == "\x00":
             i += 1
             continue
         if stripped == "---":
@@ -377,6 +383,14 @@ def body_xml(md, P):
             i += 1
             continue
         if stripped == "[[left]]":
+            i += 1
+            continue
+        if stripped.startswith("[[indent]]"):
+            # 12pt Times New Roman's "By: " label is 20.34pt (407 twips).
+            # Match the printed name/title to the start of its signature rule,
+            # preserving the existing paragraph spacing and editable blanks.
+            out.append(para(stripped[len("[[indent]]"):], P, ind_left=407,
+                            after=P["body_after"], keep_lines=True))
             i += 1
             continue
         if stripped == "[[contents]]":
@@ -396,13 +410,24 @@ def body_xml(md, P):
         ):
             rows = [split_row(stripped)]
             i += 2
-            while i < len(lines) and lines[i].strip().startswith("|"):
-                rows.append(split_row(lines[i]))
-                i += 1
+            controlled_rows = False
+            while i < len(lines):
+                if lines[i].strip() == "\x00":
+                    controlled_rows = True
+                    i += 1
+                elif lines[i].strip().startswith("|"):
+                    rows.append(split_row(lines[i]))
+                    i += 1
+                else:
+                    break
             out.append(table(rows, P))
             # The originals close every table with an empty paragraph. Without
             # it whatever follows sits flush against the bottom border.
-            out.append(para("", P, after=P["body_after"]))
+            # Restored drafting rows occupy their actual table height. Keep
+            # the closing blank line but omit its extra 8pt paragraph gap on
+            # these tables, so Exhibit A's final sentence does not spill onto
+            # a page by itself. Existing unwrapped tables retain their spacing.
+            out.append(para("", P, after=0 if controlled_rows else P["body_after"]))
             continue
 
         # Headings

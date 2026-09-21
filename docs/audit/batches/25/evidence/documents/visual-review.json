@@ -1,0 +1,286 @@
+{
+  "documents": 24,
+  "pagesRendered": 44,
+  "pagesInspected": 44,
+  "contactSheetsInspected": 11,
+  "ordinaryConsentBeforePages": 4,
+  "ordinaryConsentAfterPages": 3,
+  "observations": [
+    "Full signature rules, printed names, and dates remain together; ordinary fixture fits all consent signatures on page one.",
+    "Long entity printed name and title wrap within body margins and stay with By/signature/date.",
+    "250-character unbroken signer wraps across five lines without margin clipping.",
+    "Marker-like client text prints literally in amendments and Statements, with typed paragraph boundaries intact.",
+    "Existing master forced signature/exhibit pages and intentionally-blank notices preserved.",
+    "Long-name stress consent keeps second complete signature alone on next page when it cannot fit; no unconditional signature page introduced.",
+    "Existing doubled period in ordinary fixture purpose originates from input ending with period plus master punctuation; unchanged and outside these findings.",
+    "Entity-consent MEMBERS heading can remain at page 1 end while its complete entity signature begins page 2; the measured signature unit itself remains intact."
+  ],
+  "pagesIndividuallyInspected": 44,
+  "method": "Readable individual full-page views, separate from the earlier contact-sheet overview; not a claim of per-pixel original-detail inspection.",
+  "individualPages": [
+    {
+      "file": "green-final/pages/amendment-attached-1.png",
+      "sha256": "edc048552bcc090f4d91885f8021d514225edbc6894cb1fbd363d757f1c0d771",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/amendment-attached-2.png",
+      "sha256": "d5c68c067f680304193cdf2ebe5d9ac20a28d55e78738c01bda51f3a77178e2e",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/amendment-brackets-1.png",
+      "sha256": "f2334f039c6cc894fa033ac49a5a6429f70296968f6c1cff563cb75148d263db",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/amendment-brackets-2.png",
+      "sha256": "0eb9132e829dfd55960025b64c0ee5f9c5201a56edc7bf6296e5a0ef6bc8e59a",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/amendment-typed-1.png",
+      "sha256": "9dc2a10851e0f9c52b95b57bb3234f822bbe2a25eb0cb6af40071848a5a9f14e",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/amendment-typed-2.png",
+      "sha256": "d5c68c067f680304193cdf2ebe5d9ac20a28d55e78738c01bda51f3a77178e2e",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/boundary-entity-1.png",
+      "sha256": "c3c20f9cb5259b17675a71f7d2e8058860e99bd7d93a0bdb811a2b61dd9adb4f",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/boundary-entity-2.png",
+      "sha256": "db3e0813bbe529fedac5db50c85a3c74409fc8de9d54d96a5bf0660e1d9fa961",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/boundary-person-1.png",
+      "sha256": "bc35dd0fdcef0d217c167a481f93e71970f58bffaa91214e0d3de7889c7de46c",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/boundary-token-1.png",
+      "sha256": "c3c20f9cb5259b17675a71f7d2e8058860e99bd7d93a0bdb811a2b61dd9adb4f",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/boundary-token-2.png",
+      "sha256": "26ac71f3baade5c6fc5ab31547133f8d6612f1215108b991542600005e959575",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/entity-consent-1.png",
+      "sha256": "fe2bc5ed17d82b1ec878369b4607fc8a29f4561dbdb593620fdcb1393a7b13de",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/entity-consent-2.png",
+      "sha256": "7147eb96c7f660020c3c8c87924b0cb3cdc51b2aea93e0e3c42d5c27b875a530",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/entity-consent-3.png",
+      "sha256": "8bca9b4b41b94618459551e37724edae61309f0c67b33665d0867aa94b159d59",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/entity-consent-4.png",
+      "sha256": "cab2163ba40ad38a5429b222efe03883fc2331fd4fc70f79cd09721855191687",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-By____________-1.png",
+      "sha256": "ff354184239fdbded4ed9ce57acff3743c47d8188169bbaf7e22758f4df924dc",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-By____________-2.png",
+      "sha256": "d5aadb404161066ad1096d2df3995992c5b51ac0e81c3dcd1fc6c4c4d5adfdd0",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-Form_document-1.png",
+      "sha256": "614c2cf679408d8a1e233714f6954fcc193b25e242fdf36f233c7873c4239ae7",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-Form_document-2.png",
+      "sha256": "aff258ce3108684ba3d7f42edca1062c12bfee9932013bb648306c111e2406d8",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-_COMPANY_NAME_-1.png",
+      "sha256": "a310cdf118cbcb4730bd4fab59a1cc13e7b5b12485904a5850ac836bd06fb137",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-_COMPANY_NAME_-2.png",
+      "sha256": "41e71b3c93cccfa4f94fc52ff338a0a6cfe0276c2a98c94a6897eb81a8a1f1d7",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-_SIGNER_NAME_-1.png",
+      "sha256": "0f28f391a3052a2f79f8e2f7b2b4230091fc73502d11b241d6559d45910e9f73",
+      "reviewer": "batch25_manual",
+      "view": "1100px readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-_SIGNER_NAME_-2.png",
+      "sha256": "f8d111744596eeea6e8652191bddb27ad8d0bef469a312150b59b66b9bcca173",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-__91_FAKE__93_-1.png",
+      "sha256": "9143b51fde9a0935077f707e99c8a264f4d0098e884328a2d47b5d52b32fa9c1",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-__91_FAKE__93_-2.png",
+      "sha256": "64b3b55d7378d78d0aac6523322e57af64d1ed4b961f50ff6c0b3368abcd0a16",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-__indent__-1.png",
+      "sha256": "b3a0f84a2b6c491e71991526dc221b81682ff794238380251b355c7c51c1df48",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-__indent__-2.png",
+      "sha256": "0f967387f4b84d694dc77bf4a9e41127539018aaed52cfc1131ee13ef232ccec",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-__pagebreak__-1.png",
+      "sha256": "b7bb370655b48494884225cbdb00ff51ff20daf4cd7ba3098d7b16850f984777",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-amendment-__pagebreak__-2.png",
+      "sha256": "d3ca70d378cddc8fbc4f2e57d26b1481938a63afac3e04011bb83446c48c51fd",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-statement-By____________-1.png",
+      "sha256": "1394df793b71a430721e7eb2fd3327c11e5cfcabbf3f53a3d71c1e2c29d077b4",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-statement-Form_document-1.png",
+      "sha256": "821307e613c8b41399b413afefe9b58a6dc081cb3e10fa23930ab1fb30c01d21",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-statement-_COMPANY_NAME_-1.png",
+      "sha256": "9514748293ca9c650233af32bebb6ad418fb087cbcc94fe0b686c78055c7bcb3",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-statement-_SIGNER_NAME_-1.png",
+      "sha256": "21b790abc8ed1a96f185a49756745fe2459888667803c50b419fb166f1ecf7d5",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-statement-__91_FAKE__93_-1.png",
+      "sha256": "0abdf9a57b49a1e5fab3fabfbaee6bc45cccd285835a6df07c9e61aabdaf9e63",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-statement-__indent__-1.png",
+      "sha256": "5dc0ebb1771429c90f675b2acff5dc70cc8bed0f66ca8e35ac6524beccb3fa2d",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/literal-statement-__pagebreak__-1.png",
+      "sha256": "4597132812a9c195bd8db7573e5019f0c394160e41a929102d32b7fdc0a415d4",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/long-person-consent-1.png",
+      "sha256": "85433d9fb13cb58c052c1075f69d30cb6be165ed2009797aa835233a56b861a3",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/long-person-consent-2.png",
+      "sha256": "dbb5d34e086d14a981adc85f6024b023cd44f6e48d52c019682f6e4ca1168dd3",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/long-person-consent-3.png",
+      "sha256": "8bca9b4b41b94618459551e37724edae61309f0c67b33665d0867aa94b159d59",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/long-person-consent-4.png",
+      "sha256": "cab2163ba40ad38a5429b222efe03883fc2331fd4fc70f79cd09721855191687",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/ordinary-consent-1.png",
+      "sha256": "2834f0164d693cbafaf3d35c6b198dfd7c9861b9274951b03014862179022d27",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/ordinary-consent-2.png",
+      "sha256": "e662ca0f0d59f9a998e12da0186f94f0fdaad233053fdc5a2499599923a15e42",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/ordinary-consent-3.png",
+      "sha256": "b6e3ff33ab8b847e3db3120e90dc00f765675ac2570d534295330f7957bdf20b",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    },
+    {
+      "file": "green-final/pages/statement-brackets-1.png",
+      "sha256": "ccf37718b996d23b19c095b0d978c15abdf66c28a4dc7feefa50973b463f22c5",
+      "reviewer": "/root",
+      "view": "original PNG path, readable full-page"
+    }
+  ]
+}

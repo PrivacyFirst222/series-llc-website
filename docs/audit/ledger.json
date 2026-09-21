@@ -20703,15 +20703,47 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-21T00:00:08.074Z",
               "event": "recorded from verified audit",
               "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T05:57:18.741Z",
+              "event": "assigned",
+              "batch": "25",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T06:09:38.324Z",
+              "event": "implemented",
+              "batch": "25",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "25",
+          "fix": {
+            "batch": "25",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/batch25-word-check.py",
+                "text": "WORD-EXHIBIT-TABLE-ROWS"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "../docs/batch25-word-check.py"
+              }
+            ]
+          }
         }
       ]
     },
@@ -20728,15 +20760,47 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-21T00:00:08.074Z",
               "event": "recorded from verified audit",
               "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T05:57:18.741Z",
+              "event": "assigned",
+              "batch": "25",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T06:09:38.324Z",
+              "event": "implemented",
+              "batch": "25",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "25",
+          "fix": {
+            "batch": "25",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/batch25-word-check.py",
+                "text": "WORD-INDENT-CONTROL-LEAK"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "../docs/batch25-word-check.py"
+              }
+            ]
+          }
         }
       ]
     },
@@ -21316,15 +21380,47 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-21T00:00:08.074Z",
               "event": "recorded from verified audit",
               "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T05:57:18.741Z",
+              "event": "assigned",
+              "batch": "25",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T06:09:38.324Z",
+              "event": "implemented",
+              "batch": "25",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "25",
+          "fix": {
+            "batch": "25",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/batch25-manual-check.ts",
+                "text": "B5-MANUAL-TABLE-HEADER-PAGINATION"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "scripts/batch25-manual-check.ts"
+              }
+            ]
+          }
         }
       ]
     },
@@ -21341,15 +21437,47 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-21T00:00:08.074Z",
               "event": "recorded from verified audit",
               "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T05:57:18.741Z",
+              "event": "assigned",
+              "batch": "25",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T06:09:38.324Z",
+              "event": "implemented",
+              "batch": "25",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "25",
+          "fix": {
+            "batch": "25",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/batch25-documents-check.ts",
+                "text": "B7-CLIENT-TEXT-AS-SLOT"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "scripts/batch25-documents-check.ts"
+              }
+            ]
+          }
         }
       ]
     },
@@ -21366,15 +21494,47 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-21T00:00:08.074Z",
               "event": "recorded from verified audit",
               "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T05:57:18.741Z",
+              "event": "assigned",
+              "batch": "25",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T06:09:38.324Z",
+              "event": "implemented",
+              "batch": "25",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "25",
+          "fix": {
+            "batch": "25",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/batch25-documents-check.ts",
+                "text": "B5-CONSENT-SIGNATURE-PAGINATION"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "scripts/batch25-documents-check.ts"
+              }
+            ]
+          }
         }
       ]
     }
@@ -22335,6 +22495,25 @@
         },
         {
           "at": "2026-09-21T02:39:20.428Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "25",
+      "revision": 1,
+      "frozenHash": "2d77411999d0a5ac29db574c51a146a7ac5fa90f8a6811ef94f23a58da3665b6",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "2559e18f5094b70c8eba1eb64e3c3519aa609f3e",
+      "history": [
+        {
+          "at": "2026-09-21T05:57:18.742Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-21T06:09:38.324Z",
           "event": "implemented"
         }
       ]

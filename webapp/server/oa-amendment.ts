@@ -1,3 +1,4 @@
+import { documentInputs, decodeDocumentText, encodeDocumentText, assertTemplateComplete } from "./document-text";
 /**
  * Amendment to Operating Agreement (Adam, 12 Sep 2026): "a standard amendment
  * form with recitals that refer to the amendment provisions in the OA and then
@@ -65,14 +66,18 @@ export function paragraphsOf(text: string): string {
     .join("\n\n");
 }
 
-export function assembleAmendment(oa: OaInputs, am: AmendmentInputs): { markdown: string; title: string } {
+export function assembleAmendment(oa: OaInputs, am: AmendmentInputs): { markdown: string; title: string; encodedClientText: true } {
+  if (am.mode === "typed" && !(am.text ?? "").trim()) throw new Error("Amendment: typed changes are empty");
+  if (!am.agreementDate.trim()) throw new Error("Amendment: the agreement's effective date is required");
+  const typedText = am.text;
+  oa = documentInputs(oa);
+  am = documentInputs(am);
   const isSingle =
     oa.version === "single" || oa.version === "single-s" ||
     oa.version === "member-single" || oa.version === "member-single-s";
   const isMemberManaged =
     oa.version === "member" || oa.version === "member-s" ||
     oa.version === "member-single" || oa.version === "member-single-s";
-  if (am.mode === "typed" && !(am.text ?? "").trim()) throw new Error("Amendment: typed changes are empty");
   if (!Number.isInteger(am.number) || am.number < 1) throw new Error("Amendment: number must be 1 or more");
 
   let s = amendmentTemplate;
@@ -100,7 +105,6 @@ export function assembleAmendment(oa: OaInputs, am: AmendmentInputs): { markdown
   must(s, "[AMENDMENT DATE]", "amendment date");
   s = s.split("[AMENDMENT DATE]").join(am.effectiveDate);
   must(s, "[AGREEMENT DATE]", "agreement date");
-  if (!am.agreementDate.trim()) throw new Error("Amendment: the agreement's effective date is required");
   s = s.split("[AGREEMENT DATE]").join(am.agreementDate);
   must(s, "[AMENDMENT SECTION]", "amendment section");
   s = s.split("[AMENDMENT SECTION]").join(amendmentSection(oa.version));
@@ -136,15 +140,13 @@ export function assembleAmendment(oa: OaInputs, am: AmendmentInputs): { markdown
   s = s.trimEnd() + "\n\n" + footer + "\n";
   s = s.replace(/\n{3,}/g, "\n\n");
 
-  // Every slot filled and every marker resolved — checked BEFORE the client's
-  // typed changes go in, so a bracketed phrase of theirs cannot fail the check.
-  const leftover = (s.match(/\[[A-Z][A-Z ()/.']*\]/g) ?? []).filter((x) => !(am.mode === "typed" && x === "[AMENDMENT TEXT]"));
-  if (leftover.length > 0) throw new Error(`Amendment: unfilled slot(s): ${[...new Set(leftover)].join(", ")}`);
-  if (/<!--/.test(s)) throw new Error("Amendment: template marker left in the document");
+  // Validate only template text; client values were protected before interpolation.
+  // Typed paragraphs retain the client's line boundaries, not Markdown controls.
   if (am.mode === "typed") {
     must(s, "[AMENDMENT TEXT]", "amendment text");
-    s = s.replace("[AMENDMENT TEXT]", () => paragraphsOf(am.text ?? ""));
+    s = s.replace("[AMENDMENT TEXT]", () => paragraphsOf(typedText ?? "").split("\n\n").map(encodeDocumentText).join("\n\n"));
   }
+  assertTemplateComplete(s);
 
-  return { markdown: s, title: `${title} — ${co}` };
+  return { markdown: s, encodedClientText: true, title: `${title} — ${decodeDocumentText(co)}` };
 }

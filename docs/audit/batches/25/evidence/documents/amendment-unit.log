@@ -1,0 +1,41 @@
+✅ title names the number and the company
+✅ heading carries the number
+✅ preamble names the members and the manager's acknowledgment
+✅ recital A names the agreement and its date
+✅ recital B cites s. 15.1 and all Members
+✅ recital C and the operative words are plural
+✅ typed changes are printed, one paragraph per line
+✅ the attached-exhibit sentence is absent when the changes are typed
+✅ effect clause is verbatim
+✅ signatures start a new page
+✅ IN WITNESS WHEREOF is plural
+✅ every member signs, the couple headed by both names and their holding
+✅ the solo member signs on a line of their own
+✅ the manager acknowledges
+✅ footer names the amendment, the company, and the edition
+✅ no slot or marker is left
+✅ attached: the exhibit sentence stands in for the typed changes
+✅ two managers acknowledge under the plural heading
+✅ attached: the number is 2 throughout
+✅ single: preamble names the sole member and no manager
+✅ single: recital A names the Amended and Restated agreement
+✅ single: recital B cites s. 12.1 and the Member
+✅ single: recital C and the operative words are singular
+✅ single: IN WITNESS WHEREOF is singular and the heading is MEMBER
+✅ single member-managed: no manager block
+✅ single: no slot or marker is left
+✅ single manager-managed: s. 12.1 and the manager's acknowledgment
+✅ single manager-managed: recital A names the Operating Agreement, not restated
+✅ sections: the four multi-member forms cite 15.1
+✅ sections: the four single-member forms cite 12.1
+✅ a client's own bracketed phrase is printed as typed
+✅ recital A names the agreement by the date confirmed on the form
+✅ an amendment without the agreement's date is refused
+✅ entity: the trust signs through its trustee on the amendment
+✅ entity: the company Manager acknowledges through its president
+✅ entity: no marker or slot left
+✅ typed changes that are blank are refused
+✅ a manager-managed agreement with no manager is refused
+✅ paragraphsOf: Windows line endings and blank lines
+
+39 checks, 0 failures

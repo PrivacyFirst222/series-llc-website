@@ -1,0 +1,44 @@
+{"ok":true,"label":"batch25 documents bracketed names satisfy existing alphabet policy"}
+{"ok":true,"label":"batch25 documents amendment accepted bracket values render"}
+{"ok":true,"label":"batch25 documents amendment typed punctuation literal"}
+{"ok":true,"label":"batch25 documents amendment typed paragraphs preserved"}
+{"ok":true,"label":"batch25 documents amendment title decoded"}
+{"ok":true,"label":"batch25 documents amendment no encoded entities leak"}
+{"ok":true,"label":"batch25 documents statement accepted bracket values render"}
+{"ok":true,"label":"batch25 documents statement title decoded"}
+{"ok":true,"label":"batch25 documents statement no encoded entities leak"}
+{"ok":true,"label":"batch25 documents amendment typed ordinary control"}
+{"ok":true,"label":"batch25 documents amendment attached ordinary control"}
+{"ok":true,"label":"batch25 documents literal client marker [COMPANY NAME]"}
+{"ok":true,"label":"batch25 documents literal client marker [SIGNER NAME]"}
+{"ok":true,"label":"batch25 documents literal client marker [[indent]]"}
+{"ok":true,"label":"batch25 documents literal client marker [[pagebreak]]"}
+{"ok":true,"label":"batch25 documents literal client marker Form document"}
+{"ok":true,"label":"batch25 documents literal client marker &#91;FAKE&#93;"}
+{"ok":true,"label":"batch25 documents literal client marker By: __________"}
+{"ok":true,"label":"batch25 documents raw blank required fields rejected \" \""}
+{"ok":true,"label":"batch25 documents raw blank required fields rejected \"\\n\\r\""}
+{"ok":true,"label":"batch25 documents raw blank required fields rejected \"\\t\\n\""}
+{"ok":true,"label":"batch25 documents oa-amendment genuine unresolved master slot refused"}
+{"ok":true,"label":"batch25 documents statement genuine unresolved master slot refused"}
+{"ok":true,"label":"batch25 documents ordinary-consent every signature rule has its printed signer below on same page"}
+{"ok":true,"label":"batch25 documents ordinary-consent signature ink stays within margins"}
+{"ok":true,"label":"batch25 documents ordinary-consent all member signature dates retained"}
+{"ok":true,"label":"batch25 documents ordinary consent has no added blank signature page"}
+{"ok":true,"label":"batch25 documents ordinary consent members remain with signature dates"}
+{"ok":true,"label":"batch25 documents long-person-consent every signature rule has its printed signer below on same page"}
+{"ok":true,"label":"batch25 documents long-person-consent signature ink stays within margins"}
+{"ok":true,"label":"batch25 documents long-person-consent all member signature dates retained"}
+{"ok":true,"label":"batch25 documents entity-consent every signature rule has its printed signer below on same page"}
+{"ok":true,"label":"batch25 documents entity-consent signature ink stays within margins"}
+{"ok":true,"label":"batch25 documents entity-consent all member signature dates retained"}
+{"ok":true,"label":"batch25 documents person near-boundary complete block together"}
+{"ok":true,"label":"batch25 documents person near-boundary fits margins"}
+{"ok":true,"label":"batch25 documents entity near-boundary complete block together"}
+{"ok":true,"label":"batch25 documents entity near-boundary fits margins"}
+{"ok":true,"label":"batch25 documents token near-boundary complete block together"}
+{"ok":true,"label":"batch25 documents token near-boundary fits margins"}
+{"ok":true,"label":"batch25 documents oversized unit refuses without clipping or pagination loop"}
+{"ok":true,"label":"batch25 documents portal amendment renderer forwards encoding flag"}
+{"ok":true,"label":"batch25 documents office Statement renderer forwards encoding flag"}
+43/43 Batch25 document checks passed

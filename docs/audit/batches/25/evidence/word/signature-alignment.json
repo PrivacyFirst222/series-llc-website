@@ -1,0 +1,530 @@
+[
+  {
+    "document": 1,
+    "page": 2,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 1,
+    "page": 2,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 1,
+    "page": 2,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 1,
+    "page": 2,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 2,
+    "page": 24,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 2,
+    "page": 24,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 2,
+    "page": 24,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 2,
+    "page": 24,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 2,
+    "page": 26,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 2,
+    "page": 26,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 3,
+    "page": 23,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 3,
+    "page": 23,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 3,
+    "page": 23,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 3,
+    "page": 23,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 3,
+    "page": 25,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 3,
+    "page": 25,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 4,
+    "page": 24,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 4,
+    "page": 24,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 4,
+    "page": 26,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 4,
+    "page": 26,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 5,
+    "page": 23,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 5,
+    "page": 23,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 5,
+    "page": 25,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 5,
+    "page": 25,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 8,
+    "page": 15,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 8,
+    "page": 15,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 8,
+    "page": 17,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 8,
+    "page": 17,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 9,
+    "page": 16,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 9,
+    "page": 16,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 9,
+    "page": 18,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 9,
+    "page": 18,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 10,
+    "page": 16,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 10,
+    "page": 16,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 10,
+    "page": 16,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 10,
+    "page": 16,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 10,
+    "page": 18,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 10,
+    "page": 18,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 11,
+    "page": 18,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 11,
+    "page": 18,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 11,
+    "page": 18,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 11,
+    "page": 18,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 11,
+    "page": 20,
+    "text": "[PRINTED NAME]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  },
+  {
+    "document": 11,
+    "page": 20,
+    "text": "[TITLE]",
+    "x0": 92.45,
+    "font": [
+      "EAAAAA+LiberationSerif"
+    ],
+    "size": [
+      12.0
+    ]
+  }
+]
