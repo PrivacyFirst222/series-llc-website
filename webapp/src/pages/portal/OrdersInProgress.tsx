@@ -50,7 +50,8 @@ export function OrdersInProgress({
   // Before the LLC is formed, the detail buttons explain instead of collect.
   const [formedGateFor, setFormedGateFor] = useState<"ein" | "s-election" | null>(null);
   const [einEmployees, setEinEmployees] = useState(false);
-  const [einCertified, setEinCertified] = useState(false);
+  const [einCertifiedFor, setEinCertifiedFor] = useState<string | null>(null);
+  const einCertified = detailsFor?.type === "ein" && einCertifiedFor === detailsFor.id;
   // The IRS assistant's own questions (walked 7 Sep 2026): an LLC that
   // already has an EIN keeps it, and the activity category decides which
   // follow-up the assistant asks next.
@@ -62,6 +63,8 @@ export function OrdersInProgress({
   // Opening the EIN form brings back what the draft held for the two answers
   // that are React state rather than form fields.
   useEffect(() => {
+    // Certification is a fresh decision for this opening, never a saved answer.
+    setEinCertifiedFor(null);
     if (!detailsFor || detailsFor.type !== "ein") return;
     const d = einDrafts[detailsFor.id];
     setEinActivity(d?.activity && einCategory(d.activity) ? d.activity : "Real Estate");
@@ -122,7 +125,7 @@ export function OrdersInProgress({
     onSuccess: (_res, args) => {
       setEinDrafts((prev) => { const next = { ...prev }; delete next[args.id]; return next; });
       clearDraft("ein", args.id);
-      setEinCertified(false); setEinEmployees(false); setEinFollowUp("");
+      setEinCertifiedFor(null); setEinEmployees(false); setEinFollowUp("");
       setDetailsFor(null);
       refresh();
     },
@@ -430,7 +433,7 @@ export function OrdersInProgress({
           asks that the formation record cannot answer (SS-4 ledger). */}
       <Dialog
         open={detailsFor !== null && detailsFor.type === "ein"}
-        onOpenChange={(v) => { if (!v) { snapshotEinDraft(); setDetailsFor(null); } }}
+        onOpenChange={(v) => { if (!v) { snapshotEinDraft(); setEinCertifiedFor(null); setDetailsFor(null); } }}
       >
         <DialogContent onInteractOutside={(e) => e.preventDefault()}>
           <DialogHeader>
@@ -448,7 +451,7 @@ export function OrdersInProgress({
             onChange={snapshotEinDraft}
             onSubmit={(e) => {
               e.preventDefault();
-              if (!detailsFor) return;
+              if (!detailsFor || !einCertified) return;
               const fd = new FormData(e.currentTarget);
               const num = (k: string) => Number(String(fd.get(k) ?? "0")) || 0;
               const yes = (k: string) => fd.get(k) === "Yes";
@@ -705,7 +708,7 @@ export function OrdersInProgress({
               <input
                 type="checkbox"
                 checked={einCertified}
-                onChange={(e) => setEinCertified(e.target.checked)}
+                onChange={(e) => setEinCertifiedFor(e.target.checked ? detailsFor?.id ?? null : null)}
                 className="mt-0.5 h-4 w-4 shrink-0 accent-trust"
               />
               <span className="text-xs leading-relaxed">{EIN_CERTIFICATION}</span>

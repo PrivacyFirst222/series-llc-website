@@ -1,0 +1,799 @@
+{"label":"batch22 B6-01 GET /portal/oa rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"95c6c3bb-0dda-4fc0-b31d-9f9f69ed7756","status":200,"unchanged":true},{"id":"foreign","status":200,"unchanged":true},{"id":"unpaid","status":200,"unchanged":true},{"id":"","status":200,"unchanged":true},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+{"label":"batch22 B6-01 PUT /portal/oa/answers rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"f7892732-e181-43cd-baa6-9cb2ec2dd617","status":400,"code":"NO_LLC","unchanged":true},{"id":"foreign","status":400,"code":"NO_LLC","unchanged":true},{"id":"unpaid","status":400,"code":"NO_LLC","unchanged":true},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/oa/generate rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"20f13aa8-4022-48de-8a06-81fa3fc96689","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/series/consent rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"8368e26e-04f3-4105-b947-8227f22eb5fb","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":400,"code":"INVALID_INPUT","unchanged":true},{"id":"bad-id","status":400,"code":"INVALID_INPUT","unchanged":true},{"id":" ","status":400,"code":"INVALID_INPUT","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/oa/amend rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"cdc24a48-9f56-486b-bd82-5fd3465eeaf2","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+{"label":"batch22 B6-01 GET /portal/services rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"2e26bec2-bc99-40cc-b18a-e5f829e80ffe","status":200,"unchanged":true},{"id":"foreign","status":200,"unchanged":true},{"id":"unpaid","status":200,"unchanged":true},{"id":"","status":200,"unchanged":true},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/services/s-election rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"327fd427-2000-4144-8e3b-dc87f28fa244","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/services/series rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"da82950d-6288-4906-a730-7fd7a31ee9d5","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/services/certificate rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"a39f655c-581e-4db0-b740-7381d9175ada","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/services/ein rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"31515ea6-14b8-40e1-a436-cebb4aedc74e","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+{"label":"batch22 B6-01 POST /portal/registered-agent/cancel rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"8f523a6f-596c-48d3-b85d-0d89c5624718","status":400,"code":"NO_LLC","unchanged":true},{"id":"foreign","status":400,"code":"NO_LLC","unchanged":true},{"id":"unpaid","status":400,"code":"NO_LLC","unchanged":true},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+{"label":"batch22 B6-01 owned company and omitted default remain distinct","ok":true}
+{"label":"batch22 B3-05 100 owners and 100 contribution shares save and reload exactly","ok":false,"detail":{"status":400}}
+{"label":"batch22 B3-05 101 members refused without overwriting saved draft","ok":true,"detail":{"status":400}}
+{"label":"batch22 B3-05 101 shares refused without overwriting saved draft","ok":true,"detail":{"status":400}}
+{"label":"batch22 B3-05 101 unitIds refused without overwriting saved draft","ok":true,"detail":{"status":400}}
+{"label":"batch22 B3-05 member actual generated PDF retains all 100 owners and contributions","ok":false,"detail":{"status":400,"printed":false,"contributions":false,"error":{"message":"Please check your answers.","code":"INVALID_INPUT"}}}
+{"label":"batch22 B3-05 member-s actual generated PDF retains all 100 owners and contributions","ok":false,"detail":{"status":400,"printed":false,"contributions":false,"error":{"message":"Please check your answers.","code":"INVALID_INPUT"}}}
+{"label":"batch22 B3-05 multi actual generated PDF retains all 100 owners and contributions","ok":false,"detail":{"status":400,"printed":false,"contributions":false,"error":{"message":"Please check your answers.","code":"INVALID_INPUT"}}}
+{"label":"batch22 B3-05 s actual generated PDF retains all 100 owners and contributions","ok":false,"detail":{"status":400,"printed":false,"contributions":false,"error":{"message":"Please check your answers.","code":"INVALID_INPUT"}}}
+{"label":"batch22 B3-05 100 owners in 50 couples save and generate every ownership unit","ok":false,"detail":{"save":400,"generate":400,"error":{"message":"Please check your answers.","code":"INVALID_INPUT"}}}
+{"label":"batch22 B3-03 confirmation refusal returns truthful retry and preserves earlier pending request","ok":false,"detail":{"status":200,"response":{"data":{"ok":true,"pendingEmail":"failed22@example.test"}},"account":{"email":"batch22@example.test","pending_email":"failed22@example.test"}}}
+{"label":"batch22 B3-03 provider response without acceptance identifier is refused","ok":false,"detail":{"status":200}}
+{"label":"batch22 B3-03 response waits for provider acceptance","ok":false}
+{"label":"batch22 B3-03 old-address notice failure is separate from sent confirmation","ok":false,"detail":{"status":200,"response":{"data":{"ok":true,"pendingEmail":"warning22@example.test"}}}}
+{"label":"batch22 B3-03 retry confirms both sends without changing sign-in","ok":false,"detail":{"status":200,"response":{"data":{"ok":true,"pendingEmail":"warning22@example.test"}}}}
+{"label":"batch22 B3-03 only confirmed link changes sign-in","ok":true,"detail":{"status":200}}
+{"label":"batch22 B3-03 password change during send cannot resurrect pending email","ok":false,"detail":{"status":200,"account":{"email":"warning22@example.test","pending_email":null}}}
+10 |   try {
+11 |     const child = Bun.spawn(["bun", import.meta.filename, "--child"], { cwd: process.cwd(), env: { ...process.env, E2E_OFFLINE: "1", VERCEL: "", DEV_PG_DIR: join(dir, "pg"), DEV_STORAGE_DIR: join(dir, "files"), BATCH22_DIR: dir }, stdout: "pipe", stderr: "pipe" });
+12 |     const [out, stderr, exit] = await Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text(), child.exited]);
+13 |     const rows = out.split("\n").filter(s => s.startsWith("BATCH22:")).map(s => JSON.parse(s.slice(8)));
+14 |     for (const row of rows) check(row.label, row.ok, row.detail);
+15 |     if (exit || rows.length < 30) throw new Error(`Batch 22 fixture failed (${exit}, ${rows.length} rows)\n${stderr}\n${out}`);
+                                                 ^
+error: Batch 22 fixture failed (0, 28 rows)
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "09a9986f-fb06-4937-80a8-b451d9fa3241", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[account] verify email failed: 57 |     }),
+58 |   });
+59 |   if (!res.ok) {
+60 |     const body = await res.text();
+61 |     await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));
+62 |     throw new Error(`Resend ${res.status}: ${body}`);
+                   ^
+error: Resend 503: fixture refusal
+      at sendMail (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-2-2026-09-20/repo/webapp/server/email.ts:62:15)
+
+[account] verify email failed: 60 |     const body = await res.text();
+61 |     await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));
+62 |     throw new Error(`Resend ${res.status}: ${body}`);
+63 |   }
+64 |   const accepted = (await res.json().catch(() => null)) as { id?: string } | null;
+65 |   if (!accepted?.id) {await recordMail(mail,false,null,"Email provider did not confirm acceptance");throw new Error("Email provider did not confirm acceptance");}
+                                                                                                                   ^
+error: Email provider did not confirm acceptance
+      at sendMail (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-2-2026-09-20/repo/webapp/server/email.ts:65:111)
+
+[account] change-requested notice failed: 57 |     }),
+58 |   });
+59 |   if (!res.ok) {
+60 |     const body = await res.text();
+61 |     await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));
+62 |     throw new Error(`Resend ${res.status}: ${body}`);
+                   ^
+error: Resend 503: fixture refusal
+      at sendMail (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-2-2026-09-20/repo/webapp/server/email.ts:62:15)
+
+
+BATCH22:{"label":"batch22 B6-01 GET /portal/oa rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"95c6c3bb-0dda-4fc0-b31d-9f9f69ed7756","status":200,"unchanged":true},{"id":"foreign","status":200,"unchanged":true},{"id":"unpaid","status":200,"unchanged":true},{"id":"","status":200,"unchanged":true},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+BATCH22:{"label":"batch22 B6-01 PUT /portal/oa/answers rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"f7892732-e181-43cd-baa6-9cb2ec2dd617","status":400,"code":"NO_LLC","unchanged":true},{"id":"foreign","status":400,"code":"NO_LLC","unchanged":true},{"id":"unpaid","status":400,"code":"NO_LLC","unchanged":true},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+BATCH22:{"label":"batch22 B6-01 POST /portal/oa/generate rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"20f13aa8-4022-48de-8a06-81fa3fc96689","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+BATCH22:{"label":"batch22 B6-01 POST /portal/series/consent rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"8368e26e-04f3-4105-b947-8227f22eb5fb","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":400,"code":"INVALID_INPUT","unchanged":true},{"id":"bad-id","status":400,"code":"INVALID_INPUT","unchanged":true},{"id":" ","status":400,"code":"INVALID_INPUT","unchanged":true}]}
+BATCH22:{"label":"batch22 B6-01 POST /portal/oa/amend rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"cdc24a48-9f56-486b-bd82-5fd3465eeaf2","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+BATCH22:{"label":"batch22 B6-01 GET /portal/services rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"2e26bec2-bc99-40cc-b18a-e5f829e80ffe","status":200,"unchanged":true},{"id":"foreign","status":200,"unchanged":true},{"id":"unpaid","status":200,"unchanged":true},{"id":"","status":200,"unchanged":true},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+BATCH22:{"label":"batch22 B6-01 POST /portal/services/s-election rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"327fd427-2000-4144-8e3b-dc87f28fa244","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+BATCH22:{"label":"batch22 B6-01 POST /portal/services/series rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"da82950d-6288-4906-a730-7fd7a31ee9d5","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+BATCH22:{"label":"batch22 B6-01 POST /portal/services/certificate rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"a39f655c-581e-4db0-b740-7381d9175ada","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+BATCH22:{"label":"batch22 B6-01 POST /portal/services/ein rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"31515ea6-14b8-40e1-a436-cebb4aedc74e","status":200,"unchanged":false},{"id":"foreign","status":200,"unchanged":false},{"id":"unpaid","status":200,"unchanged":false},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+BATCH22:{"label":"batch22 B6-01 POST /portal/registered-agent/cancel rejects all six invalid company selections before writes","ok":false,"detail":[{"id":"8f523a6f-596c-48d3-b85d-0d89c5624718","status":400,"code":"NO_LLC","unchanged":true},{"id":"foreign","status":400,"code":"NO_LLC","unchanged":true},{"id":"unpaid","status":400,"code":"NO_LLC","unchanged":true},{"id":"","status":200,"unchanged":false},{"id":"bad-id","status":500,"code":"INTERNAL","unchanged":true},{"id":" ","status":500,"code":"INTERNAL","unchanged":true}]}
+BATCH22:{"label":"batch22 B6-01 owned company and omitted default remain distinct","ok":true}
+BATCH22:{"label":"batch22 B3-05 100 owners and 100 contribution shares save and reload exactly","ok":false,"detail":{"status":400}}
+BATCH22:{"label":"batch22 B3-05 101 members refused without overwriting saved draft","ok":true,"detail":{"status":400}}
+BATCH22:{"label":"batch22 B3-05 101 shares refused without overwriting saved draft","ok":true,"detail":{"status":400}}
+BATCH22:{"label":"batch22 B3-05 101 unitIds refused without overwriting saved draft","ok":true,"detail":{"status":400}}
+BATCH22:{"label":"batch22 B3-05 member actual generated PDF retains all 100 owners and contributions","ok":false,"detail":{"status":400,"printed":false,"contributions":false,"error":{"message":"Please check your answers.","code":"INVALID_INPUT"}}}
+BATCH22:{"label":"batch22 B3-05 member-s actual generated PDF retains all 100 owners and contributions","ok":false,"detail":{"status":400,"printed":false,"contributions":false,"error":{"message":"Please check your answers.","code":"INVALID_INPUT"}}}
+BATCH22:{"label":"batch22 B3-05 multi actual generated PDF retains all 100 owners and contributions","ok":false,"detail":{"status":400,"printed":false,"contributions":false,"error":{"message":"Please check your answers.","code":"INVALID_INPUT"}}}
+BATCH22:{"label":"batch22 B3-05 s actual generated PDF retains all 100 owners and contributions","ok":false,"detail":{"status":400,"printed":false,"contributions":false,"error":{"message":"Please check your answers.","code":"INVALID_INPUT"}}}
+BATCH22:{"label":"batch22 B3-05 100 owners in 50 couples save and generate every ownership unit","ok":false,"detail":{"save":400,"generate":400,"error":{"message":"Please check your answers.","code":"INVALID_INPUT"}}}
+BATCH22:{"label":"batch22 B3-03 confirmation refusal returns truthful retry and preserves earlier pending request","ok":false,"detail":{"status":200,"response":{"data":{"ok":true,"pendingEmail":"failed22@example.test"}},"account":{"email":"batch22@example.test","pending_email":"failed22@example.test"}}}
+BATCH22:{"label":"batch22 B3-03 provider response without acceptance identifier is refused","ok":false,"detail":{"status":200}}
+BATCH22:{"label":"batch22 B3-03 response waits for provider acceptance","ok":false}
+BATCH22:{"label":"batch22 B3-03 old-address notice failure is separate from sent confirmation","ok":false,"detail":{"status":200,"response":{"data":{"ok":true,"pendingEmail":"warning22@example.test"}}}}
+BATCH22:{"label":"batch22 B3-03 retry confirms both sends without changing sign-in","ok":false,"detail":{"status":200,"response":{"data":{"ok":true,"pendingEmail":"warning22@example.test"}}}}
+BATCH22:{"label":"batch22 B3-03 only confirmed link changes sign-in","ok":true,"detail":{"status":200}}
+BATCH22:{"label":"batch22 B3-03 password change during send cannot resurrect pending email","ok":false,"detail":{"status":200,"account":{"email":"warning22@example.test","pending_email":null}}}
+
+      at batch22Checks (/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-2-2026-09-20/repo/webapp/server/batch22-check.ts:15:45)
+
+Bun v1.3.14 (macOS arm64)

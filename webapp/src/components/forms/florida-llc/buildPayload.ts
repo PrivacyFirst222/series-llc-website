@@ -1,10 +1,65 @@
 import { AGENT_FORM_VERSION, registeredAgentName } from "./registeredAgent";
+import { raServicePatch } from "./raService";
 import { selectedParty } from "../../../lib/partyIdentity";
 import { canonicalizeSeriesName, buildFinalLlcName, calculateEstimatedFees } from "./validation";
 import { fullPersonName } from "./validation";
 import type { FloridaLLCFormData, SubmissionPayload } from "./types";
 
-export function buildPayload(data: FloridaLLCFormData): SubmissionPayload {
+/** The submitted branch is also the branch validated by each step. Draft
+ * answers are retained for switching back, but discarded/hidden text must not
+ * block an unrelated choice or leak into its order. */
+export function selectedFormData(source: FloridaLLCFormData): FloridaLLCFormData {
+  const data = { ...source };
+  const conversion = data.filingPath === "CONVERT";
+  if (conversion) {
+    data.desiredLlcName = "";
+    data.llcDesignator = "";
+    data.alternateName1 = "";
+    data.alternateName2 = "";
+    data.nameCheck = undefined;
+    data.purposeType = "";
+    data.businessPurposeText = "";
+    data.requestedEffectiveDate = "";
+  } else {
+    data.existingLlcName = "";
+    data.sunbizDocumentNumber = "";
+  }
+  if (data.exactNameOnly) { data.alternateName1 = ""; data.alternateName2 = ""; }
+  if (data.mailingSameAsPrincipal) data.mailingAddress = data.principalAddress;
+  data.managers = data.managementStructure === "MEMBER_MANAGED" ? [] : data.managers.map(selectedParty);
+  data.members = data.managementStructure === "MANAGER_MANAGED" ? [] : data.members.map(selectedParty);
+  if (data.purposeType === "GENERAL") data.businessPurposeText = "";
+  if (data.effectiveDateOption !== "SPECIFIC") data.requestedEffectiveDate = "";
+  if (conversion || data.articlesSignerChoice === "SERVICE") {
+    data.authorizedRepresentativeName = "";
+    data.authorizedRepresentativeTitle = "";
+    data.authorizedRepresentativeSignature = "";
+  }
+  // Legacy contact fields have no control in the current form or payload.
+  data.authorizedRepresentativeEmail = "";
+  data.authorizedRepresentativePhone = "";
+  data.correspondentCompany = "";
+  data.correspondentPhone = "";
+  data.correspondentAddress = undefined;
+  if (data.registeredAgentChoice === "SERVICE") {
+    // Replace only service-supplied text, never the customer's confirmations.
+    Object.assign(data, Object.fromEntries(Object.entries(raServicePatch()).filter(([, value]) => typeof value === "string")));
+  }
+  else if (data.registeredAgentType === "ENTITY") {
+    data.registeredAgentFirstName = "";
+    data.registeredAgentLastName = "";
+    data.registeredAgentSuffix = "";
+  } else if (data.registeredAgentType === "INDIVIDUAL") data.registeredAgentBusinessEntityName = "";
+  if (conversion && data.registeredAgentChoice === "SELF") {
+    data.registeredAgentAcceptanceName = "";
+    data.registeredAgentElectronicSignature = "";
+    data.registeredAgentAcceptanceCapacity = "";
+  }
+  return data;
+}
+
+export function buildPayload(source: FloridaLLCFormData): SubmissionPayload {
+  const data = selectedFormData(source);
   const isConversion = data.filingPath === "CONVERT";
   const signsSelf = !isConversion && data.articlesSignerChoice === "SELF";
   const fees = calculateEstimatedFees({

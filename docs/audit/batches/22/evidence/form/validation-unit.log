@@ -1,0 +1,11 @@
+[fl-llc] All 14 validation tests passed.
+[fl-llc] nameSimilarity: all Division examples normalize correctly.
+[fl-llc] series identifiers: canonical prefixes and prefix-blind duplicates hold.
+[fl-llc] name-check gate: results bind to the name they checked.
+[fl-llc] taxation labels: all 8 versions correct, unknown shows nothing.
+[admin] board new-work rule: 4 cases correct.
+[portal] S election typed dates: 8 cases correct.
+[portal] S election date slashes: 10 cases correct.
+[2553] joint owners: 13 cases correct.
+[names] first and last: 8 cases correct.
+[portal] documents order: Articles, PS Designation, EIN, Operating Agreement, then newest first.

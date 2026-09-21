@@ -1,0 +1,296 @@
+{
+  "id": "22",
+  "revision": 1,
+  "title": "Audit repair group2: order form and client portal",
+  "model": "Codex",
+  "base": "53327cf5220b8c2c07208c13d90f46cc76534993",
+  "items": [
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B1-N02",
+      "part": "all",
+      "scope": "Correct only the registered-agent payment page browser title.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch22-form-check.ts",
+          "text": "B1-N02"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch22-form-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B1-N03",
+      "part": "all",
+      "scope": "Cancel and ignore stale address suggestions after edits, selection, and unmount.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch22-form-check.ts",
+          "text": "B1-N03"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch22-form-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B2-01",
+      "part": "all",
+      "scope": "Use the active filing path company in the protected-series name preview.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch22-form-check.ts",
+          "text": "B2-01"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch22-form-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B2-02",
+      "part": "all",
+      "scope": "Validate and submit only active selected branch fields; preserve English business-text rules and visible editable errors.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch22-form-check.ts",
+          "text": "B2-02"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch22-form-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B2-03",
+      "part": "all",
+      "scope": "Ignore superseded existing-company lookup results, failures and loading completions.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch22-form-check.ts",
+          "text": "B2-03"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch22-form-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B3-02",
+      "part": "all",
+      "scope": "Reset EIN certification on application change and close, preserving draft answers.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch22-portal-check.ts",
+          "text": "B3-02"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch22-portal-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B3-03",
+      "part": "all",
+      "scope": "Await confirmation-email acceptance; truthful failure and retry; separately disclose failure of the old-address notice; change login only on confirmation.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/batch22-check.ts",
+          "text": "B3-03"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "server/batch22-check.ts"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch22-portal-check.ts",
+          "text": "B3-03"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B3-05",
+      "part": "all",
+      "scope": "Support up to100 operating-agreement owners consistently in UI/API/contribution allocations/generation; prevent owner101 visibly; preserve suggested-owner blank-row filling.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/batch22-check.ts",
+          "text": "B3-05"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "server/batch22-check.ts"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch22-portal-check.ts",
+          "text": "B3-05"
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B6-01",
+      "part": "all",
+      "scope": "Refuse explicitly invalid or nonowned company selections before fallback or records writes across every scoped portal route; preserve omission default.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/batch22-check.ts",
+          "text": "B6-01"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "server/batch22-check.ts"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/components/layout/Layout.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/AddressAutocomplete.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/buildPayload.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepName.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/src/pages/portal/AccountCard.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/src/pages/portal/OAQuestionnaire.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/src/pages/portal/OaOwnersSections.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/src/lib/oaLimits.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/scripts/batch22-form-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/scripts/batch22-portal-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/server/batch22-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/package.json",
+      "mode": "code",
+      "control": true,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement and verify only the nine approved order-form and portal findings; preserve earlier fixes and decisions."
+    },
+    {
+      "path": "docs/audit/rulings.md",
+      "mode": "code",
+      "control": true,
+      "why": "Record Adam's explicit approval of the proposed100-owner capacity in Batch22 item8; no other ruling changes."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": []
+}

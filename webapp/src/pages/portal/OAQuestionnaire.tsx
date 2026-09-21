@@ -1,3 +1,4 @@
+import { MAX_OA_OWNERS } from "@/lib/oaLimits";
 import { agreementManagers, managerProblem } from "@/lib/oaManagers";
 import { OaManagersCard } from "./OaManagersCard";
 import { AgreementLoadError } from "./AgreementLoadError";
@@ -241,11 +242,15 @@ export default function OAQuestionnaire() {
 
   // Five agreements per company (Adam, 11 Sep 2026); the server refuses the same.
   const atCap = (data?.generations?.length ?? 0) >= 5;
-  const addOwner = () => patch({ members: [...(a.members ?? []), { name: "", address: "" }] });
+  const addOwner = () => {
+    if ((a.members?.length ?? 0) >= MAX_OA_OWNERS) return;
+    patch({ members: [...(a.members ?? []), { name: "", address: "" }] });
+  };
   // A suggested owner fills the first blank row, or a new one (Adam, 10 Sep 2026).
   const addOwnerWith = (s: { name: string; address: string; isEntity?: boolean }) => {
     const current = a.members ?? [];
     const blank = current.findIndex((m) => !(m.name ?? "").trim() && !(m.address ?? "").trim());
+    if (blank < 0 && current.length >= MAX_OA_OWNERS) return;
     const filled = { name: s.name, address: s.address, ...(s.isEntity ? { isEntity: true } : {}) };
     const next = blank >= 0 ? current.map((m, i) => (i === blank ? { ...m, ...filled } : m)) : [...current, filled];
     patch({ members: next });
@@ -365,7 +370,9 @@ export default function OAQuestionnaire() {
   // The answer and the list can disagree, and neither one silently wins: we
   // cannot know which the client meant, so we say so and refuse to generate.
   const ownerCountMismatch =
-    isMulti === (owners.length > 1)
+    owners.length > MAX_OA_OWNERS
+      ? `This questionnaire supports up to ${MAX_OA_OWNERS} owners. Remove the extra owners before generating.`
+      : isMulti === (owners.length > 1)
       ? ""
       : isMulti
         ? "You answered that the LLC has more than one owner. Add the other owners here."

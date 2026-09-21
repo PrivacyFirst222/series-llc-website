@@ -99980,7 +99980,57 @@ function selectedParty(party) {
 }
 
 // src/components/forms/florida-llc/buildPayload.ts
-function buildPayload(data) {
+function selectedFormData(source) {
+  const data = { ...source };
+  const conversion = data.filingPath === "CONVERT";
+  if (conversion) {
+    data.desiredLlcName = "";
+    data.llcDesignator = "";
+    data.alternateName1 = "";
+    data.alternateName2 = "";
+    data.nameCheck = void 0;
+    data.purposeType = "";
+    data.businessPurposeText = "";
+    data.requestedEffectiveDate = "";
+  } else {
+    data.existingLlcName = "";
+    data.sunbizDocumentNumber = "";
+  }
+  if (data.exactNameOnly) {
+    data.alternateName1 = "";
+    data.alternateName2 = "";
+  }
+  if (data.mailingSameAsPrincipal) data.mailingAddress = data.principalAddress;
+  data.managers = data.managementStructure === "MEMBER_MANAGED" ? [] : data.managers.map(selectedParty);
+  data.members = data.managementStructure === "MANAGER_MANAGED" ? [] : data.members.map(selectedParty);
+  if (data.purposeType === "GENERAL") data.businessPurposeText = "";
+  if (data.effectiveDateOption !== "SPECIFIC") data.requestedEffectiveDate = "";
+  if (conversion || data.articlesSignerChoice === "SERVICE") {
+    data.authorizedRepresentativeName = "";
+    data.authorizedRepresentativeTitle = "";
+    data.authorizedRepresentativeSignature = "";
+  }
+  data.authorizedRepresentativeEmail = "";
+  data.authorizedRepresentativePhone = "";
+  data.correspondentCompany = "";
+  data.correspondentPhone = "";
+  data.correspondentAddress = void 0;
+  if (data.registeredAgentChoice === "SERVICE") {
+    Object.assign(data, Object.fromEntries(Object.entries(raServicePatch()).filter(([, value]) => typeof value === "string")));
+  } else if (data.registeredAgentType === "ENTITY") {
+    data.registeredAgentFirstName = "";
+    data.registeredAgentLastName = "";
+    data.registeredAgentSuffix = "";
+  } else if (data.registeredAgentType === "INDIVIDUAL") data.registeredAgentBusinessEntityName = "";
+  if (conversion && data.registeredAgentChoice === "SELF") {
+    data.registeredAgentAcceptanceName = "";
+    data.registeredAgentElectronicSignature = "";
+    data.registeredAgentAcceptanceCapacity = "";
+  }
+  return data;
+}
+function buildPayload(source) {
+  const data = selectedFormData(source);
   const isConversion = data.filingPath === "CONVERT";
   const signsSelf = !isConversion && data.articlesSignerChoice === "SELF";
   const fees = calculateEstimatedFees({
@@ -100996,6 +101046,9 @@ async function unavailableNames(names) {
     return null;
   }
 }
+
+// src/lib/oaLimits.ts
+var MAX_OA_OWNERS = 100;
 
 // src/lib/oaManagers.ts
 function agreementManagers(seed, answers) {
@@ -106966,7 +107019,7 @@ var oaAnswersSchema = external_exports.object({
       signerName: external_exports.string().max(200).optional(),
       signerTitle: external_exports.string().max(120).optional()
     })
-  ).max(20).optional(),
+  ).max(MAX_OA_OWNERS).optional(),
   // Who signs for each Manager that is a company, in managerNames order.
   managerSigners: external_exports.array(external_exports.object({ name: external_exports.string().max(200).optional(), title: external_exports.string().max(120).optional() })).max(20).optional(),
   series: external_exports.array(
@@ -106987,7 +107040,7 @@ var oaAnswersSchema = external_exports.object({
       description: external_exports.string().max(400).optional(),
       kind: external_exports.enum(["cash", "other"]).optional(),
       value: external_exports.number().min(0).max(1e12).multipleOf(0.01).optional(),
-      contributedBy: external_exports.object({ mode: external_exports.enum(["equal", "shares"]).optional(), shares: external_exports.array(external_exports.number().min(0).max(100)).max(20).optional(), unitIds: external_exports.array(external_exports.string().max(100)).max(20).optional(), needsReview: external_exports.boolean().optional() }).optional(),
+      contributedBy: external_exports.object({ mode: external_exports.enum(["equal", "shares"]).optional(), shares: external_exports.array(external_exports.number().min(0).max(100)).max(MAX_OA_OWNERS).optional(), unitIds: external_exports.array(external_exports.string().max(100)).max(MAX_OA_OWNERS).optional(), needsReview: external_exports.boolean().optional() }).optional(),
       allocatedTo: external_exports.union([external_exports.literal("company"), external_exports.number().int().min(0).max(200)]).optional(),
       cashAllocations: external_exports.array(external_exports.number().min(0).max(1e12).multipleOf(0.01)).max(200).optional()
     })
@@ -107005,7 +107058,7 @@ var oaAnswersSchema = external_exports.object({
       // A backup may be a class ("my children in equal shares"), so no name rule.
       todBackup: external_exports.string().max(300).optional()
     })
-  ).max(10).optional()
+  ).max(MAX_OA_OWNERS / 2).optional()
 }).superRefine((a2, ctx) => {
   const n = a2.members?.length ?? 0;
   const ids = (a2.members ?? []).flatMap((m2) => m2.id ? [m2.id] : []);
@@ -107081,8 +107134,9 @@ async function clientLlcName(clientId, orderId) {
   );
   return rows[0]?.llc_name ?? "";
 }
+var COMPANY_NOT_FOUND = "We couldn\u2019t find that company in your account. Please select a company and try again.";
 async function resolveCompanyOrder(clientId, requested) {
-  await associateLegacyServices(clientId);
+  if (requested !== void 0 && !external_exports.string().uuid().safeParse(requested).success) return null;
   const db = await getDb();
   const rows = requested ? await db.query(
     "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
@@ -107091,7 +107145,9 @@ async function resolveCompanyOrder(clientId, requested) {
     "SELECT id FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at DESC NULLS LAST LIMIT 1",
     [clientId]
   );
-  return rows[0]?.id ?? null;
+  const id = rows[0]?.id ?? null;
+  if (id) await associateLegacyServices(clientId);
+  return id;
 }
 async function clientLlcFormed(clientId, orderId) {
   const db = await getDb();
@@ -107588,6 +107644,7 @@ function registerPortalRoutes(app2) {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const companyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    if (c.req.query("company") !== void 0 && !companyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
     const seed = await oaSeed(session.clientId, companyId);
     if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const db = await getDb();
@@ -107644,6 +107701,7 @@ function registerPortalRoutes(app2) {
     const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err(answersProblem(body.error), "INVALID_INPUT"), 400);
     const answersCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    if (c.req.query("company") !== void 0 && !answersCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
     if (!answersCompanyId) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const db = await getDb();
     const baseRaw = c.req.query("baseRev");
@@ -107681,6 +107739,7 @@ function registerPortalRoutes(app2) {
     if (!body.success) return c.json(err(answersProblem(body.error), "INVALID_INPUT"), 400);
     const a2 = body.data;
     const genCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    if (c.req.query("company") !== void 0 && !genCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
     const seed = await oaSeed(session.clientId, genCompanyId);
     if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const owners = effectiveOwners(seed.members, a2);
@@ -107985,11 +108044,13 @@ function registerPortalRoutes(app2) {
     if (!body.success) {
       const first = body.error.issues[0];
       const field = String(first?.path?.[0] ?? "");
+      if (field === "company") return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
       const tooBig = first?.code === "too_big";
       const msg = field === "seriesName" ? tooBig ? "The series name can be at most 300 characters." : "Enter the protected series name." : field === "seriesNumber" ? tooBig ? "The exhibit identifier can be at most 40 characters." : "Enter the exhibit identifier." : field === "effectiveDate" ? "Enter the effective date." : field === "specialTerms" ? "Special terms can be at most 2,000 characters." : field === "contribution" ? "The contribution can be at most 300 characters." : field === "purpose" ? "The purpose can be at most 600 characters." : "Series name, identifier, and date are required.";
       return c.json(err(msg, "INVALID_INPUT"), 400);
     }
     const consentCompanyId = await resolveCompanyOrder(session.clientId, body.data.company);
+    if (body.data.company !== void 0 && !consentCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
     const seed = await oaSeed(session.clientId, consentCompanyId);
     if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     if (!body.data.seriesName.trim().toLowerCase().startsWith(seed.llcName.trim().toLowerCase())) {
@@ -108127,6 +108188,7 @@ function registerPortalRoutes(app2) {
       return c.json(err("Type the changes, or choose to attach them as Exhibit A.", "INVALID_INPUT"), 400);
     }
     const amendCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    if (c.req.query("company") !== void 0 && !amendCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
     const seed = await oaSeed(session.clientId, amendCompanyId);
     if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const db = await getDb();
@@ -108227,9 +108289,10 @@ function registerPortalRoutes(app2) {
   app2.get("/portal/services", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
     const db = await getDb();
     const svcCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    if (c.req.query("company") !== void 0 && !svcCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
+    await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
     const orders = svcCompanyId ? await db.query(
       `SELECT ${SERVICE_SAFE_COLUMNS} FROM service_orders WHERE client_id = $1
            AND formation_order_id = $2 ORDER BY created_at DESC`,
@@ -108278,6 +108341,7 @@ function registerPortalRoutes(app2) {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    if (c.req.query("company") !== void 0 && !purchaseCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
     const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
     if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const gate = await sElectionEligibility(session.clientId, purchaseCompanyId);
@@ -108325,6 +108389,7 @@ function registerPortalRoutes(app2) {
       return c.json(err(message, "INVALID_INPUT"), 400);
     }
     const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    if (c.req.query("company") !== void 0 && !purchaseCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
     const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
     if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const suffix = body.data.suffix.trim().replace(/\s+/g, " ");
@@ -108384,6 +108449,7 @@ function registerPortalRoutes(app2) {
     if (!body.success) return c.json(err("Choose which document you need.", "INVALID_INPUT"), 400);
     const spec = CERT_TYPES[body.data.kind];
     const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    if (c.req.query("company") !== void 0 && !purchaseCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
     const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
     if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     if (!await clientLlcFormed(session.clientId, purchaseCompanyId)) {
@@ -108434,6 +108500,7 @@ function registerPortalRoutes(app2) {
     const body = external_exports.object({ target: external_exports.enum(["company", "series"]), seriesName: external_exports.string().max(300).optional() }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("Choose what the EIN is for.", "INVALID_INPUT"), 400);
     const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    if (c.req.query("company") !== void 0 && !purchaseCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
     const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
     if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     if (body.data.target === "series" && !body.data.seriesName?.trim()) {
@@ -108768,7 +108835,10 @@ function registerPortalRoutes(app2) {
     const newEmail = body.data.newEmail.toLowerCase();
     const db = await getDb();
     const rows = await db.query(
-      "SELECT email, password_hash FROM clients WHERE id = $1",
+      `SELECT email, password_hash, pending_email, xmin::text AS account_version,
+      COALESCE((SELECT string_agg(token_hash, ',' ORDER BY token_hash) FROM auth_tokens
+        WHERE client_id = clients.id AND purpose = 'verify_email' AND used_at IS NULL), '') AS verification_tokens
+      FROM clients WHERE id = $1`,
       [session.clientId]
     );
     const client = rows[0];
@@ -108783,22 +108853,38 @@ function registerPortalRoutes(app2) {
       return c.json(err("That address is already in use on another account.", "EMAIL_TAKEN"), 400);
     }
     const { token, tokenHash } = newToken();
-    await db.query("UPDATE clients SET pending_email = $1 WHERE id = $2", [newEmail, session.clientId]);
-    await db.query(
-      "UPDATE auth_tokens SET used_at = now() WHERE client_id = $1 AND purpose = 'verify_email' AND used_at IS NULL",
-      [session.clientId]
-    );
-    await db.query(
-      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at, payload) VALUES ($1, $2, 'verify_email', $3, $4)",
-      [tokenHash, session.clientId, new Date(Date.now() + 36e5).toISOString(), newEmail]
-    );
     const verify = verifyNewEmail(`${env.PUBLIC_BASE_URL}/portal/verify-email?token=${token}`);
-    sendMail({ to: newEmail, ...verify }).catch((e) => console.error("[account] verify email failed:", e));
-    const notice = emailChangeRequestedEmail(maskEmail(newEmail));
-    sendMail({ to: client.email, ...notice }).catch(
-      (e) => console.error("[account] change-requested notice failed:", e)
+    try {
+      await sendMail({ to: newEmail, ...verify });
+    } catch (e) {
+      console.error("[account] verify email failed:", e);
+      return c.json(err("We could not send the confirmation link. Please try again.", "EMAIL_SEND_FAILED"), 503);
+    }
+    const activated = await db.query(
+      `WITH changed AS (
+    UPDATE clients SET pending_email = $1 WHERE id = $2 AND password_hash = $3
+      AND pending_email IS NOT DISTINCT FROM $7 AND email = $8 AND xmin::text = $10
+      AND COALESCE((SELECT string_agg(token_hash, ',' ORDER BY token_hash) FROM auth_tokens
+        WHERE client_id = $2 AND purpose = 'verify_email' AND used_at IS NULL), '') = $9
+      AND EXISTS (SELECT 1 FROM sessions WHERE token_hash = $4 AND client_id = $2 AND expires_at > now())
+    RETURNING id
+  ), superseded AS (
+    UPDATE auth_tokens SET used_at = now() WHERE client_id IN (SELECT id FROM changed)
+      AND purpose = 'verify_email' AND used_at IS NULL RETURNING token_hash
+  ) INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at, payload)
+    SELECT $5, id, 'verify_email', $6, $1 FROM changed RETURNING token_hash`,
+      [newEmail, session.clientId, client.password_hash, session.tokenHash, tokenHash, new Date(Date.now() + 36e5).toISOString(), client.pending_email, client.email, client.verification_tokens, client.account_version]
     );
-    return c.json({ data: { ok: true, pendingEmail: newEmail } });
+    if (!activated.length) return c.json(err("This email change was cancelled. Request it again from your portal.", "EMAIL_CHANGE_CANCELLED"), 409);
+    let oldAddressNoticeSent = true;
+    const notice = emailChangeRequestedEmail(maskEmail(newEmail));
+    try {
+      await sendMail({ to: client.email, ...notice });
+    } catch (e) {
+      oldAddressNoticeSent = false;
+      console.error("[account] change-requested notice failed:", e);
+    }
+    return c.json({ data: { ok: true, pendingEmail: newEmail, oldAddressNoticeSent } });
   });
   app2.post("/auth/verify-email", async (c) => {
     const body = external_exports.object({ token: external_exports.string().min(10) }).safeParse(await c.req.json().catch(() => null));
@@ -108845,7 +108931,8 @@ function registerPortalRoutes(app2) {
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     const client = rows[0];
     const cancelBody = await c.req.json().catch(() => null);
-    const cancelCompanyId = await resolveCompanyOrder(session.clientId, typeof cancelBody?.company === "string" ? cancelBody.company : void 0);
+    const cancelCompanyId = await resolveCompanyOrder(session.clientId, cancelBody?.company);
+    if (cancelBody?.company !== void 0 && !cancelCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
     const orderRows = cancelCompanyId ? await db.query(
       "SELECT id, llc_name, payload, ra_renewal_date, ra_cancellation_requested_at FROM orders WHERE id = $1 AND client_id = $2",
       [cancelCompanyId, session.clientId]

@@ -1,0 +1,6 @@
+{"label":"B3-02 certification: setup/runtime completed","ok":false,"detail":"TimeoutError: click: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Provide details securely' }).first()\u001b[22m\n"}
+{"label":"B3-03 email feedback: setup/runtime completed","ok":false,"detail":"TimeoutError: click: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Change email', exact: true })\u001b[22m\n"}
+{"label":"B3-05 owner limit: setup/runtime completed","ok":false,"detail":"TimeoutError: click: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Continue', exact: true })\u001b[22m\n"}
+{"label":"B3-02/B3-03/B3-05 no browser runtime errors","ok":false,"detail":["TypeError: Cannot read properties of undefined (reading 'VITE_SMARTY_EMBEDDED_KEY')","TypeError: Cannot read properties of undefined (reading 'VITE_SMARTY_EMBEDDED_KEY')","TypeError: Cannot read properties of undefined (reading 'VITE_SMARTY_EMBEDDED_KEY')"]}
+{"label":"B3-02/B3-03/B3-05 all requests remain local","ok":true,"detail":[]}
+Batch22 portal: 1/5 checks passed

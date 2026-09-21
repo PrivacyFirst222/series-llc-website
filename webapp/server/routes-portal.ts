@@ -1,3 +1,4 @@
+import { MAX_OA_OWNERS } from "../src/lib/oaLimits";
 import { agreementManagers, managerProblem } from "../src/lib/oaManagers";
 import { ensureOwnersManual } from "./owners-manual";
 import { requestDocumentDeletion } from "./document-retention";
@@ -217,7 +218,7 @@ export const oaAnswersSchema = z.object({
         signerTitle: z.string().max(120).optional(),
       }),
     )
-    .max(20)
+    .max(MAX_OA_OWNERS)
     .optional(),
   // Who signs for each Manager that is a company, in managerNames order.
   managerSigners: z.array(z.object({ name: z.string().max(200).optional(), title: z.string().max(120).optional() })).max(20).optional(),
@@ -242,7 +243,7 @@ export const oaAnswersSchema = z.object({
         description: z.string().max(400).optional(),
         kind: z.enum(["cash", "other"]).optional(),
         value: z.number().min(0).max(1_000_000_000_000).multipleOf(0.01).optional(),
-        contributedBy: z.object({ mode: z.enum(["equal", "shares"]).optional(), shares: z.array(z.number().min(0).max(100)).max(20).optional(), unitIds: z.array(z.string().max(100)).max(20).optional(), needsReview: z.boolean().optional() }).optional(),
+        contributedBy: z.object({ mode: z.enum(["equal", "shares"]).optional(), shares: z.array(z.number().min(0).max(100)).max(MAX_OA_OWNERS).optional(), unitIds: z.array(z.string().max(100)).max(MAX_OA_OWNERS).optional(), needsReview: z.boolean().optional() }).optional(),
         allocatedTo: z.union([z.literal("company"), z.number().int().min(0).max(200)]).optional(),
         cashAllocations: z.array(z.number().min(0).max(1_000_000_000_000).multipleOf(0.01)).max(200).optional(),
       }),
@@ -264,7 +265,7 @@ export const oaAnswersSchema = z.object({
         todBackup: z.string().max(300).optional(),
       }),
     )
-    .max(10)
+    .max(MAX_OA_OWNERS / 2)
     .optional(),
 })
   // A couple must reference two DISTINCT, EXISTING owners, each in at most one
@@ -387,8 +388,11 @@ export async function clientLlcName(clientId: string, orderId?: string | null): 
 
 /** Resolve the ?company= parameter to one of the client's own paid orders —
  *  or their latest when absent, which is exactly the pre-tabs behavior. */
-export async function resolveCompanyOrder(clientId: string, requested: string | undefined): Promise<string | null> {
-  await associateLegacyServices(clientId);
+export const COMPANY_NOT_FOUND = "We couldn’t find that company in your account. Please select a company and try again.";
+export async function resolveCompanyOrder(clientId: string, requested: unknown): Promise<string | null> {
+  // Only omission chooses the default. An empty, malformed, unpaid or foreign
+  // selection must never become another company, even through a null fallback.
+  if (requested !== undefined && !z.string().uuid().safeParse(requested).success) return null;
   const db = await getDb();
   const rows = requested
     ? await db.query<{ id: string }>(
@@ -399,7 +403,9 @@ export async function resolveCompanyOrder(clientId: string, requested: string | 
         "SELECT id FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL ORDER BY paid_at DESC NULLS LAST LIMIT 1",
         [clientId],
       );
-  return rows[0]?.id ?? null;
+  const id = rows[0]?.id ?? null;
+  if (id) await associateLegacyServices(clientId);
+  return id;
 }
 
 /** Whether the client's LLC is formed — the Articles are in their portal.
@@ -1056,6 +1062,7 @@ app.get("/portal/oa", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const companyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+  if (c.req.query("company") !== undefined && !companyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
   const seed = await oaSeed(session.clientId, companyId);
   if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   const db = await getDb();
@@ -1130,6 +1137,7 @@ app.put("/portal/oa/answers", async (c) => {
   const body = oaAnswersSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json(err(answersProblem(body.error), "INVALID_INPUT"), 400);
   const answersCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+  if (c.req.query("company") !== undefined && !answersCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
   if (!answersCompanyId) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   const db = await getDb();
   // A revision, when the client supplies one, makes the write monotonic: an
@@ -1172,6 +1180,7 @@ app.post("/portal/oa/generate", async (c) => {
   if (!body.success) return c.json(err(answersProblem(body.error), "INVALID_INPUT"), 400);
   const a = body.data;
   const genCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+  if (c.req.query("company") !== undefined && !genCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
   const seed = await oaSeed(session.clientId, genCompanyId);
   if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   // The owners are a current answer, not a fixed reading of the formation
@@ -1557,6 +1566,7 @@ app.post("/portal/series/consent", async (c) => {
     // "Series name, identifier, and date are required.").
     const first = body.error.issues[0];
     const field = String(first?.path?.[0] ?? "");
+    if (field === "company") return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
     const tooBig = first?.code === "too_big";
     const msg =
       field === "seriesName" ? (tooBig ? "The series name can be at most 300 characters." : "Enter the protected series name.")
@@ -1570,6 +1580,7 @@ app.post("/portal/series/consent", async (c) => {
   }
 
   const consentCompanyId = await resolveCompanyOrder(session.clientId, body.data.company);
+  if (body.data.company !== undefined && !consentCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
   const seed = await oaSeed(session.clientId, consentCompanyId);
   if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
 
@@ -1727,6 +1738,7 @@ app.post("/portal/oa/amend", async (c) => {
     return c.json(err("Type the changes, or choose to attach them as Exhibit A.", "INVALID_INPUT"), 400);
   }
   const amendCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+  if (c.req.query("company") !== undefined && !amendCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
   const seed = await oaSeed(session.clientId, amendCompanyId);
   if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   const db = await getDb();
@@ -1837,9 +1849,10 @@ app.get("/portal/library/:key/download", async (c) => {
 app.get("/portal/services", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
   const db = await getDb();
   const svcCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+  if (c.req.query("company") !== undefined && !svcCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
+  await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
   const orders = svcCompanyId
     ? await db.query<{ id: string; type: string; status: string; details: unknown; fulfilled_at: unknown }>(
         `SELECT ${SERVICE_SAFE_COLUMNS} FROM service_orders WHERE client_id = $1
@@ -1895,6 +1908,7 @@ app.post("/portal/services/s-election", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+  if (c.req.query("company") !== undefined && !purchaseCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
   const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
   if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   const gate = await sElectionEligibility(session.clientId, purchaseCompanyId);
@@ -1954,6 +1968,7 @@ app.post("/portal/services/series", async (c) => {
     return c.json(err(message, "INVALID_INPUT"), 400);
   }
   const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+  if (c.req.query("company") !== undefined && !purchaseCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
   const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
   if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   const suffix = body.data.suffix.trim().replace(/\s+/g, " ");
@@ -2021,6 +2036,7 @@ app.post("/portal/services/certificate", async (c) => {
   if (!body.success) return c.json(err("Choose which document you need.", "INVALID_INPUT"), 400);
   const spec = CERT_TYPES[body.data.kind];
   const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+  if (c.req.query("company") !== undefined && !purchaseCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
   const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
   if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   if (!(await clientLlcFormed(session.clientId, purchaseCompanyId))) {
@@ -2078,6 +2094,7 @@ app.post("/portal/services/ein", async (c) => {
     .safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json(err("Choose what the EIN is for.", "INVALID_INPUT"), 400);
   const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+  if (c.req.query("company") !== undefined && !purchaseCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
   const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
   if (!llcName) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   if (body.data.target === "series" && !body.data.seriesName?.trim()) {
@@ -2471,8 +2488,11 @@ app.post("/portal/account/email", async (c) => {
   }
   const newEmail = body.data.newEmail.toLowerCase();
   const db = await getDb();
-  const rows = await db.query<{ email: string; password_hash: string | null }>(
-    "SELECT email, password_hash FROM clients WHERE id = $1",
+  const rows = await db.query<{ email: string; password_hash: string | null; pending_email: string | null; verification_tokens: string; account_version: string }>(
+    `SELECT email, password_hash, pending_email, xmin::text AS account_version,
+      COALESCE((SELECT string_agg(token_hash, ',' ORDER BY token_hash) FROM auth_tokens
+        WHERE client_id = clients.id AND purpose = 'verify_email' AND used_at IS NULL), '') AS verification_tokens
+      FROM clients WHERE id = $1`,
     [session.clientId],
   );
   const client = rows[0];
@@ -2487,27 +2507,45 @@ app.post("/portal/account/email", async (c) => {
     return c.json(err("That address is already in use on another account.", "EMAIL_TAKEN"), 400);
   }
   const { token, tokenHash } = newToken();
-  await db.query("UPDATE clients SET pending_email = $1 WHERE id = $2", [newEmail, session.clientId]);
-  // A new request supersedes every outstanding verification link: an unused
-  // older token must not survive, or the link sent to inbox A could confirm
-  // the address requested later (AUTH-EMAIL-001).
-  await db.query(
-    "UPDATE auth_tokens SET used_at = now() WHERE client_id = $1 AND purpose = 'verify_email' AND used_at IS NULL",
-    [session.clientId],
-  );
-  await db.query(
-    "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at, payload) VALUES ($1, $2, 'verify_email', $3, $4)",
-    [tokenHash, session.clientId, new Date(Date.now() + 3600_000).toISOString(), newEmail],
-  );
-  // The link goes to the new address; the old address gets a warning at the
-  // same moment, so a hijacker cannot move an account silently.
+  // A rejected send must not supersede an earlier usable request or claim that
+  // a link is on its way. Activate the new request only after acceptance.
   const verify = verifyNewEmail(`${env.PUBLIC_BASE_URL}/portal/verify-email?token=${token}`);
-  sendMail({ to: newEmail, ...verify }).catch((e) => console.error("[account] verify email failed:", e));
+  try {
+    await sendMail({ to: newEmail, ...verify });
+  } catch (e) {
+    console.error("[account] verify email failed:", e);
+    return c.json(err("We could not send the confirmation link. Please try again.", "EMAIL_SEND_FAILED"), 503);
+  }
+  // The send may take time. A password change or revoked session during that
+  // wait must still cancel the request. A newer successful request also wins,
+  // including a resend to the same address. The row version also protects
+  // simultaneous activations whose subqueries share an older SQL snapshot.
+  // Supersession and address-bound token
+  // creation happen in the same statement, and only for this valid session.
+  const activated = await db.query(`WITH changed AS (
+    UPDATE clients SET pending_email = $1 WHERE id = $2 AND password_hash = $3
+      AND pending_email IS NOT DISTINCT FROM $7 AND email = $8 AND xmin::text = $10
+      AND COALESCE((SELECT string_agg(token_hash, ',' ORDER BY token_hash) FROM auth_tokens
+        WHERE client_id = $2 AND purpose = 'verify_email' AND used_at IS NULL), '') = $9
+      AND EXISTS (SELECT 1 FROM sessions WHERE token_hash = $4 AND client_id = $2 AND expires_at > now())
+    RETURNING id
+  ), superseded AS (
+    UPDATE auth_tokens SET used_at = now() WHERE client_id IN (SELECT id FROM changed)
+      AND purpose = 'verify_email' AND used_at IS NULL RETURNING token_hash
+  ) INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at, payload)
+    SELECT $5, id, 'verify_email', $6, $1 FROM changed RETURNING token_hash`,
+    [newEmail, session.clientId, client.password_hash, session.tokenHash, tokenHash, new Date(Date.now() + 3600_000).toISOString(), client.pending_email, client.email, client.verification_tokens, client.account_version]);
+  if (!activated.length) return c.json(err("This email change was cancelled. Request it again from your portal.", "EMAIL_CHANGE_CANCELLED"), 409);
+
+  let oldAddressNoticeSent = true;
   const notice = emailChangeRequestedEmail(maskEmail(newEmail));
-  sendMail({ to: client.email, ...notice }).catch((e) =>
-    console.error("[account] change-requested notice failed:", e),
-  );
-  return c.json({ data: { ok: true, pendingEmail: newEmail } });
+  try {
+    await sendMail({ to: client.email, ...notice });
+  } catch (e) {
+    oldAddressNoticeSent = false;
+    console.error("[account] change-requested notice failed:", e);
+  }
+  return c.json({ data: { ok: true, pendingEmail: newEmail, oldAddressNoticeSent } });
 });
 
 app.post("/auth/verify-email", async (c) => {
@@ -2571,7 +2609,8 @@ app.post("/portal/registered-agent/cancel", async (c) => {
   // recorded on that company, and the client record is marked too so the
   // office's chip keeps working.
   const cancelBody = (await c.req.json().catch(() => null)) as { company?: string } | null;
-  const cancelCompanyId = await resolveCompanyOrder(session.clientId, typeof cancelBody?.company === "string" ? cancelBody.company : undefined);
+  const cancelCompanyId = await resolveCompanyOrder(session.clientId, cancelBody?.company);
+  if (cancelBody?.company !== undefined && !cancelCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
   const orderRows = cancelCompanyId
     ? await db.query<{ id: string; llc_name: string; payload: unknown; ra_renewal_date: unknown; ra_cancellation_requested_at: string | null }>(
         "SELECT id, llc_name, payload, ra_renewal_date, ra_cancellation_requested_at FROM orders WHERE id = $1 AND client_id = $2",

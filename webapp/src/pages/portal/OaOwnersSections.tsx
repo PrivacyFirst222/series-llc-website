@@ -3,6 +3,7 @@
 // OAQuestionnaire.tsx on 29 Aug 2026 so their contracts are explicit props
 // instead of closures over an 880-line component. The pairing pickers own
 // their local selection state; committing a pair goes through onPair.
+import { MAX_OA_OWNERS } from "@/lib/oaLimits";
 import { useEffect, useState } from "react";
 import { Heart, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,8 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
 }) {
   // Suggestions show while another owner can still be added: any time the
   // company has more than one owner, or while the only row is blank.
+  const atOwnerLimit = owners.length >= MAX_OA_OWNERS;
+  const hasBlankOwner = owners.some((m) => !(m.name ?? "").trim() && !(m.address ?? "").trim());
   const noNamedOwner = !owners.some((m) => (m.name ?? "").trim());
   const showSuggestions = suggestions.length > 0 && !!addOwnerWith && (isMulti || noNamedOwner);
   // The same soft USPS check the wizard runs on Continue, run here when the
@@ -100,6 +103,7 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
                 come from your order and may include the order contact or managers. Confirm the actual
                 owners, adding, removing or changing names and addresses as needed.
               </p>
+              {isMulti ? <p className="text-xs text-muted-foreground">You can list up to {MAX_OA_OWNERS} owners in this questionnaire.</p> : null}
               {owners.map((m, i) => (
                 <div key={i} className="space-y-2 rounded-lg border border-border bg-secondary/30 p-3">
                   <div className="flex items-center justify-between gap-3">
@@ -217,7 +221,7 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
                 <div className="flex flex-wrap items-center gap-2" data-testid="suggested-owners">
                   <span className="text-xs text-muted-foreground">From your order:</span>
                   {suggestions.map((s) => (
-                    <Button key={s.name} type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addOwnerWith?.(s)}>
+                    <Button key={s.name} type="button" variant="outline" size="sm" className="rounded-full" disabled={atOwnerLimit && !hasBlankOwner} onClick={() => addOwnerWith?.(s)}>
                       <Plus className="mr-1.5 h-3.5 w-3.5" />
                       Add {s.name}
                     </Button>
@@ -225,11 +229,12 @@ export function OwnersCard({ owners, isMulti, ownerCountMismatch, patchMember, r
                 </div>
               ) : null}
               {isMulti ? (
-                <Button type="button" variant="outline" size="sm" className="rounded-full" onClick={addOwner}>
+                <Button type="button" variant="outline" size="sm" className="rounded-full" disabled={atOwnerLimit} onClick={addOwner}>
                   <Plus className="mr-1.5 h-3.5 w-3.5" />
                   Add owner
                 </Button>
               ) : null}
+              {isMulti && atOwnerLimit ? <p role="status" className="text-xs text-muted-foreground">The {MAX_OA_OWNERS}-owner limit has been reached. Remove an owner before adding another.</p> : null}
               {ownerCountMismatch ? (
                 <p className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive">
                   {ownerCountMismatch}

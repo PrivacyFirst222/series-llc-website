@@ -1,0 +1,11 @@
+{
+  "records": 365,
+  "other_items_unchanged": 356,
+  "prior_batch_records_unchanged": 31,
+  "new_batch_implemented": 9,
+  "new_findings_part_states": {
+    "open": 15,
+    "implemented": 16
+  },
+  "approved_rulings_appended": 1
+}

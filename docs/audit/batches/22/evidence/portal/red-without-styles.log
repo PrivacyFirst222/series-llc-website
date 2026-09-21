@@ -1,0 +1,25 @@
+{"label":"B3-02 first application can be certified","ok":true}
+{"label":"B3-02 reopening same application clears certification","ok":false}
+{"label":"B3-02 reopening preserves nonsensitive answers","ok":true}
+{"label":"B3-02 different application is not certified","ok":false}
+{"label":"B3-02 different application cannot submit before certification","ok":false}
+{"label":"B3-02 different application does not receive prior answers","ok":true}
+{"label":"B3-03 failure leaves same dialog and email for retry","ok":true}
+{"label":"B3-03 failure does not promise inbox delivery","ok":true}
+{"label":"B3-03 same request can retry immediately","ok":true}
+{"label":"B3-03 old-address notice failure is disclosed separately","ok":false}
+{"label":"B3-03 sign-in email remains unchanged before confirmation","ok":true}
+{"label":"B3-03 successful retry clears previous warning","ok":true}
+{"label":"B3-05 ninety-nine owners still permits owner100","ok":true}
+{"label":"B3-05 owner100 is editable","ok":true}
+{"label":"B3-05 blank Add owner cannot create101","ok":false}
+{"label":"B3-05 owner capacity explained before entry","ok":false}
+{"label":"B3-05 suggestion fills existing blank100","ok":true}
+{"label":"B3-05 save includes all100 owners","ok":true}
+{"label":"B3-05 suggestion cannot append101 when all rows filled","ok":false}
+{"label":"B3-05 full100 owner contribution allocations all render","ok":true}
+{"label":"B3-05 full100 allocations survive save payload","ok":true}
+{"label":"B3-05 generation submits all100 owners and allocations","ok":true}
+{"label":"B3-02/B3-03/B3-05 no browser runtime errors","ok":true,"detail":[]}
+{"label":"B3-02/B3-03/B3-05 all requests remain local","ok":true,"detail":[]}
+Batch22 portal: 17/24 checks passed

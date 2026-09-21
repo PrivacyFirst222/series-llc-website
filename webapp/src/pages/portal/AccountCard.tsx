@@ -24,6 +24,7 @@ export function AccountCard({ email, pendingEmail }: AccountCardProps) {
   const [emailOpen, setEmailOpen] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState("");
+  const [emailNoticeWarning, setEmailNoticeWarning] = useState("");
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["portal-me"] });
 
@@ -41,10 +42,13 @@ export function AccountCard({ email, pendingEmail }: AccountCardProps) {
 
   const changeEmail = useMutation({
     mutationFn: (b: { newEmail: string; currentPassword: string }) =>
-      api.post<{ pendingEmail: string }>("/api/portal/account/email", b),
+      api.post<{ pendingEmail: string; oldAddressNoticeSent: boolean }>("/api/portal/account/email", b),
     onSuccess: (res) => {
       setEmailOpen(false);
       setDone(`Check ${res.pendingEmail} for a confirmation link. Your address changes only after you confirm it.`);
+      setEmailNoticeWarning(res.oldAddressNoticeSent === false
+        ? "The confirmation link was sent, but we could not send the security notice to your current address. You can retry by choosing Change email and sending the request again."
+        : "");
       setError("");
       refresh();
     },
@@ -77,7 +81,7 @@ export function AccountCard({ email, pendingEmail }: AccountCardProps) {
             variant="outline"
             size="sm"
             className="shrink-0 self-start rounded-full sm:self-auto"
-            onClick={() => { setEmailOpen(true); setError(""); setDone(""); }}
+            onClick={() => { setEmailOpen(true); setError(""); setDone(""); setEmailNoticeWarning(""); }}
           >
             <Mail className="mr-1.5 h-3.5 w-3.5" />
             Change email
@@ -103,6 +107,7 @@ export function AccountCard({ email, pendingEmail }: AccountCardProps) {
         </div>
 
         {done ? <p className="text-sm text-trust">{done}</p> : null}
+        {emailNoticeWarning ? <p role="status" className="text-sm text-amber-700">{emailNoticeWarning}</p> : null}
       </div>
 
       {/* Change password */}
@@ -160,7 +165,8 @@ export function AccountCard({ email, pendingEmail }: AccountCardProps) {
             <DialogTitle>Change your email address</DialogTitle>
             <DialogDescription>
               We'll send a confirmation link to the new address — your account changes only after
-              you click it. Your current address is notified at the same time.
+              you click it. We also attempt to send a security notice to your current address
+              and tell you if that notice could not be sent.
             </DialogDescription>
           </DialogHeader>
           <form

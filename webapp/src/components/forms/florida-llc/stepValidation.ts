@@ -1,4 +1,5 @@
 import { englishTextProblems } from "@/lib/englishText";
+import { selectedFormData } from "./buildPayload";
 import { stepForField } from "./steps";
 import { postalCodeError } from "./addressValidation";
 import { registeredAgentName } from "./registeredAgent";
@@ -21,8 +22,9 @@ export type StepErrors = Record<string, string>;
 
 export function validateStep(
   step: StepKey,
-  data: FloridaLLCFormData,
+  source: FloridaLLCFormData,
 ): StepErrors {
+  const data = selectedFormData(source);
   const e: StepErrors = {};
 
   if (step === "path") {

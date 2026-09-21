@@ -40,6 +40,28 @@ export function AddressAutocomplete({
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const abortRef = useRef<AbortController | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const generationRef = useRef(0);
+  const latestTextRef = useRef(value);
+
+  const cancelQuery = () => {
+    generationRef.current++;
+    clearTimeout(debounceRef.current);
+    abortRef.current?.abort();
+    abortRef.current = null;
+  };
+
+  // A parent may replace the address (a saved address or selection) without
+  // typing in this input. Those replacements invalidate pending work too.
+  useEffect(() => {
+    if (latestTextRef.current !== value) {
+      latestTextRef.current = value;
+      cancelQuery();
+      setSuggestions([]);
+      setOpen(false);
+      setHighlight(-1);
+    }
+  }, [value]);
+  useEffect(() => () => cancelQuery(), []);
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
@@ -50,15 +72,19 @@ export function AddressAutocomplete({
   }, []);
 
   const query = (text: string) => {
+    cancelQuery();
+    latestTextRef.current = text;
+    const generation = generationRef.current;
+    setSuggestions([]);
+    setOpen(false);
+    setHighlight(-1);
     onChangeText(text);
     if (!SMARTY_KEY || text.trim().length < 4) {
       setSuggestions([]);
       setOpen(false);
       return;
     }
-    clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
-      abortRef.current?.abort();
       const controller = new AbortController();
       abortRef.current = controller;
       try {
@@ -77,6 +103,7 @@ export function AddressAutocomplete({
             entries?: number;
           }[];
         };
+        if (controller.signal.aborted || generation !== generationRef.current) return;
         const seen = new Set<string>();
         const next = (body.suggestions ?? [])
           .map((a) => {
@@ -106,6 +133,9 @@ export function AddressAutocomplete({
   };
 
   const choose = (s: AddressSuggestion) => {
+    cancelQuery();
+    latestTextRef.current = s.address1;
+    setHighlight(-1);
     setOpen(false);
     setSuggestions([]);
     onSelect(s);

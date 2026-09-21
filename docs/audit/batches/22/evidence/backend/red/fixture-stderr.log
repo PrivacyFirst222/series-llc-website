@@ -1,0 +1,730 @@
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: "bad-id"
+     length: 138,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", "bad-id"
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[api] 1 | import{b as ne,e as r,f as h,g as d,h as p,i as re,j as y}from"./chunk-QY3QWFKW.js";var yn={};ne(yn,{ABSTIME:()=>Et,ACLITEM:()=>Ut,BIT:()=>Qt,BOOL:()=>ye,BPCHAR:()=>ve,BYTEA:()=>he,CHAR:()=>bt,CID:()=>St,CIDR:()=>Rt,CIRCLE:()=>Nt,DATE:()=>ze,FLOAT4:()=>Qe,FLOAT8:()=>_e,GTSVECTOR:()=>nn,INET:()=>Ot,INT2:()=>Ve,INT4:()=>Fe,INT8:()=>be,INTERVAL:()=>Ft,JSON:()=>we,JSONB:()=>Ye,MACADDR:()=>kt,MACADDR8:()=>Pt,MONEY:()=>Lt,NUMERIC:()=>vt,OID:()=>Ge,PATH:()=>xt,PG_DEPENDENCIES:()=>Zt,PG_LSN:()=>$t,PG_NDISTINCT:()=>Xt,PG_NODE_TREE:()=>Dt,POLYGON:()=>Mt,REFCURSOR:()=>Ht,REGCLASS:()=>jt,REGCONFIG:()=>rn,REGDICTIONARY:()=>sn,REGNAMESPACE:()=>an,REGOPER:()=>qt,REGOPERATOR:()=>Yt,REGPROC:()=>gt,REGPROCEDURE:()=>zt,REGROLE:()=>on,REGTYPE:()=>Wt,RELTIME:()=>Ct,SMGR:()=>It,TEXT:()=>ge,TID:()=>wt,TIME:()=>Vt,TIMESTAMP:()=>qe,TIMESTAMPTZ:()=>Ae,TIMETZ:()=>Gt,TINTERVAL:()=>Tt,TSQUERY:()=>tn,TSVECTOR:()=>en,TXID_SNAPSHOT:()=>Jt,UUID:()=>Kt,VARBIT:()=>_t,VARCHAR:()=>He,XID:()=>At,XML:()=>Bt,arrayParser:()=>mn,arraySerializer:()=>W
+
+error: invalid input syntax for type uuid: " "
+     length: 133,
+   severity: "ERROR",
+     detail: undefined,
+       hint: undefined,
+   position: undefined,
+ internalPosition: undefined,
+ internalQuery: undefined,
+      where: "unnamed portal parameter $2 = '...'",
+     schema: undefined,
+      table: undefined,
+   dataType: undefined,
+ constraint: undefined,
+       file: "uuid.c",
+    routine: "string_to_uuid",
+      query: "SELECT id FROM orders WHERE client_id = $1 AND id = $2 AND paid_at IS NOT NULL",
+     params: [
+  "ad5d5682-cda8-4466-88d4-56339ba5e459", " "
+],
+ queryOptions: undefined,
+       code: "22P02"
+
+      at Ue (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17963)
+      at parse (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:52)
+      at qe (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:298)
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at unknown:1:1
+      at execProtocolRawSync (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/@electric-sql/pglite/dist/index.js:1:152)
+
+[account] verify email failed: 57 |     }),
+58 |   });
+59 |   if (!res.ok) {
+60 |     const body = await res.text();
+61 |     await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));
+62 |     throw new Error(`Resend ${res.status}: ${body}`);
+                   ^
+error: Resend 503: fixture refusal
+      at sendMail (/private/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/batch22-red-baseline-dqlc11wp/webapp/server/email.ts:62:15)
+
+[account] verify email failed: 60 |     const body = await res.text();
+61 |     await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));
+62 |     throw new Error(`Resend ${res.status}: ${body}`);
+63 |   }
+64 |   const accepted = (await res.json().catch(() => null)) as { id?: string } | null;
+65 |   if (!accepted?.id) {await recordMail(mail,false,null,"Email provider did not confirm acceptance");throw new Error("Email provider did not confirm acceptance");}
+                                                                                                                   ^
+error: Email provider did not confirm acceptance
+      at sendMail (/private/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/batch22-red-baseline-dqlc11wp/webapp/server/email.ts:65:111)
+
+[account] change-requested notice failed: 57 |     }),
+58 |   });
+59 |   if (!res.ok) {
+60 |     const body = await res.text();
+61 |     await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));
+62 |     throw new Error(`Resend ${res.status}: ${body}`);
+                   ^
+error: Resend 503: fixture refusal
+      at sendMail (/private/var/folders/2k/xc2djyxn081bmbwwn467__140000gn/T/batch22-red-baseline-dqlc11wp/webapp/server/email.ts:62:15)
+

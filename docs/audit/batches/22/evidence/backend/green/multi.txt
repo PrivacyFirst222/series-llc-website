@@ -1,0 +1,1933 @@
+                                     OPERATING AGREEMENT
+                                                                OF
+
+                                               Selected Company LLC
+
+            A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
+                      (Manager-Managed — Multiple Members / Partnership Taxation)
+THIS OPERATING AGREEMENT (this "Agreement") of Selected Company LLC, a Florida protected
+series limited liability company (the "Company"), is made and entered into effective as of September 20,
+2026 (the "Effective Date"), by and among the undersigned members (each a "Member" and collectively
+the "Members") and is acknowledged by the undersigned manager (the "Manager").
+
+RECITALS
+A. The Company was formed as a Florida limited liability company by the filing of Articles of
+Organization with the Florida Department of State, Division of Corporations (the "Department").
+B. The Company is a protected series limited liability company within the meaning of ss.
+605.2101–605.2802, Florida Statutes, having designated, or intending to designate, one or more protected
+series by filing one or more Protected Series Designations with the Department.
+C. The Members intend by this Agreement to set forth the terms governing the Company, each Protected
+Series designated by the Company, and the relations among the Company, each Protected Series, the
+Members, and the Manager.
+NOW, THEREFORE, the Members adopt the following as the operating agreement of the Company and
+of each Protected Series:
+
+ARTICLE 1 — THE COMPANY
+1.1 Definitions. Capitalized terms have the meanings set forth in Article 2 or in the Section in which they
+are used.
+1.2 Formation; Status as Protected Series LLC. The Company is a limited liability company organized
+under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the
+"Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and
+shall be identified in its records and dealings as, a protected series limited liability company governed by
+the Act, including ss. 605.2101–605.2802 (the "Protected Series Provisions"). If at any time no Protected
+Series of the Company is in existence, the Company shall continue as a Florida limited liability company
+governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected
+Series Designation is filed.
+1.3 Name; Names of Protected Series. The name of the Company is Selected Company LLC. The
+name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series
+Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to
+conform the name of each Protected Series.
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                         Page 1 of 39
+1.4 Purposes and Powers. The purpose of the Company, and of each Protected Series, is to engage in
+any lawful business, purpose, or activity for which limited liability companies may be organized under
+the Act, together with any additional purpose set forth in the Articles of Organization and, as to a
+Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is
+cumulative and does not limit the general purpose stated in this Section. The Company, and each
+Protected Series in its own name, shall have all powers conferred by the Act, including with respect to
+each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease,
+encumber, and convey real, personal, and intangible property; to grant liens and security interests in its
+Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to
+conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+1.5 Principal Office. The principal office of the Company is 100 Main Street, Miami, FL, 33101, or such
+other place as the Manager may determine. A Protected Series may maintain its own place of business as
+determined by its Protected Series Manager.
+1.6 Registered Agent and Registered Office. The registered agent and registered office of the Company
+shall be as stated in the records of the Department. As required by the Act, the registered agent and
+registered office of the Company shall also serve as the registered agent and registered office for each
+Protected Series. Service of process, notice, or demand on a Protected Series may be made as provided by
+law, including s. 48.062, Florida Statutes.
+1.7 Term. The Company's existence is perpetual unless the Company is dissolved and wound up in
+accordance with this Agreement and the Act. No Protected Series may have a duration extending beyond
+the existence of the Company.
+1.8 Location of Records. The records of the Company and of each Protected Series — including the
+records required by Article 8 — shall be maintained at the Company's principal office or at such other
+location (including secure electronic storage) as the Manager determines, and shall at all times be
+retrievable in perceivable form.
+1.9 Filings. The Manager shall execute and cause to be filed with the Department all records the Act
+requires or permits, including Protected Series Designations, amendments thereto, statements of change,
+annual reports, and statements of dissolution, and shall take all other action necessary to maintain the
+Company and each Protected Series in good standing.
+1.10 How Assets Are Associated. An asset becomes an Associated Asset of a Protected Series, or of the
+Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
+1.11 Waiver of Partition Rights. Each Member irrevocably waives any right to maintain an action for
+partition or any similar action with respect to any property of the Company or of any Protected Series.
+
+ARTICLE 2 — DEFINITIONS
+2.1 "Act" means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida
+Statutes, as amended, including the Protected Series Provisions.
+2.2 "Associated Asset" means an asset of a Protected Series, or of the Company, that satisfies the
+recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
+2.3 "Associated Liability" means a liability incurred by, contracted for, or otherwise existing with
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                         Page 2 of 39
+respect to a particular Protected Series or the Company, as reflected in the records maintained under
+Article 8.
+2.4 "Associated Member" has the meaning given in s. 605.2302, Florida Statutes — a member of the
+Company whom an operating agreement designates as an associated member of a Protected Series. This
+Agreement designates none: no Protected Series established under it has an Associated Member, and each
+Protected Series is owned by the Company as provided in Section 3.6 and managed as provided in
+Section 5.2.
+2.5 "Company" means Selected Company LLC.
+2.6 "Immediate Family Member" means, as to any Member, (a) any ancestor of that Member or
+descendant of a grandparent of that Member (each an "Individual Family Member," and including persons
+legally adopted before age 18), or (b) a trust or other entity for the benefit of one or more Individual
+Family Members, provided all beneficial interests in that entity are held by such persons; a trust is not
+excluded merely because a remainder beneficiary is not an Individual Family Member.
+2.7 "Incapacitated" means, as to any person, that (a) a court of competent jurisdiction has determined
+the person to be incapacitated or has appointed a guardian of the person's property, or (b) two licensed
+physicians have certified in writing that the person is unable to manage the person's financial affairs. A
+person ceases to be Incapacitated upon a court order restoring capacity or a written certification by two
+licensed physicians that the person is again able to manage the person's financial affairs.
+2.8 "Involuntary Transfer" means any Transfer by which a Member or transferee is deprived or
+divested of any right, title, or interest in a Membership Interest other than voluntarily, including (a) a
+Transfer to or for the benefit of a judgment creditor pursuant to court order, subject in all events to
+Section 10.6, (b) a Transfer in connection with reorganization, insolvency, bankruptcy, or receivership,
+(c) a Transfer to a public officer or agency under any abandoned-property or escheat law, and (d) a
+Transfer to a spouse or former spouse in connection with dissolution of marriage or marital separation.
+2.9 "Majority in Interest" means one or more Members holding, in the aggregate, more than fifty
+percent (50%) of the Percentage Interests then held by Members, excluding for all purposes any
+Percentage Interest held by a transferee, assignee, beneficiary, or holder of a charging order who has not
+been admitted as a Member.
+2.10 "Manager" means the person named in Section 5.1 and any successor designated under this
+Agreement.
+2.11 "Member" means each person identified as a member on Exhibit A and each person admitted as a
+member in accordance with this Agreement, in each case until dissociated.
+2.12 "Membership Interest" means a Member's entire interest in the Company, including the Member's
+interest in capital, profits, and distributions of the Company, and all rights of a member under the Act and
+this Agreement.
+2.13 "Percentage Interest" means, as to each Member, the percentage or fractional interest set forth for
+that Member on Exhibit A, as adjusted from time to time under this Agreement. Membership interests are
+of a single class.
+2.14 "Protected Series" or "PS" means a protected series of the Company established under s.
+605.2201, Florida Statutes, and identified in a Series Exhibit.
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                         Page 3 of 39
+2.15 "Protected Series Designation" means a designation of a protected series filed with the Department
+under s. 605.2201, Florida Statutes, as amended from time to time.
+2.16 "Protected Series Manager" means the person responsible for management of a Protected Series
+under Section 5.2.
+2.17 "Series Exhibit" means, for each Protected Series, the exhibit to this Agreement (each numbered
+PS-1, PS-2, and so on) setting forth the terms specific to that Protected Series, including its purpose, its
+capital, and its Associated Assets. Each Series Exhibit is a part of this Agreement.
+2.18 "Transfer" means any assignment, transfer, conveyance, devise, gift, pledge, hypothecation,
+encumbrance, or other disposition, direct or indirect, voluntary or involuntary, in trust or otherwise, and
+as a verb has a corresponding meaning.
+
+ARTICLE 3 — PROTECTED SERIES
+3.1 Establishment. With the affirmative vote or consent of all Members, the Company may establish one
+or more Protected Series by causing a Protected Series Designation to be signed and filed with the
+Department as provided in s. 605.2201, Florida Statutes. At or before the filing of each Protected Series
+Designation, the Members and the Manager shall adopt a Series Exhibit for the new Protected Series. The
+Manager is authorized to execute and file each Protected Series Designation approved under this Section.
+Each Protected Series shall be established without Associated Members.
+3.2 Status of Each Protected Series. As provided by the Act, each Protected Series:
+(a) is a "person" for purposes of the Act and the Uniform Commercial Code, distinct from the Company,
+from every other Protected Series, from each Member, and from the Manager;
+(b) may, in its own name, conduct any activity in furtherance of its purpose, exercise the powers
+described in Section 1.4, and sue and be sued;
+(c) is not a separate legal entity capable of existing independently of the Company, may not be a member
+of the Company, may not itself designate a protected series, and may not merge, convert, domesticate, or
+engage in an interest exchange except as ss. 605.2602 and 605.2605–605.2607, Florida Statutes, permit;
+and
+(d) shall be governed by this Agreement, applied to that Protected Series as though the Protected Series
+were a separate limited liability company, except as its Series Exhibit expressly provides otherwise and
+except as the Act requires otherwise.
+3.3 Limitation of Liability Among Series (Statutory Shields). Consistent with s. 605.2401, Florida
+Statutes:
+(a) A debt, obligation, or other liability of the Company is solely the debt, obligation, or liability of the
+Company, and is enforceable only against the Associated Assets of the Company;
+(b) A debt, obligation, or other liability of a Protected Series is solely the debt, obligation, or liability of
+that Protected Series, and is enforceable only against the Associated Assets of that Protected Series;
+(c) No Protected Series is liable for, and the Associated Assets of a Protected Series are not available to
+satisfy, any debt, obligation, or liability of the Company or of any other Protected Series; and the
+Company is not liable for, and the Associated Assets of the Company are not available to satisfy, any
+debt, obligation, or liability of any Protected Series; and
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                             Page 4 of 39
+(d) No Member and no Manager is personally liable, directly or indirectly, by way of contribution or
+otherwise, for any debt, obligation, or liability of the Company or of any Protected Series solely by reason
+of being or acting as a member, manager, or protected-series manager.
+3.4 Dissolution of a Protected Series Distinguished. The dissolution and winding up of a Protected
+Series does not, by itself, cause the dissolution of the Company or of any other Protected Series. The
+dissolution of the Company causes the dissolution of every Protected Series, and the winding up of the
+Company is not complete until each Protected Series is wound up.
+3.5 Series Exhibits Control Series Terms. The terms specific to each Protected Series — including its
+name, purpose, Protected Series Manager, capital, and any variations from the default rules of this
+Agreement — are set forth in its Series Exhibit. In the event of a conflict between a Series Exhibit and
+this Agreement with respect to the Protected Series to which the Series Exhibit relates, the Series Exhibit
+controls, except that no Series Exhibit may vary a provision of the Act that may not be varied by an
+operating agreement (see s. 605.2107, Florida Statutes) or the provisions of Article 8.
+3.6 Company as Owner.
+(a) Ownership. The Company owns all of the protected-series transferable interests of each Protected
+Series, as provided in s. 605.2303(1)-(3), Florida Statutes. Every distribution made by a Protected Series
+is made to the Company.
+(b) Transferee provisions inapplicable to the Company. Section 605.2303(4), Florida Statutes, applies
+to the Company, in its capacity as owner of a protected-series transferable interest, any provision of this
+Agreement that applies to a protected-series transferee. No provision of this Agreement restricting the
+rights of a transferee applies to the Company in that capacity, and nothing in this Agreement limits the
+Company's rights to manage, direct, receive distributions from, or obtain the records and information of
+any Protected Series.
+(c) No transfer of a protected-series transferable interest. The Company shall not transfer, assign,
+pledge, encumber, or otherwise dispose of all or any part of a protected-series transferable interest of any
+Protected Series to any person, and no Protected Series shall issue a protected-series transferable interest
+to any person other than the Company. Any purported transfer or issuance in violation of this paragraph is
+null and void ab initio and shall be given no force or effect for any purpose.
+
+ARTICLE 4 — MEMBERS; VOTING; MEMBER DUTIES
+4.1 Members; Percentage Interests. The Members and their Percentage Interests are set forth on Exhibit
+A. Membership interests are of a single class and are expressed as percentages; no certificates shall be
+issued unless the Manager determines otherwise. Each Member's interest in the Company is personal
+property for all purposes.
+4.2 No Series-Level Ownership. No Member is an Associated Member of any Protected Series, and no
+Member holds a protected-series transferable interest. Each Protected Series is wholly owned by the
+Company as provided in Section 3.6. Every Member's economic rights in every Protected Series arise
+solely through the Member's Percentage Interest in the Company, so that all Members participate in every
+Protected Series identically and in proportion to their Percentage Interests at all times.
+4.3 Voting. Each Member votes in proportion to the Member's Percentage Interest on matters as to which
+Members are entitled to vote or consent at the Company level. Except where this Agreement or a
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                         Page 5 of 39
+non-variable provision of the Act requires a greater vote, the act of a Majority in Interest constitutes the
+act of the Members. A Membership Interest owned by spouses as tenants by the entirety or as joint
+tenants with right of survivorship shall be voted only by the consensus of both spouses; neither spouse
+acting alone may vote the interest except as the other spouse's attorney-in-fact under a duly executed
+power of attorney.
+4.4 Meetings; Written Consents. No regular meetings are required. Any Member or the Manager may
+call a meeting of the Members on at least five (5) days' written notice stating the purpose. Members may
+participate by any means of remote communication by which all participants can hear one another. Any
+action that may be taken at a meeting may be taken without a meeting by a written consent signed by
+Members holding the Percentage Interests required to approve the action, delivered to the Company and
+maintained with its records, with prompt notice to any non-consenting Member.
+4.5 Limited Liability; No Agency. No Member shall be personally liable for any debt, obligation, or
+liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely
+by reason of being a Member. No Member is an agent of the Company or of any Protected Series solely
+by reason of being a member.
+4.6 Duty to Participate in Governance. Each Member shall materially participate in the governance of
+the Company and of each Protected Series, including by voting or consenting in a timely manner on
+matters submitted to the Members, attending meetings duly called under Section 4.4 in person or by
+remote means, furnishing information reasonably requested by the Manager for the Company's or a
+Protected Series' filings, records, and tax reporting, and executing and delivering instruments reasonably
+required to carry out actions duly approved under this Agreement.
+4.7 Competition. Each Member may engage in and possess interests in other business ventures of every
+kind, whether or not competitive with the activities of the Company or of any Protected Series. Engaging
+in such ventures shall not be deemed to violate this Agreement or any duty under the Act, no Member is
+obligated to offer any business opportunity to the Company, any Protected Series, or any other Member,
+and neither the Company, any Protected Series, nor any Member shall have any right in such ventures or
+their income by virtue of this Agreement.
+4.8 Confidentiality. Each Member shall hold in confidence, and shall not disclose or use other than for
+purposes of the Company or the applicable Protected Series, all confidential information of the Company
+and of each Protected Series, including financial records, customer and tenant information, contracts, and
+the contents of the records maintained under Article 8, except for disclosures required by law or made to
+the Member's professional advisors who are bound to confidentiality.
+4.9 Non-Disparagement; No Interference. No Member shall hinder or delay the activities and affairs of
+the Company or of any Protected Series, or slander, defame, or otherwise tarnish the reputation of the
+Company or of any Protected Series.
+4.10 Information Rights. Each Member has the information and inspection rights provided by the Act
+with respect to the Company. The records of the Company that each Member may inspect include the
+records maintained under Article 8 for every Protected Series.
+4.11 Transfer on Death Designation. Each Member's Membership Interest is "registered" with the
+Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial
+"registration in beneficiary form" under ss. 711.50–711.512, Florida Statutes, and reflects each Member's
+designation, if any, of the person or persons who will become the owner of that Member's Membership
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                         Page 6 of 39
+Interest upon that Member's death. A Member who is an individual may designate any person or entity as
+a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not
+survive the Member. Members who hold a Membership Interest jointly as tenants in common may not
+designate a TOD beneficiary. A Member may change, delete, or add a TOD designation by a signed
+writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless
+the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A
+(though updating is not required for effectiveness). Upon the designating Member's death, the designated
+beneficiary automatically succeeds to the deceased Member's transferable interest — including the
+economic rights of the deceased Member's Percentage Interest — taking subject to this Agreement, and
+holds the rights of a transferee described in Section 10.3 until admitted as a Member. A beneficiary is
+admitted as a Member upon delivery to the Company of a written agreement to be bound by this
+Agreement and the written consent of a Majority in Interest of the Members other than the deceased
+Member.
+4.12 Incapacity of a Member. While a Member is Incapacitated, that Member's rights under this
+Agreement — including the right to vote, to consent, and to sign any instrument — are exercised by the
+Member's agent under a durable power of attorney conferring that authority or, if there is none, by the
+Member's court-appointed guardian. The Company, the Manager, and the other Members may rely on a
+certified copy of the power of attorney or of the letters of guardianship without further inquiry.
+
+ARTICLE 5 — MANAGEMENT
+5.1 Manager-Managed; the Manager. The Company is manager-managed as provided in its Articles
+of Organization and this Agreement. The initial Manager is Managing Person. If more than one person is
+serving as Manager, every act, approval, consent, decision, or determination of the Manager under this
+Agreement requires the approval of a majority of the Managers then serving, and no Manager acting
+alone has actual authority to act for the Company or for any Protected Series. Anything required to be
+delivered to the Manager may be delivered to any Manager, and a covenant, restriction, or standard of
+conduct stated in this Agreement as applying to the Manager applies to each Manager individually. This
+Section governs among the Members and the Managers; it does not affect the agency rights of a Manager
+under s. 605.04074(2)(b), Florida Statutes, as to a person who dealt with the Manager without knowledge
+or notice that the Manager lacked authority. A Manager need not be a Member. A Manager serves until
+that Manager's resignation, removal, death, or Incapacity. If a Manager ceases to serve as Manager for
+any reason, the remaining Managers shall continue to serve. A Manager may be removed, with or without
+cause, and a successor or additional Manager may be appointed, by a Majority in Interest, evidenced by a
+signed writing delivered to the Company.
+5.2 Management of Each Protected Series. Each Protected Series is manager-managed. The Series
+Exhibit for a Protected Series may name one or more Protected Series Managers of that Protected Series.
+If it names none, each person then serving as a Manager of the Company is a Protected Series Manager of
+that Protected Series. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s.
+605.2304(2) so that the Protected Series Managers are the Manager or Managers of the Company rather
+than the Company itself. A Protected Series Manager has, with respect to its Protected Series, the rights,
+powers, and duties that a manager of a manager-managed limited liability company has under the Act,
+subject to this Agreement and the Series Exhibit, and may be removed and replaced with respect to that
+Protected Series by a Majority in Interest of the Members.
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                       Page 7 of 39
+5.3 Authority of the Manager. Except as limited by Section 5.4 or an applicable Series Exhibit, the
+Manager (and, as to a Protected Series, its Protected Series Manager) has full and exclusive authority to
+manage and conduct the activities and affairs of the Company or that Protected Series, including authority
+to: acquire, hold, improve, lease, sell, exchange, and convey property; borrow money and grant liens and
+security interests on Associated Assets; open, maintain, and close bank and investment accounts and
+designate signatories; engage and compensate employees, attorneys, accountants, and other agents;
+procure insurance; prosecute, defend, settle, and compromise claims; make tax filings and elections
+consistent with Article 9; execute and deliver instruments of every kind; and do all other acts necessary,
+appropriate, or convenient to the conduct of the activities and affairs of the Company or the applicable
+Protected Series.
+5.4 Actions Requiring Member Approval. Notwithstanding Section 5.3, neither the Manager nor any
+Protected Series Manager shall do any of the following without the approval stated:
+(a) establish a new Protected Series — the consent of all Members (Section 3.1);
+(b) cause any Associated Asset to become an Associated Asset of the Company or of a different
+Protected Series — the consent of a Majority in Interest;
+(c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company
+or of any Protected Series, other than in the ordinary course of business — the consent of all Members;
+(d) merge the Company as permitted by the Act — the consent of all Members; or file a statement of
+dissolution of a Protected Series — the approval required by Section 14.1;
+(e) admit any additional Member — the approval required by Article 12;
+(f) incur, on behalf of the Company or any Protected Series, indebtedness in excess of $50,000 in a single
+transaction or series of related transactions, or guarantee the obligation of any person (and no guarantee of
+the obligations of one Protected Series by another or by the Company shall be made except by an express
+written instrument approved under this Section) — the consent of all Members;
+(g) lend money of the Company or of a Protected Series to, or borrow from, a Member, the Manager, or
+their affiliates, other than loans under Section 6.5 — the consent of a Majority in Interest of the
+disinterested Members;
+(h) amend this Agreement or any Series Exhibit — the approval required by Section 15.1; or
+(i) file, amend, or cancel a statement of authority under s. 605.0302, Florida Statutes, or record a certified
+copy of one — the consent of all Members.
+5.5 Standard of Conduct; Exculpation. The Manager and each Protected Series Manager shall
+discharge their duties consistent with the Act, including the duties applicable to managers and
+protected-series managers. No Manager or Protected Series Manager shall be liable to the Company, any
+Protected Series, or any Member for any act or omission performed or omitted in good faith and in a
+manner reasonably believed to be within the scope of authority conferred by this Agreement, except for
+conduct for which exoneration is prohibited by the Act.
+5.6 Indemnification. The Company shall indemnify the Manager, and each Protected Series shall
+indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims,
+and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except
+to the extent arising from conduct for which exoneration is prohibited by the Act or from an act exceeding
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                           Page 8 of 39
+the authority conferred by Section 5.4; provided, that any indemnification obligation relating to the
+activities of a particular Protected Series is an Associated Liability of that Protected Series, payable
+solely from its Associated Assets, and any indemnification obligation relating to the activities of the
+Company generally is payable solely from the Associated Assets of the Company. A Manager who
+exceeds the authority conferred by Section 5.4 is liable to the Company or the affected Protected Series
+for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that
+Manager.
+5.7 Compensation; Reimbursement; Shared Expenses. The Manager shall serve without salary unless
+a Majority in Interest consents in writing to compensation. The Manager and each Protected Series
+Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the
+applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected
+Series (including formation and filing fees, registered agent fees, accounting, insurance, and
+administrative overhead) shall be allocated among the Company and the Protected Series benefited on a
+reasonable and consistent basis determined by the Manager — by specific attribution where practicable
+and otherwise pro rata or by such other reasonable formula as the Manager adopts — and the allocation
+shall be recorded in the records maintained under Article 8.
+5.8 Statement of Authority. With the consent of all Members required by Section 5.4(i), the Manager
+may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida
+Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series
+Manager, or of any person holding a specified position, to transfer or encumber real property held in the
+name of the Company or of a Protected Series, and may cause a certified copy of that statement to be
+recorded in the official records of any county in which the real property is located. A statement so filed
+shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it
+accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is
+filed or recorded.
+5.9 Competition; Other Activities of the Manager. The Manager may engage in and possess interests in
+other business ventures of every kind, whether or not competitive with the activities of the Company or of
+any Protected Series. Engaging in such ventures does not violate this Agreement or any duty under the
+Act, the Manager is not obligated to offer any business opportunity to the Company, any Protected Series,
+or any Member, and neither the Company, any Protected Series, nor any Member shall have any right in
+such ventures or their income by virtue of this Agreement.
+
+ARTICLE 6 — CAPITAL; CAPITAL ACCOUNTS
+6.1 Initial Contributions. Each Member's contributions to the Company are set forth on Exhibit A.
+Contributions to a Protected Series are made by the Company and are set forth in the applicable Series
+Exhibit. Each contribution shall identify whether it is made to the Company or to a specific Protected
+Series, and shall be deposited to, and recorded in the records of, the recipient. A promise by a Member to
+make a contribution is enforceable only if set out in a writing signed by the Member.
+6.2 Additional Capital Contributions. [Reserved.]
+6.3 Failure to Contribute. [Reserved.]
+6.4 No Interest; No Withdrawal. No interest shall be paid on any contribution. No Member may
+withdraw or demand the return of any contribution except as this Agreement provides.
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                          Page 9 of 39
+6.5 Member Loans. A Member may lend funds to the Company or to a specific Protected Series upon
+commercially reasonable terms evidenced by a written instrument identifying the borrower. A loan is not
+a contribution, and shall be an Associated Liability solely of the borrowing Protected Series or of the
+Company, as applicable.
+6.6 Capital Accounts. A capital account shall be established and maintained for each Member reflecting
+the Member's capital in the Company. Capital accounts shall be maintained in accordance with the capital
+accounting rules of section 704(b) of the Internal Revenue Code of 1986, as amended (the "Code"), and
+the Treasury Regulations thereunder, and shall be credited with contributions and allocations of profit and
+debited with distributions and allocations of loss as so required. A transferee of all or part of a
+Membership Interest succeeds to the portion of the transferor's capital account attributable to the
+transferred interest. Nothing in this Agreement creates a deficit restoration obligation or otherwise
+personally obligates any Member to contribute capital beyond the contributions required by Sections 6.1
+and 6.2.
+6.7 No Right to Specific Property. No Member has any right to demand or receive any distribution in
+any specific property of the Company or of any Protected Series.
+
+ARTICLE 7 — ALLOCATIONS AND DISTRIBUTIONS
+7.1 Allocations. Profits, losses, and each item of income, gain, loss, deduction, and credit of each
+Protected Series shall be allocated to the Company as its sole owner, and those of the Company
+(exclusive of every Protected Series) shall be allocated among the Members in proportion to their
+Percentage Interests. Notwithstanding the foregoing, allocations shall be made in a manner consistent
+with the capital-account maintenance rules of section 704(b) of the Code and the Treasury Regulations
+thereunder — including, to the extent required, a qualified income offset, minimum-gain chargebacks,
+and limitations on loss allocations that would create or increase an impermissible deficit — and
+allocations with respect to property contributed with a value different from its adjusted basis shall be
+made in accordance with section 704(c) of the Code. The Manager shall apply this Section so that the
+allocations have substantial economic effect and shall resolve questions of application consistently and in
+good faith.
+7.2 Distributions. The Manager (or, as to a Protected Series, its Protected Series Manager) may from
+time to time determine the extent to which cash on hand of the Company or of a Protected Series exceeds
+current and anticipated needs, including operating expenses, debt service, acquisitions, and reserves, and
+may distribute any such excess. Distributions in respect of a Protected Series shall be made solely from
+the Associated Assets of that Protected Series, and solely to the Company; distributions in respect of
+the Company shall be made solely from the Associated Assets of the Company, to the Members in
+proportion to their Percentage Interests. Each distribution shall be recorded in the records maintained
+under Article 8, identifying its source.
+7.3 Tax Distributions. To the extent of available cash of the Company or the applicable Protected Series,
+the Manager may make distributions intended to enable each Member to satisfy federal and state income
+tax liabilities attributable to the Member's distributive share of income, and is authorized to pay any such
+amount directly to the government agency responsible for collection of the tax on the Member's behalf. A
+tax distribution funded from the Associated Assets of a Protected Series shall be made by that Protected
+Series to the Company and distributed by the Company to the Members, and is treated as an advance
+against later distributions under Section 7.2.
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                        Page 10 of 39
+ARTICLE 8 — RECORDS
+8.1 Records. The Manager shall maintain, for the Company and for each Protected Series, the records
+described in this Article. Members' inspection rights are as stated in Section 4.10.
+8.2 Asset Association Records. The Manager shall create and maintain, and shall cause each Protected
+Series Manager to create and maintain, records that state the name of the Company or of the applicable
+Protected Series and describe each of its assets with sufficient specificity to permit a disinterested,
+reasonable individual to:
+(a) identify the asset and distinguish it from any other asset of the Company, of that Protected Series, and
+of every other Protected Series;
+(b) determine when and from which person the asset was acquired, or how the asset otherwise became an
+asset of the Company or that Protected Series; and
+(c) for any asset acquired from the Company or from another Protected Series, determine the
+consideration paid, the payor, and the payee.
+Records may be organized by specific listing, category, type, quantity, or computational or allocative
+formula or procedure (including a percentage or share of any asset), or in any other reasonable manner,
+consistent with s. 605.2301(4), Florida Statutes, provided the standard of this Section is met.
+8.3 Real Property. A properly recorded instrument naming the acquiring or conveying Protected Series
+(by its full statutory name) or the Company, as applicable, serves as an association record and is
+conclusive of the signer's authority in favor of a person giving value without knowledge of a lack of
+authority (ss. 605.2301(2)(b) and 605.2301(3)(b), Florida Statutes). Where an interest in real property is
+held through a representative, nominee, or similar arrangement as permitted by s. 605.2301(5), Florida
+Statutes, the arrangement shall be documented under Section 8.4, and the association of the interest shall
+be established by those records.
+8.4 Holding Associated Assets. An Associated Asset may be held directly, or indirectly through a
+representative, nominee, or similar arrangement, as permitted by s. 605.2301(5), Florida Statutes. Any
+such indirect arrangement shall be documented in the records maintained under this Article, identifying
+the holder, the Protected Series or the Company for which the asset is held, and the date the arrangement
+began. No property of the Company or of any Protected Series shall be held in the individual name of any
+Member or the Manager other than under an arrangement documented under this Section.
+8.5 Standing Association Rules; Savings Provisions.
+(a) Association; interpretation. Section 605.2301, Florida Statutes, requires records, not any particular
+record: it is satisfied by records that, read together, permit a disinterested, reasonable individual to make
+the determinations described in Section 8.2, and s. 605.2301(4), Florida Statutes, permits those records to
+be organized by specific listing, category, type, quantity, or computational or allocative formula or
+procedure, or in any other reasonable manner. As used in this Article, "record" has the meaning given in
+s. 605.0102(59), Florida Statutes, and shall be construed broadly to include anything of any type, kind, or
+nature that could reasonably associate an asset, debt, or any other thing with a Protected Series or the
+Company. Accordingly: (i) this Agreement, each Series Exhibit, each asset schedule, and the account,
+titling, tax, insurance, and transaction records of the Company or of a Protected Series are records within
+the meaning of s. 605.2301, Florida Statutes, may be read together and in combination to satisfy its
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                         Page 11 of 39
+requirements, and no single document, form, or sequence is required; (ii) an asset is an Associated Asset
+of the Company or of the Protected Series that any such record identifies, from the date the asset was
+acquired or otherwise became an asset; (iii) association established by any record is not defeated by the
+absence or incompleteness of any other record; (iv) the standing rules in paragraph (b) are a procedure
+adopted under s. 605.2301(4), Florida Statutes, and apply to every asset they reach, whether or not any
+other record exists; and (v) where the records permit more than one reading, the reading that associates an
+asset with the Company or Protected Series that acquired, holds, or uses it controls. This Agreement shall
+be interpreted and applied to give the fullest effect permitted by law to the association of assets under this
+Article, to the separateness of the Company and of each Protected Series, and to the limitations of liability
+described in Section 3.3.
+(b) Standing association rules. As a standing procedure adopted pursuant to s. 605.2301(4), Florida
+Statutes, and without limiting any other record: (i) an asset acquired by an instrument naming a Protected
+Series, or titled in the name of a Protected Series, is an Associated Asset of that Protected Series from the
+date of acquisition; (ii) an asset acquired with consideration paid from a deposit account of a Protected
+Series is an Associated Asset of that Protected Series; (iii) funds on deposit in an account established in
+the name of a Protected Series, and interest thereon, are Associated Assets of that Protected Series; (iv)
+the income, rents, profits, proceeds, and products of, the insurance proceeds relating to, and every
+replacement or substitution for, an Associated Asset are Associated Assets of the same person; and (v)
+every asset acquired in the name of the Company, and every asset not associated with a Protected Series
+under clauses (i) through (iv) or under any other record maintained under this Article, is an Associated
+Asset of the Company.
+(c) Correction of records. The Manager may, and upon discovery of any inaccuracy or omission shall,
+supplement or correct any record maintained under this Article so that it accurately reflects the
+association of assets and liabilities, and records as so supplemented or corrected shall be given effect to
+the fullest extent permitted by law. A record supplemented or corrected under this paragraph relates back
+to, and is given effect from, the date of the record it supplements or corrects, to the fullest extent
+permitted by law.
+(d) Reformation; severability in favor of association and separateness. If any provision of this
+Agreement or of any Series Exhibit, or any act taken under either, would otherwise be construed to impair
+the association of an asset under this Article, the separateness of the Company or of any Protected Series,
+or the limitations of liability described in Section 3.3, this Agreement shall be applied and, to the
+minimum extent necessary, deemed modified so as to preserve them, and the provision or act shall be
+given effect as so modified from the time it was made. To the extent a provision cannot be so conformed,
+it is null and void ab initio and shall be given no force or effect for any purpose, and every other provision
+of this Agreement and of each Series Exhibit remains in full force.
+8.6 Movement of an Asset Between Protected Series. If an Associated Asset of a Protected Series
+becomes an Associated Asset of another Protected Series, however the transaction is denominated, then to
+the extent the fair market value of what one Protected Series gives exceeds the fair market value of what
+it receives, the excess is deemed for all purposes of this Agreement to have been distributed by that
+Protected Series to the Company as provided in Section 7.2 and, immediately thereafter, contributed by
+the Company to the other Protected Series as provided in Section 6.1.
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                          Page 12 of 39
+ARTICLE 9 — TAX MATTERS
+9.1 Intended Classification. It is intended that the Company be classified as a partnership for federal
+income tax purposes, as federal tax law provides. Each Protected Series is wholly owned by the
+Company. If a Protected Series is treated as an entity separate from the Company for federal income tax
+purposes, it is intended that the Protected Series be disregarded as an entity separate from its owner, so
+that its items of income, gain, loss, deduction, and credit are reported by the Company. No member of the
+Company shall take a position inconsistent with this Section on any return without the written consent of
+all members.
+9.2 Tax Returns; Information. The Manager shall cause to be prepared and filed all tax returns required
+of the Company and of each Protected Series, if necessary or required, and shall deliver to each Member,
+after the end of each fiscal year, the tax information (including Schedule K-1s, where applicable)
+necessary for the Member's returns.
+9.3 Partnership Representative. The Manager (or a person the Manager designates) shall serve as the
+"partnership representative" within the meaning of section 6223 of the Code for the Company and for
+each Protected Series classified as a partnership, with all authority granted to a partnership representative
+under the Code, including the authority to make or revoke elections (including elections under sections
+6221(b) and 6226 of the Code), to conduct and resolve audits and proceedings, and to bind the Members
+as the Code provides. Each Member shall provide the information, and take the actions, reasonably
+requested by the partnership representative in connection with any tax matter, and shall pay the Member's
+share of any imputed underpayment or similar amount attributable to the Member as reasonably
+determined by the partnership representative.
+9.4 Tax Elections. The Manager may make, change, or revoke any tax election for the Company or any
+Protected Series (including an election under section 754 of the Code) that the Manager determines to be
+in the best interests of the Members as a whole.
+9.5 Fiscal Year. The fiscal year of the Company and of each Protected Series is the calendar year unless
+the Manager selects another permitted year.
+
+ARTICLE 10 — TRANSFERS; CREDITOR PROVISIONS
+10.1 Restriction on Transfer. No Member shall Transfer all or any portion of a Membership Interest, or
+any right to receive distributions from the Company or any Protected Series, except (a) a Transfer to an
+Immediate Family Member of the transferring Member made in compliance with Section 10.2, (b) a
+Transfer effective at death pursuant to the transferring Member's TOD designation under Section 4.11, or
+(c) another Transfer made with the prior written consent of the Manager and of a Majority in Interest of
+the Members other than the transferring Member. Any purported Transfer in violation of this Article is
+void to the fullest extent permitted by law, and the transferee acquires no rights other than those, if any,
+mandated by the Act.
+10.2 Permitted Family Transfers. A Transfer of all or part of a Membership Interest to an Immediate
+Family Member of the transferring Member is permitted, provided the transferee delivers to the Company
+a signed agreement to be bound by this Agreement. The transferee holds the transferred interest as a
+transferee under Section 10.3 unless and until admitted as a Member under Section 12.1.
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                         Page 13 of 39
+10.3 Rights of Transferees. A transferee (including a permitted family transferee) who is not admitted as
+a Member under Article 12 holds only the transferable interest — the right to receive the distributions that
+would otherwise be paid to the transferor with respect to the transferred interest — and has no right to
+vote, to participate in management, to inspect records, or to exercise any other right of a member, except
+as the Act mandates. A transferred interest remains subject to this Agreement in the hands of every
+transferee.
+10.4 Involuntary Transfers; Option to Acquire. Upon any Involuntary Transfer or any event that
+would result in an Involuntary Transfer of all or part of a Membership Interest, the Company shall have
+the option, exercisable by the Manager at any time within ninety (90) days after the Company receives
+written notice that the Involuntary Transfer has occurred, to acquire the interest that is the subject of the
+Involuntary Transfer at its fair value. Fair value shall be the value agreed in writing between the Manager
+and the holder of the interest or, absent agreement within thirty (30) days after the option is exercised, the
+value determined by an independent appraiser jointly selected by the Company and the holder within
+fifteen (15) days after the end of that thirty-day period (and, if they fail to agree within that time, by an
+appraiser selected by the two appraisers each of them then designates within a further ten (10) days), who
+shall hold the MAI designation if the assets principally concerned are real property, who shall have no
+material financial or professional relationship with any Member, and who shall deliver a written
+determination within forty-five (45) days after selection. That determination is final and binding, and the
+appraiser's fee shall be borne one-half by the Company and one-half by the holder. The purchase price is
+payable on commercially reasonable terms determined by the Manager, including payment in installments
+over a period of up to five (5) years bearing interest at the applicable federal rate. If the Company does
+not exercise its option, the Members other than the affected Member may, within thirty (30) days after the
+Company's option lapses, elect to acquire the interest on the same terms, in proportion to their Percentage
+Interests or as they otherwise agree. Pending exercise or lapse of the options, the holder of the interest has
+only the rights of a transferee described in Section 10.3.
+10.5 No Dissociation by Transfer Alone. A Transfer does not by itself dissociate a Member or dissolve
+the Company or any Protected Series.
+10.6 Charging Order — Exclusive Remedy. As provided in ss. 605.0502 and 605.0503, Florida
+Statutes, a charging order is the sole and exclusive remedy by which a judgment creditor of a Member or
+of a transferee may satisfy a judgment from the judgment debtor's Membership Interest or transferable
+interest, whether in the Company or in respect of any Protected Series. A judgment creditor or other
+holder of a charging order has only the right to receive distributions to which the judgment debtor would
+otherwise be entitled, has none of the rights of a member or manager, is not entitled to any accounting,
+inspection, or information rights except as the Act mandates, and, for so long as the Company has more
+than one member, may not foreclose upon the charged interest. Nothing in this Agreement enlarges any
+remedy of any creditor beyond those provided by the Act.
+
+ARTICLE 11 — EXECUTORY CONTRACT
+11.1 Executory Contract. The parties agree that this Agreement constitutes an executory contract and
+shall be governed by 11 U.S.C. §365 in connection with the bankruptcy of the Company or any Member
+because, among other provisions and obligations, this Agreement imposes on each Member the following
+affirmative duties (each of which constitutes a material unperformed, future obligation): (a) [Reserved.];
+(b) the duty and obligation of each Member to materially participate in the governance of the Company
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                          Page 14 of 39
+and of each Protected Series, as provided in Section 4.6; (c) [Reserved.]; (d) the duty and obligation of
+each Member not to disclose confidential information, as provided in Section 4.8; and (e) the duty and
+obligation of each Member not to hinder, delay, slander, or tarnish the reputation of the Company or of
+any Protected Series, as provided in Section 4.9. The failure of a Member to perform the duties and
+obligations set forth herein releases and excuses the mutual duties and obligations owed by the Company
+and the other Members to such defaulting Member.
+11.2 Personal Service Agreement; No Assumption or Assignment. In accordance with In re
+Soderstrom, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the
+managerial and governance duties and obligations owed by each Member and the Manager, and a
+bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance
+with 11 U.S.C. §365(c)(1) without the prior written consent of the other Members.
+11.3 Compliance upon Assumption or Rejection. Notwithstanding the foregoing, to the extent that a
+trustee of a Member's bankruptcy is allowed either to assume or reject a debtor Member's interest in the
+Company governed by this Agreement, such action shall comply with the time period set forth in 11
+U.S.C. §365(d), and if the trustee assumes such debtor Member's interest, such trustee shall comply with
+the terms of this Agreement and Florida law governing this Agreement, including, without limitation, the
+restrictions of the rights of a creditor of a Member or transferee pursuant to ss. 605.0502 and 605.0503,
+Florida Statutes.
+
+ARTICLE 12 — ADMISSION OF MEMBERS; ASSOCIATION WITH
+PROTECTED SERIES
+12.1 Admission of Members. A person may be admitted as a Member of the Company only with the
+written consent of all Members and upon the person's delivery of a signed agreement to be bound by this
+Agreement, except that (a) a TOD beneficiary is admitted as provided in Section 4.11, and (b) a permitted
+family transferee under Section 10.2 may be admitted with the written consent of a Majority in Interest of
+the Members other than the transferor.
+12.2 No Association with a Protected Series. No Member may be associated with a Protected Series. A
+Protected Series may not be established with, and may not admit, an Associated Member.
+12.3 Continuation on Termination of Last Member. Upon the termination of the membership of the
+last remaining member of the Company, the Company shall not be dissolved, and the legal representative
+of the last remaining member shall agree in writing to continue the Company, and the representative (or
+an Immediate Family Member designated by the representative who is not a creditor of the last remaining
+member) shall be admitted as a member effective as of the terminating event, all as permitted by the Act.
+
+ARTICLE 13 — WITHDRAWAL; DEADLOCK
+13.1 No Voluntary Withdrawal. No Member may voluntarily withdraw, resign, or dissociate from the
+Company before the dissolution and winding up of the Company without the written consent of all other
+Members. A Member's dissociation, whether or not wrongful, does not entitle the dissociated Member to
+any distribution or payment for the Member's interest except as this Agreement or the Act provides, and a
+dissociated Member (or the Member's successor) holds thereafter only the rights of a transferee described
+in Section 10.3.
+13.2 Deadlock; Buy-Sell Election. [Reserved.]
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                      Page 15 of 39
+ARTICLE 14 — DISSOLUTION AND WINDING UP
+14.1 Dissolution of a Protected Series. A Protected Series is dissolved, and its activities and affairs shall
+be wound up, upon the first to occur of: (a) the dissolution of the Company; (b) an event or circumstance
+specified in its Series Exhibit; (c) the affirmative vote or consent of a Majority in Interest; or (d) entry of
+a judicial order dissolving the Protected Series as provided by the Act.
+14.2 Winding Up a Protected Series. Upon dissolution of a Protected Series, its Protected Series
+Manager (or another person designated by a Majority in Interest) shall wind up its activities and affairs in
+the manner provided by the Act for winding up a limited liability company, applied to that Protected
+Series. Its Associated Assets shall be applied: first, to pay or provide for its Associated Liabilities to
+creditors other than Members; next, to pay or provide for its Associated Liabilities to Members as
+creditors, to the extent permitted by law; and finally, the balance to the Company. The Manager shall
+cause any statement or filing required by the Act or the Department in connection with the dissolution of
+the Protected Series to be made. The winding up of a Protected Series shall not draw upon, and its
+creditors shall have no recourse to, the Associated Assets of the Company or of any other Protected
+Series.
+14.3 Dissolution of the Company. The Company is dissolved, and its activities and affairs shall be
+wound up, upon the first to occur of: (a) the written consent of all Members; (b) entry of a decree of
+judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. The
+death, incapacity, bankruptcy, dissociation, or withdrawal of a Member does not by itself dissolve the
+Company. Dissolution of the Company causes the dissolution of each Protected Series, and the winding
+up of the Company is not complete until the winding up of each Protected Series is complete.
+14.4 Winding Up the Company. Upon dissolution of the Company, the Manager (or, if there is none, a
+person designated by a Majority in Interest) shall wind up the Company and each Protected Series. After
+the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the
+Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors
+other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as
+creditors; next, to the Members to the extent of their capital account balances; and finally, the balance to
+the Members in proportion to their Percentage Interests. Articles of dissolution shall be filed as the Act
+requires, and the Company shall terminate when winding up is complete.
+14.5 No Deficit Obligation; Recourse Limited. No Member shall have any obligation to restore any
+deficit or to contribute capital in connection with any winding up (beyond unpaid contributions duly
+required under Sections 6.1 and 6.2), and each creditor of the Company or of any Protected Series shall
+look solely to the Associated Assets of its obligor.
+
+ARTICLE 15 — AMENDMENTS; CONSENTS
+15.1 Amendments. This Agreement may be amended only by a written instrument signed by all
+Members; provided, that (a) a Series Exhibit may be amended by a written instrument signed by the
+Manager, except that an amendment that would alter the rights or obligations of any Member under this
+Agreement requires the signature of every Member; (b) the Manager may amend Exhibit A and the Series
+Exhibits without further consent solely to record changes duly made under this Agreement (admissions,
+Transfers, TOD designations, capital adjustments under Section 6.3); and (c) no amendment may impose
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                           Page 16 of 39
+new obligations on the Manager without the Manager's written consent. Oral, implied, or
+course-of-dealing amendments are of no effect.
+15.2 Action by Written Consent. Any action of the Members under this Agreement may be taken by
+written consent as provided in Section 4.4.
+
+ARTICLE 16 — MISCELLANEOUS
+16.1 Governing Law; Internal Affairs. This Agreement, the internal affairs of the Company and of each
+Protected Series, and the relations among the Members, the Manager, each Protected Series Manager, the
+Company, and each Protected Series, are governed by the laws of the State of Florida, without regard to
+conflict-of-laws principles.
+16.2 Venue. Any action or proceeding arising out of or relating to this Agreement, the Company, or any
+Protected Series shall be brought exclusively in the courts of the county in Florida in which the
+Company's principal office is located, and each party consents to the jurisdiction of such courts and
+waives any objection to venue there.
+16.3 Severability. If any provision of this Agreement is held invalid or unenforceable, that provision
+shall be modified to the minimum extent necessary to make it enforceable, and the remainder of this
+Agreement shall remain in full force; provided, that nothing in this Agreement shall be construed to vary
+any provision of the Act that may not be varied by an operating agreement.
+16.4 Entire Agreement. This Agreement, including Exhibit A and each Series Exhibit, constitutes the
+entire agreement governing the Company and each Protected Series and supersedes all prior agreements
+and understandings with respect to their subject matter.
+16.5 Binding Effect. This Agreement binds and benefits the Members, the Manager, and their respective
+heirs, personal representatives, successors, and permitted assigns, and any person who acquires an interest
+in the Company or is admitted as a member.
+16.6 Counterparts; Electronic Signatures. This Agreement may be executed in counterparts, each of
+which is an original and all of which together constitute one instrument. Electronic signatures and
+electronic records have the same effect as originals.
+16.7 Notices. Any notice under this Agreement shall be in writing and is effective upon delivery to the
+recipient's address on Exhibit A (or another address designated in writing), whether delivered personally,
+by nationally recognized courier, by certified mail, or by e-mail with confirmation of transmission.
+16.8 No Third-Party Beneficiaries. This Agreement is for the exclusive benefit of the parties and
+confers no rights on any creditor or other third party.
+16.9 Interpretation. Headings are for convenience only. "Including" means "including without
+limitation." References to statutes include amendments and successor provisions. Words in the singular
+include the plural, and words in the plural include the singular, as the context requires.
+16.10 Unregistered Interests. The Membership Interests have not been registered under federal or state
+securities laws and may not be offered, sold, or transferred except in compliance with this Agreement and
+applicable law.
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                       Page 17 of 39
+SIGNATURES
+IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set
+forth below.
+MEMBERS:
+
+
+
+Owner 001 Person
+Date:
+
+
+
+Owner 002 Person
+Date:
+
+
+
+Owner 003 Person
+Date:
+
+
+
+Owner 004 Person
+Date:
+
+
+
+Owner 005 Person
+Date:
+
+
+
+Owner 006 Person
+Date:
+
+
+
+Owner 007 Person
+Date:
+
+
+
+Owner 008 Person
+Date:
+
+
+
+Owner 009 Person
+Date:
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026              Page 18 of 39
+Owner 010 Person
+Date:
+
+
+
+Owner 011 Person
+Date:
+
+
+
+Owner 012 Person
+Date:
+
+
+
+Owner 013 Person
+Date:
+
+
+
+Owner 014 Person
+Date:
+
+
+
+Owner 015 Person
+Date:
+
+
+
+Owner 016 Person
+Date:
+
+
+
+Owner 017 Person
+Date:
+
+
+
+Owner 018 Person
+Date:
+
+
+
+Owner 019 Person
+Date:
+
+
+
+Owner 020 Person
+Date:
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026   Page 19 of 39
+Owner 021 Person
+Date:
+
+
+
+Owner 022 Person
+Date:
+
+
+
+Owner 023 Person
+Date:
+
+
+
+Owner 024 Person
+Date:
+
+
+
+Owner 025 Person
+Date:
+
+
+
+Owner 026 Person
+Date:
+
+
+
+Owner 027 Person
+Date:
+
+
+
+Owner 028 Person
+Date:
+
+
+
+Owner 029 Person
+Date:
+
+
+
+Owner 030 Person
+Date:
+
+
+
+Owner 031 Person
+Date:
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026   Page 20 of 39
+Owner 032 Person
+Date:
+
+
+
+Owner 033 Person
+Date:
+
+
+
+Owner 034 Person
+Date:
+
+
+
+Owner 035 Person
+Date:
+
+
+
+Owner 036 Person
+Date:
+
+
+
+Owner 037 Person
+Date:
+
+
+
+Owner 038 Person
+Date:
+
+
+
+Owner 039 Person
+Date:
+
+
+
+Owner 040 Person
+Date:
+
+
+
+Owner 041 Person
+Date:
+
+
+
+Owner 042 Person
+Date:
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026   Page 21 of 39
+Owner 043 Person
+Date:
+
+
+
+Owner 044 Person
+Date:
+
+
+
+Owner 045 Person
+Date:
+
+
+
+Owner 046 Person
+Date:
+
+
+
+Owner 047 Person
+Date:
+
+
+
+Owner 048 Person
+Date:
+
+
+
+Owner 049 Person
+Date:
+
+
+
+Owner 050 Person
+Date:
+
+
+
+Owner 051 Person
+Date:
+
+
+
+Owner 052 Person
+Date:
+
+
+
+Owner 053 Person
+Date:
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026   Page 22 of 39
+Owner 054 Person
+Date:
+
+
+
+Owner 055 Person
+Date:
+
+
+
+Owner 056 Person
+Date:
+
+
+
+Owner 057 Person
+Date:
+
+
+
+Owner 058 Person
+Date:
+
+
+
+Owner 059 Person
+Date:
+
+
+
+Owner 060 Person
+Date:
+
+
+
+Owner 061 Person
+Date:
+
+
+
+Owner 062 Person
+Date:
+
+
+
+Owner 063 Person
+Date:
+
+
+
+Owner 064 Person
+Date:
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026   Page 23 of 39
+Owner 065 Person
+Date:
+
+
+
+Owner 066 Person
+Date:
+
+
+
+Owner 067 Person
+Date:
+
+
+
+Owner 068 Person
+Date:
+
+
+
+Owner 069 Person
+Date:
+
+
+
+Owner 070 Person
+Date:
+
+
+
+Owner 071 Person
+Date:
+
+
+
+Owner 072 Person
+Date:
+
+
+
+Owner 073 Person
+Date:
+
+
+
+Owner 074 Person
+Date:
+
+
+
+Owner 075 Person
+Date:
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026   Page 24 of 39
+Owner 076 Person
+Date:
+
+
+
+Owner 077 Person
+Date:
+
+
+
+Owner 078 Person
+Date:
+
+
+
+Owner 079 Person
+Date:
+
+
+
+Owner 080 Person
+Date:
+
+
+
+Owner 081 Person
+Date:
+
+
+
+Owner 082 Person
+Date:
+
+
+
+Owner 083 Person
+Date:
+
+
+
+Owner 084 Person
+Date:
+
+
+
+Owner 085 Person
+Date:
+
+
+
+Owner 086 Person
+Date:
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026   Page 25 of 39
+Owner 087 Person
+Date:
+
+
+
+Owner 088 Person
+Date:
+
+
+
+Owner 089 Person
+Date:
+
+
+
+Owner 090 Person
+Date:
+
+
+
+Owner 091 Person
+Date:
+
+
+
+Owner 092 Person
+Date:
+
+
+
+Owner 093 Person
+Date:
+
+
+
+Owner 094 Person
+Date:
+
+
+
+Owner 095 Person
+Date:
+
+
+
+Owner 096 Person
+Date:
+
+
+
+Owner 097 Person
+Date:
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026   Page 26 of 39
+Owner 098 Person
+Date:
+
+
+
+Owner 099 Person
+Date:
+
+
+
+Owner 100 Person
+Date:
+ACKNOWLEDGED AND AGREED BY MANAGER:
+
+
+
+Managing Person, Manager
+Date:
+
+
+
+
+                                           [INTENTIONALLY LEFT BLANK]
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026   Page 27 of 39
+EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS;
+TOD DESIGNATIONS
+Company: Selected Company LLC
+
+ Member name               Address                    Percentage Interest    Initial contribution   Date
+                                                                             to the Company
+
+ Owner 001 Person          1 Main Street, Miami       1%                     $100                   September 20, 2026
+                           FL 33101
+
+ Owner 002 Person          2 Main Street, Miami       1%                     $100                   September 20, 2026
+                           FL 33101
+
+ Owner 003 Person          3 Main Street, Miami       1%                     $100                   September 20, 2026
+                           FL 33101
+
+ Owner 004 Person          4 Main Street, Miami       1%                     $100                   September 20, 2026
+                           FL 33101
+
+ Owner 005 Person          5 Main Street, Miami       1%                     $100                   September 20, 2026
+                           FL 33101
+
+ Owner 006 Person          6 Main Street, Miami       1%                     $100                   September 20, 2026
+                           FL 33101
+
+ Owner 007 Person          7 Main Street, Miami       1%                     $100                   September 20, 2026
+                           FL 33101
+
+ Owner 008 Person          8 Main Street, Miami       1%                     $100                   September 20, 2026
+                           FL 33101
+
+ Owner 009 Person          9 Main Street, Miami       1%                     $100                   September 20, 2026
+                           FL 33101
+
+ Owner 010 Person          10 Main Street,            1%                     $100                   September 20, 2026
+                           Miami FL 33101
+
+ Owner 011 Person          11 Main Street,            1%                     $100                   September 20, 2026
+                           Miami FL 33101
+
+ Owner 012 Person          12 Main Street,            1%                     $100                   September 20, 2026
+                           Miami FL 33101
+
+ Owner 013 Person          13 Main Street,            1%                     $100                   September 20, 2026
+                           Miami FL 33101
+
+ Owner 014 Person          14 Main Street,            1%                     $100                   September 20, 2026
+                           Miami FL 33101
+
+ Owner 015 Person          15 Main Street,            1%                     $100                   September 20, 2026
+                           Miami FL 33101
+
+ Owner 016 Person          16 Main Street,            1%                     $100                   September 20, 2026
+                           Miami FL 33101
+
+ Owner 017 Person          17 Main Street,            1%                     $100                   September 20, 2026
+                           Miami FL 33101
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                                     Page 28 of 39
+ Owner 018 Person          18 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 019 Person          19 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 020 Person          20 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 021 Person          21 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 022 Person          22 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 023 Person          23 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 024 Person          24 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 025 Person          25 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 026 Person          26 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 027 Person          27 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 028 Person          28 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 029 Person          29 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 030 Person          30 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 031 Person          31 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 032 Person          32 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 033 Person          33 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 034 Person          34 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 035 Person          35 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 036 Person          36 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 037 Person          37 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                     Page 29 of 39
+ Owner 038 Person          38 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 039 Person          39 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 040 Person          40 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 041 Person          41 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 042 Person          42 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 043 Person          43 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 044 Person          44 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 045 Person          45 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 046 Person          46 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 047 Person          47 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 048 Person          48 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 049 Person          49 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 050 Person          50 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 051 Person          51 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 052 Person          52 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 053 Person          53 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 054 Person          54 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 055 Person          55 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 056 Person          56 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 057 Person          57 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                     Page 30 of 39
+ Owner 058 Person          58 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 059 Person          59 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 060 Person          60 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 061 Person          61 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 062 Person          62 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 063 Person          63 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 064 Person          64 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 065 Person          65 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 066 Person          66 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 067 Person          67 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 068 Person          68 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 069 Person          69 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 070 Person          70 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 071 Person          71 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 072 Person          72 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 073 Person          73 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 074 Person          74 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 075 Person          75 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 076 Person          76 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 077 Person          77 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                     Page 31 of 39
+ Owner 078 Person          78 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 079 Person          79 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 080 Person          80 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 081 Person          81 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 082 Person          82 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 083 Person          83 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 084 Person          84 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 085 Person          85 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 086 Person          86 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 087 Person          87 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 088 Person          88 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 089 Person          89 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 090 Person          90 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 091 Person          91 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 092 Person          92 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 093 Person          93 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 094 Person          94 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 095 Person          95 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 096 Person          96 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+ Owner 097 Person          97 Main Street,            1%                     $100   September 20, 2026
+                           Miami FL 33101
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                     Page 32 of 39
+ Owner 098 Person          98 Main Street,            1%                      $100        September 20, 2026
+                           Miami FL 33101
+
+ Owner 099 Person          99 Main Street,            1%                      $100        September 20, 2026
+                           Miami FL 33101
+
+ Owner 100 Person          100 Main Street,           1%                      $100        September 20, 2026
+                           Miami FL 33101
+
+ Total                                                100%
+
+Contributed assets:
+
+ Asset                            Agreed value                      Contributed by   Allocated to
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                           Page 33 of 39
+ Initial cash                   $10,000                            Owner 001 Person (1%),   the Company: $10,000
+                                                                   Owner 002 Person (1%),
+                                                                   Owner 003 Person (1%),
+                                                                   Owner 004 Person (1%),
+                                                                   Owner 005 Person (1%),
+                                                                   Owner 006 Person (1%),
+                                                                   Owner 007 Person (1%),
+                                                                   Owner 008 Person (1%),
+                                                                   Owner 009 Person (1%),
+                                                                   Owner 010 Person (1%),
+                                                                   Owner 011 Person (1%),
+                                                                   Owner 012 Person (1%),
+                                                                   Owner 013 Person (1%),
+                                                                   Owner 014 Person (1%),
+                                                                   Owner 015 Person (1%),
+                                                                   Owner 016 Person (1%),
+                                                                   Owner 017 Person (1%),
+                                                                   Owner 018 Person (1%),
+                                                                   Owner 019 Person (1%),
+                                                                   Owner 020 Person (1%),
+                                                                   Owner 021 Person (1%),
+                                                                   Owner 022 Person (1%),
+                                                                   Owner 023 Person (1%),
+                                                                   Owner 024 Person (1%),
+                                                                   Owner 025 Person (1%),
+                                                                   Owner 026 Person (1%),
+                                                                   Owner 027 Person (1%),
+                                                                   Owner 028 Person (1%),
+                                                                   Owner 029 Person (1%),
+                                                                   Owner 030 Person (1%),
+                                                                   Owner 031 Person (1%),
+                                                                   Owner 032 Person (1%),
+                                                                   Owner 033 Person (1%),
+                                                                   Owner 034 Person (1%),
+                                                                   Owner 035 Person (1%),
+                                                                   Owner 036 Person (1%),
+                                                                   Owner 037 Person (1%),
+                                                                   Owner 038 Person (1%),
+                                                                   Owner 039 Person (1%),
+                                                                   Owner 040 Person (1%),
+                                                                   Owner 041 Person (1%),
+                                                                   Owner 042 Person (1%),
+                                                                   Owner 043 Person (1%),
+                                                                   Owner 044 Person (1%),
+                                                                   Owner 045 Person (1%),
+                                                                   Owner 046 Person (1%),
+                                                                   Owner 047 Person (1%),
+                                                                   Owner 048 Person (1%),
+                                                                   Owner 049 Person (1%),
+                                                                   Owner 050 Person (1%),
+                                                                   Owner 051 Person (1%),
+                                                                   Owner 052 Person (1%),
+                                                                   Owner 053 Person (1%),
+                                                                   Owner 054 Person (1%),
+                                                                   Owner 055 Person (1%),
+                                                                   Owner 056 Person (1%),
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                                  Page 34 of 39
+                                                                   Owner 057 Person (1%),
+                                                                   Owner 058 Person (1%),
+                                                                   Owner 059 Person (1%),
+Allocation of the Company's capital to the Protected Series:
+
+ Protected Series                            Assets allocated by the Company   Total
+
+ Retained by the Company                     Initial cash ($10,000)            $10,000
+
+Transfer on Death designations (ss. 711.50–711.512, Fla. Stat.):
+
+ Designating Member                          TOD beneficiary (any person or    If that beneficiary does not survive
+                                             entity)                           the Member
+
+ Owner 001 Person                            None                              None
+
+ Owner 002 Person                            None                              None
+
+ Owner 003 Person                            None                              None
+
+ Owner 004 Person                            None                              None
+
+ Owner 005 Person                            None                              None
+
+ Owner 006 Person                            None                              None
+
+ Owner 007 Person                            None                              None
+
+ Owner 008 Person                            None                              None
+
+ Owner 009 Person                            None                              None
+
+ Owner 010 Person                            None                              None
+
+ Owner 011 Person                            None                              None
+
+ Owner 012 Person                            None                              None
+
+ Owner 013 Person                            None                              None
+
+ Owner 014 Person                            None                              None
+
+ Owner 015 Person                            None                              None
+
+ Owner 016 Person                            None                              None
+
+ Owner 017 Person                            None                              None
+
+ Owner 018 Person                            None                              None
+
+ Owner 019 Person                            None                              None
+
+ Owner 020 Person                            None                              None
+
+ Owner 021 Person                            None                              None
+
+ Owner 022 Person                            None                              None
+
+ Owner 023 Person                            None                              None
+
+ Owner 024 Person                            None                              None
+
+ Owner 025 Person                            None                              None
+
+ Owner 026 Person                            None                              None
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                                 Page 35 of 39
+ Owner 027 Person                            None                            None
+
+ Owner 028 Person                            None                            None
+
+ Owner 029 Person                            None                            None
+
+ Owner 030 Person                            None                            None
+
+ Owner 031 Person                            None                            None
+
+ Owner 032 Person                            None                            None
+
+ Owner 033 Person                            None                            None
+
+ Owner 034 Person                            None                            None
+
+ Owner 035 Person                            None                            None
+
+ Owner 036 Person                            None                            None
+
+ Owner 037 Person                            None                            None
+
+ Owner 038 Person                            None                            None
+
+ Owner 039 Person                            None                            None
+
+ Owner 040 Person                            None                            None
+
+ Owner 041 Person                            None                            None
+
+ Owner 042 Person                            None                            None
+
+ Owner 043 Person                            None                            None
+
+ Owner 044 Person                            None                            None
+
+ Owner 045 Person                            None                            None
+
+ Owner 046 Person                            None                            None
+
+ Owner 047 Person                            None                            None
+
+ Owner 048 Person                            None                            None
+
+ Owner 049 Person                            None                            None
+
+ Owner 050 Person                            None                            None
+
+ Owner 051 Person                            None                            None
+
+ Owner 052 Person                            None                            None
+
+ Owner 053 Person                            None                            None
+
+ Owner 054 Person                            None                            None
+
+ Owner 055 Person                            None                            None
+
+ Owner 056 Person                            None                            None
+
+ Owner 057 Person                            None                            None
+
+ Owner 058 Person                            None                            None
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026          Page 36 of 39
+ Owner 059 Person                            None                            None
+
+ Owner 060 Person                            None                            None
+
+ Owner 061 Person                            None                            None
+
+ Owner 062 Person                            None                            None
+
+ Owner 063 Person                            None                            None
+
+ Owner 064 Person                            None                            None
+
+ Owner 065 Person                            None                            None
+
+ Owner 066 Person                            None                            None
+
+ Owner 067 Person                            None                            None
+
+ Owner 068 Person                            None                            None
+
+ Owner 069 Person                            None                            None
+
+ Owner 070 Person                            None                            None
+
+ Owner 071 Person                            None                            None
+
+ Owner 072 Person                            None                            None
+
+ Owner 073 Person                            None                            None
+
+ Owner 074 Person                            None                            None
+
+ Owner 075 Person                            None                            None
+
+ Owner 076 Person                            None                            None
+
+ Owner 077 Person                            None                            None
+
+ Owner 078 Person                            None                            None
+
+ Owner 079 Person                            None                            None
+
+ Owner 080 Person                            None                            None
+
+ Owner 081 Person                            None                            None
+
+ Owner 082 Person                            None                            None
+
+ Owner 083 Person                            None                            None
+
+ Owner 084 Person                            None                            None
+
+ Owner 085 Person                            None                            None
+
+ Owner 086 Person                            None                            None
+
+ Owner 087 Person                            None                            None
+
+ Owner 088 Person                            None                            None
+
+ Owner 089 Person                            None                            None
+
+ Owner 090 Person                            None                            None
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026          Page 37 of 39
+ Owner 091 Person                            None                            None
+
+ Owner 092 Person                            None                            None
+
+ Owner 093 Person                            None                            None
+
+ Owner 094 Person                            None                            None
+
+ Owner 095 Person                            None                            None
+
+ Owner 096 Person                            None                            None
+
+ Owner 097 Person                            None                            None
+
+ Owner 098 Person                            None                            None
+
+ Owner 099 Person                            None                            None
+
+ Owner 100 Person                            None                            None
+
+If no beneficiary is designated, or a designation fails, the Member's interest passes as provided by law,
+subject to this Agreement.
+
+
+
+
+                                           [INTENTIONALLY LEFT BLANK]
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026                      Page 38 of 39
+Operating Agreement of Selected Company LLC — generated by MyFloridaSeriesLLC · Master First
+Edition — August 2026
+
+
+
+
+Copyright FLORIDA PROTECTED SERIES, LLC - PS 1, First Edition, August 2026          Page 39 of 39
+

@@ -22,6 +22,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/terms": `Terms of Service \u2014 ${SITE}`,
   "/privacy": `Privacy Policy \u2014 ${SITE}`,
   "/form-llc": `Form Your LLC \u2014 ${SITE}`,
+  "/agent-checkout": `Registered Agent Payment \u2014 ${SITE}`,
   "/order/confirmed": `Order Confirmed \u2014 ${SITE}`,
   "/portal": `Client Portal \u2014 ${SITE}`,
   "/portal/amend": `Amendment to Operating Agreement — ${SITE}`,

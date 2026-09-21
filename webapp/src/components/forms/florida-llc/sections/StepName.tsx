@@ -44,20 +44,25 @@ function ConversionName({ data, patch, errors }: StepProps) {
   const [looking, setLooking] = useState(false);
   const typed = (data.existingLlcName ?? "").trim();
   useEffect(() => {
+    setLooking(false);
     if (typed.length < 3) { setLookup(null); return; }
     if (lookup?.forName === typed) return;
+    let active = true;
+    const controller = new AbortController();
     const t = setTimeout(async () => {
       setLooking(true);
       try {
-        const r = await api.post<{ available: boolean; matches: EntityMatch[] }>("/api/entity-lookup", { name: typed });
+        const r = await api.post<{ available: boolean; matches: EntityMatch[] }>("/api/entity-lookup", { name: typed }, { signal: controller.signal });
+        if (!active) return;
         setLookup({ forName: typed, available: r.available, matches: r.matches });
       } catch {
+        if (!active) return;
         setLookup({ forName: typed, available: false, matches: [] });
       } finally {
-        setLooking(false);
+        if (active) setLooking(false);
       }
     }, 700);
-    return () => clearTimeout(t);
+    return () => { active = false; clearTimeout(t); controller.abort(); };
     // The recorded name guards re-running; the effect keys on what was typed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typed]);
