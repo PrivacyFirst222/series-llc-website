@@ -1,0 +1,38 @@
+{"ok":true,"label":"batch24 Sunday rollover"}
+{"ok":true,"label":"batch24 Saturday rollover"}
+{"ok":true,"label":"batch24 DC Emancipation Day"}
+{"ok":true,"label":"batch24 Saturday holiday observed Friday"}
+{"ok":true,"label":"batch24 Labor Day"}
+{"ok":true,"label":"batch24 Christmas Friday"}
+{"ok":true,"label":"batch24 New Year Friday"}
+{"ok":true,"label":"batch24 next-year New Year observed December31"}
+{"ok":true,"label":"batch24 weekend then Washington birthday"}
+{"ok":true,"label":"batch24 Emancipation Friday"}
+{"ok":true,"label":"batch24 Sunday Emancipation observed Monday"}
+{"ok":true,"label":"batch24 Saturday inauguration has no Friday substitute"}
+{"ok":true,"label":"batch24 inauguration and MLK"}
+{"ok":true,"label":"batch24 ordinary weekday unchanged"}
+{"ok":true,"label":"batch24 month-end arithmetic"}
+{"ok":true,"label":"batch24 leap-year arithmetic"}
+{"ok":true,"label":"batch24 five-day preparation guard 2026-03-11"}
+{"ok":true,"label":"batch24 five-day preparation guard 2026-03-12"}
+{"ok":true,"label":"batch24 five-day preparation guard 2026-03-16"}
+{"ok":true,"label":"batch24 five-day preparation guard 2026-03-17"}
+{"ok":true,"label":"batch24 rolled deadline day still timely"}
+{"ok":true,"label":"batch24 formation ordering retained"}
+{"ok":true,"label":"batch24 invalid calendar input rejected"}
+{"ok":true,"label":"batch24 general timing wording 2026-01-02"}
+{"ok":true,"label":"batch24 general timing wording 2026-03-16"}
+{"ok":true,"label":"batch24 general timing wording 2026-03-17"}
+{"ok":true,"label":"batch24 filing responsibility acknowledgment retained"}
+{"ok":true,"label":"batch24 issued EIN required unchanged"}
+Removing XFA form data as pdf-lib does not support reading or writing XFA. Set preserveXFA: true in load options to keep XFA data.
+{"ok":true,"label":"batch24 filing-package approved general deadline"}
+{"ok":true,"label":"batch24 filing-package no calculated deadline"}
+{"ok":true,"label":"batch24 filing-package real form identity retained"}
+Removing XFA form data as pdf-lib does not support reading or writing XFA. Set preserveXFA: true in load options to keep XFA data.
+{"ok":true,"label":"batch24 record-copy approved general deadline"}
+{"ok":true,"label":"batch24 record-copy no calculated deadline"}
+{"ok":true,"label":"batch24 record-copy real form identity retained"}
+{"ok":true,"label":"batch24 record copy warning retained"}
+35/35 Batch24 timing checks passed

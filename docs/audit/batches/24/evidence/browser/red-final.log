@@ -1,0 +1,28 @@
+{"label":"B3-01 series owned by a three-owner parent defaults to one member","ok":false}
+{"label":"B3-01 count-dependent hint does not call series several-member partnership","ok":false}
+{"label":"B3-01 actual submitted payload carries one for series","ok":false,"detail":{"id":"49c53dc9-3aa8-4275-9341-83938f2f40db","count":3,"status":200}}
+{"label":"B3-01 actual route persists series count one","ok":false,"detail":3}
+{"label":"B3-01 office IRS assistant reads one from saved application","ok":false}
+{"label":"B3-01 parent-company EIN still defaults to its three members","ok":true}
+{"label":"B3-01 parent-company submitted count stays three","ok":true,"detail":{"count":3,"status":200}}
+{"label":"B3-01 parent office count stays three","ok":true}
+{"label":"B3-01 editing other series does not leak count to first series","ok":false}
+{"label":"B3-01 explicit answer survives close and reopen","ok":true}
+{"label":"B3-01 explicit answer survives browser reload","ok":true}
+{"label":"B3-01 explicit answer is not overwritten at submission","ok":true,"detail":{"count":4,"status":200}}
+{"label":"B3-01 office receives explicit client count","ok":true}
+{"label":"B3-01 series default remains one when parent owner list unavailable","ok":true}
+{"label":"B3-01 company empty-owner fallback remains one","ok":true}
+{"label":"B1-N01 Terms renders exact approved refund and delivery wording","ok":false}
+{"label":"B1-N01 Terms removes immediate-generation claim","ok":false}
+{"label":"B1-N01 FAQ renders exact same approved refund and delivery wording","ok":false}
+{"label":"B1-N01 FAQ removes immediate-generation claim","ok":false}
+{"label":"B1-N04 actual questionnaire shows exact approved general deadline","ok":false}
+{"label":"B1-N04 deadline notice and acknowledgment show no computed calendar date","ok":false}
+{"label":"B1-N04 deadline acknowledgment remains required","ok":true}
+{"label":"B1-N04 Monday after Sunday deadline is insufficient preparation time, not late","ok":false}
+{"label":"B1-N04 insufficient-window explanation shows no computed calendar deadline","ok":false}
+{"label":"Batch24 browser no runtime errors","ok":true,"detail":[]}
+{"label":"Batch24 browser no unexpected endpoints","ok":true,"detail":[]}
+{"label":"Batch24 browser no external requests","ok":true,"detail":[]}
+Batch24 browser: 13/27 checks passed

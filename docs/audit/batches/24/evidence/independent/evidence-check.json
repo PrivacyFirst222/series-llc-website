@@ -1,0 +1,30 @@
+{
+  "timing": {
+    "red": {
+      "total": 35,
+      "passed": 12
+    },
+    "green": {
+      "total": 35,
+      "passed": 35
+    },
+    "sameLabels": true,
+    "uniqueLabels": 35,
+    "redSha256": "be370a2c8eb6af47dc09ef4c9740c0ff2ee8349d9bbd34f86180adddfdf1de0c",
+    "greenSha256": "1d719c1bafebfb9f179376eca9c2cc9ace92ee85d4816b4e20de9b240fccb9a0"
+  },
+  "browser": {
+    "red": {
+      "total": 27,
+      "passed": 13
+    },
+    "green": {
+      "total": 27,
+      "passed": 27
+    },
+    "sameLabels": true,
+    "uniqueLabels": 27,
+    "redSha256": "35505c438102d5a59674b1f1a9afc7874edb3262254d0d483eb6aa7c19fbfc17",
+    "greenSha256": "8db53ef086a7da3a5ec3e40a2dcb109144aecd88e53c74aff22d993e5eabc43e"
+  }
+}

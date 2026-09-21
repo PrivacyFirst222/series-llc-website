@@ -1,0 +1,297 @@
+diff --git a/docs/facts.md b/docs/facts.md
+index 5a5d633..3fca155 100644
+--- a/docs/facts.md
++++ b/docs/facts.md
+@@ -231,3 +231,13 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
+ - where: webapp/src/lib/englishText.ts — `Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.`
+ - where: docs/oa-instructions.md — `Series LLC Owner's Manual`
+ - where: docs/owners-manual.md — `keep your email address current in the portal so notices reach you`
++
++
++### Batch 24 — S-election delivery and deadline wording (Adam, 20 September 2026)
++- value: `The deadline is two months and 15 days from the date the LLC is formed. The exact deadline date may differ based on holidays and weekends, so you should not put off filing it.`
++- where: webapp/src/lib/form2553Timing.ts — `The deadline is two months and 15 days from the date the LLC is formed. The exact deadline date may differ based on holidays and weekends, so you should not put off filing it.`
++- The questionnaire and generated S-election package use this general wording rather than a computed due date. The internal deadline calculation observes weekends and IRS/DC legal holidays; the formation-date starting point, preparation runway and purchase eligibility are unchanged.
++- value: `The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.`
++- where: webapp/src/content/terms.md — `The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.`
++- where: webapp/src/pages/FAQ.tsx — `The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.`
++- For a company-owned protected series, the EIN questionnaire initially counts one owner, the company. A parent-company EIN uses the parent membership count. Preserve explicit saved answers.
+diff --git a/webapp/scripts/batch13-walk.ts b/webapp/scripts/batch13-walk.ts
+index 0b6d975..28c25be 100644
+--- a/webapp/scripts/batch13-walk.ts
++++ b/webapp/scripts/batch13-walk.ts
+@@ -47,11 +47,11 @@ export async function batch13Walk(browser:Browser,web:string,check:Check){
+  const dir=mkdtempSync(join(tmpdir(),'batch13-'));let rt:Awaited<ReturnType<typeof JSON.parse>>;
+  try{const p=Bun.spawn(['bun',import.meta.filename,'--routes'],{cwd:process.cwd(),env:{...process.env,E2E_OFFLINE:'1',VERCEL:'',DEV_PG_DIR:dir},stdout:'pipe',stderr:'pipe'});const [out,err,code]=await Promise.all([new Response(p.stdout).text(),new Response(p.stderr).text(),p.exited]);const line=out.split('\n').find(l=>l.startsWith('B13:'));if(code||!line)throw Error(`Fixture ${code}: ${err}\n${out}`);rt=JSON.parse(line.slice(4));}finally{rmSync(dir,{recursive:true,force:true});}
+  const timing=source('src/lib/form2553Timing.ts'),optional=source('src/components/forms/florida-llc/sections/StepOptionalDocs.tsx'),mail=source('server/email.ts'),pdf=source('server/s-election.ts'),orderPdf=source('server/order-summary.ts');
+- emit('formation deadline wording', [optional,mail,timing].every(t=>t.includes('officially formed with the Florida Division'))&&form2553Deadline('2026-01-07')==='2026-03-21'&&form2553Deadline('2026-10-01')==='2026-12-15', {formula:form2553Deadline('2026-10-01')});
++ emit('formation deadline wording', [optional,mail,timing].every(t=>t.includes('officially formed with the Florida Division'))&&form2553Deadline('2026-01-07')==='2026-03-23'&&form2553Deadline('2026-10-01')==='2026-12-15', {formula:form2553Deadline('2026-10-01')});
+  emit('fax or mail consistently',optional.includes('fax or mail')&&mail.includes('faxing or mailing')&&source('src/pages/portal/OrdersInProgress.tsx').includes('fax or mail'));
+  emit('existing LLC can submit EIN details',rt.existing.status===200&&rt.unformed.status===400&&rt.unformed.body.error?.code==='NOT_FORMED',{existing:rt.existing,unformed:rt.unformed});
+  emit('SSN impossible groups rejected',['123001234','123450000','000121234','666121234','900121234'].every(n=>!!ssnProblem(n))&&!ssnProblem('123456789')&&rt.invalid.every((r:{status:number;body:{error?:{message:string}}})=>r.status===400&&!!r.body.error?.message.includes('Social Security')),rt.invalid);
+- emit('record copy deadline neutral tense',pdf.includes('The IRS deadline for this election is ${fmtDateLong(deadlineIso)}.')&&!pdf.includes('The IRS deadline for this election was')&&pdf.includes('**An election filed with incomplete Social Security numbers is invalid.**'));
++ emit('record copy deadline neutral tense',pdf.includes('${FORM2553_DEADLINE_NOTICE} If the deadline has passed, discuss late-election relief with your tax professional.')&&!pdf.includes('The IRS deadline for this election was')&&pdf.includes('**An election filed with incomplete Social Security numbers is invalid.**'));
+  emit('issued EIN required for filing package',rt.noEinRefused&&rt.pending.status===200&&!rt.pending.body.data.documentId&&rt.saved.encrypted&&rt.issued.status===200&&!!rt.completed?.documentId&&rt.completed.details.ein==='881234567',{pending:rt.pending,saved:rt.saved,issued:rt.issued,refused:rt.noEinRefused});
+  emit('office EIN labels agree',(orderPdf.match(/line\("Federal EIN service"/g)||[]).length===2&&!orderPdf.includes('line("Federal EIN",'));
+  const p=await browser.newPage();p.setDefaultTimeout(5000);let hired=false;
+diff --git a/webapp/server/s-election.ts b/webapp/server/s-election.ts
+index 20ac214..9276d37 100644
+--- a/webapp/server/s-election.ts
++++ b/webapp/server/s-election.ts
+@@ -10,7 +10,7 @@
+  *   Fax: 855-214-7520. There is no IRS filing fee.
+  */
+ import { isValidEin } from "../src/lib/ein";
+-import { form2553Deadline } from "../src/lib/form2553Timing";
++import { form2553Deadline, FORM2553_DEADLINE_NOTICE } from "../src/lib/form2553Timing";
+ import { type JointKind, columnJText, isJoint, jointDisplayName, ssnColumnText } from "../src/lib/jointOwner";
+ import { PDFDocument, StandardFonts, degrees, rgb } from "@cantoo/pdf-lib";
+ import f2553Base64 from "./assets/f2553-b64";
+@@ -175,7 +175,7 @@ ${rows}
+ `;
+ }
+ 
+-function instructionsMarkdown(d: SElectionDetails, deadlineIso: string): string {
++function instructionsMarkdown(d: SElectionDetails): string {
+   const einLine = `The form is completed with your EIN, **${fmtEin(d.ein)}**.`;
+   if (d.recordCopy) {
+     return `# S CORPORATION ELECTION PACKAGE — RECORD COPY
+@@ -196,7 +196,7 @@ If you still need to file, contact us and we will prepare a new package.
+ 2. The cover letter as it was prepared.
+ 3. **IRS Form 2553 as it was completed**, with the Social Security numbers removed.
+ 
+-The IRS deadline for this election is ${fmtDateLong(deadlineIso)}. If that date has passed, discuss late-election relief with your tax professional.
++${FORM2553_DEADLINE_NOTICE} If the deadline has passed, discuss late-election relief with your tax professional.
+ `;
+   }
+   return `# S CORPORATION ELECTION PACKAGE
+@@ -224,9 +224,9 @@ Review every entry, especially the company name and address, the EIN, the effect
+ 
+ ${d.shareholders.length > 7 ? `- **Owners eight onward sign the continuation sheet** at the back of this package: the form holds seven, so ${d.shareholders.length - 7} owner${d.shareholders.length - 7 === 1 ? " is" : "s are"} listed there in the same columns, and each signs and dates column K on that sheet. File it with the form.\n\n` : ""}An election without every required signature is invalid. Do not leave any consent line blank.
+ 
+-## STEP 3 — FILE IT (DEADLINE: ${fmtDateLong(deadlineIso).toUpperCase()})
++## STEP 3 — FILE IT
+ 
+-You must file Form 2553 **within 2 months and 15 days after your LLC is officially formed with the Florida Division of Corporations** — for your company, that is **${fmtDateLong(deadlineIso)}**. File as soon as the form is signed; do not wait for the deadline.
++${FORM2553_DEADLINE_NOTICE} File as soon as the form is signed; do not wait for the deadline.
+ 
+ Choose ONE of the following. There is no IRS filing fee.
+ 
+@@ -307,10 +307,11 @@ async function stampRecordCopy(doc: PDFDocument): Promise<void> {
+ 
+ export async function buildSElectionPackage(d: SElectionDetails): Promise<Uint8Array> {
+   if (!isValidEin(d.ein)) throw new Error("An issued EIN is required before preparing Form 2553.");
+-  const deadline = electionDeadline(d.effectiveDate);
++  // Retain validation of the formation effective date even though no due date is printed.
++  electionDeadline(d.effectiveDate);
+   const title = `S Corporation Election Package — ${d.llcName}`;
+   const instructions = await renderMarkdownPdf({
+-    markdown: instructionsMarkdown(d, deadline),
++    markdown: instructionsMarkdown(d),
+     watermark: null,
+     title,
+   });
+diff --git a/webapp/src/content/terms.md b/webapp/src/content/terms.md
+index 33900a3..f6a363d 100644
+--- a/webapp/src/content/terms.md
++++ b/webapp/src/content/terms.md
+@@ -1,4 +1,4 @@
+-Last updated: **September 19, 2026**
++Last updated: **September 20, 2026**
+ 
+ ### 1. The Parties
+ These Terms of Service ("Terms") are a binding agreement between you and **FLORIDA PROTECTED SERIES, LLC - PS 1** ("Filing Services") and **FLORIDA PROTECTED SERIES, LLC - PS 2** ("Agent Services"), each a protected series of FLORIDA PROTECTED SERIES, LLC, a Florida limited liability company (the "Company"; each series a "Company party" and together the "Companies"). "We," "us," and "our" refer to the Company party providing the Service at issue.
+@@ -74,7 +74,7 @@ You must notify us immediately of any change to your email address, mailing addr
+ **(c) After submission.** No portion of the service fee is refundable.
+ **(d) Government fees.** Fees remitted to the State of Florida are never refundable by us.
+ **(e) Registered agent service.** Changing registered agents during a paid service year does not entitle you to a refund. Otherwise, a renewal charge is refundable within 30 days if we have not yet received or posted any document for you in that term; after that it is non-refundable. No prorated refunds. The resignation charge covers state filing fees and processing, not a renewed service year.
+-**(f) Add-on services.** Each add-on service is refundable until we begin work on it. The S corporation election package is not refundable once you submit your details, because the completed package is generated and delivered to your client portal at that moment.
++**(f) Add-on services.** Each add-on service is refundable until we begin work on it. The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.
+ 
+ ### 12. Chargebacks
+ Chargebacks initiated after services are performed constitute a breach of these Terms. You agree to reimburse us our costs of responding, including a $100 administrative charge, and we may suspend the Services and portal access pending resolution.
+diff --git a/webapp/src/lib/form2553Timing.test.ts b/webapp/src/lib/form2553Timing.test.ts
+index 483ca68..bc927e8 100644
+--- a/webapp/src/lib/form2553Timing.test.ts
++++ b/webapp/src/lib/form2553Timing.test.ts
+@@ -1,9 +1,11 @@
+ // Adam's cases for form2553Timing (6 Sep 2026). Run by `bun run test`; exits
+ // non-zero on any failure.
+-import { form2553Deadline, evaluate2553Timing, ORDER_TIME_ACKNOWLEDGMENT } from "./form2553Timing";
++import { form2553Deadline, evaluate2553Timing, ORDER_TIME_ACKNOWLEDGMENT, FORM2553_DEADLINE_NOTICE } from "./form2553Timing";
+ 
+ let failed = 0;
++let total = 0;
+ const eq = (got: unknown, want: unknown, label: string) => {
++  total++;
+   if (JSON.stringify(got) !== JSON.stringify(want)) {
+     failed++;
+     console.log(`  ❌ ${label}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`);
+@@ -12,17 +14,17 @@ const eq = (got: unknown, want: unknown, label: string) => {
+ 
+ // Deadlines — the IRS example first.
+ const deadlines: [string, string][] = [
+-  ["2026-01-07", "2026-03-21"],
++  ["2026-01-07", "2026-03-23"],
+   ["2026-12-31", "2027-03-15"],
+   ["2027-12-31", "2028-03-15"],
+   ["2026-03-01", "2026-05-15"],
+   ["2026-01-31", "2026-04-14"],
+   ["2026-01-30", "2026-04-13"],
+   ["2026-12-30", "2027-03-15"],
+-  ["2026-11-30", "2027-02-13"],
++  ["2026-11-30", "2027-02-16"],
+   ["2026-09-05", "2026-11-19"],
+   ["2027-01-01", "2027-03-15"],
+-  ["2028-02-29", "2028-05-13"],
++  ["2028-02-29", "2028-05-15"],
+ ];
+ for (const [eff, want] of deadlines) eq(form2553Deadline(eff), want, `deadline ${eff}`);
+ 
+@@ -43,8 +45,9 @@ for (const bad of ["2026-02-30", "09/05/2026"]) {
+   try { form2553Deadline(bad); } catch { threw = true; }
+   eq(threw, true, `${bad} throws`);
+ }
+-eq(g1.acknowledgment?.includes("11/19/2026"), true, "the acknowledgment carries the deadline");
++eq(g1.message, FORM2553_DEADLINE_NOTICE, "general deadline notice");
++eq(g1.acknowledgment?.includes("two months and 15 days") && !g1.acknowledgment.includes("11/19/2026"), true, "the acknowledgment carries the deadline");
+ eq(ORDER_TIME_ACKNOWLEDGMENT.includes("no refund"), true, "the order-time acknowledgment says no refund");
+ 
+-console.log(`[2553 timing] ${deadlines.length + 11} cases, ${failed} failures.`);
++console.log(`[2553 timing] ${total} cases, ${failed} failures.`);
+ if (typeof process !== "undefined" && import.meta.main) process.exit(failed === 0 ? 0 : 1);
+diff --git a/webapp/src/lib/form2553Timing.ts b/webapp/src/lib/form2553Timing.ts
+index 8ae5bdd..e0aa91b 100644
+--- a/webapp/src/lib/form2553Timing.ts
++++ b/webapp/src/lib/form2553Timing.ts
+@@ -5,7 +5,8 @@
+ // year begins and ends with the close of the day before the numerically
+ // corresponding day of the second calendar month following that month. If
+ // there is no corresponding day, use the close of the last day of the
+-// calendar month" — then 15 days. Example 1: January 7 → March 21.
++// calendar month" — then 15 days. Example 1: January 7 → March 21 before
++// weekend/holiday adjustment (IRS Publication 509, 2026).
+ //
+ // All date math is on YYYY-MM-DD strings. "today" is passed in as an
+ // Eastern Time date string — never the server clock directly (Vercel runs
+@@ -13,6 +14,10 @@
+ 
+ export const DEFAULT_MIN_DAYS = 5;
+ 
++/** Adam, Batch 24: general client wording, not a definitive calculated date. */
++export const FORM2553_DEADLINE_NOTICE =
++  "The deadline is two months and 15 days from the date the LLC is formed. The exact deadline date may differ based on holidays and weekends, so you should not put off filing it.";
++
+ function parseISODate(s: string): Date {
+   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+   if (!m) throw new Error(`Expected YYYY-MM-DD, got: ${s}`);
+@@ -29,13 +34,47 @@ function addDays(dt: Date, n: number): Date { return new Date(dt.getTime() + n *
+ function daysBetween(a: Date, b: Date): number { return Math.round((b.getTime() - a.getTime()) / 86400000); }
+ function lastDayOfMonth(y: number, mZeroBased: number): Date { return new Date(Date.UTC(y, mZeroBased + 1, 0)); }
+ 
++/** Recurring IRS/DC holidays, not the Federal Reserve banking calendar.
++ * IRS Publication 509 (2026), Saturday, Sunday, or legal holiday;
++ * D.C. Code 1-612.02. This does not calculate case-specific state holidays
++ * or IRS disaster-relief extensions, hence no definitive client due date. */
++function isIRSClosed(date: Date): boolean {
++  if (date.getUTCDay() === 0 || date.getUTCDay() === 6) return true;
++  const iso = toISO(date), year = date.getUTCFullYear();
++  const observed = (d: Date) => addDays(d, d.getUTCDay() === 6 ? -1 : d.getUTCDay() === 0 ? 1 : 0);
++  const nthMonday = (y: number, month: number, n: number) => {
++    const first = new Date(Date.UTC(y, month, 1));
++    return new Date(Date.UTC(y, month, 1 + (8 - first.getUTCDay()) % 7 + (n - 1) * 7));
++  };
++  // Next year's January 1 can be observed on December 31 of this year.
++  for (const y of [year - 1, year, year + 1]) {
++    const fixed = [[0, 1], [3, 16], [5, 19], [6, 4], [10, 11], [11, 25]];
++    const holidays = fixed.map(([month, day]) => observed(new Date(Date.UTC(y, month, day))));
++    const mayEnd = lastDayOfMonth(y, 4);
++    holidays.push(nthMonday(y, 0, 3), nthMonday(y, 1, 3),
++      addDays(mayEnd, -((mayEnd.getUTCDay() + 6) % 7)),
++      nthMonday(y, 8, 1), nthMonday(y, 9, 2));
++    const novemberFirst = new Date(Date.UTC(y, 10, 1));
++    holidays.push(new Date(Date.UTC(y, 10, 1 + (11 - novemberFirst.getUTCDay()) % 7 + 21)));
++    if ((y - 1981) % 4 === 0) {
++      const inauguration = new Date(Date.UTC(y, 0, 20));
++      // Sunday moves to Monday; Saturday has no preceding-Friday substitute.
++      holidays.push(addDays(inauguration, inauguration.getUTCDay() === 0 ? 1 : 0));
++    }
++    if (holidays.some(holiday => toISO(holiday) === iso)) return true;
++  }
++  return false;
++}
++
+ export function form2553Deadline(effectiveDateISO: string): string {
+   const eff = parseISODate(effectiveDateISO);
+   const y = eff.getUTCFullYear(), m = eff.getUTCMonth(), d = eff.getUTCDate();
+   const corresponding = new Date(Date.UTC(y, m + 2, d));
+   const noCorrespondingDay = corresponding.getUTCMonth() !== ((m + 2) % 12);
+   const endOfTwoMonths = noCorrespondingDay ? lastDayOfMonth(y, m + 2) : addDays(corresponding, -1);
+-  return toISO(addDays(endOfTwoMonths, 15));
++  let deadline = addDays(endOfTwoMonths, 15);
++  while (isIRSClosed(deadline)) deadline = addDays(deadline, 1);
++  return toISO(deadline);
+ }
+ 
+ function businessDaysBetween(a: Date, b: Date): number {
+@@ -83,17 +122,17 @@ export function evaluate2553Timing(opts: {
+   const runway = businessDays ? businessDaysBetween(now, deadline) : calendarDaysRemaining;
+   if (calendarDaysRemaining < 0) {
+     return { status: "late", deadline: deadlineISO, deadlineDisplay, daysRemaining: calendarDaysRemaining,
+-      message: `Your Form 2553 filing deadline was ${deadlineDisplay}. We do not prepare late S-election packages. A late election requires relief under Rev. Proc. 2013-30 — please consult a tax professional.`,
++      message: `${FORM2553_DEADLINE_NOTICE} The filing deadline has passed. We do not prepare late S-election packages. A late election requires relief under Rev. Proc. 2013-30 — please consult a tax professional.`,
+       acknowledgment: null };
+   }
+   if (runway < minDays) {
+     return { status: "insufficient", deadline: deadlineISO, deadlineDisplay, daysRemaining: calendarDaysRemaining,
+-      message: `Your Form 2553 filing deadline is ${deadlineDisplay}. That leaves insufficient time for us to prepare your package and for you to sign and file it. We do not prepare packages inside this window.`,
++      message: `${FORM2553_DEADLINE_NOTICE} There is insufficient time for us to prepare your package and for you to sign and file it. We do not prepare packages inside this window.`,
+       acknowledgment: null };
+   }
+   return { status: "ok", deadline: deadlineISO, deadlineDisplay, daysRemaining: calendarDaysRemaining,
+-    message: `Your Form 2553 must be filed (postmarked or faxed) by ${deadlineDisplay}.`,
+-    acknowledgment: `I understand that Form 2553 must be filed (postmarked or faxed) by ${deadlineDisplay}, and that MyFloridaSeriesLLC prepares the form but does not file it for me.` };
++    message: FORM2553_DEADLINE_NOTICE,
++    acknowledgment: `I understand that Form 2553 must be filed within two months and 15 days from the date the LLC is formed, that the exact deadline may differ based on holidays and weekends, and that MyFloridaSeriesLLC prepares the form but does not file it for me.` };
+ }
+ 
+ export const ORDER_TIME_ACKNOWLEDGMENT =
+diff --git a/webapp/src/pages/FAQ.tsx b/webapp/src/pages/FAQ.tsx
+index 9cba67e..7ee48cd 100644
+--- a/webapp/src/pages/FAQ.tsx
++++ b/webapp/src/pages/FAQ.tsx
+@@ -66,7 +66,7 @@ const FAQ_ITEMS: {
+   },
+   {
+     q: "Can I cancel or get a refund?",
+-    a: "Yes, until we start. Your service fee is fully refundable up to the point we begin preparing your documents, and it is not refundable after that, or after we submit your filing to the Division of Corporations. State fees already paid to Florida are never refundable by us. Add-on services are refundable until we begin work on them — for the S corporation election package that means until you submit your details, since the completed package is generated and delivered the moment you do.",
++    a: "Yes, until we start. Your service fee is fully refundable up to the point we begin preparing your documents, and it is not refundable after that, or after we submit your filing to the Division of Corporations. State fees already paid to Florida are never refundable by us. Add-on services are refundable until we begin work on them. The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.",
+     link: { to: "/terms", label: "Full refund terms" },
+   },
+ ];
+diff --git a/webapp/src/pages/portal/OrdersInProgress.tsx b/webapp/src/pages/portal/OrdersInProgress.tsx
+index cec0f19..6fe1df9 100644
+--- a/webapp/src/pages/portal/OrdersInProgress.tsx
++++ b/webapp/src/pages/portal/OrdersInProgress.tsx
+@@ -182,6 +182,9 @@ export function OrdersInProgress({
+ 
+   if (!data) return null;
+   const open = data.orders.filter((o) => o.status !== "fulfilled" && o.status !== "cancelled");
++  // The Company owns each protected series; its own members are not owners
++  // of the series (agreement §§3.6 and 4.2). A saved answer still takes priority.
++  const einMemberCountDefault = detailsFor?.details.target === "series" ? 1 : Math.max(1, data.members.length);
+ 
+   return (
+     <>
+@@ -547,9 +550,9 @@ export function OrdersInProgress({
+             <div className="grid grid-cols-2 gap-3">
+               <div className="space-y-1.5">
+                 <label className="text-sm font-medium">Number of members</label>
+-                <Input name="memberCount" inputMode="numeric" autoComplete="off" aria-label="Number of members" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount ?? String(Math.max(1, data.members.length))} />
++                <Input name="memberCount" inputMode="numeric" autoComplete="off" aria-label="Number of members" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount ?? String(einMemberCountDefault)} />
+                 <p className="text-xs text-muted-foreground">
+-                  {(Number((detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount) || data.members.length || 1) > 1
++                  {(Number((detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount) || einMemberCountDefault) > 1
+                     ? (data.sElection.reason === "already_ordered" ? "We will report it as an S corporation, since the Form 2553 package is on the order." : "We will report it as a partnership, the IRS's default for several members.")
+                     : (data.sElection.reason === "already_ordered" ? "We will report it as an S corporation, since the Form 2553 package is on the order." : "We will report it as a disregarded entity, the IRS's default for one member.")}
+                 </p>

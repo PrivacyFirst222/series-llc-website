@@ -231,3 +231,13 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - where: webapp/src/lib/englishText.ts — `Please use English letters (A–Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.`
 - where: docs/oa-instructions.md — `Series LLC Owner's Manual`
 - where: docs/owners-manual.md — `keep your email address current in the portal so notices reach you`
+
+
+### Batch 24 — S-election delivery and deadline wording (Adam, 20 September 2026)
+- value: `The deadline is two months and 15 days from the date the LLC is formed. The exact deadline date may differ based on holidays and weekends, so you should not put off filing it.`
+- where: webapp/src/lib/form2553Timing.ts — `The deadline is two months and 15 days from the date the LLC is formed. The exact deadline date may differ based on holidays and weekends, so you should not put off filing it.`
+- The questionnaire and generated S-election package use this general wording rather than a computed due date. The internal deadline calculation observes weekends and IRS/DC legal holidays; the formation-date starting point, preparation runway and purchase eligibility are unchanged.
+- value: `The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.`
+- where: webapp/src/content/terms.md — `The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.`
+- where: webapp/src/pages/FAQ.tsx — `The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.`
+- For a company-owned protected series, the EIN questionnaire initially counts one owner, the company. A parent-company EIN uses the parent membership count. Preserve explicit saved answers.

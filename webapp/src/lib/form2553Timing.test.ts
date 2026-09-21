@@ -1,9 +1,11 @@
 // Adam's cases for form2553Timing (6 Sep 2026). Run by `bun run test`; exits
 // non-zero on any failure.
-import { form2553Deadline, evaluate2553Timing, ORDER_TIME_ACKNOWLEDGMENT } from "./form2553Timing";
+import { form2553Deadline, evaluate2553Timing, ORDER_TIME_ACKNOWLEDGMENT, FORM2553_DEADLINE_NOTICE } from "./form2553Timing";
 
 let failed = 0;
+let total = 0;
 const eq = (got: unknown, want: unknown, label: string) => {
+  total++;
   if (JSON.stringify(got) !== JSON.stringify(want)) {
     failed++;
     console.log(`  ❌ ${label}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`);
@@ -12,17 +14,17 @@ const eq = (got: unknown, want: unknown, label: string) => {
 
 // Deadlines — the IRS example first.
 const deadlines: [string, string][] = [
-  ["2026-01-07", "2026-03-21"],
+  ["2026-01-07", "2026-03-23"],
   ["2026-12-31", "2027-03-15"],
   ["2027-12-31", "2028-03-15"],
   ["2026-03-01", "2026-05-15"],
   ["2026-01-31", "2026-04-14"],
   ["2026-01-30", "2026-04-13"],
   ["2026-12-30", "2027-03-15"],
-  ["2026-11-30", "2027-02-13"],
+  ["2026-11-30", "2027-02-16"],
   ["2026-09-05", "2026-11-19"],
   ["2027-01-01", "2027-03-15"],
-  ["2028-02-29", "2028-05-13"],
+  ["2028-02-29", "2028-05-15"],
 ];
 for (const [eff, want] of deadlines) eq(form2553Deadline(eff), want, `deadline ${eff}`);
 
@@ -43,8 +45,9 @@ for (const bad of ["2026-02-30", "09/05/2026"]) {
   try { form2553Deadline(bad); } catch { threw = true; }
   eq(threw, true, `${bad} throws`);
 }
-eq(g1.acknowledgment?.includes("11/19/2026"), true, "the acknowledgment carries the deadline");
+eq(g1.message, FORM2553_DEADLINE_NOTICE, "general deadline notice");
+eq(g1.acknowledgment?.includes("two months and 15 days") && !g1.acknowledgment.includes("11/19/2026"), true, "the acknowledgment carries the deadline");
 eq(ORDER_TIME_ACKNOWLEDGMENT.includes("no refund"), true, "the order-time acknowledgment says no refund");
 
-console.log(`[2553 timing] ${deadlines.length + 11} cases, ${failed} failures.`);
+console.log(`[2553 timing] ${total} cases, ${failed} failures.`);
 if (typeof process !== "undefined" && import.meta.main) process.exit(failed === 0 ? 0 : 1);

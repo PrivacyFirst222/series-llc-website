@@ -1,0 +1,21 @@
+1747 |     let { file, line, column } = e.location;
+1748 |     let pluginText = e.pluginName ? `[plugin: ${e.pluginName}] ` : "";
+1749 |     return `
+1750 | ${file}:${line}:${column}: ERROR: ${pluginText}${e.text}`;
+1751 |   }).join("");
+1752 |   let error = new Error(text);
+                         ^
+error: Build failed with 1 error:
+webapp/src/pages/Terms.tsx:2:24: ERROR: [plugin: raw-markdown] ENOENT: no such file or directory, open '/Users/adam/Documents/FLPSLLC Website Review/audit-repair-group-4-2026-09-20/repo/webapp/src/pages/@/content/terms.md'
+      at failureErrorWithLog (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/esbuild/lib/main.js:1752:19)
+      at <anonymous> (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/esbuild/lib/main.js:1211:25)
+      at buildResponseToResult (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/esbuild/lib/main.js:1209:7)
+      at <anonymous> (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/esbuild/lib/main.js:886:9)
+      at handleIncomingPacket (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/esbuild/lib/main.js:941:12)
+      at readFromStdout (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/esbuild/lib/main.js:864:7)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:264:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:242:18)
+      at handleNumberResult (internal:streams/native-readable:69:18)
+
+Bun v1.3.14 (macOS arm64)

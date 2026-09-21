@@ -101825,6 +101825,7 @@ var fmtEinDisplay = (digits) => /^\d{9}$/.test(digits) ? `${digits.slice(0, 2)}-
 
 // src/lib/form2553Timing.ts
 var DEFAULT_MIN_DAYS = 5;
+var FORM2553_DEADLINE_NOTICE = "The deadline is two months and 15 days from the date the LLC is formed. The exact deadline date may differ based on holidays and weekends, so you should not put off filing it.";
 function parseISODate(s) {
   const m2 = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
   if (!m2) throw new Error(`Expected YYYY-MM-DD, got: ${s}`);
@@ -101851,13 +101852,44 @@ function daysBetween(a2, b2) {
 function lastDayOfMonth(y, mZeroBased) {
   return new Date(Date.UTC(y, mZeroBased + 1, 0));
 }
+function isIRSClosed(date2) {
+  if (date2.getUTCDay() === 0 || date2.getUTCDay() === 6) return true;
+  const iso = toISO(date2), year = date2.getUTCFullYear();
+  const observed = (d2) => addDays2(d2, d2.getUTCDay() === 6 ? -1 : d2.getUTCDay() === 0 ? 1 : 0);
+  const nthMonday2 = (y, month, n) => {
+    const first = new Date(Date.UTC(y, month, 1));
+    return new Date(Date.UTC(y, month, 1 + (8 - first.getUTCDay()) % 7 + (n - 1) * 7));
+  };
+  for (const y of [year - 1, year, year + 1]) {
+    const fixed = [[0, 1], [3, 16], [5, 19], [6, 4], [10, 11], [11, 25]];
+    const holidays = fixed.map(([month, day]) => observed(new Date(Date.UTC(y, month, day))));
+    const mayEnd = lastDayOfMonth(y, 4);
+    holidays.push(
+      nthMonday2(y, 0, 3),
+      nthMonday2(y, 1, 3),
+      addDays2(mayEnd, -((mayEnd.getUTCDay() + 6) % 7)),
+      nthMonday2(y, 8, 1),
+      nthMonday2(y, 9, 2)
+    );
+    const novemberFirst = new Date(Date.UTC(y, 10, 1));
+    holidays.push(new Date(Date.UTC(y, 10, 1 + (11 - novemberFirst.getUTCDay()) % 7 + 21)));
+    if ((y - 1981) % 4 === 0) {
+      const inauguration = new Date(Date.UTC(y, 0, 20));
+      holidays.push(addDays2(inauguration, inauguration.getUTCDay() === 0 ? 1 : 0));
+    }
+    if (holidays.some((holiday) => toISO(holiday) === iso)) return true;
+  }
+  return false;
+}
 function form2553Deadline(effectiveDateISO) {
   const eff = parseISODate(effectiveDateISO);
   const y = eff.getUTCFullYear(), m2 = eff.getUTCMonth(), d2 = eff.getUTCDate();
   const corresponding = new Date(Date.UTC(y, m2 + 2, d2));
   const noCorrespondingDay = corresponding.getUTCMonth() !== (m2 + 2) % 12;
   const endOfTwoMonths = noCorrespondingDay ? lastDayOfMonth(y, m2 + 2) : addDays2(corresponding, -1);
-  return toISO(addDays2(endOfTwoMonths, 15));
+  let deadline = addDays2(endOfTwoMonths, 15);
+  while (isIRSClosed(deadline)) deadline = addDays2(deadline, 1);
+  return toISO(deadline);
 }
 function businessDaysBetween(a2, b2) {
   let count = 0;
@@ -101895,7 +101927,7 @@ function evaluate2553Timing(opts) {
       deadline: deadlineISO,
       deadlineDisplay,
       daysRemaining: calendarDaysRemaining,
-      message: `Your Form 2553 filing deadline was ${deadlineDisplay}. We do not prepare late S-election packages. A late election requires relief under Rev. Proc. 2013-30 \u2014 please consult a tax professional.`,
+      message: `${FORM2553_DEADLINE_NOTICE} The filing deadline has passed. We do not prepare late S-election packages. A late election requires relief under Rev. Proc. 2013-30 \u2014 please consult a tax professional.`,
       acknowledgment: null
     };
   }
@@ -101905,7 +101937,7 @@ function evaluate2553Timing(opts) {
       deadline: deadlineISO,
       deadlineDisplay,
       daysRemaining: calendarDaysRemaining,
-      message: `Your Form 2553 filing deadline is ${deadlineDisplay}. That leaves insufficient time for us to prepare your package and for you to sign and file it. We do not prepare packages inside this window.`,
+      message: `${FORM2553_DEADLINE_NOTICE} There is insufficient time for us to prepare your package and for you to sign and file it. We do not prepare packages inside this window.`,
       acknowledgment: null
     };
   }
@@ -101914,8 +101946,8 @@ function evaluate2553Timing(opts) {
     deadline: deadlineISO,
     deadlineDisplay,
     daysRemaining: calendarDaysRemaining,
-    message: `Your Form 2553 must be filed (postmarked or faxed) by ${deadlineDisplay}.`,
-    acknowledgment: `I understand that Form 2553 must be filed (postmarked or faxed) by ${deadlineDisplay}, and that MyFloridaSeriesLLC prepares the form but does not file it for me.`
+    message: FORM2553_DEADLINE_NOTICE,
+    acknowledgment: `I understand that Form 2553 must be filed within two months and 15 days from the date the LLC is formed, that the exact deadline may differ based on holidays and weekends, and that MyFloridaSeriesLLC prepares the form but does not file it for me.`
   };
 }
 
@@ -102057,7 +102089,7 @@ The official form lists seven shareholders on page 2. The shareholders below are
 ${rows}
 `;
 }
-function instructionsMarkdown(d2, deadlineIso) {
+function instructionsMarkdown(d2) {
   const einLine = `The form is completed with your EIN, **${fmtEin(d2.ein)}**.`;
   if (d2.recordCopy) {
     return `# S CORPORATION ELECTION PACKAGE \u2014 RECORD COPY
@@ -102078,7 +102110,7 @@ If you still need to file, contact us and we will prepare a new package.
 2. The cover letter as it was prepared.
 3. **IRS Form 2553 as it was completed**, with the Social Security numbers removed.
 
-The IRS deadline for this election is ${fmtDateLong(deadlineIso)}. If that date has passed, discuss late-election relief with your tax professional.
+${FORM2553_DEADLINE_NOTICE} If the deadline has passed, discuss late-election relief with your tax professional.
 `;
   }
   return `# S CORPORATION ELECTION PACKAGE
@@ -102110,9 +102142,9 @@ ${d2.shareholders.length > 7 ? `- **Owners eight onward sign the continuation sh
 
 ` : ""}An election without every required signature is invalid. Do not leave any consent line blank.
 
-## STEP 3 \u2014 FILE IT (DEADLINE: ${fmtDateLong(deadlineIso).toUpperCase()})
+## STEP 3 \u2014 FILE IT
 
-You must file Form 2553 **within 2 months and 15 days after your LLC is officially formed with the Florida Division of Corporations** \u2014 for your company, that is **${fmtDateLong(deadlineIso)}**. File as soon as the form is signed; do not wait for the deadline.
+${FORM2553_DEADLINE_NOTICE} File as soon as the form is signed; do not wait for the deadline.
 
 Choose ONE of the following. There is no IRS filing fee.
 
@@ -102185,10 +102217,10 @@ async function stampRecordCopy(doc) {
 }
 async function buildSElectionPackage(d2) {
   if (!isValidEin(d2.ein)) throw new Error("An issued EIN is required before preparing Form 2553.");
-  const deadline = electionDeadline(d2.effectiveDate);
+  electionDeadline(d2.effectiveDate);
   const title = `S Corporation Election Package \u2014 ${d2.llcName}`;
   const instructions = await renderMarkdownPdf({
-    markdown: instructionsMarkdown(d2, deadline),
+    markdown: instructionsMarkdown(d2),
     watermark: null,
     title
   });

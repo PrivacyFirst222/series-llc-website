@@ -5,13 +5,18 @@
 // year begins and ends with the close of the day before the numerically
 // corresponding day of the second calendar month following that month. If
 // there is no corresponding day, use the close of the last day of the
-// calendar month" — then 15 days. Example 1: January 7 → March 21.
+// calendar month" — then 15 days. Example 1: January 7 → March 21 before
+// weekend/holiday adjustment (IRS Publication 509, 2026).
 //
 // All date math is on YYYY-MM-DD strings. "today" is passed in as an
 // Eastern Time date string — never the server clock directly (Vercel runs
 // UTC).
 
 export const DEFAULT_MIN_DAYS = 5;
+
+/** Adam, Batch 24: general client wording, not a definitive calculated date. */
+export const FORM2553_DEADLINE_NOTICE =
+  "The deadline is two months and 15 days from the date the LLC is formed. The exact deadline date may differ based on holidays and weekends, so you should not put off filing it.";
 
 function parseISODate(s: string): Date {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
@@ -29,13 +34,47 @@ function addDays(dt: Date, n: number): Date { return new Date(dt.getTime() + n *
 function daysBetween(a: Date, b: Date): number { return Math.round((b.getTime() - a.getTime()) / 86400000); }
 function lastDayOfMonth(y: number, mZeroBased: number): Date { return new Date(Date.UTC(y, mZeroBased + 1, 0)); }
 
+/** Recurring IRS/DC holidays, not the Federal Reserve banking calendar.
+ * IRS Publication 509 (2026), Saturday, Sunday, or legal holiday;
+ * D.C. Code 1-612.02. This does not calculate case-specific state holidays
+ * or IRS disaster-relief extensions, hence no definitive client due date. */
+function isIRSClosed(date: Date): boolean {
+  if (date.getUTCDay() === 0 || date.getUTCDay() === 6) return true;
+  const iso = toISO(date), year = date.getUTCFullYear();
+  const observed = (d: Date) => addDays(d, d.getUTCDay() === 6 ? -1 : d.getUTCDay() === 0 ? 1 : 0);
+  const nthMonday = (y: number, month: number, n: number) => {
+    const first = new Date(Date.UTC(y, month, 1));
+    return new Date(Date.UTC(y, month, 1 + (8 - first.getUTCDay()) % 7 + (n - 1) * 7));
+  };
+  // Next year's January 1 can be observed on December 31 of this year.
+  for (const y of [year - 1, year, year + 1]) {
+    const fixed = [[0, 1], [3, 16], [5, 19], [6, 4], [10, 11], [11, 25]];
+    const holidays = fixed.map(([month, day]) => observed(new Date(Date.UTC(y, month, day))));
+    const mayEnd = lastDayOfMonth(y, 4);
+    holidays.push(nthMonday(y, 0, 3), nthMonday(y, 1, 3),
+      addDays(mayEnd, -((mayEnd.getUTCDay() + 6) % 7)),
+      nthMonday(y, 8, 1), nthMonday(y, 9, 2));
+    const novemberFirst = new Date(Date.UTC(y, 10, 1));
+    holidays.push(new Date(Date.UTC(y, 10, 1 + (11 - novemberFirst.getUTCDay()) % 7 + 21)));
+    if ((y - 1981) % 4 === 0) {
+      const inauguration = new Date(Date.UTC(y, 0, 20));
+      // Sunday moves to Monday; Saturday has no preceding-Friday substitute.
+      holidays.push(addDays(inauguration, inauguration.getUTCDay() === 0 ? 1 : 0));
+    }
+    if (holidays.some(holiday => toISO(holiday) === iso)) return true;
+  }
+  return false;
+}
+
 export function form2553Deadline(effectiveDateISO: string): string {
   const eff = parseISODate(effectiveDateISO);
   const y = eff.getUTCFullYear(), m = eff.getUTCMonth(), d = eff.getUTCDate();
   const corresponding = new Date(Date.UTC(y, m + 2, d));
   const noCorrespondingDay = corresponding.getUTCMonth() !== ((m + 2) % 12);
   const endOfTwoMonths = noCorrespondingDay ? lastDayOfMonth(y, m + 2) : addDays(corresponding, -1);
-  return toISO(addDays(endOfTwoMonths, 15));
+  let deadline = addDays(endOfTwoMonths, 15);
+  while (isIRSClosed(deadline)) deadline = addDays(deadline, 1);
+  return toISO(deadline);
 }
 
 function businessDaysBetween(a: Date, b: Date): number {
@@ -83,17 +122,17 @@ export function evaluate2553Timing(opts: {
   const runway = businessDays ? businessDaysBetween(now, deadline) : calendarDaysRemaining;
   if (calendarDaysRemaining < 0) {
     return { status: "late", deadline: deadlineISO, deadlineDisplay, daysRemaining: calendarDaysRemaining,
-      message: `Your Form 2553 filing deadline was ${deadlineDisplay}. We do not prepare late S-election packages. A late election requires relief under Rev. Proc. 2013-30 — please consult a tax professional.`,
+      message: `${FORM2553_DEADLINE_NOTICE} The filing deadline has passed. We do not prepare late S-election packages. A late election requires relief under Rev. Proc. 2013-30 — please consult a tax professional.`,
       acknowledgment: null };
   }
   if (runway < minDays) {
     return { status: "insufficient", deadline: deadlineISO, deadlineDisplay, daysRemaining: calendarDaysRemaining,
-      message: `Your Form 2553 filing deadline is ${deadlineDisplay}. That leaves insufficient time for us to prepare your package and for you to sign and file it. We do not prepare packages inside this window.`,
+      message: `${FORM2553_DEADLINE_NOTICE} There is insufficient time for us to prepare your package and for you to sign and file it. We do not prepare packages inside this window.`,
       acknowledgment: null };
   }
   return { status: "ok", deadline: deadlineISO, deadlineDisplay, daysRemaining: calendarDaysRemaining,
-    message: `Your Form 2553 must be filed (postmarked or faxed) by ${deadlineDisplay}.`,
-    acknowledgment: `I understand that Form 2553 must be filed (postmarked or faxed) by ${deadlineDisplay}, and that MyFloridaSeriesLLC prepares the form but does not file it for me.` };
+    message: FORM2553_DEADLINE_NOTICE,
+    acknowledgment: `I understand that Form 2553 must be filed within two months and 15 days from the date the LLC is formed, that the exact deadline may differ based on holidays and weekends, and that MyFloridaSeriesLLC prepares the form but does not file it for me.` };
 }
 
 export const ORDER_TIME_ACKNOWLEDGMENT =

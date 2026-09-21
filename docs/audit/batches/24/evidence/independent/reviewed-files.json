@@ -1,0 +1,68 @@
+{
+  "capturedAtUTC": "2026-09-21T02:39:58.479155+00:00",
+  "head": "81a7290cc77d13c42685a57d9d37f5103cf6d4c4",
+  "baseline": "81a7290cc77d13c42685a57d9d37f5103cf6d4c4",
+  "diffSha256": "24396ff0961b2de6f7efce18a9e9f343b14233f6707275481e568a1fba548873",
+  "files": [
+    {
+      "path": "webapp/src/lib/form2553Timing.ts",
+      "sha256": "d43702e2022e17188a75866a6fce46cca72c6d11537cbbc4ee3a67f1bb6bb094",
+      "lines": 152
+    },
+    {
+      "path": "webapp/server/s-election.ts",
+      "sha256": "c5f854908a8047bdac1fa87bb55b0fbb0e22d7397934c469b845e7c694188d15",
+      "lines": 343
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "sha256": "94edfbb409ac82681afec92aaee4b0da96d32334d34e237b7b500501621f01b9",
+      "lines": 736
+    },
+    {
+      "path": "webapp/src/content/terms.md",
+      "sha256": "400990d8d7f8c4e14e1d49d1b4ed4a301332d44ca5bada57df43223d749e58ee",
+      "lines": 176
+    },
+    {
+      "path": "webapp/src/pages/FAQ.tsx",
+      "sha256": "3da222e3a920d439928e3ca91e7753413ac77440cb531b3577fdbe8b293c1bfb",
+      "lines": 170
+    },
+    {
+      "path": "docs/facts.md",
+      "sha256": "8c00d7d9c6005a66f4b1ab46da95e50be065a6af8b287c00b26da97fc97edd04",
+      "lines": 243
+    },
+    {
+      "path": "webapp/src/lib/form2553Timing.test.ts",
+      "sha256": "c0ee8f392ccd30c8f540a12de71a6ae2acf19f6e8e52f4d1d06955e9741303d4",
+      "lines": 53
+    },
+    {
+      "path": "webapp/scripts/batch13-walk.ts",
+      "sha256": "2dc2a63745e215f715822c68e4e0f71f781554dbf3e20dfc582187d299d2951c",
+      "lines": 68
+    },
+    {
+      "path": "webapp/scripts/batch24-ein-check.ts",
+      "sha256": "6c70ffc37618ffa4bc1efcf49220a8bf1f029a951db54a786c1ecaba8e052979",
+      "lines": 142
+    },
+    {
+      "path": "webapp/scripts/batch24-timing-check.ts",
+      "sha256": "b1740f4ca6eca220e1e5d47215257a219b79658b51a56bda4c1324282d31b2a5",
+      "lines": 29
+    },
+    {
+      "path": "docs/audit/batches/24/batch.json",
+      "sha256": "64043ba69810898abf88b78a29c89c467478f4e9e6b65e33e8ceb5a6a4a2f054",
+      "lines": 163
+    },
+    {
+      "path": "docs/audit/batches/24/revisions/r1.json",
+      "sha256": "64043ba69810898abf88b78a29c89c467478f4e9e6b65e33e8ceb5a6a4a2f054",
+      "lines": 163
+    }
+  ]
+}

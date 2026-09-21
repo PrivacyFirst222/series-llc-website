@@ -1,4 +1,4 @@
-Last updated: **September 19, 2026**
+Last updated: **September 20, 2026**
 
 ### 1. The Parties
 These Terms of Service ("Terms") are a binding agreement between you and **FLORIDA PROTECTED SERIES, LLC - PS 1** ("Filing Services") and **FLORIDA PROTECTED SERIES, LLC - PS 2** ("Agent Services"), each a protected series of FLORIDA PROTECTED SERIES, LLC, a Florida limited liability company (the "Company"; each series a "Company party" and together the "Companies"). "We," "us," and "our" refer to the Company party providing the Service at issue.
@@ -74,7 +74,7 @@ You must notify us immediately of any change to your email address, mailing addr
 **(c) After submission.** No portion of the service fee is refundable.
 **(d) Government fees.** Fees remitted to the State of Florida are never refundable by us.
 **(e) Registered agent service.** Changing registered agents during a paid service year does not entitle you to a refund. Otherwise, a renewal charge is refundable within 30 days if we have not yet received or posted any document for you in that term; after that it is non-refundable. No prorated refunds. The resignation charge covers state filing fees and processing, not a renewed service year.
-**(f) Add-on services.** Each add-on service is refundable until we begin work on it. The S corporation election package is not refundable once you submit your details, because the completed package is generated and delivered to your client portal at that moment.
+**(f) Add-on services.** Each add-on service is refundable until we begin work on it. The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.
 
 ### 12. Chargebacks
 Chargebacks initiated after services are performed constitute a breach of these Terms. You agree to reimburse us our costs of responding, including a $100 administrative charge, and we may suspend the Services and portal access pending resolution.

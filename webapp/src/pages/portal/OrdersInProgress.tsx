@@ -182,6 +182,9 @@ export function OrdersInProgress({
 
   if (!data) return null;
   const open = data.orders.filter((o) => o.status !== "fulfilled" && o.status !== "cancelled");
+  // The Company owns each protected series; its own members are not owners
+  // of the series (agreement §§3.6 and 4.2). A saved answer still takes priority.
+  const einMemberCountDefault = detailsFor?.details.target === "series" ? 1 : Math.max(1, data.members.length);
 
   return (
     <>
@@ -547,9 +550,9 @@ export function OrdersInProgress({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Number of members</label>
-                <Input name="memberCount" inputMode="numeric" autoComplete="off" aria-label="Number of members" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount ?? String(Math.max(1, data.members.length))} />
+                <Input name="memberCount" inputMode="numeric" autoComplete="off" aria-label="Number of members" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount ?? String(einMemberCountDefault)} />
                 <p className="text-xs text-muted-foreground">
-                  {(Number((detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount) || data.members.length || 1) > 1
+                  {(Number((detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount) || einMemberCountDefault) > 1
                     ? (data.sElection.reason === "already_ordered" ? "We will report it as an S corporation, since the Form 2553 package is on the order." : "We will report it as a partnership, the IRS's default for several members.")
                     : (data.sElection.reason === "already_ordered" ? "We will report it as an S corporation, since the Form 2553 package is on the order." : "We will report it as a disregarded entity, the IRS's default for one member.")}
                 </p>

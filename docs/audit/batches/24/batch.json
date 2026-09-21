@@ -1,0 +1,163 @@
+{
+  "id": "24",
+  "revision": 1,
+  "title": "EIN member counts and S-election delivery and deadline wording",
+  "model": "Codex",
+  "base": "81a7290cc77d13c42685a57d9d37f5103cf6d4c4",
+  "items": [
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B1-N01",
+      "part": "all",
+      "scope": "Correct Terms and FAQ delivery explanation while preserving the no-refund cutoff; the S package waits for required details and issued EIN.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch24-ein-check.ts",
+          "text": "B1-N01"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch24-ein-check.ts"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/content/terms.md",
+          "text": "The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available."
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/FAQ.tsx",
+          "text": "The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available."
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B1-N04",
+      "part": "all",
+      "scope": "Use Adam's general deadline wording in questionnaire and generated package without a computed due date; correct internal IRS weekend/DC-holiday deadline rollover and preserve formation start and service preparation limits.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch24-timing-check.ts",
+          "text": "B1-N04"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch24-timing-check.ts"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/lib/form2553Timing.ts",
+          "text": "The deadline is two months and 15 days from the date the LLC is formed. The exact deadline date may differ based on holidays and weekends, so you should not put off filing it."
+        }
+      ]
+    },
+    {
+      "id": "AUD-post-batches-2026-09-20-4a344e2-B3-01",
+      "part": "all",
+      "scope": "Seed protected-series EIN membership count as one company owner; retain parent membership count for parent EINs and explicit saved client answers; verify submission, storage and office display.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch24-ein-check.ts",
+          "text": "B3-01"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch24-ein-check.ts"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/content/terms.md",
+      "mode": "code",
+      "control": false,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    },
+    {
+      "path": "webapp/src/pages/FAQ.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    },
+    {
+      "path": "webapp/src/lib/form2553Timing.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    },
+    {
+      "path": "webapp/server/s-election.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    },
+    {
+      "path": "docs/facts.md",
+      "mode": "code",
+      "control": true,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    },
+    {
+      "path": "webapp/src/lib/form2553Timing.test.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    },
+    {
+      "path": "webapp/scripts/batch13-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    },
+    {
+      "path": "webapp/scripts/batch24-ein-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    },
+    {
+      "path": "webapp/scripts/batch24-timing-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    },
+    {
+      "path": "webapp/package.json",
+      "mode": "code",
+      "control": true,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "control": true,
+      "why": "Implement the three approved Batch24 repairs with Adam\u2019s revised deadline wording and full regression evidence; preserve prior decisions and unrelated product behavior."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": []
+}

@@ -19821,15 +19821,57 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-21T00:00:08.074Z",
               "event": "recorded from verified audit",
               "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T02:29:17.978Z",
+              "event": "assigned",
+              "batch": "24",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T02:39:20.428Z",
+              "event": "implemented",
+              "batch": "24",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "24",
+          "fix": {
+            "batch": "24",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/batch24-ein-check.ts",
+                "text": "B1-N01"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "scripts/batch24-ein-check.ts"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/content/terms.md",
+                "text": "The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available."
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/pages/FAQ.tsx",
+                "text": "The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available."
+              }
+            ]
+          }
         }
       ]
     },
@@ -19960,15 +20002,52 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-21T00:00:08.074Z",
               "event": "recorded from verified audit",
               "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T02:29:17.978Z",
+              "event": "assigned",
+              "batch": "24",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T02:39:20.428Z",
+              "event": "implemented",
+              "batch": "24",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "24",
+          "fix": {
+            "batch": "24",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/batch24-timing-check.ts",
+                "text": "B1-N04"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "scripts/batch24-timing-check.ts"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/lib/form2553Timing.ts",
+                "text": "The deadline is two months and 15 days from the date the LLC is formed. The exact deadline date may differ based on holidays and weekends, so you should not put off filing it."
+              }
+            ]
+          }
         }
       ]
     },
@@ -20327,15 +20406,47 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-21T00:00:08.074Z",
               "event": "recorded from verified audit",
               "note": "post-batches-2026-09-20-4a344e2 at 4a344e22e0d0239481f3182d6528bf84d960ed0d; audit b7af04f1e5845a6dcbd8c3cb944cc7196b69934c858d527ab02f449e2a064516"
+            },
+            {
+              "at": "2026-09-21T02:29:17.978Z",
+              "event": "assigned",
+              "batch": "24",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T02:39:20.428Z",
+              "event": "implemented",
+              "batch": "24",
+              "revision": 1,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "24",
+          "fix": {
+            "batch": "24",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/batch24-ein-check.ts",
+                "text": "B3-01"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "scripts/batch24-ein-check.ts"
+              }
+            ]
+          }
         }
       ]
     },
@@ -22205,6 +22316,25 @@
         },
         {
           "at": "2026-09-21T01:56:56.961Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "24",
+      "revision": 1,
+      "frozenHash": "1d78d4e027065defe1da3f5e3005561bb35ab66d38afa30076a7a7cb2a06828b",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "81a7290cc77d13c42685a57d9d37f5103cf6d4c4",
+      "history": [
+        {
+          "at": "2026-09-21T02:29:17.979Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-21T02:39:20.428Z",
           "event": "implemented"
         }
       ]

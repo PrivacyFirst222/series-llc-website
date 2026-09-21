@@ -1,0 +1,16 @@
+{
+  "baseline": "81a7290cc77d13c42685a57d9d37f5103cf6d4c4",
+  "ids": 365,
+  "unchangedItems": 362,
+  "unchangedBatches": 33,
+  "unchangedRulings": 42,
+  "changedItems": [
+    "AUD-post-batches-2026-09-20-4a344e2-B1-N01",
+    "AUD-post-batches-2026-09-20-4a344e2-B1-N04",
+    "AUD-post-batches-2026-09-20-4a344e2-B3-01"
+  ],
+  "importedPartStatus": {
+    "implemented": 24,
+    "open": 7
+  }
+}

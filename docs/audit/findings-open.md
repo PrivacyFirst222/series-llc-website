@@ -324,13 +324,14 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Opened2026 s.605.0304(1) protects against liability solely by reason of being or acting as a member or manager. It does not turn title to property into immunity from independently actionable conduct. The stated example does not establish who negligently maintained the walkway or any other basis for an individual claim. This concerns the inside-liability example, not the owner's ruled charging-order sentence. Source: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/Sections/0605.0304.html .
   - Replace with: Ralph can sue Heavenly Havens, LLC. Chuck and Belinda are not personally liable merely because they own or manage it, but the LLC does not protect them from liability for their own wrongful conduct or other independent obligations.
   - Ruling, 2026-09-20: Batch 17 review item 8 rejected. Keep the existing owner-immunity example as is.
-- **AUD-post-batches-2026-09-20-4a344e2-B1-N01. [substantive]** — **open**
+- **AUD-post-batches-2026-09-20-4a344e2-B1-N01. [substantive]** — **implemented**
   - Terms of Service, Add-on refunds; also FAQ “What is the refund policy?” (FAQ.tsx:69). — `webapp/src/content/terms.md:77`
   - Reads: **(f) Add-on services.** Each add-on service is refundable until we begin work on it. The S corporation election package is not refundable once you submit your details, because the completed package is generated and delivered to your client portal at that moment.
   - Claims: Submitting S-election questionnaire details immediately generates and delivers the completed package.
   - True: routes-portal.ts:2396–2403 explicitly saves answers with an EIN pending, returns awaitingEin:true and documentId:null, and does not build the PDF. Batch13 authorizes this supported waiting state. FAQ.tsx:69 repeats the same immediate-delivery explanation. This differs from prior39, which concerns who can buy the package.
   - Proposed replacement (not approved): **(f) Add-on services.** Each add-on service is refundable until we begin work on it. The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.
   - Rechecked by codex-reader-5: Terms77/FAQ69 claim immediate PDF delivery. Actual routes-portal2396–2404 returns awaitingEin true and documentId null when no issued EIN. Replacement preserves the existing refund cutoff and corrects only false delivery rationale. Prior39 concerns purchase eligibility and differs.
+  - Fixed: batch 24 revision 1, commit , by Codex; protected by 4 assertion(s).
 - **AUD-post-batches-2026-09-20-4a344e2-B1-N02. [wording]** — **implemented**
   - Registered-agent payment page, browser tab title (/agent-checkout). — `webapp/src/components/layout/Layout.tsx:41`
   - Reads: document.title = PAGE_TITLES[pathname] ?? `Page Not Found \u2014 ${SITE}`;
@@ -339,13 +340,14 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Add the title-map entry: "/agent-checkout": `Registered Agent Payment — ${SITE}`,
   - Rechecked by codex-reader-5: Read Layout full and App44–63: valid /agent-checkout route has no title key; fallback is Page Not Found. Prior17 covers /portal/amend, already present. Specific proposed entry is accurate.
   - Fixed: batch 22 revision 1, commit , by Codex; protected by 2 assertion(s).
-- **AUD-post-batches-2026-09-20-4a344e2-B1-N04. [substantive]** — **open**
+- **AUD-post-batches-2026-09-20-4a344e2-B1-N04. [substantive]** — **implemented**
   - Client portal, S-election questionnaire filing deadline and late-election warning; shared Form2553 deadline helper. — `webapp/src/lib/form2553Timing.ts:38`
   - Reads: return toISO(addDays(endOfTwoMonths, 15));
   - Claims: The raw two-month-plus15day calendar result is the final IRS filing deadline, including weekends and legal holidays.
   - True: Actual helper returns2026-03-15(Sunday) for a company formed2026-01-01 and declares the election late onMonday03-16. IRS Publication509(2026), “Saturday, Sunday, or legal holiday”, generally moves the tax-act due date to the next nonweekend/nonlegal-holiday day; the root reader opened that rule and the Form2553 entry in the same publication. Preserve owner63’s formation-date starting point: this finding concerns only the ending-day adjustment. Primary source reading and quotation retained in evidence/primary-irs-deadline-read.md.
   - Proposed replacement (not approved): After computing the ordinary two-month-plus15day deadline, advance it past Saturdays, Sundays and applicable IRS/DC legal holidays. Use that adjusted date consistently for deadline display, the late decision and the preparation runway; keep the owner-approved formation-date starting point.
   - Rechecked by codex-reader-5: Independently imported real form2553Timing helper; Jan1 deadline is SundayMar15 and nextMondayMar16 is late. Read full relevant helper30–89 and root primary-irs-deadline-read.md. Root current IRS Publication509 evidence establishes weekend/holiday timely-nextday rule; rollover is independent of owner63 startdate decision and65-day purchase cutoff. Proposed adjustment correct, retaining5-day service runway separately.
+  - Fixed: batch 24 revision 1, commit , by Codex; protected by 3 assertion(s).
 
 ## Order form and payment — 84 open of 86
 
@@ -1502,13 +1504,14 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: OaOwnersSections.tsx:134-143 explicitly permits a company or trust and :126 asks its full legal name. OAQuestionnaire.tsx:330 nevertheless applies hasFirstAndLast to all owners, including isEntity:true; routes-portal.ts:1215-1217 repeats the restriction. An entity’s one-word legal name therefore blocks generation even with its separate human signer’s full name and title supplied at :335. The form conflates the entity’s legal name with the signer’s personal name.
   - Replace with: Require a nonblank full legal entity name for isEntity owners and apply first/last-name validation only to individual owners and human signers. Entity label: “Full legal name of the company or trust”.
   - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **AUD-post-batches-2026-09-20-4a344e2-B3-01. [substantive]** — **open**
+- **AUD-post-batches-2026-09-20-4a344e2-B3-01. [substantive]** — **implemented**
   - Client portal, EIN application details for a protected series, Number of members. — `webapp/src/pages/portal/OrdersInProgress.tsx:545`
   - Reads:                 <Input name="memberCount" inputMode="numeric" autoComplete="off" aria-label="Number of members" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount ?? String(Math.max(1, data.members.length))} />
   - Claims: The protected series has the parent company's number of owners.
   - True: routes-portal.ts:1853–1859 derives data.members from parent OA owners. OrdersInProgress.tsx:545 uses that count for a series EIN too, even though templates-oa-multi.md:120/132 give the Company the entire protected-series interest. Submitted memberCount persists at routes-portal.ts:2198 and reaches ServiceOrdersSection.tsx:328. Source-confirmed; not a claim of observed external IRS submission. The adjacent parent-S-package tax hint is recorded as residual prior N1.07 rather than another new defect.
   - Proposed replacement (not approved): For a protected-series EIN, derive the initial owner count from that series' ownership. For the company-owned series created by these agreements, prefill 1. Do not count the parent company's members as owners of its series.
   - Rechecked by codex-reader-5: Actual OrdersInProgress545 seed uses parent data.members and API1853–1859 obtains parent effectiveOwners;2198 persists supplied count; master3.6 gives Company entire series interest. Wrong series member-count seed is new. However portal taxhint547–549 infers series S treatment from parent package: same inference already covered by priorN1.07, whose replacement specifically says not to infer series treatment from parent package. Split into new member-count finding and residual priorN1.07 sighting. Avoid universal tax-classification advice; root IRS review required for any specific tax treatment. A generic entity-specific explanation is supported. Root narrowed this finding to owner count; no tax-classification replacement remains.
+  - Fixed: batch 24 revision 1, commit , by Codex; protected by 2 assertion(s).
 - **AUD-post-batches-2026-09-20-4a344e2-B3-02. [substantive]** — **implemented**
   - Client portal, EIN application details, certification checkbox after closing one order and opening another. — `webapp/src/pages/portal/OrdersInProgress.tsx:707`
   - Reads:                 checked={einCertified}

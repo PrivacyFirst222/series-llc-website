@@ -66,7 +66,7 @@ const FAQ_ITEMS: {
   },
   {
     q: "Can I cancel or get a refund?",
-    a: "Yes, until we start. Your service fee is fully refundable up to the point we begin preparing your documents, and it is not refundable after that, or after we submit your filing to the Division of Corporations. State fees already paid to Florida are never refundable by us. Add-on services are refundable until we begin work on them — for the S corporation election package that means until you submit your details, since the completed package is generated and delivered the moment you do.",
+    a: "Yes, until we start. Your service fee is fully refundable up to the point we begin preparing your documents, and it is not refundable after that, or after we submit your filing to the Division of Corporations. State fees already paid to Florida are never refundable by us. Add-on services are refundable until we begin work on them. The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.",
     link: { to: "/terms", label: "Full refund terms" },
   },
 ];

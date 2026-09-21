@@ -10,7 +10,7 @@
  *   Fax: 855-214-7520. There is no IRS filing fee.
  */
 import { isValidEin } from "../src/lib/ein";
-import { form2553Deadline } from "../src/lib/form2553Timing";
+import { form2553Deadline, FORM2553_DEADLINE_NOTICE } from "../src/lib/form2553Timing";
 import { type JointKind, columnJText, isJoint, jointDisplayName, ssnColumnText } from "../src/lib/jointOwner";
 import { PDFDocument, StandardFonts, degrees, rgb } from "@cantoo/pdf-lib";
 import f2553Base64 from "./assets/f2553-b64";
@@ -175,7 +175,7 @@ ${rows}
 `;
 }
 
-function instructionsMarkdown(d: SElectionDetails, deadlineIso: string): string {
+function instructionsMarkdown(d: SElectionDetails): string {
   const einLine = `The form is completed with your EIN, **${fmtEin(d.ein)}**.`;
   if (d.recordCopy) {
     return `# S CORPORATION ELECTION PACKAGE — RECORD COPY
@@ -196,7 +196,7 @@ If you still need to file, contact us and we will prepare a new package.
 2. The cover letter as it was prepared.
 3. **IRS Form 2553 as it was completed**, with the Social Security numbers removed.
 
-The IRS deadline for this election is ${fmtDateLong(deadlineIso)}. If that date has passed, discuss late-election relief with your tax professional.
+${FORM2553_DEADLINE_NOTICE} If the deadline has passed, discuss late-election relief with your tax professional.
 `;
   }
   return `# S CORPORATION ELECTION PACKAGE
@@ -224,9 +224,9 @@ Review every entry, especially the company name and address, the EIN, the effect
 
 ${d.shareholders.length > 7 ? `- **Owners eight onward sign the continuation sheet** at the back of this package: the form holds seven, so ${d.shareholders.length - 7} owner${d.shareholders.length - 7 === 1 ? " is" : "s are"} listed there in the same columns, and each signs and dates column K on that sheet. File it with the form.\n\n` : ""}An election without every required signature is invalid. Do not leave any consent line blank.
 
-## STEP 3 — FILE IT (DEADLINE: ${fmtDateLong(deadlineIso).toUpperCase()})
+## STEP 3 — FILE IT
 
-You must file Form 2553 **within 2 months and 15 days after your LLC is officially formed with the Florida Division of Corporations** — for your company, that is **${fmtDateLong(deadlineIso)}**. File as soon as the form is signed; do not wait for the deadline.
+${FORM2553_DEADLINE_NOTICE} File as soon as the form is signed; do not wait for the deadline.
 
 Choose ONE of the following. There is no IRS filing fee.
 
@@ -307,10 +307,11 @@ async function stampRecordCopy(doc: PDFDocument): Promise<void> {
 
 export async function buildSElectionPackage(d: SElectionDetails): Promise<Uint8Array> {
   if (!isValidEin(d.ein)) throw new Error("An issued EIN is required before preparing Form 2553.");
-  const deadline = electionDeadline(d.effectiveDate);
+  // Retain validation of the formation effective date even though no due date is printed.
+  electionDeadline(d.effectiveDate);
   const title = `S Corporation Election Package — ${d.llcName}`;
   const instructions = await renderMarkdownPdf({
-    markdown: instructionsMarkdown(d, deadline),
+    markdown: instructionsMarkdown(d),
     watermark: null,
     title,
   });
