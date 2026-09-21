@@ -22,7 +22,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -61,8 +61,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -85,7 +92,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -124,8 +131,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -148,7 +162,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -187,8 +201,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -268,7 +289,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -307,8 +328,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -364,7 +392,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -403,8 +431,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -457,7 +492,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -496,8 +531,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -1088,7 +1130,7 @@
         {
           "key": "contact-wording",
           "scope": "The Contact page says 'please contact us' on the contact page itself.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -1127,8 +1169,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -1151,7 +1200,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -1190,8 +1239,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -1214,7 +1270,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -1253,8 +1309,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -1278,7 +1341,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -1317,8 +1380,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -1403,7 +1473,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -1442,8 +1512,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -1523,7 +1600,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -1562,8 +1639,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -1957,7 +2041,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -1996,8 +2080,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -2050,7 +2141,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -2089,8 +2180,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -2114,7 +2212,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -2153,8 +2251,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -2241,7 +2346,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -2280,8 +2385,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -2335,7 +2447,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -2374,8 +2486,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -6264,7 +6383,7 @@
         {
           "key": "fact-ledger",
           "scope": "The fact ledger lacks the $99 renewal, the 15- and 30-day rules and the four optional prices.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -6303,8 +6422,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -8011,7 +8137,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -8050,8 +8176,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -13983,7 +14116,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -14022,8 +14155,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -14046,7 +14186,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -14085,8 +14225,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -14625,7 +14772,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -14664,12 +14811,19 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
           ],
           "canonical": {
             "item": "127",
             "part": "all"
-          }
+          },
+          "batch": "27"
         }
       ],
       "codex": {
@@ -14693,7 +14847,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -14732,8 +14886,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -14756,7 +14917,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -14795,8 +14956,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -14819,7 +14987,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -14858,8 +15026,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -15562,7 +15737,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -15601,8 +15776,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -16285,7 +16467,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -16324,8 +16506,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -16437,7 +16626,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -16476,12 +16665,19 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
           ],
           "canonical": {
             "item": "242",
             "part": "all"
-          }
+          },
+          "batch": "27"
         }
       ],
       "codex": {
@@ -17061,7 +17257,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -17100,8 +17296,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "codex": {
@@ -17858,7 +18061,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -17897,8 +18100,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ]
     },
@@ -18222,7 +18432,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -18261,8 +18471,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ]
     },
@@ -18307,7 +18524,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -18346,8 +18563,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ]
     },
@@ -18392,7 +18616,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -18431,8 +18655,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ]
     },
@@ -18449,7 +18680,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -18488,8 +18719,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ]
     },
@@ -18599,7 +18837,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -18638,8 +18876,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ]
     },
@@ -18914,7 +19159,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -18953,8 +19198,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ]
     },
@@ -18973,7 +19225,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -19012,8 +19264,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ]
     },
@@ -19463,7 +19722,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -19502,8 +19761,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ]
     },
@@ -19739,7 +20005,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -19778,8 +20044,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ],
       "correctedReplacement": "Verified: FinCEN's page says the rule is final (alert updated 11 Aug 2026). NOT verified by Claude: the effective date of 14 Aug 2026."
@@ -19799,7 +20072,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -19838,8 +20111,15 @@
               "batch": "27",
               "revision": 2,
               "note": "proceed with revision 3"
+            },
+            {
+              "at": "2026-09-21T18:47:11.707Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 3
             }
-          ]
+          ],
+          "batch": "27"
         }
       ]
     },
@@ -24010,6 +24290,21 @@
           "at": "2026-09-21T18:45:27.384Z",
           "event": "rejected by Adam",
           "note": "Adam's record of 2026-09-21T18:39 (terminal): proceed with revision 3"
+        }
+      ]
+    },
+    {
+      "id": "27",
+      "revision": 3,
+      "frozenHash": "dea3f34c268d2b9aff1b90f32d3aca7c6d2c2cb5789817043cac364c86dbf304",
+      "status": "authorized",
+      "model": "Codex",
+      "base": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "history": [
+        {
+          "at": "2026-09-21T18:47:11.709Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
         }
       ]
     }

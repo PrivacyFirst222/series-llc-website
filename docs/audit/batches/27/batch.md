@@ -4,6 +4,8 @@ Adam directed: **“lets implement this now”** after approving the recovery pl
 
 Revision 1 was rejected on Adam's instruction because its inherited item 5 assertion expected the Terms page to retain a September 19 date even though a later approved change correctly updated that page on September 20. Revision 2 changes only that assertion; the Privacy Policy assertion remains September 19 and no product date is changed.
 
+Revision 2 was rejected on Adam's instruction after the full review showed that the Batch 25 Word safeguard treated every later approved document-text change as a regression. Revision 3 declares the safeguard itself and requires it to apply this batch's exact replacement assertions to the protected baseline, prove that the transformed baseline equals the current source, and then compare the generated Word text with that expected result. It does not waive or skip the safeguard.
+
 ## Scope
 
 This batch recovers the approved work from Batch 11 revision 2, Batch 12 revision 2 and Batch 16 revision 3 onto current base `4b6d0d54297f169def1729bf789dd8bdbfc2d5d0`. The exact assertions are copied into `batch.json`; the original pending work orders and evidence remain unchanged outside this checkout.
