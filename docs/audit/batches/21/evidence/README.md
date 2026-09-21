@@ -10,3 +10,5 @@ The red logs run against the unchanged 4a344e2 baseline; green logs run the corr
 - return-point-verification.txt: rollback bundle actually restored into a clean temporary checkout.
 
 The final review package reruns mandatory checks from the committed tree. No package acceptance or publication decision is manufactured here.
+
+The first full review at 75ba5a7 correctly failed because the older synthetic repair fixture replaced real items while retaining audit-import references to them. control-fixture-before.log retains the failure. Only that disposable fixture now clears its real intake references when replacing its items; the real ledger and guard are unchanged. control-fixture-after.log records all 34 direct control cases passing. A complete review of the corrected commit is still required.

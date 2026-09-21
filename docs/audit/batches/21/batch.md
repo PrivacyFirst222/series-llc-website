@@ -128,3 +128,5 @@ The 31 verified new findings were imported through audit-import.ts. Exactly seve
 Rollback: the bundle ../return-point-4a344e2.bundle restores the complete baseline history. A clean temporary restore was tested. This repair clone has no origin remote; it cannot accidentally publish using an inherited production remote.
 
 Final package checks run after the normal guarded commit. No acceptance is recorded by this batch.
+
+The first full review exposed a synthetic-fixture setup incompatibility with imported findings: repair-check replaced real items but retained references to them. The guard correctly refused. The disposable fixture now clears those references along with its replacement items and rulings. No production ledger or enforcement rule changed. The focused rerun passes 34/34 cases; both logs are retained, and the final review reruns all mandatory checks.

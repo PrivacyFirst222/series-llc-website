@@ -104,6 +104,11 @@ try {
   const fixture = readLedger();
   fixture.items = [synthetic("17", ["amend-title"]), synthetic("95", ["eyebrow", "title"]), ...["1", "28", "63", "127", "198"].map(id => synthetic(id))];
   fixture.rulings = [];
+  // The fixture deliberately replaces every real item. Retaining real intake
+  // references would make it an invalid ledger before any probe is planted.
+  // This clears references only in the disposable synthetic fixture; the
+  // source ledger and its immutable intake protections remain unchanged.
+  fixture.auditImports = [];
   ledger(fixture); baseline = commit();
   console.log(`Synthetic fixture baseline: ${baseline}; real source ledger not used.`);
   // 1: use the actual authorize/implemented commands, then erase a recorded fix.
