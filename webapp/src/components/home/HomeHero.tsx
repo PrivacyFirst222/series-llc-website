@@ -84,7 +84,7 @@ export function HomeHero() {
             <div className="flex flex-wrap items-center gap-6 pt-4 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-trust" />
-                Florida registered agent service included
+                Florida registered-agent service—first year included; $99/year after.
               </span>
             </div>
           </div>

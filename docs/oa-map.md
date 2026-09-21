@@ -21,11 +21,11 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | masters | section | heading | hash | category | binds | benefits | attack | source |
 |---|---|---|---|---|---|---|---|---|
 | mbr mbs mul scp sgl sgm sgms sgs | 1.1 | Definitions | ae42c9cb | definition | — | members manager | — | drafting convention |
-| mbr mbs mul scp sgl sgm sgms sgs | 1.2 | Formation; Status as Protected Series LLC | 4e8d1156 | statutory-route | company | members | — | s. 605.2201 |
+| mbr mbs mul scp sgl sgm sgms sgs | 1.2 | Formation; Status as Protected Series LLC | bd16607f | statutory-route | company | members | — | s. 605.2201; Batch 16, Adam 20 Sep 2026 |
 | mul scp sgl sgs | 1.3 | Name; Names of Protected Series | f145a65b | covenant | manager | members | The company changed its name and never conformed the series names, so the series were not maintained. | s. 605.2202; the compliance recital was cut 2026-08-13 — non-variable under s. 605.2107(1)(j), so restating it only supplied a yardstick |
 | mbr mbs | 1.3 | Name; Names of Protected Series | 4b9d47d5 | covenant | manager | members | The company changed its name and never conformed the series names, so the series were not maintained. | s. 605.2202; the compliance recital was cut 2026-08-13 — non-variable under s. 605.2107(1)(j), so restating it only supplied a yardstick |
 | sgm sgms | 1.3 | Name; Names of Protected Series | c5e32e13 | covenant | manager | members | The company changed its name and never conformed the series names, so the series were not maintained. | s. 605.2202; the compliance recital was cut 2026-08-13 — non-variable under s. 605.2107(1)(j), so restating it only supplied a yardstick |
-| mbr mbs mul scp sgl sgm sgms sgs | 1.4 | Purposes and Powers | 493808f8 | benefit | company | members | — | s. 605.0108 |
+| mbr mbs mul scp sgl sgm sgms sgs | 1.4 | Purposes and Powers | babcf2a0 | covenant | company members | members | An ineligible professional owner is admitted or the company conducts prohibited business. | ss. 621.08, 621.09(2), 621.11(2); Adam Batch 16 approval; ordinary purposes unchanged |
 | mul scp sgl sgs | 1.5 | Principal Office | c4203c65 | mechanic | company | members | — | s. 605.0113 |
 | mbr mbs | 1.5 | Principal Office | a8bc210b | mechanic | company | members | — | s. 605.0113; 15 Sep 2026: "a Majority in Interest" replaces "a majority of the Members" for a series' place of business (Adam) |
 | sgm sgms | 1.5 | Principal Office | ad6901a2 | mechanic | company | members | — | s. 605.0113 |
@@ -34,13 +34,13 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mul scp sgl sgs | 1.8 | Location of Records | 34bea4c4 | covenant | manager | members | The records were not kept where the agreement says, so they were not maintained. | s. 605.0410(1) |
 | mbr mbs | 1.8 | Location of Records | 79554fa8 | covenant | manager | members | The records were not kept where the agreement says, so they were not maintained. | s. 605.0410(1) |
 | sgm sgms | 1.8 | Location of Records | fdec2ea1 | covenant | manager | members | The records were not kept where the agreement says, so they were not maintained. | s. 605.0410(1) |
-| mul scp sgl sgs | 1.9 | Filings | 14414961 | covenant | manager | members | The manager did not file what the agreement required, so the series lacks the standing it claims. | s. 605.2201 |
-| mbr mbs | 1.9 | Filings | d789508c | covenant | manager | members | The manager did not file what the agreement required, so the series lacks the standing it claims. | s. 605.2201 |
-| sgm sgms | 1.9 | Filings | b50bf394 | covenant | manager | members | The manager did not file what the agreement required, so the series lacks the standing it claims. | s. 605.2201 |
+| mul scp sgl sgs | 1.9 | Filings | 3e445ab7 | covenant | manager | members | The manager did not file what the agreement required, so the series lacks the standing it claims. | s. 605.2201; Batch 16, Adam 20 Sep 2026; s.605.2502 dissolution and post-winding-up cancellation filings |
+| mbr mbs | 1.9 | Filings | f7ccc631 | covenant | manager | members | The manager did not file what the agreement required, so the series lacks the standing it claims. | s. 605.2201; Batch 16, Adam 20 Sep 2026; s.605.2502 dissolution and post-winding-up cancellation filings |
+| sgm sgms | 1.9 | Filings | fb7c0756 | covenant | manager | members | The manager did not file what the agreement required, so the series lacks the standing it claims. | s. 605.2201; Batch 16, Adam 20 Sep 2026; s.605.2502 dissolution and post-winding-up cancellation filings |
 | mbr mbs mul scp sgl sgm sgms sgs | 1.10 | How Assets Are Associated | de49f23e | statutory-route | — | members | — | s. 605.2301 |
 | sgl sgm sgms sgs | 1.11 | Membership Interest | 3adc00c1 | definition | — | members | — | s. 605.0102(41) |
 | mbr mbs mul scp | 1.11 | Waiver of Partition Rights | e24cf863 | benefit | members | company members | — | common law |
-| mbr mbs mul scp sgl sgm sgms sgs | 2.1 | "Act" | 1f5154e3 | definition | — | members manager | — | ch. 605 |
+| mbr mbs mul scp sgl sgm sgms sgs | 2.1 | "Act" | 8a2b474c | definition | — | members manager | — | ch. 605; Batch 16, Adam 20 Sep 2026 |
 | mul scp sgl sgm sgms sgs | 2.2 | "Associated Asset" | 6bc88113 | definition | — | members | — | s. 605.2102(2) |
 | mbr mbs | 2.2 | "Administrative Member" | 45b7580e | definition | — | members | — | drafting convention |
 | mul scp sgl sgm sgms sgs | 2.3 | "Associated Liability" | c6835881 | definition | — | members | — | no statutory definition; ours |
@@ -151,8 +151,8 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 4.12 | Incapacity of a Member | 09d33983 | benefit | company members | members | — | ch. 744, Fla. Stat.; s. 605.0602(6) |
 | sgl sgs | 5.1 | Manager-Managed; the Manager | 0af0229e | authority | manager member | member manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b); the appointment sentence moved from oa.ts into the master on 17 August as a singular/plural pair — same operative terms, no substantive change |
 | mul scp | 5.1 | Manager-Managed; the Manager | 6e7136b6 | authority | manager members | members manager | — | ss. 605.04072, 605.04073(2), 605.04074(2)(b); the appointment sentence moved from oa.ts into the master on 17 August as a singular/plural pair — same operative terms, no substantive change |
-| mbr mbs | 5.1 | Member-Managed | b9f7026e | authority | members | members | — | ss. 605.0407(1), 605.04073(1) |
-| sgm sgms | 5.1 | Member-Managed | c3a381a5 | authority | members | members | — | ss. 605.0407(1), 605.04073(1) |
+| mbr mbs | 5.1 | Member-Managed | 1ff40f0f | authority | members | members | — | ss. 605.0407(1), 605.04073(1); Batch 16, Adam 20 Sep 2026 |
+| sgm sgms | 5.1 | Member-Managed | 0a0b4b1d | authority | members | members | — | ss. 605.0407(1), 605.04073(1); Batch 16, Adam 20 Sep 2026 |
 | sgl sgs | 5.2 | Management of Each Protected Series | 9391162b | authority | manager | member series | — | ss. 605.2304(2), 605.2107(1)(n) |
 | mul scp | 5.2 | Management of Each Protected Series | 00750ec0 | authority | manager | members series | — | ss. 605.2304(2), 605.2107(1)(n) |
 | mbr mbs | 5.2 | Management of Each Protected Series | 8d99d6e7 | authority | members | members series | The Company was the protected-series manager, so a management-conduct judgment against the Company exposed its ownership of every series — each a single-owner interest a company creditor could take outright rather than charge. | ss. 605.2304(2), 605.2107(1)(n); varied per Adam 2026-08-18: management authority carries liability, and the one holder it must never rest on is the entity that owns all the series interests (s. 605.2303) |
@@ -161,15 +161,15 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 5.3 | Voting; Decisions | 0b631d8f | authority | members | members | — | s. 605.04073 |
 | sgm sgms | 5.3 | Authority to Act | 088acca7 | authority | member | member third-party | — | ss. 605.04074(1), 605.0301 |
 | sgl | 5.4 | Actions Requiring Member Approval | 1ab566f9 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301; the borrowing limit (former (b)) is a multi-member provision only (Adam, 13 Sep 2026) |
-| mul scp | 5.4 | Actions Requiring Member Approval | 08256f46 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301 |
+| mul scp | 5.4 | Actions Requiring Member Approval | 13fc355d | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301; Batch 16, Adam 20 Sep 2026 |
 | mbr mbs | 5.4 | Authority to Act; Limits on Authority | be68b5c7 | authority | members | members | — | s. 605.04074(1) |
 | sgs | 5.4 | Actions Requiring Member Approval | 5f986214 | authority | manager | members | the Manager moved the building into another series without the members' consent | ss. 605.04073(2)(d), 605.0302, 605.2301; the borrowing threshold is a multi-member question; 15 Sep 2026: (c) no longer offers consent to acts s. 9.3 makes void (Adam) |
 | sgm sgms | 5.4 | Standard of Conduct; Exculpation | 048c8e4a | benefit | manager member | manager member | — | ss. 605.04091, 605.0105(3) |
 | sgl sgs | 5.5 | Standard of Conduct; Exculpation | cce8e03a | benefit | manager member | manager member | — | ss. 605.04091, 605.0105(3) |
 | mul scp | 5.5 | Standard of Conduct; Exculpation | db5f385a | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
-| mbr mbs | 5.5 | Actions Requiring Member Approval | 1e2fa70c | authority | members | members | the Member moved the building into another series without the other members' consent | ss. 605.04073(1)(c), 605.0302, 605.2301 |
+| mbr mbs | 5.5 | Actions Requiring Member Approval | 4f518750 | authority | members | members | the Member moved the building into another series without the other members' consent | ss. 605.04073(1)(c), 605.0302, 605.2301; Batch 16, Adam 20 Sep 2026 |
 | sgm sgms | 5.5 | Indemnification | 789d7df9 | benefit | company series | member | — | s. 605.0408 |
-| mul scp sgl sgs | 5.6 | Indemnification | 88f2b141 | benefit | company series | manager members | — | s. 605.0408 |
+| mul scp sgl sgs | 5.6 | Indemnification | edcf8a87 | benefit | company series | manager members | — | s. 605.0408; Batch 16, Adam 20 Sep 2026 |
 | mbr mbs | 5.6 | Standard of Conduct; Exculpation | dfa8cbf5 | benefit | manager members | manager members | — | ss. 605.04091, 605.0105(3) |
 | sgm sgms | 5.6 | Reimbursement; Shared Expenses | 1892460b | benefit | company | member | — | s. 605.04091(1); the shared-expense allocation is the record Article 8 relies on |
 | sgl sgs | 5.7 | Compensation; Reimbursement; Shared Expenses | a0c4af21 | benefit | company | manager member | — | s. 605.04091(1) |
@@ -227,8 +227,8 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgm sgms | 8.5 | Standing Association Rules; Savings Provisions | 88edee94 | benefit | — | members series company | — | s. 605.2301(2)(a), (4); s. 605.2404(4) burden of proof |
 | mbr mbs mul scp sgl sgm sgms sgs | 8.6 | Movement of an Asset Between Protected Series | e77a53b4 | mechanic | company series | members series company | — | ss. 605.2301(2)(a)3, 605.0404, 605.0405 |
 | sgl sgm | 9.1 | Intended Classification | 10663e90 | benefit | member | member | — | Treas. Reg. 301.7701-3 |
-| mbr mul | 9.1 | Intended Classification | 6c18356d | benefit | members | members | — | Treas. Reg. 301.7701-3 |
-| mbs scp | 9.1 | S Corporation Status | 86c3eddc | benefit | members | members | — | IRC 1362 |
+| mbr mul | 9.1 | Intended Classification | 870e6d18 | benefit | members | members | — | Treas. Reg. 301.7701-3; Batch 16, Adam 20 Sep 2026 |
+| mbs scp | 9.1 | S Corporation Status | d13ad4b8 | benefit | members | members | — | IRC 1362; Batch 16, Adam 20 Sep 2026 |
 | sgs | 9.1 | S Corporation Status | b0a7f370 | benefit | member | member | — | IRC 1362; the single-member form of the election |
 | sgms | 9.1 | S Corporation Status | 3ab29999 | benefit | member | member | — | IRC 1362; the member-managed single-member form of the election |
 | sgl | 9.2 | Tax Filings and Elections | 33370c47 | authority | manager | members | — | IRC 6031 |
@@ -247,9 +247,9 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgm | 9.3 | Fiscal Year | 1b397ee7 | mechanic | company | member | — | IRC 706 |
 | sgms | 9.3 | Protecting the Election | a5da6cde | covenant | member | member | A transfer, TOD designation, or admission blew the election and the Company was taxed as a C corporation from that day. | IRC 1361, 1362 |
 | mul | 9.4 | Tax Elections | 4ca8f78f | authority | manager members | members | — | IRC 754 |
-| scp | 9.4 | S Corporation Status; Intent; Savings Clause | 9ae38848 | benefit | members | members | — | IRC 1361, 1362 |
+| scp | 9.4 | S Corporation Status; Intent; Savings Clause | d9563034 | benefit | members | members | — | IRC 1361, 1362; Batch 16, Adam 20 Sep 2026 |
 | mbr | 9.4 | Tax Elections | 157b3294 | authority | manager members | members | — | IRC 754 |
-| mbs | 9.4 | S Corporation Status; Intent; Savings Clause | 5f4827e9 | benefit | members | members | — | IRC 1361, 1362 |
+| mbs | 9.4 | S Corporation Status; Intent; Savings Clause | cdc9c89b | benefit | members | members | — | IRC 1361, 1362; Batch 16, Adam 20 Sep 2026 |
 | sgs | 9.4 | Intent; Savings Clause | 1ecf2164 | benefit | — | member | — | IRC 1361, 1362(f) |
 | sgms | 9.4 | Intent; Savings Clause | 39ee4012 | benefit | — | member | — | IRC 1361, 1362(f) |
 | mul | 9.5 | Fiscal Year | cc0c6c19 | mechanic | company | members | — | IRC 706; 1378 for the S forms; 15 Sep 2026: text unchanged, a rule line added before Article 10 |
@@ -276,8 +276,7 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl sgm sgms sgs | 11.1 | Dissolution of a Protected Series | baccbda5 | mechanic | — | members series | — | s. 605.2501 |
 | mbr mbs mul scp | 11.1 | Executory Contract | 050e6248 | benefit | members | members company | — | 11 U.S.C. 365; In re Soderstrom |
 | sgl sgs | 11.2 | Winding Up a Protected Series | 90fe7e4e | mechanic | manager members | members series | — | s. 605.2502 |
-| mul scp | 11.2 | Personal Service Agreement; No Assumption or Assignment | 439e9643 | benefit | members | members company | — | 11 U.S.C. 365(c); In re Soderstrom |
-| mbr mbs | 11.2 | Personal Service Agreement; No Assumption or Assignment | 3d769064 | benefit | members | members company | — | 11 U.S.C. 365(c); In re Soderstrom |
+| mbr mbs mul scp | 11.2 | Personal Service Agreement; No Assumption or Assignment | 1f134c64 | benefit | members | members company | — | Adam exact paragraph, 20 Sep 2026; 11 USC 365(c)(1); economic interests expressly reserved |
 | sgm sgms | 11.2 | Winding Up a Protected Series | d91e5962 | mechanic | manager members | members series | — | s. 605.2502 |
 | sgl sgm sgms sgs | 11.3 | Dissolution of the Company | 922d7938 | mechanic | — | member | — | s. 605.0701 |
 | mbr mbs mul scp | 11.3 | Compliance upon Assumption or Rejection | 5c8f9b13 | benefit | members | members company | — | 11 U.S.C. 365 |
@@ -310,9 +309,9 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbr mbs | 14.2 | Winding Up a Protected Series | 5f431084 | mechanic | manager members | members series | — | s. 605.2502 |
 | mbr mbs mul scp | 14.3 | Dissolution of the Company | 92dba41b | mechanic | — | members | — | s. 605.0701 |
 | mul | 14.4 | Winding Up the Company | c9a4ba4c | mechanic | manager members | members | — | ss. 605.0709, 605.0710; 15 Sep 2026: "capital account balances" — the defined term; "capital sub-account" was never defined |
-| scp | 14.4 | Winding Up the Company | aedb6377 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
+| scp | 14.4 | Winding Up the Company | 3e3d8a4b | mechanic | manager members | members | — | ss. 605.0709, 605.0710; Batch 16, Adam 20 Sep 2026 |
 | mbr | 14.4 | Winding Up the Company | 2be18f45 | mechanic | manager members | members | — | ss. 605.0709, 605.0710; 15 Sep 2026: "capital account balances" — the defined term; "capital sub-account" was never defined |
-| mbs | 14.4 | Winding Up the Company | 7f3dbab2 | mechanic | manager members | members | — | ss. 605.0709, 605.0710 |
+| mbs | 14.4 | Winding Up the Company | 8df0e0b4 | mechanic | manager members | members | — | ss. 605.0709, 605.0710; Batch 16, Adam 20 Sep 2026 |
 | mbr mul | 14.5 | No Deficit Obligation; Recourse Limited | a80b2aad | benefit | — | members | — | s. 605.0405 |
 | mbs scp | 14.5 | No Obligation to Contribute; Recourse Limited | 758ff4ef | benefit | — | members | — | s. 605.0405; the S corporation forms carry no capital accounts, so deficit-restoration language was removed 2026-08-14 |
 | mul scp | 15.1 | Amendments | fa5b242d | authority | members | members | — | s. 605.04073(1)(d), (2)(e) |

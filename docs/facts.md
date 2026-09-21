@@ -115,8 +115,8 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 
 ### The S corporation forms' limit on a death beneficiary
 - value: `an eligible S corporation shareholder (§9.3(b))`
-- where: docs/oa-instructions.md — `must be an eligible S corporation shareholder (§9.3(b))`
-- where: docs/owners-manual.md — `subject on the S corporation forms to the eligible-shareholder rule`
+- where: docs/oa-instructions.md — `the S corporation forms also require an eligible S corporation shareholder (§9.3(b))`
+- where: docs/owners-manual.md — `and the eligible-shareholder rule on the S corporation forms`
 - where: webapp/src/content/oaLearnMore.tsx — `eligible S corporation
           shareholder`
 - where: webapp/server/templates-oa-s.md — `TOD beneficiary (eligible S corporation shareholder)`
@@ -241,3 +241,56 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - where: webapp/src/content/terms.md — `The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.`
 - where: webapp/src/pages/FAQ.tsx — `The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.`
 - For a company-owned protected series, the EIN questionnaire initially counts one owner, the company. A parent-company EIN uses the parent membership count. Preserve explicit saved answers.
+
+### Batch 12 approved tax labels and Manual explanations
+- value: `Disregarded entity, Partnership, or S Corporation describes the agreement's tax classification; ownership and management remain separate title details.`
+- where: webapp/src/lib/agreementLabels.ts — `Reported through its owner for federal income-tax purposes.`
+- value: `Our $95 S-election service is available for new LLCs we form, ordered within 65 days of formation payment; this is the service window.`
+- where: webapp/src/pages/FAQ.tsx — `Order it within 65 days of paying for your formation.`
+- where: webapp/src/pages/Pricing.tsx — `ordered within 65 days of paying for your formation`
+- value: `A disregarded entity's W-9 identifies its tax owner; contracts and bank accounts have separate naming requirements.`
+- where: docs/owners-manual.md — `For a disregarded entity, use the tax owner's name and taxpayer identification number as the W-9 instructions require, and identify the disregarded entity on line 2.`
+- value: `A second eligible owner does not by itself terminate an existing S election.`
+- where: docs/owners-manual.md — `An existing S election does not end merely because a second eligible owner joins.`
+- value: `A disregarded LLC reports through its tax owner, who need not be an individual.`
+- where: docs/owners-manual.md — `other owners use their applicable reporting rules`
+- value: `FinCEN's final domestic-company BOI exemption rule became effective August 14, 2026.`
+- where: docs/owners-manual.md — `FinCEN’s final rule, effective August 14, 2026`
+
+## Batch 16 — agreement consistency (Adam, 20 September 2026)
+
+- The Act is the Florida Revised Limited Liability Company Act. Signature dates record signing; the agreement's defined Effective Date controls, and the amendment uses its date stated above.
+- Company and series dissolution filings use their statutory names; a statement of designation cancellation follows series winding up.
+- Member-managed companies have no separate company manager. Their Members serve as protected-series managers under Section 5.2.
+- Every series distributes to its owner, the Company. Multi-member S Company distributions to Members remain pro rata with identical rights, including liquidation.
+- Professional LLC variants carry Chapter 621 purpose and ownership restrictions, including TOD recipients; S eligibility applies in addition. Ordinary LLC variants omit those restrictions.
+- Restatement alternatives reside in all eight masters. The added recital is E for the two single-member S forms and D for the other six.
+- Multi-member Section 11.2 uses Adam's exact paragraph distinguishing governance/management rights and admission from transferable economic interests. Manual and Instructions preserve this distinction and court-dependent limits.
+- Adam rejected Batch 16 review items 4, 5 and 9: preserve manager-amendment wording (232), repeated single-class wording (236), and agency wording (N2.02).
+
+### Registered-agent annual price and renewal timing (Adam, Batch 07)
+- value: `First year included from effective appointment; $99 annually thereafter. Reminder 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`
+- where: webapp/server/pricing.ts — `RA_RENEWAL_FEE_CENTS = 99_00`
+- where: webapp/src/pages/Pricing.tsx — `p: "$99 / yr"`
+- where: webapp/src/content/terms.md — `currently $99`
+- where: webapp/src/content/terms.md — `60 days before your renewal date`
+- where: webapp/src/content/terms.md — `fifteen (15) days before your renewal date`
+- where: webapp/src/content/terms.md — `at least thirty (30) days before your renewal date`
+- where: webapp/src/content/terms.md — `at least 30 days' notice before any increase`
+- where: webapp/src/content/terms.md — `Changing registered agents during a paid service year does not entitle you to a refund.`
+
+### Optional service prices
+- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`
+- where: webapp/server/pricing.ts — `EIN_FEE_CENTS = 50_00`
+- where: webapp/server/pricing.ts — `S_ELECTION_FEE_CENTS = 95_00`
+- where: webapp/server/pricing.ts — `CERT_STATUS_FEE_CENTS = 15_00`
+- where: webapp/server/pricing.ts — `CERTIFIED_COPY_FEE_CENTS = 40_00`
+- where: webapp/src/pages/Pricing.tsx — `p: "$50 / EIN"`
+- where: webapp/src/pages/Pricing.tsx — `p: "$95"`
+- where: webapp/src/pages/Pricing.tsx — `p: "$15"`
+- where: webapp/src/pages/Pricing.tsx — `p: "$40"`
+
+### Manual's short series-price examples (Adam, Batch 11)
+- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`
+- where: docs/owners-manual.md — `add a $50 series per property`
+- where: docs/owners-manual.md — `PS 1, PS 2, PS 3 (her first three series are included in the service package)`

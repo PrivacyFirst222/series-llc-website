@@ -21,7 +21,7 @@ const STEPS: {
     n: "01",
     icon: ClipboardList,
     title: "You tell us about your LLC",
-    body: "Our online form walks you through what Florida needs: your LLC name, principal and mailing addresses, the protected series you want to create, your registered agent, management structure, members, purpose, and effective date. It saves as you go, so you can stop and come back.",
+    body: "Our online form walks you through what Florida needs: your LLC name, principal and mailing addresses, the protected series you want to create, your registered agent, management structure, members, purpose, and effective date. Your progress saves in this browser, so you can return using the same browser and device.",
   },
   {
     n: "02",
@@ -33,7 +33,7 @@ const STEPS: {
     n: "03",
     icon: FolderCheck,
     title: "You get your filed documents and records package",
-    body: "Once the state accepts your filing, we send you the filed Articles of Organization and each filed Protected Series Designation, along with a form Operating Agreement completed from your questionnaire answers, a comprehensive Series LLC Owner's Manual, and free access to our iPhone recordkeeping app when it is released, expected by the end of the year.",
+    body: "Once your filings are accepted, we post the filed Articles of Organization and Protected Series Designations in your client portal, where you can also access a comprehensive Series LLC Owner's Manual. Complete the operating-agreement questionnaire in your portal and select Generate to create your form Operating Agreement. Your package also includes free access to our iPhone recordkeeping app when it is released, expected by the end of the year.",
   },
 ];
 
@@ -93,10 +93,11 @@ export default function HowItWorks() {
 
           <div className="rounded-2xl border border-border bg-secondary/40 p-6">
             <PlusCircle className="h-5 w-5 text-trust" />
-            <h3 className="mt-4 font-display text-lg">Optional add-ons</h3>
+            <h3 className="mt-4 font-display text-lg">Add-ons and registered-agent choices</h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              A Federal EIN is not included in the formation fee, and you can either use our registered
-              agent service or serve as your own if you're a Florida resident.{" "}
+              Federal EIN service is an optional $50 add-on. If you choose our registered-agent service,
+              the first year is included in your service fee; renewal is $99 annually. You can instead
+              serve as your own registered agent if you're a Florida resident.{" "}
               <Link
                 to="/pricing"
                 className="text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"

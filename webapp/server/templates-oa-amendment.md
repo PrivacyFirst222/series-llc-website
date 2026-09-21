@@ -33,7 +33,7 @@ NOW, THEREFORE, <!-- one:member -->the Member amends<!-- /one --><!-- many:membe
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned <!-- one:member -->has<!-- /one --><!-- many:member -->have<!-- /many --> executed this Amendment effective as of the <!-- one:member -->date<!-- /one --><!-- many:member -->date(s)<!-- /many --> set forth below.
+IN WITNESS WHEREOF, the undersigned <!-- one:member -->has<!-- /one --><!-- many:member -->have<!-- /many --> executed this Amendment as of the date stated above.
 
 <!-- one:member -->**MEMBER:**<!-- /one --><!-- many:member -->**MEMBERS:**<!-- /many -->
 

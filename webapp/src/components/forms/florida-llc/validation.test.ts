@@ -233,9 +233,9 @@ if (typeof console !== "undefined") {
 {
   const { taxationLabel } = await import("../../../lib/datetime");
   const expected: Record<string, string> = {
-    single: "Single-Member",
+    single: "Disregarded entity",
     "single-s": "S Corporation",
-    "member-single": "Single-Member",
+    "member-single": "Disregarded entity",
     "member-single-s": "S Corporation",
     multi: "Partnership",
     s: "S Corporation",

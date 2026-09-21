@@ -42,6 +42,7 @@ const S = {
   company: "ZQCOMPANYQZ",
   principal: "ZQPRINCIPALQZ",
   date: "ZQDATEQZ",
+  prior: "ZQPRIORDATEQZ",
   mgr1: "ZQMANAGERONEQZ",
   mgr2: "ZQMANAGERTWOQZ",
   m1: "ZQMEMBERONEQZ",
@@ -125,6 +126,9 @@ function inputsFor(v: OaInputs["version"]): OaInputs {
  *  manufacture false reports (see the header). */
 function normalize(s: string): string {
   return s
+    // Heading level is presentation; the professional cover alternative is
+    // inserted into the master's existing heading without changing its words.
+    .replace(/^#{1,6} /gm, "")
     // Literal percentages appear in master prose ("one hundred percent (100%)",
     // "twenty-five percent (25%)") AND as filled share values. Same token both
     // sides, so equality is preserved.
@@ -149,6 +153,7 @@ function unwind(s: string): string {
     .split(S.company).join("[COMPANY NAME]")
     .split(S.principal).join("[PRINCIPAL ADDRESS]")
     .split(S.date).join("[DATE]")
+    .split(S.prior).join("[PRIOR AGREEMENT DATE]")
     .split(S.amDate).join("[DATE]")
     .split(S.amText).join("[AMENDMENT TEXT]")
     // A marital unit's tenancy in the signature heading: the master's line is
@@ -258,6 +263,13 @@ let violations = 0;
 
 /** Every paragraph and line of a master, in all its resolved variants. */
 function knownOf(raw: string): Set<string> {
+  // Alternative paragraphs are master text too. Decode only these marked
+  // literal strings; do not whitelist wording invented by the assembler.
+  raw = raw.replace(/^<!-- alternative:[a-z-]+ (.+) -->$/gm, (_m, encoded: string) => {
+    const text: unknown = JSON.parse(encoded);
+    if (typeof text !== "string") throw new Error("Invalid master alternative");
+    return text;
+  });
   // A master paragraph carrying <!-- one:… --> / <!-- many:… --> holds BOTH
   // wordings; the delivered document holds one. Resolve it both ways so the
   // chosen wording traces, and the unchosen one does not go missing.
@@ -317,7 +329,14 @@ function report(label: string, file: string, markdown: string): void {
 }
 
 for (const [version, file] of Object.entries(MASTERS) as [OaInputs["version"], string][]) {
-  report(version, file, assembleOa(inputsFor(version)).markdown);
+  for (const professional of [false, true]) {
+    for (const restatement of ["initial", "dated", "undated"] as const) {
+      report(`${version}, ${professional ? "professional" : "ordinary"}, ${restatement}`, file,
+        assembleOa({ ...inputsFor(version), professional,
+          amendedRestated: restatement !== "initial",
+          priorAgreementDate: restatement === "dated" ? S.prior : null }).markdown);
+    }
+  }
 }
 
 // The amendment master, filled from each kind of agreement it can amend:

@@ -14,7 +14,7 @@ import memberSCorpTemplateRaw from "./templates-oa-member-s.md";
 import singleSCorpTemplateRaw from "./templates-oa-single-s.md";
 import memberSingleTemplateRaw from "./templates-oa-member-single.md";
 import memberSingleSCorpTemplateRaw from "./templates-oa-member-single-s.md";
-import { taxationLabel } from "./datetime";
+import { agreementTitle } from "../src/lib/agreementLabels";
 
 /** esbuild bundles .md as text; Bun without the bunfig loader resolves the
  *  import to a file path instead — read it from disk in that case. */
@@ -85,10 +85,8 @@ export interface OaInputs {
   priorAgreementDate: string | null; // known prior generation date, else null
   members: OaMemberInput[];
   series: OaSeriesInput[];
-  /** Organized under ch. 621 as a PLLC. Exactly three descriptor lines change
-   *  (Adam's dictation, 29 Aug 2026): the cover, the preamble, and Recital B,
-   *  which also gains the Chapter 621 citation. s. 1.2 and every other use of
-   *  the ch. 605 term of art stay as the Act writes them — his ruling. */
+  /** Organized under ch. 621 as a PLLC. Selects the master's descriptors and
+   * professional-only purpose, ownership and admission restrictions. */
   professional?: boolean;
   // multi-member options
   includeCapitalCalls?: boolean;
@@ -352,6 +350,25 @@ function stripInstructionNotes(s: string): string {
     .replace(/ \[SELECT ONE ALTERNATIVE[\s\S]*?\](?=\*\*|$)/gm, "");
 }
 
+/** Complete alternative wordings belong to the master, including its recital
+ * letter. JSON string syntax permits a multiline title inside one comment. */
+export function masterAlternatives(raw: string): { text: string; select: (key: string) => string } {
+  const values = new Map<string, string>();
+  const text = raw.replace(/^<!-- alternative:([a-z-]+) (.+) -->\r?\n?/gm, (_whole, key: string, encoded: string) => {
+    const value: unknown = JSON.parse(encoded);
+    if (values.has(key) || typeof value !== "string" || !value.trim()) {
+      throw new Error(`OA template alternative invalid: ${key}`);
+    }
+    values.set(key, value);
+    return "";
+  });
+  return { text, select: (key) => {
+    const value = values.get(key);
+    if (!value) throw new Error(`OA template alternative missing: ${key}`);
+    return value;
+  } };
+}
+
 export function assembleOa(inputs: OaInputs): { markdown: string; title: string; encodedClientText: true } {
   inputs = documentInputs(inputs);
   const TEMPLATES = {
@@ -364,7 +381,8 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string;
     "member-single": memberSingleTemplate,
     "member-single-s": memberSingleSCorpTemplate,
   } as const;
-  let s = TEMPLATES[inputs.version];
+  const alternatives = masterAlternatives(TEMPLATES[inputs.version]);
+  let s = alternatives.text;
   /** Every form except the single-member ones shares the multi chassis. */
   const isSingle =
     inputs.version === "single" || inputs.version === "single-s" ||
@@ -387,17 +405,29 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string;
   must(s, FOOTER_LINE, "master footer line");
   s = s.replace(FOOTER_LINE, "").trimEnd() + "\n";
 
-  // ---- professional company (ch. 621) ----
+  // Select complete master alternatives before filling their ordinary slots.
+  if (inputs.amendedRestated) {
+    s = replaceOnce(s, "# OPERATING AGREEMENT", alternatives.select("restated-title"), "restated title");
+  }
+  if (inputs.professional || inputs.amendedRestated) {
+    const preamble = s.match(/^THIS OPERATING AGREEMENT[^\n]+/m)?.[0];
+    if (!preamble) throw new Error("OA template marker missing: preamble");
+    const key = inputs.professional
+      ? (inputs.amendedRestated ? "restated-professional-preamble" : "professional-preamble")
+      : "restated-preamble";
+    s = replaceOnce(s, preamble, alternatives.select(key), "selected preamble");
+  }
   if (inputs.professional) {
     s = replaceOnce(s, "A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY",
-      "A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY", "professional cover line");
-    s = replaceOnce(s, 'a Florida protected series limited liability company (the "Company")',
-      'a Florida professional protected series limited liability company (the "Company")', "professional preamble");
-    s = replaceOnce(s,
-      "The Company is a **protected series limited liability company** within the meaning of ss. 605.2101–605.2802, Florida Statutes, having designated,",
-      "The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101–605.2802, and Chapter 621, Florida Statutes, having designated,",
-      "professional recital B");
+      alternatives.select("professional-cover"), "professional cover line");
+    const recital = s.match(/^B\. The Company is[^\n]+/m)?.[0];
+    if (!recital) throw new Error("OA template marker missing: recital B");
+    s = replaceOnce(s, recital, alternatives.select("professional-recital"), "professional recital B");
+    const exhibit = s.match(/^## EXHIBIT A[^\n]+/m)?.[0];
+    if (!exhibit) throw new Error("OA template marker missing: Exhibit A");
+    s = replaceOnce(s, exhibit, `${exhibit}\n\n${alternatives.select("professional-exhibit-note")}`, "professional Exhibit A note");
   }
+  s = resolveIf(s, "professional", !!inputs.professional);
 
   // ---- global fields ----
   must(s, "[COMPANY NAME], LLC", "company name");
@@ -525,15 +555,13 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string;
   let titleName = "Operating Agreement";
   if (inputs.amendedRestated) {
     titleName = "Amended and Restated Operating Agreement";
-    s = replaceOnce(s, "# OPERATING AGREEMENT", "# AMENDED AND RESTATED\n# OPERATING AGREEMENT", "title");
-    s = replaceOnce(s, "THIS OPERATING AGREEMENT (this \"Agreement\")", "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \"Agreement\")", "preamble");
-    const supersede = inputs.priorAgreementDate
-      ? `the Operating Agreement of the Company dated ${inputs.priorAgreementDate}`
-      : "any and all prior operating agreements of the Company, whether written or oral";
+    const recital = inputs.priorAgreementDate
+      ? alternatives.select("restatement-dated").replace("[PRIOR AGREEMENT DATE]", () => inputs.priorAgreementDate!)
+      : alternatives.select("restatement-undated");
     s = replaceOnce(
       s,
       "NOW, THEREFORE,",
-      `D. This Agreement amends, restates, and supersedes in its entirety ${supersede}, which shall be of no further force or effect from the Effective Date.\n\nNOW, THEREFORE,`,
+      `${recital}\n\nNOW, THEREFORE,`,
       "supersede recital",
     );
   }
@@ -749,15 +777,15 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string;
 
   assertTemplateComplete(s);
 
-  const seq = inputs.generationNumber ? ` (No. ${inputs.generationNumber})` : "";
-  // The taxation designation leads the name: a client holding three PDFs should
-  // be able to tell the S corporation form from the partnership form without
-  // opening any of them.
-  const tax = taxationLabel(inputs.version);
   return {
     markdown: s,
     encodedClientText: true,
-    title: `${inputs.amendedRestated ? "Amended and Restated " : ""}${tax} Operating Agreement${seq} — ${decodeDocumentText(co)}`,
+    title: agreementTitle({
+      version: inputs.version,
+      amendedRestated: inputs.amendedRestated,
+      generationNumber: inputs.generationNumber,
+      companyName: decodeDocumentText(co),
+    }),
   };
 }
 

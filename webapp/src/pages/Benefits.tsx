@@ -38,7 +38,7 @@ function renderCell(v: Cell, accent?: boolean) {
 const ONE_TIME: { label: string; oldVal: string; newVal: string; costlier?: boolean }[] = [
   { label: "State filing fee to form", oldVal: "$1,250", newVal: "$125" },
   {
-    label: "Protected Series Designations (3 of 10 covered by the fee)",
+    label: "Series designation state fees—first 3 included in our $499 service fee",
     oldVal: "—",
     newVal: "$175",
     costlier: true,
@@ -179,8 +179,8 @@ export default function Benefits() {
                 Series LLC holding ten protected series, at $125 to file the Articles, $25 in state
                 filing fees for each designation past the three the service fee covers, one $138.75
                 annual report, and one $99/yr registered agent whose first year is included in the
-                service fee. Registered agent pricing is held at $99/yr on both sides, so the
-                comparison turns on the number of entities rather than on what any agent charges. Florida does not require an annual report in the year an
+                service fee. The comparison uses $99 per year for each registered agent. For our package, the first year
+                is included in the service fee; the $99 annual renewal begins in year two. Florida does not require an annual report in the year an
                 entity is formed, so the first-year figure covers filing fees and registered agent only.
                 State fees only; our service fee is on the{" "}
                 <Link
@@ -247,7 +247,7 @@ export default function Benefits() {
           </div>
           <div className="rounded-2xl border border-border bg-card p-7">
             <div className="font-mono-feature text-xs uppercase tracking-[0.18em] text-muted-foreground">
-              Use multiple LLCs if…
+              Consider a regular LLC if…
             </div>
             <h3 className="mt-2 font-display text-xl">You only ever own 1 asset</h3>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">

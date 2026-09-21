@@ -1,3 +1,12 @@
+<!-- alternative:restated-title "# AMENDED AND RESTATED\n# OPERATING AGREEMENT" -->
+<!-- alternative:restated-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \"Agreement\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \"Company\"), is made and entered into effective as of [DATE] (the \"Effective Date\"), by the undersigned sole member (the \"Member\")." -->
+<!-- alternative:professional-cover "A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY" -->
+<!-- alternative:professional-preamble "THIS OPERATING AGREEMENT (this \"Agreement\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \"Company\"), is made and entered into effective as of [DATE] (the \"Effective Date\"), by the undersigned sole member (the \"Member\")." -->
+<!-- alternative:restated-professional-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \"Agreement\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \"Company\"), is made and entered into effective as of [DATE] (the \"Effective Date\"), by the undersigned sole member (the \"Member\")." -->
+<!-- alternative:professional-recital "B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101–605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department." -->
+<!-- alternative:restatement-dated "D. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date." -->
+<!-- alternative:restatement-undated "D. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date." -->
+
 # OPERATING AGREEMENT
 ## OF
 ## [COMPANY NAME], LLC
@@ -25,11 +34,11 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
 
-**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
+**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Member shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Member may determine. A Protected Series may maintain its own place of business as determined by the Member.
 
@@ -39,7 +48,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.8 Location of Records.** The records of the Company and of each Protected Series — including the records required by Article 8 — shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Member determines, and shall at all times be retrievable in perceivable form.
 
-**1.9 Filings.** The Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
+**1.9 Filings.** The Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
 **1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
@@ -49,7 +58,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 2 — DEFINITIONS
 
-**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
+**2.1 "Act"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
 
 **2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
 
@@ -133,7 +142,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 5 — MANAGEMENT BY THE MEMBER
 
-**5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Member. There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.
+**5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Member. There is no manager of the Company, and no person shall be designated or hold out as a manager of the Company. The Member serves as protected-series manager as provided in Section 5.2.
 
 **5.2 Management of Each Protected Series.** Each Protected Series is managed by the Member. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Member, rather than the Company, is the protected-series manager of each Protected Series. The Member has, with respect to each Protected Series, the rights, powers, and duties of a protected-series manager under the Act, subject to this Agreement and the Series Exhibit.
 
@@ -271,7 +280,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned has executed this Agreement effective as of the date set forth below.
+IN WITNESS WHEREOF, the undersigned has executed this Agreement as of the Effective Date.
 
 **MEMBER:**
 
@@ -287,6 +296,8 @@ Date: _____________________________<!-- /if -->
 [[pagebreak]]
 
 ## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION
+
+<!-- alternative:professional-exhibit-note "**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4." -->
 
 **Company:** [COMPANY NAME], LLC
 

@@ -22,8 +22,8 @@ const BENEFITS: { icon: typeof Shield; title: string; body: string }[] = [
   },
   {
     icon: Coins,
-    title: "One filing, one franchise relationship",
-    body: "Pay the $125 Florida formation fee once. Your first three protected series are covered by the formation fee; each one after that is $50 — $25 to prepare plus the $25 state filing fee.",
+    title: "One annual report for the company and its series.",
+    body: "Pay the $125 Florida state filing fee once. Our $499 service fee covers your first three Protected Series Designations, including their state filing fees. Each additional series costs $50—$25 to prepare and the $25 state filing fee.",
   },
   {
     icon: MapPin,

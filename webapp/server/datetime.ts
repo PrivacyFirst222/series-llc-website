@@ -38,14 +38,7 @@ export function stampForFilename(d: Date = new Date()): string {
   return `${get("year")}-${get("month")}-${get("day")}-${hour}${get("minute")}ET`;
 }
 
-/** How the agreement is taxed, in the words a client would use. */
-export function taxationLabel(version: string): string {
-  if (version === "s" || version === "member-s") return "S Corporation";
-  if (version === "single-s" || version === "member-single-s") return "Single-Member S Corporation";
-  if (version === "member-single") return "Single-Member";
-  if (version === "single") return "Single-Member";
-  return "Partnership";
-}
+export { taxationLabel } from "../src/lib/agreementLabels";
 
 /** Today as a YYYY-MM-DD in Florida time — what the Form 2553 timing gate
  *  is handed as "today". Never the host clock's date: Vercel runs UTC, and

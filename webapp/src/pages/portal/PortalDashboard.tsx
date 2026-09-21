@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { api, ApiError } from "@/lib/api";
 import { formatDate, formatDateTime, taxationLabel } from "@/lib/datetime";
+import { agreementTitle, taxationHelp } from "@/lib/agreementLabels";
 import { AccountCard } from "./AccountCard";
 import { ViewingAsBanner } from "./ViewingAsBanner";
 
@@ -55,10 +56,12 @@ interface Me {
 interface OwnAgreement {
   generationId: string;
   isCurrent: boolean;
-  /** "S Corporation" / "Partnership" / "Single-Member". Read from the
+  /** "S Corporation" / "Partnership" / "Disregarded entity". Read from the
    *  generation record, so agreements made before the designation was part of
    *  the title are labeled too. */
   taxation: string;
+  help: string;
+  title?: string;
 }
 
 function DocList({
@@ -98,7 +101,7 @@ function DocList({
                 {/* Wrap rather than truncate: the agreement number and company
                     name sit at the end of the title and are what tell two
                     agreements apart. */}
-                <span className="text-sm font-medium">{d.title}</span>
+                <span className="text-sm font-medium">{mine?.title ?? d.title}</span>
                 {d.kind === "legal_mail" && d.company_name ? <span className="text-xs text-muted-foreground">{d.company_name}</span> : null}
                 {d.kind === "legal_mail" && d.receivedOn ? (
                   <span className="text-xs text-muted-foreground" data-testid="received-on">
@@ -121,6 +124,7 @@ function DocList({
                   </>
                 ) : null}
               </div>
+              {mine?.help ? <p className="mt-1 text-xs text-muted-foreground">{mine.help}</p> : null}
               <div className="text-xs text-muted-foreground">{formatDateTime(d.created_at)}</div>
               {extra?.(d)?.note ?? null}
             </div>
@@ -475,7 +479,7 @@ export default function PortalDashboard() {
   const oaGenerations = useQuery({
     queryKey: ["portal-oa", company],
     queryFn: () =>
-      api.get<{ generations: { id: string; document_id: string | null; version: string | null }[] }>(
+      api.get<{ seed: { llcName: string }; generations: { id: string; document_id: string | null; version: string | null; amended_restated: boolean; generation_number: number }[] }>(
         `/api/portal/oa${company ? `?company=${company}` : ""}`,
       ),
     enabled: meQuery.isSuccess,
@@ -525,6 +529,9 @@ export default function PortalDashboard() {
           generationId: g.id,
           isCurrent: i === 0,
           taxation: taxationLabel(g.version ?? ""),
+          help: taxationHelp(g.version ?? ""),
+          title: g.version && g.generation_number && oaGenerations.data?.seed?.llcName
+            ? agreementTitle({ version: g.version, amendedRestated: g.amended_restated, generationNumber: g.generation_number, companyName: oaGenerations.data.seed.llcName }) : undefined,
         });
       }
     });

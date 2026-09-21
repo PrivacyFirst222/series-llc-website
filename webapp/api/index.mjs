@@ -100783,6 +100783,24 @@ function sElectionEinArrivedLateEmail(opts) {
   };
 }
 
+// src/lib/agreementLabels.ts
+var AGREEMENT_FORMS = {
+  single: { name: "Manager-Managed Single-Member (Disregarded Entity)", tax: "Disregarded entity" },
+  "single-s": { name: "Manager-Managed Single-Member (S Corporation)", tax: "S Corporation" },
+  "member-single": { name: "Member-Managed Single-Member (Disregarded Entity)", tax: "Disregarded entity" },
+  "member-single-s": { name: "Member-Managed Single-Member (S Corporation)", tax: "S Corporation" },
+  multi: { name: "Manager-Managed Multi-Member (Partnership)", tax: "Partnership" },
+  s: { name: "Manager-Managed Multi-Member (S Corporation)", tax: "S Corporation" },
+  member: { name: "Member-Managed Multi-Member (Partnership)", tax: "Partnership" },
+  "member-s": { name: "Member-Managed Multi-Member (S Corporation)", tax: "S Corporation" }
+};
+function agreementTitle(opts) {
+  const form = Object.prototype.hasOwnProperty.call(AGREEMENT_FORMS, opts.version) ? AGREEMENT_FORMS[opts.version].name : "";
+  const prefix = opts.amendedRestated ? "Amended and Restated " : "";
+  const number = opts.generationNumber ? ` (No. ${opts.generationNumber})` : "";
+  return `${prefix}Operating Agreement${form ? ` \u2014 ${form}` : ""}${number}${opts.companyName ? ` \u2014 ${opts.companyName}` : ""}`;
+}
+
 // server/datetime.ts
 var ZONE = "America/New_York";
 function stampEastern(d2 = /* @__PURE__ */ new Date()) {
@@ -100812,13 +100830,6 @@ function stampForFilename(d2 = /* @__PURE__ */ new Date()) {
   const get2 = (t) => parts.find((p2) => p2.type === t)?.value ?? "";
   const hour = get2("hour") === "24" ? "00" : get2("hour");
   return `${get2("year")}-${get2("month")}-${get2("day")}-${hour}${get2("minute")}ET`;
-}
-function taxationLabel(version) {
-  if (version === "s" || version === "member-s") return "S Corporation";
-  if (version === "single-s" || version === "member-single-s") return "Single-Member S Corporation";
-  if (version === "member-single") return "Single-Member";
-  if (version === "single") return "Single-Member";
-  return "Partnership";
 }
 function easternDateIso(d2 = /* @__PURE__ */ new Date()) {
   const parts = new Intl.DateTimeFormat("en-CA", { timeZone: ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d2);
@@ -101276,7 +101287,7 @@ Read those two paragraphs again. They are the entire game:
 
 Your operating agreement fights this battle for you in two ways. Article 8 puts the records in a named person's hands and sets the standard they must meet. The standing association rules in Section 8.5 make the agreement *itself* part of your records and help determine where assets belong. They work alongside real ledgers and real bank accounts, not instead of them. Missing records can leave an asset non-associated; the default rule does not replace the identifying, acquisition, and transfer information the statute requires.
 ## 4. WHY USE A SERIES LLC \u2014 AND WHEN NOT TO
-**Use it for:** multiple rental properties; a portfolio you are growing (add a $25 series per property instead of a $125+ LLC per property); separating a risky operating business from valuable equipment; or separating brands or projects.
+**Use it for:** multiple rental properties; a portfolio you are growing (add a $50 series per property instead of a $125+ LLC per property); separating a risky operating business from valuable equipment; or separating brands or projects.
 **Think harder before using it for:**
 - **Assets and operations in other states.** Florida will respect your horizontal shield; a state with no series statute may not. If a series will own property or do business outside Florida, get advice first (Section 25).
 - **Outside investors.** Sophisticated investors and their counsel may prefer separate LLCs they understand. The structure supports investors (the multi-member agreement is built for it), but expect diligence questions.
@@ -101294,7 +101305,7 @@ Full glossary in Section 31; these thirteen carry the load.
 | **Protected Series Designation** | The $25 online Sunbiz filing that creates a protected series |
 | **Member** | An owner of the company. In our structure the members own the company, and the company owns every series |
 | **Associated member** | A member of the company linked to a particular series (s. 605.2302). **Our agreements deliberately have none:** every series is wholly owned by the company, which is why the whole structure files one return (Section 18). Because no series has an associated member, s. 605.2304(2) would make the company its protected-series manager; every form of our agreement varies that default and names the Manager or the owners instead (Section 18) |
-| **Manager / Protected Series Manager** | Who runs the company / who runs a particular series. In the manager-managed forms each series is run by the company's Manager. In the member-managed forms there is no manager: the owners run the company and are themselves named each series' protected-series managers |
+| **Manager / Protected Series Manager** | Who runs the company / who runs a particular series. In the manager-managed forms each series is run by the company's Manager. In the member-managed forms there is no separate company manager: the owners run the company and are themselves named each series' protected-series managers |
 | **Associated asset** | An asset whose records satisfy s. 605.2301 for a particular silo \u2014 the only kind of asset the horizontal shield protects |
 | **Non-associated asset** | An asset whose records fail the test \u2014 reachable by creditors under s. 605.2404, with the burden of proof on you |
 | **Series Exhibit** | The exhibit to your operating agreement (PS-1, PS-2, \u2026) that states each series' name, purpose, manager, capital, and starting asset schedule, and records that the series has no associated members |
@@ -101332,7 +101343,7 @@ All eight share the same skeleton through Article 9. From there the multi-owner 
 | **Article 2** | The defined terms \u2014 Associated Asset, Protected Series, Series Exhibit, Majority in Interest, and the rest |
 | **Article 3** | The series engine: how series are established (unanimous consent under Section 3.1, retaining the statutory default), their legal status, the liability shields in both directions, and the rule that Series Exhibits control series-specific terms |
 | **Article 4** | The owners: membership interests as simple percentages, the rule that no owner holds any series directly, voting (multi-owner), the transfer-on-death designation (Section 23), and \u2014 in the multi-owner forms \u2014 the member duties that power the bankruptcy protections |
-| **Article 5** | Management. In the **manager-managed** forms, the Manager runs the company and every series. In the **member-managed** forms there is no manager at all: the owners run the company by majority of ownership and \u2014 as s. 605.2107(1)(n) permits \u2014 are themselves named each series' protected-series managers (with one owner, that is you), and one owner may be designated **Administrative Member** to handle filings, records, and returns (a paperwork role with any additional authority expressly granted by the agreement or by owners holding a Majority in Interest). Every multi-owner form lists the big decisions that need an owner vote \u2014 including **moving any asset between silos** |
+| **Article 5** | Management. In the **manager-managed** forms, the Manager runs the company and every series. In the **member-managed** forms there is no separate company manager: the owners run the company by majority of ownership and \u2014 as s. 605.2107(1)(n) permits \u2014 are themselves named each series' protected-series managers (with one owner, that is you), and one owner may be designated **Administrative Member** to handle filings, records, and returns (a paperwork role with any additional authority expressly granted by the agreement or by owners holding a Majority in Interest). Every multi-owner form lists the big decisions that need an owner vote \u2014 including **moving any asset between silos** |
 | **Articles 6\u20137** | Money: contributions (always made *to a specific silo* and recorded), capital accounts (multi-member partnership forms only; contribution records elsewhere), distributions \u2014 always **from a series' own assets, and by a series only to the company that owns it** |
 | **Article 8** | The recordkeeping covenants (this manual's Section 14 is its field guide) and the standing association rules in Section 8.5 \u2014 and the holding rule (\xA78.4): hold assets in the owning company's or series' name, or through a properly documented nominee arrangement under Section 8.4 \u2014 not simply in your personal name |
 | **Article 9** | Taxes (Part Four) |
@@ -101351,7 +101362,7 @@ When you completed the questionnaire, you decided several things. Here is what e
 Three practical rules about the agreement itself:
 1. **Sign it, and sign every Series Exhibit.** An unsigned operating agreement is a rumor. Your agreement also makes itself part of the association records (the standing association rules in Section 8.5) \u2014 it only earns that status executed.
 2. **Amendments are written or they are nothing.** Oral side-deals between members are unenforceable under the agreement and poisonous in litigation.
-3. **When you add a second owner to a single-member company, change agreements.** Your agreement does not require it \u2014 nothing in it does \u2014 but the single-member form is built for one owner: it has no voting rules, no capital-call machinery, no transfer restrictions among owners, and none of the multi-owner bankruptcy armor, and its tax treatment changes the moment a second member is admitted. Move to the multi-member form at the same time, not later. (The portal does this for you: add the new owner in the operating agreement questionnaire, and the regenerated agreement is built on the multi-owner form automatically.)
+3. **When you add a second owner to a single-member company, change agreements.** Your agreement does not require it \u2014 nothing in it does \u2014 but the single-member form is built for one owner: it has no voting rules, no capital-call machinery, no transfer restrictions among owners, and none of the multi-owner bankruptcy armor. A disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner joins. Move to the multi-member form at the same time, not later. (The portal does this for you: add the new owner in the operating agreement questionnaire, and the regenerated agreement is built on the multi-owner form automatically.)
 ## 8. THE MOTHERSHIP STRATEGY \u2014 KEEP THE PARENT POOR
 The company itself \u2014 the mothership \u2014 should own as little as possible. Two reasons:
 **First, the mothership is a silo too.** Its assets are exposed to *its* creditors \u2014 and the mothership is the silo most likely to attract general liabilities: it files things, signs service contracts, hires the bookkeeper, deals with the registered agent and the state. Anything valuable parked at the company level is exposed to all of that.
@@ -101518,7 +101529,7 @@ So however many series you designate, the number of federal income tax returns f
 
 | Your company | What the entire structure files |
 |---|---|
-| One owner, no election | Nothing of its own. Everything on your Form 1040, each property or business as its own Schedule E or C activity |
+| One owner, no election | No separate federal income-tax return for the disregarded LLC. Its activity is reported through its tax owner. An individual generally uses the applicable schedules of Form 1040 or 1040-SR; other owners use their applicable reporting rules. |
 | Two or more owners, partnership | **One** Form 1065, with a K-1 to each member |
 | S election | **One** Form 1120-S, with a K-1 to each shareholder |
 
@@ -101544,13 +101555,13 @@ If one of those has already happened, tell your CPA immediately.
 - **The other taxes do not care about check-the-box.** Documentary stamp tax on deeds and on notes and mortgages (Section 11). Tangible personal property tax \u2014 each county assesses business personalty, appliances in rentals included, with a return (Form DR-405) due per property or business by April 1, and an exemption that often covers small holdings. Sales tax, if any series rents short-term lodging or sells taxable goods \u2014 its own Department of Revenue registration and collections, plus county tourist development taxes on short-term rentals. Florida's sales tax on commercial rent (former s. 212.031) was repealed for occupancy periods beginning on or after October 1, 2025, so a series that only leases office, retail, or warehouse space no longer collects it. Employment taxes, in the silo that employs the people. Property taxes, where a transfer can reset assessments or lose exemptions (Section 11's homestead warning again).
 Each of those obligations belongs to a **specific silo**, and paying it from that silo's own account is part of the separateness you are proving.
 ### THE EIN QUESTION \u2014 WHO NEEDS ONE, AND WHAT AN EIN DOES NOT MEAN
-**The company needs an EIN.** Its bank requires one for the account, the IRS requires one to process any election, and it is the number the company gives on W-9s so you are not handing out your Social Security number.
+**The company needs an EIN.** Its bank requires one for the account, the IRS requires one to process any election, and an EIN identifies the company for those purposes. **A W-9 identifies the taxpayer.** For a disregarded entity, use the tax owner's name and taxpayer identification number as the W-9 instructions require, and identify the disregarded entity on line 2.
 **A protected series usually does not need one.** Every series is wholly owned by the company, so for federal income tax it is disregarded (this Section): the IRS will never ask a series for an income tax return. A series needs \u2014 or benefits from \u2014 its own EIN only in limited circumstances:
 - **Its bank insists.** Most banks require an EIN for an account titled in the series' name. This is the most common reason by far, and it is a banking rule, not a tax rule. Your CPA or our EIN service can obtain one.
 - **It has employees.** Disregarded status does not apply to employment taxes (Treas. Reg. \xA7301.7701-2(c)(2)(iv)); a series that pays wages must have its own EIN and file its own employment returns (Section 16).
-- **A counterparty demands a taxpayer number for the named entity** \u2014 a lender, title company, insurer, or property manager. Giving them the company's EIN for a series' business stitches the two identities together on paper, the opposite of the separateness you are documenting.
+- **A counterparty requires an EIN for its records** \u2014 a lender, title company, insurer, or property manager. Distinguish that request from a W-9: a W-9 identifies the tax owner under the form's instructions. That tax identification is different from the series' name on its contracts and bank accounts.
 - **State registrations,** where a series is the operator \u2014 sales tax, tourist development tax, reemployment tax (Section 16).
-**A separate EIN does not mean a separate tax return.** An EIN is an identification number, not a tax status. Because every series is wholly owned by the mothership, the series never file income tax returns of their own \u2014 the only income tax return ever filed for the whole structure is the company's (and where the company itself is disregarded to a single owner, Section 16's table shows that lands on your own Form 1040). If you have questions about the technicalities, ask your attorney or accountant.
+**A separate EIN does not mean a separate tax return.** An EIN is an identification number, not a tax status. Because every series is wholly owned by the mothership, the series never file income tax returns of their own \u2014 the only income tax return ever filed for the whole structure is the company's (where the company itself is disregarded, its activity is reported through its tax owner; an individual generally uses the applicable schedules of Form 1040 or 1040-SR, while other owners use their applicable reporting rules). If you have questions about the technicalities, ask your attorney or accountant.
 # PART FIVE \u2014 COMPLIANCE AND CREDITOR PROTECTION
 ## 19. STATE FILINGS, YEAR AFTER YEAR
 **Annual report \u2014 $138.75, due between January 1 and May 1.** Filed with the Division of Corporations online. **One report covers the company and every protected series**, however many you have \u2014 the same $138.75 whether you run one series or twelve. Filed even one day late, the fee becomes **$538.75**: Florida adds a $400 penalty that is automatic and cannot be waived. Ignore it long enough and the company is administratively dissolved \u2014 which, in a series LLC, drags **every protected series** down with it (a series cannot outlive its mothership).
@@ -101562,7 +101573,7 @@ Each of those obligations belongs to a **specific silo**, and paying it from tha
 **Statement of authority \u2014 only if you chose to file one:** re-file before its **five-year** expiration, and record a fresh certified copy ($30) in each county where you own property. See Section 11.
 - **When the company's name changes,** every series' name changes with it (each begins with the company name); conforming state filings and re-papering follow. Change the company name rarely and deliberately.
 ## 20. FEDERAL BENEFICIAL OWNERSHIP REPORTING \u2014 CURRENTLY: EXEMPT
-The Corporate Transparency Act briefly required most small LLCs to file beneficial ownership reports with FinCEN. **As of this edition, U.S.-formed companies are exempt:** FinCEN's March 2025 interim final rule narrowed "reporting company" to entities formed under *foreign* law that register to do business here. A Florida series LLC formed in Florida currently files nothing with FinCEN, and its owners report nothing.
+The Corporate Transparency Act briefly required most small LLCs to file beneficial ownership reports with FinCEN. **As of this edition, U.S.-formed companies are exempt:** FinCEN\u2019s final rule, effective August 14, 2026, retained the exemption for U.S.-formed companies. A Florida LLC formed in Florida does not file a federal beneficial ownership report under that rule, and its owners do not submit one for that company.
 Two cautions. First, this area has reversed course more than once \u2014 verify the current rule (fincen.gov/boi) before relying on this paragraph in a later year; material changes will be covered in manual updates. Second, the exemption is federal BOI only \u2014 it changes none of your Florida filings and none of your recordkeeping duties.
 ## 21. HOW OWNERS DESTROY THE SHIELDS (VEIL PIERCING AND WORSE)
 Courts respect entities that respect themselves. Both shields \u2014 vertical and horizontal \u2014 can be disregarded when the structure is abused. Florida veil-piercing doctrine asks, in substance: was the entity dominated and used as the owner's instrument, was there improper conduct (fraud, commingling, stripping), and did it cause injury? The protected series construct adds a second, easier path for creditors that skips veil piercing entirely: **s. 605.2404** \u2014 prove the records inadequate and the asset is simply *non-associated*, no fraud required, burden on you (Section 3).
@@ -101587,10 +101598,10 @@ The shields in Section 2 protect the structure from the *business's* creditors. 
 **The single-member exception \u2014 read this if you own alone.** Florida law is different for single-member LLCs: s. 605.0503(4) lets a judgment creditor **foreclose** on a single member's entire interest if distributions won't satisfy the judgment in a reasonable time \u2014 the *Olmstead* fix, written into the statute. The single-member structure still fully protects against the *business's* creditors, but it is not a fortress against your *personal* creditors. That is a reason to carry strong personal umbrella coverage, and \u2014 where genuine \u2014 to consider legitimate multi-member ownership (a real co-investor, a spouse with real economic rights, a family partnership). Adding a token 1% member solely to defeat creditors is a strategy courts see through; get real advice for real asset-protection planning.
 **Charging-order exclusivity is not absolute \u2014 know its edges.** Section 605.0503(7) says the section does not limit a creditor's rights under a **consensual security interest** you granted, does not limit **fraudulent transfer** law, and does not limit "the equitable principles of alter ego, equitable lien, or constructive trust." Pledge your interest to a lender and the charging-order rules do not stand between that lender and its collateral. Move an interest to dodge a creditor and Ch. 726 applies. Run the structure as your personal checkbook and equitable doctrines are available. Exclusivity protects a *well-run* company from an *ordinary* judgment creditor; it is not a shield against your own conduct.
 **Involuntary transfers (multi-member).** If a member's interest is seized, passes through bankruptcy, or lands with an ex-spouse, your agreement (\xA710.4) gives the company \u2014 then the other members \u2014 an option to buy that interest at appraised fair value on up-to-five-year terms. A stranger who forces their way in holds only an economic interest (\xA710.3) and faces a structured buyout, not a seat at the table.
-**Bankruptcy armor (multi-member).** Article 11 of the multi-member agreement declares the agreement an executory contract under 11 U.S.C. \xA7365, catalogs each member's material ongoing duties, and \u2014 citing *In re Soderstrom* (M.D. Fla. 2013) \u2014 takes the position that a bankruptcy trustee cannot assume or assign a debtor-member's interest without the other members' consent. Understand it honestly: bankruptcy courts wield broad equitable power, and no drafting guarantees an outcome there. Article 11 gives your side the strongest available argument; combined with charging-order exclusivity, it makes the interest an unappetizing target \u2014 which is the practical goal.
+**Bankruptcy armor (multi-member).** Article 11 describes the members' continuing managerial and governance obligations and states that the agreement is intended to be an executory contract under 11 U.S.C. \xA7365. Section 11.2 requires the other members' prior written consent before a bankruptcy trustee or debtor in possession may assume or assign a debtor-member's governance or management rights, or cause a substitute to be admitted as a member, under \xA7365(c)(1) and applicable Florida law. This separates control of the company from the economic interest: the section does not limit the bankruptcy estate's interest in the debtor-member's transferable economic interest to the extent permitted by applicable law. It is not a promise that economic rights cannot enter the estate or be sold. The provision's effect depends on applicable law and the bankruptcy court's decision; no drafting guarantees an outcome.
 **Bankruptcy if you own alone.** Florida's statute has a trap for the sole owner of a member-managed company: filing bankruptcy automatically expels you as a member (s. 605.0602(8)), and a company with no members starts a 90-day clock toward dissolution \u2014 your worst financial day would also dissolve the container holding your assets. Your agreement turns that trap off (\xA74.7 of the member-managed single-member forms; \xA74.8 of the manager-managed single-member forms, where the statute does not expel you but the same section keeps management and the series running): filing does not end your membership, the company and every series continue, and whoever ends up holding the interest holds it subject to the agreement. Understand what this section does *not* do: in a single-member company there are no co-members whose rights a bankruptcy court must respect, so the estate steps into your shoes \u2014 federal law makes the interest estate property no matter what any agreement says, and any clause that tried to punish filing would be void. The section's job is continuity, not concealment: the business keeps operating, the walls between series stand, and the estate deals with an intact company instead of a dissolving one. If bankruptcy is a live concern, that is a conversation for a bankruptcy attorney before filing, not after.
 
-**Death \u2014 the TOD designation.** Every form of the agreement lets an individual member register a transfer-on-death beneficiary (an owner that is a company or trust cannot make this designation, nor can co-owners holding an interest as tenants in common) \u2014 anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule \u2014 on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50\u2013711.512). At death the interest passes directly \u2014 no probate \u2014 and the beneficiary takes subject to the operating agreement. In the multi-member agreements, a beneficiary receives the economic interest automatically but becomes a voting member only after delivering a signed agreement to be bound and obtaining written consent from owners holding more than 50% of the ownership interests held by the remaining members. A permitted family transferee needs the same admission approval, excluding the transferring owner; other new members need every member's written consent and a signed agreement to be bound. Permission to transfer an interest and admission as a voting member are separate requirements. In the single-member agreement the beneficiary is admitted as the Member on delivering a signed agreement to be bound, since there is no one else to consent. Keep designations current (the formalities are strict: a signed writing with two witnesses, delivered as your form directs), and coordinate with your estate plan \u2014 for large or complicated estates, a trust may be the better vehicle; ask your estate planner. If no designation is made, the interest passes through your estate, and the agreement's continuation provisions keep the company alive while it does.
+**Death \u2014 the TOD designation.** Every form of the agreement lets an individual member register a transfer-on-death beneficiary (an owner that is a company or trust cannot make this designation, nor can co-owners holding an interest as tenants in common) \u2014 anyone the member chooses, subject to the professional-owner eligibility requirements on the professional LLC forms and the eligible-shareholder rule on the S corporation forms \u2014 on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50\u2013711.512). At death the interest passes directly \u2014 no probate \u2014 and the beneficiary takes subject to the operating agreement. In the multi-member agreements, a beneficiary receives the economic interest automatically but becomes a voting member only after delivering a signed agreement to be bound and obtaining written consent from owners holding more than 50% of the ownership interests held by the remaining members. A permitted family transferee needs the same admission approval, excluding the transferring owner; other new members need every member's written consent and a signed agreement to be bound. Permission to transfer an interest and admission as a voting member are separate requirements. In the single-member agreement the beneficiary is admitted as the Member on delivering a signed agreement to be bound, since there is no one else to consent. Keep designations current (the formalities are strict: a signed writing with two witnesses, delivered as your form directs), and coordinate with your estate plan \u2014 for large or complicated estates, a trust may be the better vehicle; ask your estate planner. If no designation is made, the interest passes through your estate, and the agreement's continuation provisions keep the company alive while it does.
 ## 24. WHEN A SERIES GETS SUED \u2014 SERVICE OF PROCESS AND LEGAL MAIL
 A protected series can sue and be sued in its own name. Process against a series is served like process against the LLC (s. 48.062) \u2014 which in practice means **served on the registered agent**, who is the same for the company and every series.
 If MyFloridaSeriesLLC is your registered agent: anything served or officially delivered for any of your silos is scanned to your client portal the day we receive it, and you get an email alert immediately. Then the clock is yours to respect: **a lawsuit has a response deadline (typically 20 days in Florida) that runs whether or not you read it.** Sign in, download, and get the papers to your attorney the same day. A default judgment converts a defensible claim into a fixed debt of that series \u2014 and tests your records under s. 605.2404 at their worst moment. The alert email is not the last step; it is the first.
@@ -101629,7 +101640,7 @@ Practical rules:
 15. **Moving assets after the accident.** Fraudulent-transfer law was written for exactly that move (Section 10).
 16. **Set-and-forget.** The structure is a practice, not a purchase. The annual review (Section 29) is the whole price of keeping it.
 ## 28. THREE WORKED EXAMPLES
-**Example 1 \u2014 The landlord (single member).** Maria forms Sunshine Holdings, LLC; designates PS 1, PS 2, PS 3 ($75 total); deeds one rental into each (after clearing each mortgage-consent and stamp-tax question); opens four bank accounts (mothership + three); moves each property's insurance to the owning series; assigns each lease; tenants pay each series directly. Tax time: everything is disregarded to Maria \u2014 three Schedule E properties, like always. The slip-and-fall at 101 Palm Street in year three settles at policy limits; the plaintiff's lawyer, reading PS 1's clean records and facing only PS 1's equity beyond the policy, does not bother testing the shield. PS 2 and PS 3 never appear in the case.
+**Example 1 \u2014 The landlord (single member).** Maria forms Sunshine Holdings, LLC; designates PS 1, PS 2, PS 3 (her first three series are included in the service package); deeds one rental into each (after clearing each mortgage-consent and stamp-tax question); opens four bank accounts (mothership + three); moves each property's insurance to the owning series; assigns each lease; tenants pay each series directly. Tax time: everything is disregarded to Maria \u2014 three Schedule E properties, like always. The slip-and-fall at 101 Palm Street in year three settles at policy limits; the plaintiff's lawyer, reading PS 1's clean records and facing only PS 1's equity beyond the policy, does not bother testing the shield. PS 2 and PS 3 never appear in the case.
 **Example 2 \u2014 The operating business plus assets (single member).** Dev runs a pressure-washing business and owns the trucks and equipment. PS 1 runs the business (contracts, customers, employees, its own payroll and sales-tax registrations). PS 2 owns the trucks and equipment and **leases them to PS 1** under a written lease at market rate \u2014 payments actually moving monthly from PS 1's account to PS 2's, the lease and every payment logged. A customer lawsuit against the business reaches PS 1: its receivables and its bank account \u2014 not the trucks. The inter-series lease is the load-bearing wall; it exists because it is papered and paid, not because Dev thinks of the trucks as "separate."
 **Example 3 \u2014 The family structure (multi-member).** Elena (70%) and her brother Marco (30%) own Cypress Group, LLC, manager-managed with Elena as Manager. The company designates two series: PS 1 holds a duplex, PS 2 a fourplex. **Both series are owned by the company, not by Elena or Marco individually** \u2014 that is what the form does, and it is what keeps the tax simple. The mothership holds no real estate. Tax: both series are disregarded to the company, so the structure files **one** Form 1065 and issues two K-1s, 70/30, exactly as it would with no series at all. Elena and Marco share both properties' economics in those proportions; if they wanted the duplex to be Elena's alone, the answer is a separate LLC or a custom-drafted agreement (Section 18), not different owners on different series. Marco's later personal bankruptcy tests the structure: his trustee takes his transferable interest in the company subject to the agreement, faces charging-order exclusivity, the Article 11 executory-contract position, and the company's \xA710.4 appraisal buyout option \u2014 and settles for a payout of Marco's interest at appraised value over time. Both properties stay where they are, and PS 1's tenant lawsuit two years later still reaches only PS 1.
 ## 29. THE CHECKLISTS
@@ -101740,7 +101751,7 @@ Practical rules:
 **What single habit matters most?** Contemporaneous records. Every section of this manual is a variation on that theme, and the app exists so the habit costs minutes, not weekends.
 ### ABOUT MYFLORIDASERIESLLC
 MyFloridaSeriesLLC is a document-preparation and registered agent service dedicated to the Florida Protected Series LLC. Your formation package includes the operating agreement and Series Exhibits, this manual, the recordkeeping app, and \u2014 if selected \u2014 registered agent service with same-day portal delivery of legal mail. Support: **support@myfloridaseriesllc.com**. Client portal: **myfloridaseriesllc.com/portal**.
-*\xA9 2026 MyFloridaSeriesLLC. This manual may be updated as Florida law and federal rules evolve; the portal always holds the current edition. Statutory citations verified against Official Florida Statutes: ss. 48.062, 220.02, 605.0302, 605.0410, 605.0503, 605.0602, 605.0714, 605.1103, 605.04074, 605.2101\u2013605.2802, 711.50\u2013711.512; former s. 212.031 (historical commercial-rent tax); Ch. 726; Prop. Treas. Reg. \xA7301.7701-1(a)(5); FinCEN interim final rule (Mar. 2025); Florida Division of Corporations series LLC filing guidance.*
+*\xA9 2026 MyFloridaSeriesLLC. This manual may be updated as Florida law and federal rules evolve; the portal always holds the current edition. Statutory citations verified against Official Florida Statutes: ss. 48.062, 220.02, 605.0302, 605.0410, 605.0503, 605.0602, 605.0714, 605.1103, 605.04074, 605.2101\u2013605.2802, 711.50\u2013711.512; former s. 212.031 (historical commercial-rent tax); Ch. 726; Prop. Treas. Reg. \xA7301.7701-1(a)(5); FinCEN final rule (effective Aug. 14, 2026; fincen.gov/boi); Florida Division of Corporations series LLC filing guidance.*
 `;
 
 // server/owners-manual.ts
@@ -102496,7 +102507,16 @@ init_document_text();
 import { readFileSync } from "node:fs";
 
 // server/templates-oa-single.md
-var templates_oa_single_default = `# OPERATING AGREEMENT
+var templates_oa_single_default = `<!-- alternative:restated-title "# AMENDED AND RESTATED\\n# OPERATING AGREEMENT" -->
+<!-- alternative:restated-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by the undersigned sole member (the \\"Member\\") and is acknowledged by the undersigned manager (the \\"Manager\\")." -->
+<!-- alternative:professional-cover "A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY" -->
+<!-- alternative:professional-preamble "THIS OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by the undersigned sole member (the \\"Member\\") and is acknowledged by the undersigned manager (the \\"Manager\\")." -->
+<!-- alternative:restated-professional-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by the undersigned sole member (the \\"Member\\") and is acknowledged by the undersigned manager (the \\"Manager\\")." -->
+<!-- alternative:professional-recital "B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department." -->
+<!-- alternative:restatement-dated "D. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date." -->
+<!-- alternative:restatement-undated "D. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date." -->
+
+# OPERATING AGREEMENT
 ## OF
 ## [COMPANY NAME], LLC
 ### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
@@ -102523,11 +102543,11 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
 
-**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
+**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
 
@@ -102537,7 +102557,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.8 Location of Records.** The records of the Company and of each Protected Series \u2014 including the records required by Article 8 \u2014 shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Manager determines, and shall at all times be retrievable in perceivable form.
 
-**1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
+**1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
 **1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
@@ -102547,7 +102567,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 2 \u2014 DEFINITIONS
 
-**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
+**2.1 "Act"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
 
 **2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
 
@@ -102653,7 +102673,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **5.5 Standard of Conduct; Exculpation.** The Manager and each Protected Series Manager shall discharge their duties consistent with the Act, including the duties applicable to managers and protected-series managers. No Manager or Protected Series Manager shall be liable to the Company, any Protected Series, or the Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
 
-**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act exceeding the authority conferred by Section 5.4; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who exceeds the authority conferred by Section 5.4 is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager.
+**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act taken without the approval Section 5.4 requires; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who acts without the approval Section 5.4 requires is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager.
 
 **5.7 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless the Member consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager \u2014 by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts \u2014 and the allocation shall be recorded in the records maintained under Article 8.
 
@@ -102783,7 +102803,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement as of the Effective Date.
 
 **MEMBER:**
 
@@ -102815,6 +102835,8 @@ Date: _____________________________
 [[pagebreak]]
 
 ## EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION
+
+<!-- alternative:professional-exhibit-note "**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4." -->
 
 **Company:** [COMPANY NAME], LLC
 
@@ -102892,7 +102914,16 @@ By: _____________________________
 `;
 
 // server/templates-oa-multi.md
-var templates_oa_multi_default = `# OPERATING AGREEMENT
+var templates_oa_multi_default = `<!-- alternative:restated-title "# AMENDED AND RESTATED\\n# OPERATING AGREEMENT" -->
+<!-- alternative:restated-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by and among the undersigned members (each a \\"Member\\" and collectively the \\"Members\\") and is acknowledged by the undersigned manager (the \\"Manager\\")." -->
+<!-- alternative:professional-cover "A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY" -->
+<!-- alternative:professional-preamble "THIS OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by and among the undersigned members (each a \\"Member\\" and collectively the \\"Members\\") and is acknowledged by the undersigned manager (the \\"Manager\\")." -->
+<!-- alternative:restated-professional-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by and among the undersigned members (each a \\"Member\\" and collectively the \\"Members\\") and is acknowledged by the undersigned manager (the \\"Manager\\")." -->
+<!-- alternative:professional-recital "B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department." -->
+<!-- alternative:restatement-dated "D. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date." -->
+<!-- alternative:restatement-undated "D. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date." -->
+
+# OPERATING AGREEMENT
 ## OF
 ## [COMPANY NAME], LLC
 ### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
@@ -102919,11 +102950,11 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
 
-**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
+**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
 
@@ -102933,7 +102964,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.8 Location of Records.** The records of the Company and of each Protected Series \u2014 including the records required by Article 8 \u2014 shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Manager determines, and shall at all times be retrievable in perceivable form.
 
-**1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
+**1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
 **1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
@@ -102943,7 +102974,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 2 \u2014 DEFINITIONS
 
-**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
+**2.1 "Act"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
 
 **2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
 
@@ -103067,7 +103098,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business \u2014 the consent of **all Members**;
 
-(d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file a statement of dissolution of a Protected Series \u2014 the approval required by Section 14.1;
+(d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file articles of protected series dissolution \u2014 the approval required by Section 14.1;
 
 (e) admit any additional Member \u2014 the approval required by Article 12;
 
@@ -103081,7 +103112,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **5.5 Standard of Conduct; Exculpation.** The Manager and each Protected Series Manager shall discharge their duties consistent with the Act, including the duties applicable to managers and protected-series managers. No Manager or Protected Series Manager shall be liable to the Company, any Protected Series, or any Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
 
-**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act exceeding the authority conferred by Section 5.4; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who exceeds the authority conferred by Section 5.4 is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager.
+**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act taken without the approval Section 5.4 requires; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who acts without the approval Section 5.4 requires is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager.
 
 **5.7 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless a Majority in Interest consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager \u2014 by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts \u2014 and the allocation shall be recorded in the records maintained under Article 8.
 
@@ -103157,7 +103188,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## ARTICLE 9 \u2014 TAX MATTERS
 
-**9.1 Intended Classification.** It is intended that the Company be classified as a partnership for federal income tax purposes, as federal tax law provides. Each Protected Series is wholly owned by the Company. If a Protected Series is treated as an entity separate from the Company for federal income tax purposes, it is intended that the Protected Series be disregarded as an entity separate from its owner, so that its items of income, gain, loss, deduction, and credit are reported by the Company. No member of the Company shall take a position inconsistent with this Section on any return without the written consent of all members.
+**9.1 Intended Classification.** It is intended that the Company be classified as a partnership for federal income tax purposes, as federal tax law provides. Each Protected Series is wholly owned by the Company. If a Protected Series is treated as an entity separate from the Company for federal income tax purposes, it is intended that the Protected Series be disregarded as an entity separate from its owner, so that its items of income, gain, loss, deduction, and credit are reported by the Company. No Member of the Company shall take a position inconsistent with this Section on any return without the written consent of all Members.
 
 **9.2 Tax Returns; Information.** The Manager shall cause to be prepared and filed all tax returns required of the Company and of each Protected Series, if necessary or required, and shall deliver to each Member, after the end of each fiscal year, the tax information (including Schedule K-1s, where applicable) necessary for the Member's returns.
 
@@ -103189,7 +103220,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **11.1 Executory Contract.** The parties agree that this Agreement constitutes an executory contract and shall be governed by 11 U.S.C. \xA7365 in connection with the bankruptcy of the Company or any Member because, among other provisions and obligations, this Agreement imposes on each Member the following affirmative duties (each of which constitutes a material unperformed, future obligation): (a) *[include only if optional Section 6.2 is included; otherwise replace with "(a) [Reserved.]"]* upon approval of a Majority in Interest as provided in Section 6.2, the duty and obligation of each Member to contribute additional capital to the Company or the affected Protected Series; (b) the duty and obligation of each Member to materially participate in the governance of the Company and of each Protected Series, as provided in Section 4.6; (c) *[include only if Section 4.7 Alternative A is selected; otherwise replace with "(c) [Reserved.]"]* the duty and obligation of each Member not to compete with the Company or with any Protected Series in the conduct of their activities and affairs before the dissolution of the Company, as provided in Section 4.7 and consistent with s. 605.04091(2)(c), Florida Statutes; (d) the duty and obligation of each Member not to disclose confidential information, as provided in Section 4.8; and (e) the duty and obligation of each Member not to hinder, delay, slander, or tarnish the reputation of the Company or of any Protected Series, as provided in Section 4.9. The failure of a Member to perform the duties and obligations set forth herein releases and excuses the mutual duties and obligations owed by the Company and the other Members to such defaulting Member.
 
-**11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member and the Manager, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. \xA7365(c)(1) without the prior written consent of the other Members.
+**11.2 Personal Service Agreement; No Assumption or Assignment.** The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. \xA7 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member\u2019s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate\u2019s interest in a Member\u2019s transferable (economic) interest to the extent permitted by applicable law.
 
 **11.3 Compliance upon Assumption or Rejection.** Notwithstanding the foregoing, to the extent that a trustee of a Member's bankruptcy is allowed either to assume or reject a debtor Member's interest in the Company governed by this Agreement, such action shall comply with the time period set forth in 11 U.S.C. \xA7365(d), and if the trustee assumes such debtor Member's interest, such trustee shall comply with the terms of this Agreement and Florida law governing this Agreement, including, without limitation, the restrictions of the rights of a creditor of a Member or transferee pursuant to ss. 605.0502 and 605.0503, Florida Statutes.
 
@@ -103273,7 +103304,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement as of the Effective Date.
 
 **MEMBERS:**
 
@@ -103313,6 +103344,8 @@ Date: _____________________________
 [[pagebreak]]
 
 ## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
+
+<!-- alternative:professional-exhibit-note "**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4." -->
 
 **Company:** [COMPANY NAME], LLC
 
@@ -103402,7 +103435,16 @@ By: _____________________________
 `;
 
 // server/templates-oa-s.md
-var templates_oa_s_default = `# OPERATING AGREEMENT
+var templates_oa_s_default = `<!-- alternative:restated-title "# AMENDED AND RESTATED\\n# OPERATING AGREEMENT" -->
+<!-- alternative:restated-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by and among the undersigned members (each a \\"Member\\" and collectively the \\"Members\\") and is acknowledged by the undersigned manager (the \\"Manager\\")." -->
+<!-- alternative:professional-cover "A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY" -->
+<!-- alternative:professional-preamble "THIS OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by and among the undersigned members (each a \\"Member\\" and collectively the \\"Members\\") and is acknowledged by the undersigned manager (the \\"Manager\\")." -->
+<!-- alternative:restated-professional-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by and among the undersigned members (each a \\"Member\\" and collectively the \\"Members\\") and is acknowledged by the undersigned manager (the \\"Manager\\")." -->
+<!-- alternative:professional-recital "B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department." -->
+<!-- alternative:restatement-dated "D. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date." -->
+<!-- alternative:restatement-undated "D. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date." -->
+
+# OPERATING AGREEMENT
 ## OF
 ## [COMPANY NAME], LLC
 ### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
@@ -103429,11 +103471,11 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
 
-**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
+**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
 
@@ -103443,7 +103485,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.8 Location of Records.** The records of the Company and of each Protected Series \u2014 including the records required by Article 8 \u2014 shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Manager determines, and shall at all times be retrievable in perceivable form.
 
-**1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
+**1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
 **1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
@@ -103453,7 +103495,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 2 \u2014 DEFINITIONS
 
-**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
+**2.1 "Act"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
 
 **2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
 
@@ -103577,7 +103619,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business \u2014 the consent of **all Members**;
 
-(d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file a statement of dissolution of a Protected Series \u2014 the approval required by Section 14.1;
+(d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file articles of protected series dissolution \u2014 the approval required by Section 14.1;
 
 (e) admit any additional Member \u2014 the approval required by Article 12;
 
@@ -103591,7 +103633,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **5.5 Standard of Conduct; Exculpation.** The Manager and each Protected Series Manager shall discharge their duties consistent with the Act, including the duties applicable to managers and protected-series managers. No Manager or Protected Series Manager shall be liable to the Company, any Protected Series, or any Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
 
-**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act exceeding the authority conferred by Section 5.4; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who exceeds the authority conferred by Section 5.4 is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager.
+**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act taken without the approval Section 5.4 requires; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who acts without the approval Section 5.4 requires is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager.
 
 **5.7 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless a Majority in Interest consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager \u2014 by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts \u2014 and the allocation shall be recorded in the records maintained under Article 8.
 
@@ -103667,7 +103709,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## ARTICLE 9 \u2014 TAX MATTERS
 
-**9.1 S Corporation Status.** The Company has elected, or intends to elect, classification as an association taxable as a corporation and S corporation status under section 1362 of the Code, and it is intended that the election remain continuously in effect. Each Member shall execute the consents and other instruments (including IRS Form 2553) necessary or appropriate to make and maintain the election, and no election shall be revoked without the affirmative vote or consent of all Members. Each Protected Series is wholly owned by the Company. If a Protected Series is treated as an entity separate from the Company for federal income tax purposes, it is intended that the Protected Series be disregarded as an entity separate from its owner, so that its items of income, gain, loss, deduction, and credit are reported by the Company. No member of the Company shall take a position inconsistent with this Section on any return without the written consent of all members.
+**9.1 S Corporation Status.** The Company has elected, or intends to elect, classification as an association taxable as a corporation and S corporation status under section 1362 of the Code, and it is intended that the election remain continuously in effect. Each Member shall execute the consents and other instruments (including IRS Form 2553) necessary or appropriate to make and maintain the election, and no election shall be revoked without the affirmative vote or consent of all Members. Each Protected Series is wholly owned by the Company. If a Protected Series is treated as an entity separate from the Company for federal income tax purposes, it is intended that the Protected Series be disregarded as an entity separate from its owner, so that its items of income, gain, loss, deduction, and credit are reported by the Company. No Member of the Company shall take a position inconsistent with this Section on any return without the written consent of all Members.
 
 **9.2 Returns; Information.** The Manager shall cause to be prepared and filed all tax returns required of the Company (including Form 1120-S) and of each Protected Series, if necessary or required, and shall deliver to each Member, after the end of each fiscal year, the information (including Schedule K-1) necessary for the Member's returns.
 
@@ -103681,7 +103723,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **(c) Offending acts are void.** No Member, and no Protected Series, shall take any action, or omit to take any action, that would cause the election to be invalid or to terminate; any purported action or omission in violation of this subsection is null and void ab initio and shall be given no force or effect for any purpose.
 
-**(d) Pro rata in all events.** Notwithstanding any other provision of this Agreement or of any Series Exhibit, all allocations and distributions \u2014 including distributions in liquidation of the Company or of any Protected Series \u2014 shall be made strictly pro rata in accordance with Percentage Interests, and every Membership Interest confers identical rights to distributions and liquidation proceeds.
+**(d) Pro rata in all events.** Notwithstanding any other provision of this Agreement or of any Series Exhibit, all allocations and distributions by the Company to its Members \u2014 including distributions in liquidation of the Company \u2014 shall be made strictly pro rata in accordance with Percentage Interests, and every Membership Interest confers identical rights to distributions and liquidation proceeds. All distributions by a Protected Series, including in liquidation, shall be made solely to the Company as provided in Sections 7.2 and 14.2.
 
 **(e) Conforming construction.** To the extent any provision can be conformed rather than voided, this Agreement shall be applied and, to the minimum extent necessary, deemed modified so that the Company has a single class of ownership and the election remains valid.
 
@@ -103713,7 +103755,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **11.1 Executory Contract.** The parties agree that this Agreement constitutes an executory contract and shall be governed by 11 U.S.C. \xA7365 in connection with the bankruptcy of the Company or any Member because, among other provisions and obligations, this Agreement imposes on each Member the following affirmative duties (each of which constitutes a material unperformed, future obligation): (a) *[include only if optional Section 6.2 is included; otherwise replace with "(a) [Reserved.]"]* upon approval of a Majority in Interest as provided in Section 6.2, the duty and obligation of each Member to contribute additional capital to the Company or the affected Protected Series; (b) the duty and obligation of each Member to materially participate in the governance of the Company and of each Protected Series, as provided in Section 4.6; (c) *[include only if Section 4.7 Alternative A is selected; otherwise replace with "(c) [Reserved.]"]* the duty and obligation of each Member not to compete with the Company or with any Protected Series in the conduct of their activities and affairs before the dissolution of the Company, as provided in Section 4.7 and consistent with s. 605.04091(2)(c), Florida Statutes; (d) the duty and obligation of each Member not to disclose confidential information, as provided in Section 4.8; and (e) the duty and obligation of each Member not to hinder, delay, slander, or tarnish the reputation of the Company or of any Protected Series, as provided in Section 4.9. The failure of a Member to perform the duties and obligations set forth herein releases and excuses the mutual duties and obligations owed by the Company and the other Members to such defaulting Member.
 
-**11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member and the Manager, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. \xA7365(c)(1) without the prior written consent of the other Members.
+**11.2 Personal Service Agreement; No Assumption or Assignment.** The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. \xA7 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member\u2019s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate\u2019s interest in a Member\u2019s transferable (economic) interest to the extent permitted by applicable law.
 
 **11.3 Compliance upon Assumption or Rejection.** Notwithstanding the foregoing, to the extent that a trustee of a Member's bankruptcy is allowed either to assume or reject a debtor Member's interest in the Company governed by this Agreement, such action shall comply with the time period set forth in 11 U.S.C. \xA7365(d), and if the trustee assumes such debtor Member's interest, such trustee shall comply with the terms of this Agreement and Florida law governing this Agreement, including, without limitation, the restrictions of the rights of a creditor of a Member or transferee pursuant to ss. 605.0502 and 605.0503, Florida Statutes.
 
@@ -103757,7 +103799,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **14.3 Dissolution of the Company.** The Company is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the written consent of **all** Members; (b) entry of a decree of judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. The death, incapacity, bankruptcy, dissociation, or withdrawal of a Member does not by itself dissolve the Company. Dissolution of the Company causes the dissolution of each Protected Series, and the winding up of the Company is not complete until the winding up of each Protected Series is complete.
 
-**14.4 Winding Up the Company.** Upon dissolution of the Company, the Manager (or, if there is none, a person designated by a Majority in Interest) shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as creditors; and finally, the balance to the Members in proportion to their Percentage Interests. All distributions in winding up, whether of the Company or of any Protected Series, shall be made in proportion to Percentage Interests, so that every Membership Interest confers identical rights to liquidation proceeds. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
+**14.4 Winding Up the Company.** Upon dissolution of the Company, the Manager (or, if there is none, a person designated by a Majority in Interest) shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as creditors; and finally, the balance to the Members in proportion to their Percentage Interests. All distributions by the Company to its Members in winding up shall be made in proportion to Percentage Interests, so that every Membership Interest confers identical rights to liquidation proceeds. Distributions in winding up a Protected Series shall be made solely to the Company as provided in Section 14.2. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
 
 **14.5 No Obligation to Contribute; Recourse Limited.** No Member shall have any obligation to contribute capital in connection with any winding up (beyond unpaid contributions duly required under Sections 6.1 and 6.2), and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
 
@@ -103797,7 +103839,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement as of the Effective Date.
 
 **MEMBERS:**
 
@@ -103837,6 +103879,8 @@ Date: _____________________________
 [[pagebreak]]
 
 ## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
+
+<!-- alternative:professional-exhibit-note "**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4." -->
 
 **Company:** [COMPANY NAME], LLC
 
@@ -103928,7 +103972,16 @@ By: _____________________________
 `;
 
 // server/templates-oa-member.md
-var templates_oa_member_default = `# OPERATING AGREEMENT
+var templates_oa_member_default = `<!-- alternative:restated-title "# AMENDED AND RESTATED\\n# OPERATING AGREEMENT" -->
+<!-- alternative:restated-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by and among the undersigned members (each a \\"Member\\" and collectively the \\"Members\\")." -->
+<!-- alternative:professional-cover "A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY" -->
+<!-- alternative:professional-preamble "THIS OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by and among the undersigned members (each a \\"Member\\" and collectively the \\"Members\\")." -->
+<!-- alternative:restated-professional-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by and among the undersigned members (each a \\"Member\\" and collectively the \\"Members\\")." -->
+<!-- alternative:professional-recital "B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department." -->
+<!-- alternative:restatement-dated "D. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date." -->
+<!-- alternative:restatement-undated "D. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date." -->
+
+# OPERATING AGREEMENT
 ## OF
 ## [COMPANY NAME], LLC
 ### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
@@ -103955,11 +104008,11 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
 
-**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
+**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Administrative Member shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by a Majority in Interest.
 
@@ -103969,7 +104022,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.8 Location of Records.** The records of the Company and of each Protected Series \u2014 including the records required by Article 8 \u2014 shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Administrative Member determines, and shall at all times be retrievable in perceivable form.
 
-**1.9 Filings.** The Administrative Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
+**1.9 Filings.** The Administrative Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
 **1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
@@ -103979,7 +104032,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 2 \u2014 DEFINITIONS
 
-**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
+**2.1 "Act"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
 
 **2.2 "Administrative Member"** means the Member designated under Section 5.8 to perform the ministerial functions assigned to that role by this Agreement, and any successor so designated. The Administrative Member has no authority beyond that expressly conferred by this Agreement or by a Majority in Interest.
 
@@ -104087,7 +104140,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 5 \u2014 MANAGEMENT BY THE MEMBERS
 
-**5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.
+**5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager of the Company, and no person shall be designated or hold out as a manager of the Company. The Members serve as protected-series managers as provided in Section 5.2.
 
 **5.2 Management of Each Protected Series.** Each Protected Series is managed by the Members. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Members, rather than the Company, are the protected-series managers of each Protected Series. Every decision with respect to a Protected Series is made by a Majority in Interest of the Members as provided in Section 5.3, and the Administrative Member performs for each Protected Series the ministerial functions described in Section 5.8. The Members have, with respect to each Protected Series, the rights, powers, and duties of protected-series managers under the Act, subject to this Agreement and the Series Exhibit.
 
@@ -104109,7 +104162,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business \u2014 the consent of **all Members**;
 
-(d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file a statement of dissolution of a Protected Series \u2014 the approval required by Section 14.1;
+(d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file articles of protected series dissolution \u2014 the approval required by Section 14.1;
 
 (e) admit any additional Member \u2014 the approval required by Article 12;
 
@@ -104195,7 +104248,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## ARTICLE 9 \u2014 TAX MATTERS
 
-**9.1 Intended Classification.** It is intended that the Company be classified as a partnership for federal income tax purposes, as federal tax law provides. Each Protected Series is wholly owned by the Company. If a Protected Series is treated as an entity separate from the Company for federal income tax purposes, it is intended that the Protected Series be disregarded as an entity separate from its owner, so that its items of income, gain, loss, deduction, and credit are reported by the Company. No member of the Company shall take a position inconsistent with this Section on any return without the written consent of all members.
+**9.1 Intended Classification.** It is intended that the Company be classified as a partnership for federal income tax purposes, as federal tax law provides. Each Protected Series is wholly owned by the Company. If a Protected Series is treated as an entity separate from the Company for federal income tax purposes, it is intended that the Protected Series be disregarded as an entity separate from its owner, so that its items of income, gain, loss, deduction, and credit are reported by the Company. No Member of the Company shall take a position inconsistent with this Section on any return without the written consent of all Members.
 
 **9.2 Tax Returns; Information.** The Administrative Member shall cause to be prepared and filed all tax returns required of the Company and of each Protected Series, if necessary or required, and shall deliver to each Member, after the end of each fiscal year, the tax information (including Schedule K-1s, where applicable) necessary for the Member's returns.
 
@@ -104227,7 +104280,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **11.1 Executory Contract.** The parties agree that this Agreement constitutes an executory contract and shall be governed by 11 U.S.C. \xA7365 in connection with the bankruptcy of the Company or any Member because, among other provisions and obligations, this Agreement imposes on each Member the following affirmative duties (each of which constitutes a material unperformed, future obligation): (a) *[include only if optional Section 6.2 is included; otherwise replace with "(a) [Reserved.]"]* upon approval of a Majority in Interest as provided in Section 6.2, the duty and obligation of each Member to contribute additional capital to the Company or the affected Protected Series; (b) the duty and obligation of each Member to materially participate in the governance of the Company and of each Protected Series, as provided in Section 4.6; (c) *[include only if Section 4.7 Alternative A is selected; otherwise replace with "(c) [Reserved.]"]* the duty and obligation of each Member not to compete with the Company or with any Protected Series in the conduct of their activities and affairs before the dissolution of the Company, as provided in Section 4.7 and consistent with s. 605.04091(2)(c), Florida Statutes; (d) the duty and obligation of each Member not to disclose confidential information, as provided in Section 4.8; and (e) the duty and obligation of each Member not to hinder, delay, slander, or tarnish the reputation of the Company or of any Protected Series, as provided in Section 4.9. The failure of a Member to perform the duties and obligations set forth herein releases and excuses the mutual duties and obligations owed by the Company and the other Members to such defaulting Member.
 
-**11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. \xA7365(c)(1) without the prior written consent of the other Members.
+**11.2 Personal Service Agreement; No Assumption or Assignment.** The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. \xA7 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member\u2019s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate\u2019s interest in a Member\u2019s transferable (economic) interest to the extent permitted by applicable law.
 
 **11.3 Compliance upon Assumption or Rejection.** Notwithstanding the foregoing, to the extent that a trustee of a Member's bankruptcy is allowed either to assume or reject a debtor Member's interest in the Company governed by this Agreement, such action shall comply with the time period set forth in 11 U.S.C. \xA7365(d), and if the trustee assumes such debtor Member's interest, such trustee shall comply with the terms of this Agreement and Florida law governing this Agreement, including, without limitation, the restrictions of the rights of a creditor of a Member or transferee pursuant to ss. 605.0502 and 605.0503, Florida Statutes.
 
@@ -104311,7 +104364,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement as of the Effective Date.
 
 **MEMBERS:**
 
@@ -104335,6 +104388,8 @@ Date: _____________________________
 [[pagebreak]]
 
 ## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
+
+<!-- alternative:professional-exhibit-note "**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4." -->
 
 **Company:** [COMPANY NAME], LLC
 
@@ -104424,7 +104479,16 @@ By: _____________________________
 `;
 
 // server/templates-oa-member-s.md
-var templates_oa_member_s_default = `# OPERATING AGREEMENT
+var templates_oa_member_s_default = `<!-- alternative:restated-title "# AMENDED AND RESTATED\\n# OPERATING AGREEMENT" -->
+<!-- alternative:restated-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by and among the undersigned members (each a \\"Member\\" and collectively the \\"Members\\")." -->
+<!-- alternative:professional-cover "A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY" -->
+<!-- alternative:professional-preamble "THIS OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by and among the undersigned members (each a \\"Member\\" and collectively the \\"Members\\")." -->
+<!-- alternative:restated-professional-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by and among the undersigned members (each a \\"Member\\" and collectively the \\"Members\\")." -->
+<!-- alternative:professional-recital "B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department." -->
+<!-- alternative:restatement-dated "D. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date." -->
+<!-- alternative:restatement-undated "D. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date." -->
+
+# OPERATING AGREEMENT
 ## OF
 ## [COMPANY NAME], LLC
 ### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
@@ -104451,11 +104515,11 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
 
-**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
+**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Administrative Member shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as a Majority in Interest may determine. A Protected Series may maintain its own place of business as determined by a Majority in Interest.
 
@@ -104465,7 +104529,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **1.8 Location of Records.** The records of the Company and of each Protected Series \u2014 including the records required by Article 8 \u2014 shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Administrative Member determines, and shall at all times be retrievable in perceivable form.
 
-**1.9 Filings.** The Administrative Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
+**1.9 Filings.** The Administrative Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
 **1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
@@ -104475,7 +104539,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 2 \u2014 DEFINITIONS
 
-**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
+**2.1 "Act"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
 
 **2.2 "Administrative Member"** means the Member designated under Section 5.8 to perform the ministerial functions assigned to that role by this Agreement, and any successor so designated. The Administrative Member has no authority beyond that expressly conferred by this Agreement or by a Majority in Interest.
 
@@ -104583,7 +104647,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 5 \u2014 MANAGEMENT BY THE MEMBERS
 
-**5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.
+**5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager of the Company, and no person shall be designated or hold out as a manager of the Company. The Members serve as protected-series managers as provided in Section 5.2.
 
 **5.2 Management of Each Protected Series.** Each Protected Series is managed by the Members. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Members, rather than the Company, are the protected-series managers of each Protected Series. Every decision with respect to a Protected Series is made by a Majority in Interest of the Members as provided in Section 5.3, and the Administrative Member performs for each Protected Series the ministerial functions described in Section 5.8. The Members have, with respect to each Protected Series, the rights, powers, and duties of protected-series managers under the Act, subject to this Agreement and the Series Exhibit.
 
@@ -104605,7 +104669,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 (c) sell, exchange, or otherwise dispose of all or substantially all of the Associated Assets of the Company or of any Protected Series, other than in the ordinary course of business \u2014 the consent of **all Members**;
 
-(d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file a statement of dissolution of a Protected Series \u2014 the approval required by Section 14.1;
+(d) merge the Company as permitted by the Act \u2014 the consent of **all Members**; or file articles of protected series dissolution \u2014 the approval required by Section 14.1;
 
 (e) admit any additional Member \u2014 the approval required by Article 12;
 
@@ -104691,7 +104755,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## ARTICLE 9 \u2014 TAX MATTERS
 
-**9.1 S Corporation Status.** The Company has elected, or intends to elect, classification as an association taxable as a corporation and S corporation status under section 1362 of the Code, and it is intended that the election remain continuously in effect. Each Member shall execute the consents and other instruments (including IRS Form 2553) necessary or appropriate to make and maintain the election, and no election shall be revoked without the affirmative vote or consent of all Members. Each Protected Series is wholly owned by the Company. If a Protected Series is treated as an entity separate from the Company for federal income tax purposes, it is intended that the Protected Series be disregarded as an entity separate from its owner, so that its items of income, gain, loss, deduction, and credit are reported by the Company. No member of the Company shall take a position inconsistent with this Section on any return without the written consent of all members.
+**9.1 S Corporation Status.** The Company has elected, or intends to elect, classification as an association taxable as a corporation and S corporation status under section 1362 of the Code, and it is intended that the election remain continuously in effect. Each Member shall execute the consents and other instruments (including IRS Form 2553) necessary or appropriate to make and maintain the election, and no election shall be revoked without the affirmative vote or consent of all Members. Each Protected Series is wholly owned by the Company. If a Protected Series is treated as an entity separate from the Company for federal income tax purposes, it is intended that the Protected Series be disregarded as an entity separate from its owner, so that its items of income, gain, loss, deduction, and credit are reported by the Company. No Member of the Company shall take a position inconsistent with this Section on any return without the written consent of all Members.
 
 **9.2 Returns; Information.** The Administrative Member shall cause to be prepared and filed all tax returns required of the Company (including Form 1120-S) and of each Protected Series, if necessary or required, and shall deliver to each Member, after the end of each fiscal year, the information (including Schedule K-1) necessary for the Member's returns.
 
@@ -104705,7 +104769,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **(c) Offending acts are void.** No Member, and no Protected Series, shall take any action, or omit to take any action, that would cause the election to be invalid or to terminate; any purported action or omission in violation of this subsection is null and void ab initio and shall be given no force or effect for any purpose.
 
-**(d) Pro rata in all events.** Notwithstanding any other provision of this Agreement or of any Series Exhibit, all allocations and distributions \u2014 including distributions in liquidation of the Company or of any Protected Series \u2014 shall be made strictly pro rata in accordance with Percentage Interests, and every Membership Interest confers identical rights to distributions and liquidation proceeds.
+**(d) Pro rata in all events.** Notwithstanding any other provision of this Agreement or of any Series Exhibit, all allocations and distributions by the Company to its Members \u2014 including distributions in liquidation of the Company \u2014 shall be made strictly pro rata in accordance with Percentage Interests, and every Membership Interest confers identical rights to distributions and liquidation proceeds. All distributions by a Protected Series, including in liquidation, shall be made solely to the Company as provided in Sections 7.2 and 14.2.
 
 **(e) Conforming construction.** To the extent any provision can be conformed rather than voided, this Agreement shall be applied and, to the minimum extent necessary, deemed modified so that the Company has a single class of ownership and the election remains valid.
 
@@ -104737,7 +104801,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **11.1 Executory Contract.** The parties agree that this Agreement constitutes an executory contract and shall be governed by 11 U.S.C. \xA7365 in connection with the bankruptcy of the Company or any Member because, among other provisions and obligations, this Agreement imposes on each Member the following affirmative duties (each of which constitutes a material unperformed, future obligation): (a) *[include only if optional Section 6.2 is included; otherwise replace with "(a) [Reserved.]"]* upon approval of a Majority in Interest as provided in Section 6.2, the duty and obligation of each Member to contribute additional capital to the Company or the affected Protected Series; (b) the duty and obligation of each Member to materially participate in the governance of the Company and of each Protected Series, as provided in Section 4.6; (c) *[include only if Section 4.7 Alternative A is selected; otherwise replace with "(c) [Reserved.]"]* the duty and obligation of each Member not to compete with the Company or with any Protected Series in the conduct of their activities and affairs before the dissolution of the Company, as provided in Section 4.7 and consistent with s. 605.04091(2)(c), Florida Statutes; (d) the duty and obligation of each Member not to disclose confidential information, as provided in Section 4.8; and (e) the duty and obligation of each Member not to hinder, delay, slander, or tarnish the reputation of the Company or of any Protected Series, as provided in Section 4.9. The failure of a Member to perform the duties and obligations set forth herein releases and excuses the mutual duties and obligations owed by the Company and the other Members to such defaulting Member.
 
-**11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. \xA7365(c)(1) without the prior written consent of the other Members.
+**11.2 Personal Service Agreement; No Assumption or Assignment.** The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. \xA7 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member\u2019s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate\u2019s interest in a Member\u2019s transferable (economic) interest to the extent permitted by applicable law.
 
 **11.3 Compliance upon Assumption or Rejection.** Notwithstanding the foregoing, to the extent that a trustee of a Member's bankruptcy is allowed either to assume or reject a debtor Member's interest in the Company governed by this Agreement, such action shall comply with the time period set forth in 11 U.S.C. \xA7365(d), and if the trustee assumes such debtor Member's interest, such trustee shall comply with the terms of this Agreement and Florida law governing this Agreement, including, without limitation, the restrictions of the rights of a creditor of a Member or transferee pursuant to ss. 605.0502 and 605.0503, Florida Statutes.
 
@@ -104781,7 +104845,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 **14.3 Dissolution of the Company.** The Company is dissolved, and its activities and affairs shall be wound up, upon the first to occur of: (a) the written consent of **all** Members; (b) entry of a decree of judicial dissolution under the Act; or (c) any other event that under the Act requires dissolution. The death, incapacity, bankruptcy, dissociation, or withdrawal of a Member does not by itself dissolve the Company. Dissolution of the Company causes the dissolution of each Protected Series, and the winding up of the Company is not complete until the winding up of each Protected Series is complete.
 
-**14.4 Winding Up the Company.** Upon dissolution of the Company, a person designated by a Majority in Interest shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as creditors; and finally, the balance to the Members in proportion to their Percentage Interests. All distributions in winding up, whether of the Company or of any Protected Series, shall be made in proportion to Percentage Interests, so that every Membership Interest confers identical rights to liquidation proceeds. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
+**14.4 Winding Up the Company.** Upon dissolution of the Company, a person designated by a Majority in Interest shall wind up the Company and each Protected Series. After the winding up of each Protected Series under Section 14.2, the remaining Associated Assets of the Company shall be applied: first, to pay or provide for the Company's Associated Liabilities to creditors other than Members; next, to pay or provide for the Company's Associated Liabilities to Members as creditors; and finally, the balance to the Members in proportion to their Percentage Interests. All distributions by the Company to its Members in winding up shall be made in proportion to Percentage Interests, so that every Membership Interest confers identical rights to liquidation proceeds. Distributions in winding up a Protected Series shall be made solely to the Company as provided in Section 14.2. Articles of dissolution shall be filed as the Act requires, and the Company shall terminate when winding up is complete.
 
 **14.5 No Obligation to Contribute; Recourse Limited.** No Member shall have any obligation to contribute capital in connection with any winding up (beyond unpaid contributions duly required under Sections 6.1 and 6.2), and each creditor of the Company or of any Protected Series shall look solely to the Associated Assets of its obligor.
 
@@ -104821,7 +104885,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement as of the Effective Date.
 
 **MEMBERS:**
 
@@ -104845,6 +104909,8 @@ Date: _____________________________
 [[pagebreak]]
 
 ## EXHIBIT A \u2014 MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS
+
+<!-- alternative:professional-exhibit-note "**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4." -->
 
 **Company:** [COMPANY NAME], LLC
 
@@ -104936,7 +105002,16 @@ By: _____________________________
 `;
 
 // server/templates-oa-single-s.md
-var templates_oa_single_s_default = `# OPERATING AGREEMENT
+var templates_oa_single_s_default = `<!-- alternative:restated-title "# AMENDED AND RESTATED\\n# OPERATING AGREEMENT" -->
+<!-- alternative:restated-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by the undersigned sole member (the \\"Member\\") and is acknowledged by the undersigned manager (the \\"Manager\\")." -->
+<!-- alternative:professional-cover "A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY" -->
+<!-- alternative:professional-preamble "THIS OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by the undersigned sole member (the \\"Member\\") and is acknowledged by the undersigned manager (the \\"Manager\\")." -->
+<!-- alternative:restated-professional-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by the undersigned sole member (the \\"Member\\") and is acknowledged by the undersigned manager (the \\"Manager\\")." -->
+<!-- alternative:professional-recital "B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department." -->
+<!-- alternative:restatement-dated "E. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date." -->
+<!-- alternative:restatement-undated "E. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date." -->
+
+# OPERATING AGREEMENT
 ## OF
 ## [COMPANY NAME], LLC
 ### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
@@ -104965,11 +105040,11 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
 
-**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
+**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Manager shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Manager may determine. A Protected Series may maintain its own place of business as determined by its Protected Series Manager.
 
@@ -104979,7 +105054,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.8 Location of Records.** The records of the Company and of each Protected Series \u2014 including the records required by Article 8 \u2014 shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Manager determines, and shall at all times be retrievable in perceivable form.
 
-**1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
+**1.9 Filings.** The Manager shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
 **1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
@@ -104989,7 +105064,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 2 \u2014 DEFINITIONS
 
-**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
+**2.1 "Act"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
 
 **2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
 
@@ -105099,7 +105174,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **5.5 Standard of Conduct; Exculpation.** The Manager and each Protected Series Manager shall discharge their duties consistent with the Act, including the duties applicable to managers and protected-series managers. No Manager or Protected Series Manager shall be liable to the Company, any Protected Series, or the Member for any act or omission performed or omitted in good faith and in a manner reasonably believed to be within the scope of authority conferred by this Agreement, except for conduct for which exoneration is prohibited by the Act.
 
-**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act exceeding the authority conferred by Section 5.4; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who exceeds the authority conferred by Section 5.4 is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager.
+**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act taken without the approval Section 5.4 requires; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who acts without the approval Section 5.4 requires is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager.
 
 **5.7 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless the Member consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager \u2014 by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts \u2014 and the allocation shall be recorded in the records maintained under Article 8.
 
@@ -105255,7 +105330,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned have executed this Agreement effective as of the date(s) set forth below.
+IN WITNESS WHEREOF, the undersigned have executed this Agreement as of the Effective Date.
 
 **MEMBER:**
 
@@ -105287,6 +105362,8 @@ Date: _____________________________
 [[pagebreak]]
 
 ## EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION
+
+<!-- alternative:professional-exhibit-note "**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4." -->
 
 **Company:** [COMPANY NAME], LLC
 
@@ -105364,7 +105441,16 @@ By: _____________________________
 `;
 
 // server/templates-oa-member-single.md
-var templates_oa_member_single_default = `# OPERATING AGREEMENT
+var templates_oa_member_single_default = `<!-- alternative:restated-title "# AMENDED AND RESTATED\\n# OPERATING AGREEMENT" -->
+<!-- alternative:restated-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by the undersigned sole member (the \\"Member\\")." -->
+<!-- alternative:professional-cover "A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY" -->
+<!-- alternative:professional-preamble "THIS OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by the undersigned sole member (the \\"Member\\")." -->
+<!-- alternative:restated-professional-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by the undersigned sole member (the \\"Member\\")." -->
+<!-- alternative:professional-recital "B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department." -->
+<!-- alternative:restatement-dated "D. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date." -->
+<!-- alternative:restatement-undated "D. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date." -->
+
+# OPERATING AGREEMENT
 ## OF
 ## [COMPANY NAME], LLC
 ### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
@@ -105391,11 +105477,11 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
 
-**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
+**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Member shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Member may determine. A Protected Series may maintain its own place of business as determined by the Member.
 
@@ -105405,7 +105491,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.8 Location of Records.** The records of the Company and of each Protected Series \u2014 including the records required by Article 8 \u2014 shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Member determines, and shall at all times be retrievable in perceivable form.
 
-**1.9 Filings.** The Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
+**1.9 Filings.** The Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
 **1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
@@ -105415,7 +105501,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 2 \u2014 DEFINITIONS
 
-**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
+**2.1 "Act"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
 
 **2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
 
@@ -105499,7 +105585,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 5 \u2014 MANAGEMENT BY THE MEMBER
 
-**5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Member. There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.
+**5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Member. There is no manager of the Company, and no person shall be designated or hold out as a manager of the Company. The Member serves as protected-series manager as provided in Section 5.2.
 
 **5.2 Management of Each Protected Series.** Each Protected Series is managed by the Member. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Member, rather than the Company, is the protected-series manager of each Protected Series. The Member has, with respect to each Protected Series, the rights, powers, and duties of a protected-series manager under the Act, subject to this Agreement and the Series Exhibit.
 
@@ -105637,7 +105723,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned has executed this Agreement effective as of the date set forth below.
+IN WITNESS WHEREOF, the undersigned has executed this Agreement as of the Effective Date.
 
 **MEMBER:**
 
@@ -105653,6 +105739,8 @@ Date: _____________________________<!-- /if -->
 [[pagebreak]]
 
 ## EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION
+
+<!-- alternative:professional-exhibit-note "**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4." -->
 
 **Company:** [COMPANY NAME], LLC
 
@@ -105730,7 +105818,16 @@ By: _____________________________
 `;
 
 // server/templates-oa-member-single-s.md
-var templates_oa_member_single_s_default = `# OPERATING AGREEMENT
+var templates_oa_member_single_s_default = `<!-- alternative:restated-title "# AMENDED AND RESTATED\\n# OPERATING AGREEMENT" -->
+<!-- alternative:restated-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by the undersigned sole member (the \\"Member\\")." -->
+<!-- alternative:professional-cover "A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY" -->
+<!-- alternative:professional-preamble "THIS OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by the undersigned sole member (the \\"Member\\")." -->
+<!-- alternative:restated-professional-preamble "THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\"Agreement\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\"Company\\"), is made and entered into effective as of [DATE] (the \\"Effective Date\\"), by the undersigned sole member (the \\"Member\\")." -->
+<!-- alternative:professional-recital "B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department." -->
+<!-- alternative:restatement-dated "E. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date." -->
+<!-- alternative:restatement-undated "E. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date." -->
+
+# OPERATING AGREEMENT
 ## OF
 ## [COMPANY NAME], LLC
 ### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
@@ -105759,11 +105856,11 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.1 Definitions.** Capitalized terms have the meanings set forth in Article 2 or in the Section in which they are used.
 
-**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
+**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101\u2013605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
 
 **1.3 Name; Names of Protected Series.** The name of the Company is **[COMPANY NAME], LLC**. The name of each Protected Series shall be as set forth in its filed Protected Series Designation and its Series Exhibit. If the Company changes its name, the Member shall promptly make all filings required to conform the name of each Protected Series.
 
-**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.
+**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->
 
 **1.5 Principal Office.** The principal office of the Company is [PRINCIPAL ADDRESS], or such other place as the Member may determine. A Protected Series may maintain its own place of business as determined by the Member.
 
@@ -105773,7 +105870,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 **1.8 Location of Records.** The records of the Company and of each Protected Series \u2014 including the records required by Article 8 \u2014 shall be maintained at the Company's principal office or at such other location (including secure electronic storage) as the Member determines, and shall at all times be retrievable in perceivable form.
 
-**1.9 Filings.** The Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, and statements of dissolution, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
+**1.9 Filings.** The Member shall execute and cause to be filed with the Department all records the Act requires or permits, including Protected Series Designations, amendments thereto, statements of change, annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation, and shall take all other action necessary to maintain the Company and each Protected Series in good standing.
 
 **1.10 How Assets Are Associated.** An asset becomes an Associated Asset of a Protected Series, or of the Company, by the records required under Article 8 and s. 605.2301, Florida Statutes.
 
@@ -105783,7 +105880,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 2 \u2014 DEFINITIONS
 
-**2.1 "Act"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
+**2.1 "Act"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.
 
 **2.2 "Associated Asset"** means an asset of a Protected Series, or of the Company, that satisfies the recordkeeping requirements of s. 605.2301, Florida Statutes, and Article 8 of this Agreement.
 
@@ -105871,7 +105968,7 @@ NOW, THEREFORE, the Member adopts the following as the operating agreement of th
 
 ## ARTICLE 5 \u2014 MANAGEMENT BY THE MEMBER
 
-**5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Member. There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.
+**5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Member. There is no manager of the Company, and no person shall be designated or hold out as a manager of the Company. The Member serves as protected-series manager as provided in Section 5.2.
 
 **5.2 Management of Each Protected Series.** Each Protected Series is managed by the Member. As permitted by s. 605.2107(1)(n), Florida Statutes, this Section varies s. 605.2304(2) so that the Member, rather than the Company, is the protected-series manager of each Protected Series. The Member has, with respect to each Protected Series, the rights, powers, and duties of a protected-series manager under the Act, subject to this Agreement and the Series Exhibit.
 
@@ -106035,7 +106132,7 @@ Records may be organized by specific listing, category, type, quantity, or compu
 
 ## SIGNATURES
 
-IN WITNESS WHEREOF, the undersigned has executed this Agreement effective as of the date set forth below.
+IN WITNESS WHEREOF, the undersigned has executed this Agreement as of the Effective Date.
 
 **MEMBER:**
 
@@ -106051,6 +106148,8 @@ Date: _____________________________<!-- /if -->
 [[pagebreak]]
 
 ## EXHIBIT A \u2014 MEMBER; CONTRIBUTIONS; TOD DESIGNATION
+
+<!-- alternative:professional-exhibit-note "**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4." -->
 
 **Company:** [COMPANY NAME], LLC
 
@@ -106264,6 +106363,22 @@ function extractSection(s, heading, label) {
 function stripInstructionNotes(s) {
   return s.replace(/\s*\*\((To omit|Retain the selected|If this Section is omitted)[\s\S]*?\)\*/g, "").replace(/\s*\*\[include only if[\s\S]*?\]\*/g, "").replace(/ \[OPTIONAL PROVISION[\s\S]*?\](?=\*\*|$)/gm, "").replace(/ \[SELECT ONE ALTERNATIVE[\s\S]*?\](?=\*\*|$)/gm, "");
 }
+function masterAlternatives(raw2) {
+  const values2 = /* @__PURE__ */ new Map();
+  const text = raw2.replace(/^<!-- alternative:([a-z-]+) (.+) -->\r?\n?/gm, (_whole, key, encoded) => {
+    const value = JSON.parse(encoded);
+    if (values2.has(key) || typeof value !== "string" || !value.trim()) {
+      throw new Error(`OA template alternative invalid: ${key}`);
+    }
+    values2.set(key, value);
+    return "";
+  });
+  return { text, select: (key) => {
+    const value = values2.get(key);
+    if (!value) throw new Error(`OA template alternative missing: ${key}`);
+    return value;
+  } };
+}
 function assembleOa(inputs) {
   inputs = documentInputs(inputs);
   const TEMPLATES = {
@@ -106276,7 +106391,8 @@ function assembleOa(inputs) {
     "member-single": memberSingleTemplate,
     "member-single-s": memberSingleSCorpTemplate
   };
-  let s = TEMPLATES[inputs.version];
+  const alternatives = masterAlternatives(TEMPLATES[inputs.version]);
+  let s = alternatives.text;
   const isSingle = inputs.version === "single" || inputs.version === "single-s" || inputs.version === "member-single" || inputs.version === "member-single-s";
   const isMulti = !isSingle;
   const isMemberManaged = inputs.version === "member" || inputs.version === "member-s" || inputs.version === "member-single" || inputs.version === "member-single-s";
@@ -106284,26 +106400,32 @@ function assembleOa(inputs) {
   const FOOTER_LINE = "*[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*";
   must(s, FOOTER_LINE, "master footer line");
   s = s.replace(FOOTER_LINE, "").trimEnd() + "\n";
+  if (inputs.amendedRestated) {
+    s = replaceOnce(s, "# OPERATING AGREEMENT", alternatives.select("restated-title"), "restated title");
+  }
+  if (inputs.professional || inputs.amendedRestated) {
+    const preamble = s.match(/^THIS OPERATING AGREEMENT[^\n]+/m)?.[0];
+    if (!preamble) throw new Error("OA template marker missing: preamble");
+    const key = inputs.professional ? inputs.amendedRestated ? "restated-professional-preamble" : "professional-preamble" : "restated-preamble";
+    s = replaceOnce(s, preamble, alternatives.select(key), "selected preamble");
+  }
   if (inputs.professional) {
     s = replaceOnce(
       s,
       "A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY",
-      "A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY",
+      alternatives.select("professional-cover"),
       "professional cover line"
     );
-    s = replaceOnce(
-      s,
-      'a Florida protected series limited liability company (the "Company")',
-      'a Florida professional protected series limited liability company (the "Company")',
-      "professional preamble"
-    );
-    s = replaceOnce(
-      s,
-      "The Company is a **protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, Florida Statutes, having designated,",
-      "The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101\u2013605.2802, and Chapter 621, Florida Statutes, having designated,",
-      "professional recital B"
-    );
+    const recital = s.match(/^B\. The Company is[^\n]+/m)?.[0];
+    if (!recital) throw new Error("OA template marker missing: recital B");
+    s = replaceOnce(s, recital, alternatives.select("professional-recital"), "professional recital B");
+    const exhibit = s.match(/^## EXHIBIT A[^\n]+/m)?.[0];
+    if (!exhibit) throw new Error("OA template marker missing: Exhibit A");
+    s = replaceOnce(s, exhibit, `${exhibit}
+
+${alternatives.select("professional-exhibit-note")}`, "professional Exhibit A note");
   }
+  s = resolveIf(s, "professional", !!inputs.professional);
   must(s, "[COMPANY NAME], LLC", "company name");
   s = s.split("[COMPANY NAME], LLC").join(co);
   s = s.split("[COMPANY NAME]").join(co);
@@ -106379,13 +106501,11 @@ function assembleOa(inputs) {
   let titleName = "Operating Agreement";
   if (inputs.amendedRestated) {
     titleName = "Amended and Restated Operating Agreement";
-    s = replaceOnce(s, "# OPERATING AGREEMENT", "# AMENDED AND RESTATED\n# OPERATING AGREEMENT", "title");
-    s = replaceOnce(s, 'THIS OPERATING AGREEMENT (this "Agreement")', 'THIS AMENDED AND RESTATED OPERATING AGREEMENT (this "Agreement")', "preamble");
-    const supersede = inputs.priorAgreementDate ? `the Operating Agreement of the Company dated ${inputs.priorAgreementDate}` : "any and all prior operating agreements of the Company, whether written or oral";
+    const recital = inputs.priorAgreementDate ? alternatives.select("restatement-dated").replace("[PRIOR AGREEMENT DATE]", () => inputs.priorAgreementDate) : alternatives.select("restatement-undated");
     s = replaceOnce(
       s,
       "NOW, THEREFORE,",
-      `D. This Agreement amends, restates, and supersedes in its entirety ${supersede}, which shall be of no further force or effect from the Effective Date.
+      `${recital}
 
 NOW, THEREFORE,`,
       "supersede recital"
@@ -106519,12 +106639,15 @@ NOW, THEREFORE,`,
   }
   s = s.replace(/(\[\[pagebreak\]\]\s*){2,}/g, "[[pagebreak]]\n\n");
   assertTemplateComplete(s);
-  const seq = inputs.generationNumber ? ` (No. ${inputs.generationNumber})` : "";
-  const tax = taxationLabel(inputs.version);
   return {
     markdown: s,
     encodedClientText: true,
-    title: `${inputs.amendedRestated ? "Amended and Restated " : ""}${tax} Operating Agreement${seq} \u2014 ${decodeDocumentText(co)}`
+    title: agreementTitle({
+      version: inputs.version,
+      amendedRestated: inputs.amendedRestated,
+      generationNumber: inputs.generationNumber,
+      companyName: decodeDocumentText(co)
+    })
   };
 }
 function replaceSectionBody(s, re, replacement, label) {
@@ -106641,7 +106764,7 @@ init_document_text();
 import { readFileSync as readFileSync2 } from "node:fs";
 
 // server/templates-oa-amendment.md
-var templates_oa_amendment_default = '# AMENDMENT NO. [AMENDMENT NUMBER]\n# TO OPERATING AGREEMENT\n## OF\n## [COMPANY NAME], LLC\n### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY\n\n---\n\nTHIS AMENDMENT NO. [AMENDMENT NUMBER] TO OPERATING AGREEMENT (this "Amendment") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made effective as of [AMENDMENT DATE], by <!-- one:member -->the undersigned sole member (the "Member")<!-- /one --><!-- many:member -->the undersigned members (each a "Member" and collectively the "Members")<!-- /many --><!-- if:managed -->, and is acknowledged by the undersigned <!-- one:manager -->Manager<!-- /one --><!-- many:manager -->Managers<!-- /many --><!-- /if -->.\n\n### RECITALS\n\nA. The Company is governed by the <!-- if:restated -->Amended and Restated <!-- /if -->Operating Agreement of the Company effective as of [AGREEMENT DATE] (the "Agreement").\n\nB. Section [AMENDMENT SECTION] of the Agreement provides that the Agreement may be amended only by a written instrument signed by <!-- one:member -->the Member<!-- /one --><!-- many:member -->all Members<!-- /many -->.\n\nC. <!-- one:member -->The Member wishes<!-- /one --><!-- many:member -->The Members wish<!-- /many --> to amend the Agreement as set forth in this Amendment.\n\nNOW, THEREFORE, <!-- one:member -->the Member amends<!-- /one --><!-- many:member -->the Members amend<!-- /many --> the Agreement as follows:\n\n---\n\n## AMENDMENT\n\n**1. Amendments to the Agreement.** The Agreement is amended as follows:\n\n<!-- if:typed -->[AMENDMENT TEXT]<!-- /if -->\n<!-- if:attached -->The Agreement is amended as set forth in Exhibit A attached to this Amendment.<!-- /if -->\n\n**2. Effect of Amendment.** Except as amended by this Amendment, the Agreement remains in full force and effect. Capitalized terms have the meanings given in the Agreement. This Amendment is effective on the date stated above.\n\n[[pagebreak]]\n\n## SIGNATURES\n\nIN WITNESS WHEREOF, the undersigned <!-- one:member -->has<!-- /one --><!-- many:member -->have<!-- /many --> executed this Amendment effective as of the <!-- one:member -->date<!-- /one --><!-- many:member -->date(s)<!-- /many --> set forth below.\n\n<!-- one:member -->**MEMBER:**<!-- /one --><!-- many:member -->**MEMBERS:**<!-- /many -->\n\n<!-- repeat:signatory -->\n<!-- if:unit -->**[UNIT]**\n[HOLDING]\n\n<!-- /if --><!-- if:person -->_____________________________\n[SIGNATORY NAME]\nDate: _____________________________\n\n<!-- /if --><!-- if:entity -->[SIGNATORY NAME]\n\nBy: _____________________________\n[[indent]][PRINTED NAME]\n[[indent]][TITLE]\nDate: _____________________________\n\n<!-- /if --><!-- /repeat -->\n\n<!-- if:managed --><!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->\n\n<!-- repeat:manager -->\n<!-- if:person -->_____________________________\n[MANAGER NAME], Manager\nDate: _____________________________\n\n<!-- /if --><!-- if:entity -->[MANAGER NAME], Manager\n\nBy: _____________________________\n[[indent]][PRINTED NAME]\n[[indent]][TITLE]\nDate: _____________________________\n\n<!-- /if --><!-- /repeat -->\n<!-- /if -->\n\n*[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*\n';
+var templates_oa_amendment_default = '# AMENDMENT NO. [AMENDMENT NUMBER]\n# TO OPERATING AGREEMENT\n## OF\n## [COMPANY NAME], LLC\n### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY\n\n---\n\nTHIS AMENDMENT NO. [AMENDMENT NUMBER] TO OPERATING AGREEMENT (this "Amendment") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), is made effective as of [AMENDMENT DATE], by <!-- one:member -->the undersigned sole member (the "Member")<!-- /one --><!-- many:member -->the undersigned members (each a "Member" and collectively the "Members")<!-- /many --><!-- if:managed -->, and is acknowledged by the undersigned <!-- one:manager -->Manager<!-- /one --><!-- many:manager -->Managers<!-- /many --><!-- /if -->.\n\n### RECITALS\n\nA. The Company is governed by the <!-- if:restated -->Amended and Restated <!-- /if -->Operating Agreement of the Company effective as of [AGREEMENT DATE] (the "Agreement").\n\nB. Section [AMENDMENT SECTION] of the Agreement provides that the Agreement may be amended only by a written instrument signed by <!-- one:member -->the Member<!-- /one --><!-- many:member -->all Members<!-- /many -->.\n\nC. <!-- one:member -->The Member wishes<!-- /one --><!-- many:member -->The Members wish<!-- /many --> to amend the Agreement as set forth in this Amendment.\n\nNOW, THEREFORE, <!-- one:member -->the Member amends<!-- /one --><!-- many:member -->the Members amend<!-- /many --> the Agreement as follows:\n\n---\n\n## AMENDMENT\n\n**1. Amendments to the Agreement.** The Agreement is amended as follows:\n\n<!-- if:typed -->[AMENDMENT TEXT]<!-- /if -->\n<!-- if:attached -->The Agreement is amended as set forth in Exhibit A attached to this Amendment.<!-- /if -->\n\n**2. Effect of Amendment.** Except as amended by this Amendment, the Agreement remains in full force and effect. Capitalized terms have the meanings given in the Agreement. This Amendment is effective on the date stated above.\n\n[[pagebreak]]\n\n## SIGNATURES\n\nIN WITNESS WHEREOF, the undersigned <!-- one:member -->has<!-- /one --><!-- many:member -->have<!-- /many --> executed this Amendment as of the date stated above.\n\n<!-- one:member -->**MEMBER:**<!-- /one --><!-- many:member -->**MEMBERS:**<!-- /many -->\n\n<!-- repeat:signatory -->\n<!-- if:unit -->**[UNIT]**\n[HOLDING]\n\n<!-- /if --><!-- if:person -->_____________________________\n[SIGNATORY NAME]\nDate: _____________________________\n\n<!-- /if --><!-- if:entity -->[SIGNATORY NAME]\n\nBy: _____________________________\n[[indent]][PRINTED NAME]\n[[indent]][TITLE]\nDate: _____________________________\n\n<!-- /if --><!-- /repeat -->\n\n<!-- if:managed --><!-- one:manager -->**ACKNOWLEDGED AND AGREED BY MANAGER:**<!-- /one --><!-- many:manager -->**ACKNOWLEDGED AND AGREED BY MANAGERS:**<!-- /many -->\n\n<!-- repeat:manager -->\n<!-- if:person -->_____________________________\n[MANAGER NAME], Manager\nDate: _____________________________\n\n<!-- /if --><!-- if:entity -->[MANAGER NAME], Manager\n\nBy: _____________________________\n[[indent]][PRINTED NAME]\n[[indent]][TITLE]\nDate: _____________________________\n\n<!-- /if --><!-- /repeat -->\n<!-- /if -->\n\n*[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*\n';
 
 // server/oa-amendment.ts
 function loadTemplate2(v2) {

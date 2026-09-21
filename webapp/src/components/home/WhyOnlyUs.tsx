@@ -21,13 +21,13 @@ const ROWS: { label: string; us: string; them: string; themHasNone: boolean }[] 
   },
   {
     label: "Recordkeeping app built around §605.2301",
-    us: "Free with formation",
+    us: "Free with formation—iPhone app expected by the end of the year.",
     them: "Not offered",
     themHasNone: true,
   },
   {
-    label: "Registered agent + legal-mail client portal",
-    us: "First year included",
+    label: "Registered agent, with legal mail posted to your portal",
+    us: "First year of registered-agent service included.",
     them: "Extra, or standalone",
     themHasNone: false,
   },
@@ -111,7 +111,7 @@ export function WhyOnlyUsCompact() {
   const items = [
     { t: "Series operating agreement", d: "Drafted for Ch. 605, with a Series Exhibit per series" },
     { t: "Series LLC Owner's Manual", d: "No other formation service offers one" },
-    { t: "Recordkeeping app", d: "Built around §605.2301 — free with formation" },
+    { t: "Recordkeeping app", d: "Built around §605.2301. Free with formation—iPhone app expected by the end of the year." },
     { t: "Only-business focus", d: "Florida Protected Series LLCs are all we do" },
   ];
   return (

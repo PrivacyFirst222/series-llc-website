@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api, ApiError } from "@/lib/api";
 import { formatDateTime, taxationLabel } from "@/lib/datetime";
+import { agreementTitle, taxationHelp } from "@/lib/agreementLabels";
 import { QuestionCard } from "./OaQuestionCard";
 import { OwnersCard, SpousePairingCard, UnitFieldCards } from "./OaOwnersSections";
 import { type MemberAnswer, type SeriesAnswer, type CoupleAnswer, type Answers, type Unit, FORM_LABEL } from "./oaTypes";
@@ -874,7 +875,7 @@ export default function OAQuestionnaire() {
                       <li key={g.id} className="flex flex-col gap-2 py-2.5 sm:flex-row sm:items-center sm:justify-between">
                         <div className="min-w-0 text-sm">
                           <span className={isCurrent ? "font-medium" : "text-muted-foreground"}>
-                            {g.amended_restated ? "Amended & Restated" : "Operating Agreement"} (No. {seq})
+                            {agreementTitle({ version: g.version ?? "", amendedRestated: g.amended_restated, generationNumber: seq, companyName: data.seed.llcName })}
                           </span>
                           <span
                             className={`ml-2 rounded-full px-2 py-0.5 text-[11px] font-medium ${
@@ -886,6 +887,7 @@ export default function OAQuestionnaire() {
                           <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
                             {taxationLabel(g.version ?? "")}
                           </span>
+                          {taxationHelp(g.version ?? "") ? <p className="mt-1 text-xs text-muted-foreground">{taxationHelp(g.version ?? "")}</p> : null}
                           <span className="ml-2 text-xs text-muted-foreground">
                             {formatDateTime(g.created_at)} · {g.template_version}
                           </span>

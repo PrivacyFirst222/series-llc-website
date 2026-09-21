@@ -83,8 +83,7 @@ export default function Contact() {
         <div className="rounded-2xl border border-amber-300/60 bg-amber-50 p-5 lg:p-6 flex items-start gap-3">
           <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
           <p className="text-sm text-amber-900 leading-relaxed">
-            <span className="font-semibold">Disclaimer:</span> We cannot answer legal, tax, or accounting
-            questions. If you have questions about the formation process or about your order, please contact us.
+            <span className="font-semibold">Disclaimer:</span> This form is for formation-service and order issues. We cannot answer legal, tax, or accounting questions.
           </p>
         </div>
       </section>
@@ -129,7 +128,7 @@ export default function Contact() {
               <div className="flex flex-wrap gap-3 pt-2 items-center justify-between">
                 <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
                   <ShieldCheck className="h-4 w-4 text-trust" />
-                  Document preparation service only.
+                  Document preparation and registered-agent service. No legal, tax, or accounting advice.
                 </span>
                 <Button
                   type="submit"

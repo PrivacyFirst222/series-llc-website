@@ -89,7 +89,7 @@ Forming an LLC creates ongoing obligations we do not perform unless you separate
 We may use software that includes artificial intelligence or machine learning to assist with internal operations such as reviewing submissions for completeness, drafting communications, and improving the Site. A human reviews every filing before it is submitted.
 
 ### 16. Intellectual Property
-The Site, deliverable templates, guides, and app content are our property or our licensors'. You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC formed through the Services, and no other rights.
+The Site, deliverable templates, guides, and app content are our property or our licensors'. You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC for which you purchased the Services, and no other rights.
 
 ### 17. Acceptable Use
 You will not: provide false information or impersonate another person; use the Services for unlawful purposes; submit filings for entities you are not authorized to act for; scrape, resell, or reverse-engineer the Site or the Services; interfere with operation or security; or use the Services to facilitate fraud, money laundering, terrorist financing, sanctions evasion, or any other prohibited activity.

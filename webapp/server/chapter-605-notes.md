@@ -176,8 +176,10 @@ s. 14.1 on s. 605.2501(2) — neither is in the non-variable list.
   the grounds for dissolution for the purposes of this paragraph"** (blesses our
   Article 13 deadlock/buy-sell); (k) may not unreasonably restrict a member's
   right to sue under ss. 605.0801–605.0806; (p) may not indemnify for bad faith,
-  willful or intentional misconduct, improper personal benefit, or s. 605.0406
-  liability.
+  willful or intentional misconduct, a knowing violation of law, improper
+  personal benefit, s. 605.0406 liability, or breach of duties or obligations
+  under s. 605.04091, taking into account restrictions, expansions, or
+  eliminations permitted under subsection (4).
 - **s. 605.0105(4)(c)** — if not manifestly unreasonable, the agreement may
   alter or eliminate aspects of the duty of loyalty, identify categories of
   activity that do not violate it, alter the duty of care (but not authorize
@@ -538,14 +540,19 @@ on Online Sunshine, not inferred from Chapter 605 alone.
 **Appraisal rights — a gap in our masters**
 - **s. 605.1006(1)** — a member has appraisal rights on a merger, conversion,
   interest exchange, **a sale of substantially all the assets** where the member
-  could vote on it, and certain amendments to the organic rules.
+  could vote on it, and certain amendments to the organic rules. Under
+  s. 605.1006(1)(d), the asset-disposition right does not apply to a court-ordered
+  disposition, or to a disposition for cash under a plan adopted by the company
+  to distribute all or substantially all net proceeds to interest holders within
+  one year after the disposition.
 - **s. 605.1006(2)** — the company "may modify, restrict, or eliminate the
   appraisal rights ... in its organic rules if the provision ... is authorized by
   each member whose appraisal rights are being modified, restricted, or
   eliminated."
 - Our masters let a Majority in Interest sell substantially all the assets of the
   company or of a series but say nothing about appraisal rights, so a dissenting
-  member keeps them. **Decide whether to waive.**
+  member retains whatever appraisal rights the statute provides, subject to its
+  conditions and exceptions. **Decide whether to waive.**
 - **s. 605.1061(5)** — "fair value" is determined immediately before the event,
   using customary valuation techniques, "**without discounting for lack of
   marketability or minority status**." Our s. 10.4 and s. 13.2 both use "fair

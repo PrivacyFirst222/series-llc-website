@@ -155,7 +155,7 @@ if (hasPdftotext) {
   const sig = text.slice(text.indexOf("SIGNATURES"), text.indexOf("EXHIBIT A"));
   const lines = sig.split("\n").map((l) => l.trim()).filter(Boolean);
   const at = (re: RegExp) => lines.findIndex((l) => re.test(l));
-  check("signatures: the preamble refers to the dates set forth below", /effective as of the date\(s\)\s+set\s+forth\s+below/.test(sig), sig.slice(0, 200));
+  check("signatures: the signature introduction uses the defined Effective Date", /as of the Effective Date/.test(sig), sig.slice(0, 200));
   // The rules are drawn, so the text holds no underscores: name, then "Date:".
   const solo = at(/^Casey Gatecheck$/);
   check("signatures: the solo owner's name, then Date", solo >= 0 && /^Date:$/.test(lines[solo + 1] ?? ""), lines.slice(solo, solo + 2));

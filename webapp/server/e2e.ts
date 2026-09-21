@@ -1,5 +1,6 @@
 import { requireEnvironmentProof } from "../scripts/offline-proof";
 import { waitForOwnedApi } from "../scripts/isolated-stack";
+import { batch16Checks } from "./batch16-check";
 import {batch05Checks} from "./batch05-check";
 import {batch04Checks} from "./batch04-check";
 import {batch03Checks} from "./batch03-check";
@@ -1542,7 +1543,7 @@ if (mint.status === 200) {
   check("a sole owner who is member-managed gets the member-single master", gen1.body?.data?.version === "member-single", gen1.body?.data);
   check(
     "OA title carries the taxation designation",
-    /^(Single-Member|Partnership|S Corporation) Operating Agreement/.test(gen1.body?.data?.title ?? ""),
+    gen1.body?.data?.title === "Operating Agreement — Member-Managed Single-Member (Disregarded Entity) (No. 1) — E2E Coastal Holdings, LLC",
     gen1.body?.data,
   );
   // A ch. 621 company's agreement carries exactly three professional
@@ -4101,6 +4102,12 @@ for(const [label,r]of batch05Results)check(label,r.ok,r.detail);
   const capital = computeCapital(parsed.assets, ["Jane Smith"], []);
   check("batch20 165: asset contributions survive removal of obsolete answer fields", !JSON.stringify(parsed).includes("obsolete") && JSON.stringify(parsed.assets) === JSON.stringify(assets) && capital.errors.length === 0 && capital.memberContributions[0].includes("1,250"), {parsed,capital});
 }
+const batch16Results = new Map<string, {ok: boolean; detail?: unknown}>();
+batch16Checks((label, ok, detail) => batch16Results.set(label, {ok, detail}));
+{ const r = batch16Results.get("batch16: restatement language traces to each master"); check("batch16: restatement language traces to each master", r?.ok === true, r?.detail); }
+{ const r = batch16Results.get("batch16: restatement recitals remain sequential"); check("batch16: restatement recitals remain sequential", r?.ok === true, r?.detail); }
+{ const r = batch16Results.get("batch16: professional eligibility is conditional and cumulative"); check("batch16: professional eligibility is conditional and cumulative", r?.ok === true, r?.detail); }
+{ const r = batch16Results.get("batch16: bankruptcy paragraph is exactly owner approved"); check("batch16: bankruptcy paragraph is exactly owner approved", r?.ok === true, r?.detail); }
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

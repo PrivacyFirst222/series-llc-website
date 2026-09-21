@@ -1,5 +1,6 @@
 import { batch14Walk } from "./batch14-walk";
 import { batch13Walk } from "./batch13-walk";
+import { batch12Walk } from "./batch12-walk";
 import { batch10Walk } from "./batch10-walk";
 import { batch09Walk } from "./batch09-walk";
 import { batch08Walk } from "./batch08-walk";
@@ -2733,6 +2734,13 @@ await batch13Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>ba
 {const r=batch13Results.get("batch13 record copy deadline neutral tense");expect(r?.ok===true,"batch13 record copy deadline neutral tense",r?.detail);}
 {const r=batch13Results.get("batch13 issued EIN required for filing package");expect(r?.ok===true,"batch13 issued EIN required for filing package",r?.detail);}
 {const r=batch13Results.get("batch13 office EIN labels agree");expect(r?.ok===true,"batch13 office EIN labels agree",r?.detail);}
+
+const batch12Results = new Map<string, { ok: boolean; detail?: unknown }>();
+await batch12Walk(browser, `http://localhost:${WEB_PORT}`, (ok, label, detail) => batch12Results.set(label, { ok, detail }));
+{ const r = batch12Results.get("batch12 33: all eight tax labels and disregarded help render consistently"); expect(r?.ok === true, "batch12 33: all eight tax labels and disregarded help render consistently", r?.detail); }
+{ const r = batch12Results.get("batch12 127: all eight forms share full titles across assembly and both portal lists"); expect(r?.ok === true, "batch12 127: all eight forms share full titles across assembly and both portal lists", r?.detail); }
+{ const r = batch12Results.get("batch12 39: FAQ states the new formation service window"); expect(r?.ok === true, "batch12 39: FAQ states the new formation service window", r?.detail); }
+{ const r = batch12Results.get("batch12 scope: all six rejected corrections remain unchanged"); expect(r?.ok === true, "batch12 scope: all six rejected corrections remain unchanged", r?.detail); }
 
 const batch10Results = new Map<string,{ok:boolean;detail?:unknown}>();
 await batch10Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>batch10Results.set(label,{ok,detail}));

@@ -22,14 +22,62 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/FAQ.tsx",
+                "before": "Drawn from real client questions about Florida's Protected Series LLC statute.",
+                "after": "Answers to common questions about Florida Protected Series LLCs."
+              },
+              {
+                "kind": "page",
+                "path": "/faq",
+                "present": [
+                  "Answers to common questions about Florida Protected Series LLCs."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -52,14 +100,62 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/HowItWorks.tsx",
+                "before": "Once the state accepts your filing, we send you the filed Articles of Organization and each filed Protected Series Designation, along with a form Operating Agreement completed from your questionnaire answers, a comprehensive Series LLC Owner's Manual, and free access to our iPhone recordkeeping app when it is released, expected by the end of the year.",
+                "after": "Once your filings are accepted, we post the filed Articles of Organization and Protected Series Designations in your client portal, where you can also access a comprehensive Series LLC Owner's Manual. Complete the operating-agreement questionnaire in your portal and select Generate to create your form Operating Agreement. Your package also includes free access to our iPhone recordkeeping app when it is released, expected by the end of the year."
+              },
+              {
+                "kind": "page",
+                "path": "/how-it-works",
+                "present": [
+                  "Once your filings are accepted, we post the filed Articles of Organization and Protected Series Designations in your client portal, where you can also access a comprehensive Series LLC Owner's Manual. Complete the operating-agreement questionnaire in your portal and select Generate to create your form Operating Agreement. Your package also includes free access to our iPhone recordkeeping app when it is released, expected by the end of the year."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -82,14 +178,76 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/HowItWorks.tsx",
+                "before": "Optional add-ons",
+                "after": "Add-ons and registered-agent choices"
+              },
+              {
+                "kind": "page",
+                "path": "/how-it-works",
+                "present": [
+                  "Add-ons and registered-agent choices"
+                ]
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/HowItWorks.tsx",
+                "before": "A Federal EIN is not included in the formation fee, and you can either use our registered\n              agent service or serve as your own if you're a Florida resident.",
+                "after": "Federal EIN service is an optional $50 add-on. If you choose our registered-agent service,\n              the first year is included in your service fee; renewal is $99 annually. You can instead\n              serve as your own registered agent if you're a Florida resident."
+              },
+              {
+                "kind": "page",
+                "path": "/how-it-works",
+                "present": [
+                  "Federal EIN service is an optional $50 add-on.",
+                  "the first year is included in your service fee; renewal is $99 annually."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -169,14 +327,59 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/src/content/terms.md",
+                "text": "Last updated: **September 20, 2026**"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/src/content/privacy.md",
+                "text": "Last updated: **September 19, 2026**"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -232,14 +435,62 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/Benefits.tsx",
+                "before": "Use multiple LLCs if…",
+                "after": "Consider a regular LLC if…"
+              },
+              {
+                "kind": "page",
+                "path": "/benefits",
+                "present": [
+                  "CONSIDER A REGULAR LLC IF…"
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -292,14 +543,62 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/Benefits.tsx",
+                "before": "Protected Series Designations (3 of 10 covered by the fee)",
+                "after": "Series designation state fees—first 3 included in our $499 service fee"
+              },
+              {
+                "kind": "page",
+                "path": "/benefits",
+                "present": [
+                  "Series designation state fees—first 3 included in our $499 service fee"
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -890,14 +1189,62 @@
         {
           "key": "contact-wording",
           "scope": "The Contact page says 'please contact us' on the contact page itself.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/Contact.tsx",
+                "before": "We cannot answer legal, tax, or accounting\n            questions. If you have questions about the formation process or about your order, please contact us.",
+                "after": "This form is for formation-service and order issues. We cannot answer legal, tax, or accounting questions."
+              },
+              {
+                "kind": "page",
+                "path": "/contact",
+                "present": [
+                  "This form is for formation-service and order issues. We cannot answer legal, tax, or accounting questions."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -920,14 +1267,62 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/components/home/BenefitsGrid.tsx",
+                "before": "Pay the $125 Florida formation fee once. Your first three protected series are covered by the formation fee; each one after that is $50 — $25 to prepare plus the $25 state filing fee.",
+                "after": "Pay the $125 Florida state filing fee once. Our $499 service fee covers your first three Protected Series Designations, including their state filing fees. Each additional series costs $50—$25 to prepare and the $25 state filing fee."
+              },
+              {
+                "kind": "page",
+                "path": "/benefits",
+                "present": [
+                  "Pay the $125 Florida state filing fee once. Our $499 service fee covers your first three Protected Series Designations, including their state filing fees. Each additional series costs $50—$25 to prepare and the $25 state filing fee."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -950,14 +1345,62 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/components/home/BenefitsGrid.tsx",
+                "before": "One filing, one franchise relationship",
+                "after": "One annual report for the company and its series."
+              },
+              {
+                "kind": "page",
+                "path": "/benefits",
+                "present": [
+                  "One annual report for the company and its series."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -981,14 +1424,62 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/components/home/HomeHero.tsx",
+                "before": "Florida registered agent service included",
+                "after": "Florida registered-agent service—first year included; $99/year after."
+              },
+              {
+                "kind": "page",
+                "path": "/",
+                "present": [
+                  "Florida registered-agent service—first year included; $99/year after."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -1073,14 +1564,62 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/Benefits.tsx",
+                "before": "Registered agent pricing is held at $99/yr on both sides, so the\n                comparison turns on the number of entities rather than on what any agent charges.",
+                "after": "The comparison uses $99 per year for each registered agent. For our package, the first year\n                is included in the service fee; the $99 annual renewal begins in year two."
+              },
+              {
+                "kind": "page",
+                "path": "/benefits",
+                "present": [
+                  "The comparison uses $99 per year for each registered agent. For our package, the first year is included in the service fee; the $99 annual renewal begins in year two."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -1160,14 +1699,62 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/Contact.tsx",
+                "before": "Document preparation service only.",
+                "after": "Document preparation and registered-agent service. No legal, tax, or accounting advice."
+              },
+              {
+                "kind": "page",
+                "path": "/contact",
+                "present": [
+                  "Document preparation and registered-agent service. No legal, tax, or accounting advice."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -1561,14 +2148,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch12 33: all eight tax labels and disregarded help render consistently"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -1621,14 +2248,62 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/HowItWorks.tsx",
+                "before": "It saves as you go, so you can stop and come back.",
+                "after": "Your progress saves in this browser, so you can return using the same browser and device."
+              },
+              {
+                "kind": "page",
+                "path": "/how-it-works",
+                "present": [
+                  "Your progress saves in this browser, so you can return using the same browser and device."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -1652,14 +2327,75 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/components/home/WhyOnlyUs.tsx",
+                "before": "us: \"Free with formation\",",
+                "after": "us: \"Free with formation—iPhone app expected by the end of the year.\","
+              },
+              {
+                "kind": "page",
+                "path": "/",
+                "present": [
+                  "Free with formation—iPhone app expected by the end of the year."
+                ]
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/src/components/home/WhyOnlyUs.tsx",
+                "before": "Built around §605.2301 — free with formation",
+                "after": "Built around §605.2301. Free with formation—iPhone app expected by the end of the year."
+              },
+              {
+                "kind": "page",
+                "path": "/pricing",
+                "present": [
+                  "Free with formation—iPhone app expected by the end of the year."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -1746,14 +2482,60 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/pages/FAQ.tsx",
+                "before": "If you decide on an S corporation election, we offer a $95 package that prepares IRS Form 2553 for you to sign and file.",
+                "after": "For new LLCs we form, our $95 S-election package prepares Form 2553 for you to sign and file. Order it within 65 days of paying for your formation."
+              },
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch12 39: FAQ states the new formation service window"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -1807,14 +2589,62 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/components/home/WhyOnlyUs.tsx",
+                "before": "label: \"Registered agent + legal-mail client portal\",\n    us: \"First year included\",",
+                "after": "label: \"Registered agent, with legal mail posted to your portal\",\n    us: \"First year of registered-agent service included.\","
+              },
+              {
+                "kind": "page",
+                "path": "/",
+                "present": [
+                  "First year of registered-agent service included."
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -5703,14 +6533,54 @@
         {
           "key": "fact-ledger",
           "scope": "The fact ledger lacks the $99 renewal, the 15- and 30-day rules and the four optional prices.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T18:29:55.001Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/facts.md",
+                "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts — `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md — `currently $99`\n- where: webapp/src/content/terms.md — `60 days before your renewal date`\n- where: webapp/src/content/terms.md — `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md — `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts — `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts — `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts — `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts — `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md — `add a $50 series per property`\n- where: docs/owners-manual.md — `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -7417,14 +8287,54 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch12 127: all eight forms share full titles across assembly and both portal lists"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -13356,14 +14266,55 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/server/chapter-605-notes.md",
+                "before": "(p) may not indemnify for bad faith,\n  willful or intentional misconduct, improper personal benefit, or s. 605.0406\n  liability.",
+                "after": "(p) may not indemnify for bad faith,\n  willful or intentional misconduct, a knowing violation of law, improper\n  personal benefit, s. 605.0406 liability, or breach of duties or obligations\n  under s. 605.04091, taking into account restrictions, expansions, or\n  eliminations permitted under subsection (4)."
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -13386,14 +14337,61 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/server/chapter-605-notes.md",
+                "before": "  could vote on it, and certain amendments to the organic rules.",
+                "after": "  could vote on it, and certain amendments to the organic rules. Under\n  s. 605.1006(1)(d), the asset-disposition right does not apply to a court-ordered\n  disposition, or to a disposition for cash under a plan adopted by the company\n  to distribute all or substantially all net proceeds to interest holders within\n  one year after the disposition."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/chapter-605-notes.md",
+                "before": "  member keeps them. **Decide whether to waive.**",
+                "after": "  member retains whatever appraisal rights the statute provides, subject to its\n  conditions and exceptions. **Decide whether to waive.**"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -13932,17 +14930,57 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "127",
             "part": "all"
+          },
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "walk",
+                "label": "batch12 127: all eight forms share full titles across assembly and both portal lists"
+              }
+            ]
           }
         }
       ],
@@ -13967,14 +15005,73 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single.md",
+                "before": "**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act exceeding the authority conferred by Section 5.4; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who exceeds the authority conferred by Section 5.4 is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager.",
+                "after": "**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act taken without the approval Section 5.4 requires; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who acts without the approval Section 5.4 requires is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single-s.md",
+                "before": "**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act exceeding the authority conferred by Section 5.4; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who exceeds the authority conferred by Section 5.4 is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager.",
+                "after": "**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act taken without the approval Section 5.4 requires; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who acts without the approval Section 5.4 requires is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-multi.md",
+                "before": "**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act exceeding the authority conferred by Section 5.4; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who exceeds the authority conferred by Section 5.4 is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager.",
+                "after": "**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act taken without the approval Section 5.4 requires; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who acts without the approval Section 5.4 requires is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-s.md",
+                "before": "**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act exceeding the authority conferred by Section 5.4; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who exceeds the authority conferred by Section 5.4 is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager.",
+                "after": "**5.6 Indemnification.** The Company shall indemnify the Manager, and each Protected Series shall indemnify its Protected Series Manager, to the fullest extent permitted by the Act, against losses, claims, and expenses (including reasonable attorney's fees) incurred by reason of service in that capacity, except to the extent arising from conduct for which exoneration is prohibited by the Act or from an act taken without the approval Section 5.4 requires; **provided, that any indemnification obligation relating to the activities of a particular Protected Series is an Associated Liability of that Protected Series, payable solely from its Associated Assets**, and any indemnification obligation relating to the activities of the Company generally is payable solely from the Associated Assets of the Company. A Manager who acts without the approval Section 5.4 requires is liable to the Company or the affected Protected Series for any loss caused by that act, and the Company or Protected Series is entitled to indemnity from that Manager."
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -13997,14 +15094,103 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single.md",
+                "before": "executed this Agreement effective as of the date(s) set forth below.",
+                "after": "executed this Agreement as of the Effective Date."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single-s.md",
+                "before": "executed this Agreement effective as of the date(s) set forth below.",
+                "after": "executed this Agreement as of the Effective Date."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single.md",
+                "before": "executed this Agreement effective as of the date set forth below.",
+                "after": "executed this Agreement as of the Effective Date."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single-s.md",
+                "before": "executed this Agreement effective as of the date set forth below.",
+                "after": "executed this Agreement as of the Effective Date."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-multi.md",
+                "before": "executed this Agreement effective as of the date(s) set forth below.",
+                "after": "executed this Agreement as of the Effective Date."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-s.md",
+                "before": "executed this Agreement effective as of the date(s) set forth below.",
+                "after": "executed this Agreement as of the Effective Date."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member.md",
+                "before": "executed this Agreement effective as of the date(s) set forth below.",
+                "after": "executed this Agreement as of the Effective Date."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "before": "executed this Agreement effective as of the date(s) set forth below.",
+                "after": "executed this Agreement as of the Effective Date."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-amendment.md",
+                "before": "executed this Amendment effective as of the <!-- one:member -->date<!-- /one --><!-- many:member -->date(s)<!-- /many --> set forth below.",
+                "after": "executed this Amendment as of the date stated above."
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -14027,14 +15213,73 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-multi.md",
+                "before": "No member of the Company shall take a position inconsistent with this Section on any return without the written consent of all members.",
+                "after": "No Member of the Company shall take a position inconsistent with this Section on any return without the written consent of all Members."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-s.md",
+                "before": "No member of the Company shall take a position inconsistent with this Section on any return without the written consent of all members.",
+                "after": "No Member of the Company shall take a position inconsistent with this Section on any return without the written consent of all Members."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member.md",
+                "before": "No member of the Company shall take a position inconsistent with this Section on any return without the written consent of all members.",
+                "after": "No Member of the Company shall take a position inconsistent with this Section on any return without the written consent of all Members."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "before": "No member of the Company shall take a position inconsistent with this Section on any return without the written consent of all members.",
+                "after": "No Member of the Company shall take a position inconsistent with this Section on any return without the written consent of all Members."
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -14737,14 +15982,72 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "add a $25 series per property",
+                "after": "add a $50 series per property"
+              },
+              {
+                "kind": "document",
+                "master": "docs/owners-manual.md",
+                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                "masterPresent": [
+                  "add a $50 series per property"
+                ],
+                "masterAbsent": [
+                  "add a $25 series per property"
+                ],
+                "wordPresent": [
+                  "add a $50 series per property"
+                ],
+                "wordAbsent": [
+                  "add a $25 series per property"
+                ]
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -15427,14 +16730,121 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single.md",
+                "before": "annual reports, and statements of dissolution",
+                "after": "annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single-s.md",
+                "before": "annual reports, and statements of dissolution",
+                "after": "annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single.md",
+                "before": "annual reports, and statements of dissolution",
+                "after": "annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single-s.md",
+                "before": "annual reports, and statements of dissolution",
+                "after": "annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-multi.md",
+                "before": "annual reports, and statements of dissolution",
+                "after": "annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-multi.md",
+                "before": "file a statement of dissolution of a Protected Series",
+                "after": "file articles of protected series dissolution"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-s.md",
+                "before": "annual reports, and statements of dissolution",
+                "after": "annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-s.md",
+                "before": "file a statement of dissolution of a Protected Series",
+                "after": "file articles of protected series dissolution"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member.md",
+                "before": "annual reports, and statements of dissolution",
+                "after": "annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member.md",
+                "before": "file a statement of dissolution of a Protected Series",
+                "after": "file articles of protected series dissolution"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "before": "annual reports, and statements of dissolution",
+                "after": "annual reports, articles of dissolution of the Company, articles of protected series dissolution, and, after winding up a Protected Series, statements of designation cancellation"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "before": "file a statement of dissolution of a Protected Series",
+                "after": "file articles of protected series dissolution"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -15546,17 +16956,75 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "242",
             "part": "all"
+          },
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "designates PS 1, PS 2, PS 3 ($75 total)",
+                "after": "designates PS 1, PS 2, PS 3 (her first three series are included in the service package)"
+              },
+              {
+                "kind": "document",
+                "master": "docs/owners-manual.md",
+                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                "masterPresent": [
+                  "designates PS 1, PS 2, PS 3 (her first three series are included in the service package)"
+                ],
+                "masterAbsent": [
+                  "designates PS 1, PS 2, PS 3 ($75 total)"
+                ],
+                "wordPresent": [
+                  "designates PS 1, PS 2, PS 3 (her first three series are included in the service package)"
+                ],
+                "wordAbsent": [
+                  "designates PS 1, PS 2, PS 3 ($75 total)"
+                ]
+              }
+            ]
           }
         }
       ],
@@ -16137,14 +17605,102 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single.md",
+                "before": "# OPERATING AGREEMENT\n",
+                "after": "<!-- alternative:restated-title \"# AMENDED AND RESTATED\\n# OPERATING AGREEMENT\" -->\n<!-- alternative:restated-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by the undersigned sole member (the \\\"Member\\\") and is acknowledged by the undersigned manager (the \\\"Manager\\\").\" -->\n<!-- alternative:professional-cover \"A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY\" -->\n<!-- alternative:professional-preamble \"THIS OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by the undersigned sole member (the \\\"Member\\\") and is acknowledged by the undersigned manager (the \\\"Manager\\\").\" -->\n<!-- alternative:restated-professional-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by the undersigned sole member (the \\\"Member\\\") and is acknowledged by the undersigned manager (the \\\"Manager\\\").\" -->\n<!-- alternative:professional-recital \"B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101–605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.\" -->\n<!-- alternative:restatement-dated \"D. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date.\" -->\n<!-- alternative:restatement-undated \"D. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date.\" -->\n\n# OPERATING AGREEMENT\n"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single-s.md",
+                "before": "# OPERATING AGREEMENT\n",
+                "after": "<!-- alternative:restated-title \"# AMENDED AND RESTATED\\n# OPERATING AGREEMENT\" -->\n<!-- alternative:restated-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by the undersigned sole member (the \\\"Member\\\") and is acknowledged by the undersigned manager (the \\\"Manager\\\").\" -->\n<!-- alternative:professional-cover \"A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY\" -->\n<!-- alternative:professional-preamble \"THIS OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by the undersigned sole member (the \\\"Member\\\") and is acknowledged by the undersigned manager (the \\\"Manager\\\").\" -->\n<!-- alternative:restated-professional-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by the undersigned sole member (the \\\"Member\\\") and is acknowledged by the undersigned manager (the \\\"Manager\\\").\" -->\n<!-- alternative:professional-recital \"B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101–605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.\" -->\n<!-- alternative:restatement-dated \"E. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date.\" -->\n<!-- alternative:restatement-undated \"E. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date.\" -->\n\n# OPERATING AGREEMENT\n"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single.md",
+                "before": "# OPERATING AGREEMENT\n",
+                "after": "<!-- alternative:restated-title \"# AMENDED AND RESTATED\\n# OPERATING AGREEMENT\" -->\n<!-- alternative:restated-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by the undersigned sole member (the \\\"Member\\\").\" -->\n<!-- alternative:professional-cover \"A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY\" -->\n<!-- alternative:professional-preamble \"THIS OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by the undersigned sole member (the \\\"Member\\\").\" -->\n<!-- alternative:restated-professional-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by the undersigned sole member (the \\\"Member\\\").\" -->\n<!-- alternative:professional-recital \"B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101–605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.\" -->\n<!-- alternative:restatement-dated \"D. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date.\" -->\n<!-- alternative:restatement-undated \"D. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date.\" -->\n\n# OPERATING AGREEMENT\n"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single-s.md",
+                "before": "# OPERATING AGREEMENT\n",
+                "after": "<!-- alternative:restated-title \"# AMENDED AND RESTATED\\n# OPERATING AGREEMENT\" -->\n<!-- alternative:restated-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by the undersigned sole member (the \\\"Member\\\").\" -->\n<!-- alternative:professional-cover \"A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY\" -->\n<!-- alternative:professional-preamble \"THIS OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by the undersigned sole member (the \\\"Member\\\").\" -->\n<!-- alternative:restated-professional-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by the undersigned sole member (the \\\"Member\\\").\" -->\n<!-- alternative:professional-recital \"B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101–605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.\" -->\n<!-- alternative:restatement-dated \"E. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date.\" -->\n<!-- alternative:restatement-undated \"E. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date.\" -->\n\n# OPERATING AGREEMENT\n"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-multi.md",
+                "before": "# OPERATING AGREEMENT\n",
+                "after": "<!-- alternative:restated-title \"# AMENDED AND RESTATED\\n# OPERATING AGREEMENT\" -->\n<!-- alternative:restated-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by and among the undersigned members (each a \\\"Member\\\" and collectively the \\\"Members\\\") and is acknowledged by the undersigned manager (the \\\"Manager\\\").\" -->\n<!-- alternative:professional-cover \"A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY\" -->\n<!-- alternative:professional-preamble \"THIS OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by and among the undersigned members (each a \\\"Member\\\" and collectively the \\\"Members\\\") and is acknowledged by the undersigned manager (the \\\"Manager\\\").\" -->\n<!-- alternative:restated-professional-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by and among the undersigned members (each a \\\"Member\\\" and collectively the \\\"Members\\\") and is acknowledged by the undersigned manager (the \\\"Manager\\\").\" -->\n<!-- alternative:professional-recital \"B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101–605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.\" -->\n<!-- alternative:restatement-dated \"D. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date.\" -->\n<!-- alternative:restatement-undated \"D. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date.\" -->\n\n# OPERATING AGREEMENT\n"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-s.md",
+                "before": "# OPERATING AGREEMENT\n",
+                "after": "<!-- alternative:restated-title \"# AMENDED AND RESTATED\\n# OPERATING AGREEMENT\" -->\n<!-- alternative:restated-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by and among the undersigned members (each a \\\"Member\\\" and collectively the \\\"Members\\\") and is acknowledged by the undersigned manager (the \\\"Manager\\\").\" -->\n<!-- alternative:professional-cover \"A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY\" -->\n<!-- alternative:professional-preamble \"THIS OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by and among the undersigned members (each a \\\"Member\\\" and collectively the \\\"Members\\\") and is acknowledged by the undersigned manager (the \\\"Manager\\\").\" -->\n<!-- alternative:restated-professional-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by and among the undersigned members (each a \\\"Member\\\" and collectively the \\\"Members\\\") and is acknowledged by the undersigned manager (the \\\"Manager\\\").\" -->\n<!-- alternative:professional-recital \"B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101–605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.\" -->\n<!-- alternative:restatement-dated \"D. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date.\" -->\n<!-- alternative:restatement-undated \"D. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date.\" -->\n\n# OPERATING AGREEMENT\n"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member.md",
+                "before": "# OPERATING AGREEMENT\n",
+                "after": "<!-- alternative:restated-title \"# AMENDED AND RESTATED\\n# OPERATING AGREEMENT\" -->\n<!-- alternative:restated-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by and among the undersigned members (each a \\\"Member\\\" and collectively the \\\"Members\\\").\" -->\n<!-- alternative:professional-cover \"A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY\" -->\n<!-- alternative:professional-preamble \"THIS OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by and among the undersigned members (each a \\\"Member\\\" and collectively the \\\"Members\\\").\" -->\n<!-- alternative:restated-professional-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by and among the undersigned members (each a \\\"Member\\\" and collectively the \\\"Members\\\").\" -->\n<!-- alternative:professional-recital \"B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101–605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.\" -->\n<!-- alternative:restatement-dated \"D. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date.\" -->\n<!-- alternative:restatement-undated \"D. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date.\" -->\n\n# OPERATING AGREEMENT\n"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "before": "# OPERATING AGREEMENT\n",
+                "after": "<!-- alternative:restated-title \"# AMENDED AND RESTATED\\n# OPERATING AGREEMENT\" -->\n<!-- alternative:restated-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by and among the undersigned members (each a \\\"Member\\\" and collectively the \\\"Members\\\").\" -->\n<!-- alternative:professional-cover \"A FLORIDA PROFESSIONAL PROTECTED SERIES LIMITED LIABILITY COMPANY\" -->\n<!-- alternative:professional-preamble \"THIS OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by and among the undersigned members (each a \\\"Member\\\" and collectively the \\\"Members\\\").\" -->\n<!-- alternative:restated-professional-preamble \"THIS AMENDED AND RESTATED OPERATING AGREEMENT (this \\\"Agreement\\\") of **[COMPANY NAME], LLC**, a Florida professional protected series limited liability company (the \\\"Company\\\"), is made and entered into effective as of [DATE] (the \\\"Effective Date\\\"), by and among the undersigned members (each a \\\"Member\\\" and collectively the \\\"Members\\\").\" -->\n<!-- alternative:professional-recital \"B. The Company is a **professional protected series limited liability company** within the meaning of ss. 605.2101–605.2802, and Chapter 621, Florida Statutes, having designated, or intending to designate, one or more protected series by filing one or more Protected Series Designations with the Department.\" -->\n<!-- alternative:restatement-dated \"D. This Agreement amends, restates, and supersedes in its entirety the Operating Agreement of the Company dated [PRIOR AGREEMENT DATE], which shall be of no further force or effect from the Effective Date.\" -->\n<!-- alternative:restatement-undated \"D. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date.\" -->\n\n# OPERATING AGREEMENT\n"
+              },
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch16: restatement language traces to each master"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -16901,14 +18457,62 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/content/terms.md",
+                "before": "You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC formed through the Services, and no other rights.",
+                "after": "You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC for which you purchased the Services, and no other rights."
+              },
+              {
+                "kind": "page",
+                "path": "/terms",
+                "present": [
+                  "You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC for which you purchased the Services, and no other rights."
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -17232,14 +18836,145 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single.md",
+                "before": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.",
+                "after": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single.md",
+                "before": "**2.1 \"Act\"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.",
+                "after": "**2.1 \"Act\"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single-s.md",
+                "before": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.",
+                "after": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single-s.md",
+                "before": "**2.1 \"Act\"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.",
+                "after": "**2.1 \"Act\"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single.md",
+                "before": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.",
+                "after": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single.md",
+                "before": "**2.1 \"Act\"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.",
+                "after": "**2.1 \"Act\"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single-s.md",
+                "before": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.",
+                "after": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single-s.md",
+                "before": "**2.1 \"Act\"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.",
+                "after": "**2.1 \"Act\"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-multi.md",
+                "before": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.",
+                "after": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-multi.md",
+                "before": "**2.1 \"Act\"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.",
+                "after": "**2.1 \"Act\"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-s.md",
+                "before": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.",
+                "after": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-s.md",
+                "before": "**2.1 \"Act\"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.",
+                "after": "**2.1 \"Act\"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member.md",
+                "before": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.",
+                "after": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member.md",
+                "before": "**2.1 \"Act\"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.",
+                "after": "**2.1 \"Act\"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "before": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.",
+                "after": "**1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the \"Act\"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the \"Protected Series Provisions\"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "before": "**2.1 \"Act\"** means the Florida Revised Uniform Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions.",
+                "after": "**2.1 \"Act\"** means the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes, as amended, including the Protected Series Provisions."
+              }
+            ]
+          }
         }
       ]
     },
@@ -17284,14 +19019,91 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single.md",
+                "before": "There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.",
+                "after": "There is no manager of the Company, and no person shall be designated or hold out as a manager of the Company. The Member serves as protected-series manager as provided in Section 5.2."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single-s.md",
+                "before": "There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.",
+                "after": "There is no manager of the Company, and no person shall be designated or hold out as a manager of the Company. The Member serves as protected-series manager as provided in Section 5.2."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member.md",
+                "before": "There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.",
+                "after": "There is no manager of the Company, and no person shall be designated or hold out as a manager of the Company. The Members serve as protected-series managers as provided in Section 5.2."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "before": "There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.",
+                "after": "There is no manager of the Company, and no person shall be designated or hold out as a manager of the Company. The Members serve as protected-series managers as provided in Section 5.2."
+              },
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "In the member-managed forms there is no manager:",
+                "after": "In the member-managed forms there is no separate company manager:"
+              },
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "In the **member-managed** forms there is no manager at all:",
+                "after": "In the **member-managed** forms there is no separate company manager:"
+              },
+              {
+                "kind": "replace",
+                "file": "docs/oa-instructions.md",
+                "before": "The member-managed forms have no manager:",
+                "after": "The member-managed forms have no separate company manager:"
+              }
+            ]
+          }
         }
       ]
     },
@@ -17336,14 +19148,73 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-s.md",
+                "before": "all allocations and distributions — including distributions in liquidation of the Company or of any Protected Series — shall be made strictly pro rata in accordance with Percentage Interests, and every Membership Interest confers identical rights to distributions and liquidation proceeds.",
+                "after": "all allocations and distributions by the Company to its Members — including distributions in liquidation of the Company — shall be made strictly pro rata in accordance with Percentage Interests, and every Membership Interest confers identical rights to distributions and liquidation proceeds. All distributions by a Protected Series, including in liquidation, shall be made solely to the Company as provided in Sections 7.2 and 14.2."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-s.md",
+                "before": "All distributions in winding up, whether of the Company or of any Protected Series, shall be made in proportion to Percentage Interests, so that every Membership Interest confers identical rights to liquidation proceeds.",
+                "after": "All distributions by the Company to its Members in winding up shall be made in proportion to Percentage Interests, so that every Membership Interest confers identical rights to liquidation proceeds. Distributions in winding up a Protected Series shall be made solely to the Company as provided in Section 14.2."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "before": "all allocations and distributions — including distributions in liquidation of the Company or of any Protected Series — shall be made strictly pro rata in accordance with Percentage Interests, and every Membership Interest confers identical rights to distributions and liquidation proceeds.",
+                "after": "all allocations and distributions by the Company to its Members — including distributions in liquidation of the Company — shall be made strictly pro rata in accordance with Percentage Interests, and every Membership Interest confers identical rights to distributions and liquidation proceeds. All distributions by a Protected Series, including in liquidation, shall be made solely to the Company as provided in Sections 7.2 and 14.2."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "before": "All distributions in winding up, whether of the Company or of any Protected Series, shall be made in proportion to Percentage Interests, so that every Membership Interest confers identical rights to liquidation proceeds.",
+                "after": "All distributions by the Company to its Members in winding up shall be made in proportion to Percentage Interests, so that every Membership Interest confers identical rights to liquidation proceeds. Distributions in winding up a Protected Series shall be made solely to the Company as provided in Section 14.2."
+              }
+            ]
+          }
         }
       ]
     },
@@ -17360,14 +19231,64 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/templates-oa-single-s.md",
+                "text": "restatement-undated \"E. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date.\""
+              },
+              {
+                "kind": "present",
+                "file": "webapp/server/templates-oa-member-single-s.md",
+                "text": "restatement-undated \"E. This Agreement amends, restates, and supersedes in its entirety any and all prior operating agreements of the Company, whether written or oral, which shall be of no further force or effect from the Effective Date.\""
+              },
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch16: restatement recitals remain sequential"
+              }
+            ]
+          }
         }
       ]
     },
@@ -17477,14 +19398,74 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "and it is the number the company gives on W-9s so you are not handing out your Social Security number.",
+                "after": "and an EIN identifies the company for those purposes. **A W-9 identifies the taxpayer.** For a disregarded entity, use the tax owner's name and taxpayer identification number as the W-9 instructions require, and identify the disregarded entity on line 2."
+              },
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "**A counterparty demands a taxpayer number for the named entity** — a lender, title company, insurer, or property manager. Giving them the company's EIN for a series' business stitches the two identities together on paper, the opposite of the separateness you are documenting.",
+                "after": "**A counterparty requires an EIN for its records** — a lender, title company, insurer, or property manager. Distinguish that request from a W-9: a W-9 identifies the tax owner under the form's instructions. That tax identification is different from the series' name on its contracts and bank accounts."
+              },
+              {
+                "kind": "document",
+                "master": "docs/owners-manual.md",
+                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                "masterPresent": [
+                  "and an EIN identifies the company for those purposes. **A W-9 identifies the taxpayer.** For a disregarded entity, use the tax owner's name and taxpayer identification number as the W-9 instructions require, and identify the disregarded entity on line 2.",
+                  "**A counterparty requires an EIN for its records** — a lender, title company, insurer, or property manager. Distinguish that request from a W-9: a W-9 identifies the tax owner under the form's instructions. That tax identification is different from the series' name on its contracts and bank accounts."
+                ],
+                "wordPresent": [
+                  "and an EIN identifies the company for those purposes. A W-9 identifies the taxpayer. For a disregarded entity, use the tax owner's name and taxpayer identification number as the W-9 instructions require, and identify the disregarded entity on line 2.",
+                  "A counterparty requires an EIN for its records — a lender, title company, insurer, or property manager. Distinguish that request from a W-9: a W-9 identifies the tax owner under the form's instructions. That tax identification is different from the series' name on its contracts and bank accounts."
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -17759,14 +19740,66 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": ", and its tax treatment changes the moment a second member is admitted.",
+                "after": ". A disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner joins."
+              },
+              {
+                "kind": "document",
+                "master": "docs/owners-manual.md",
+                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                "masterPresent": [
+                  ". A disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner joins."
+                ],
+                "wordPresent": [
+                  ". A disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner joins."
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -17785,14 +19818,74 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "Nothing of its own. Everything on your Form 1040, each property or business as its own Schedule E or C activity",
+                "after": "No separate federal income-tax return for the disregarded LLC. Its activity is reported through its tax owner. An individual generally uses the applicable schedules of Form 1040 or 1040-SR; other owners use their applicable reporting rules."
+              },
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "(and where the company itself is disregarded to a single owner, Section 16's table shows that lands on your own Form 1040)",
+                "after": "(where the company itself is disregarded, its activity is reported through its tax owner; an individual generally uses the applicable schedules of Form 1040 or 1040-SR, while other owners use their applicable reporting rules)"
+              },
+              {
+                "kind": "document",
+                "master": "docs/owners-manual.md",
+                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                "masterPresent": [
+                  "No separate federal income-tax return for the disregarded LLC. Its activity is reported through its tax owner. An individual generally uses the applicable schedules of Form 1040 or 1040-SR; other owners use their applicable reporting rules.",
+                  "(where the company itself is disregarded, its activity is reported through its tax owner; an individual generally uses the applicable schedules of Form 1040 or 1040-SR, while other owners use their applicable reporting rules)"
+                ],
+                "wordPresent": [
+                  "No separate federal income-tax return for the disregarded LLC. Its activity is reported through its tax owner. An individual generally uses the applicable schedules of Form 1040 or 1040-SR; other owners use their applicable reporting rules.",
+                  "(where the company itself is disregarded, its activity is reported through its tax owner; an individual generally uses the applicable schedules of Form 1040 or 1040-SR, while other owners use their applicable reporting rules)"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -18242,14 +20335,162 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single.md",
+                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single.md",
+                "before": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
+                "after": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single-s.md",
+                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-single-s.md",
+                "before": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
+                "after": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single.md",
+                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single.md",
+                "before": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
+                "after": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single-s.md",
+                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-single-s.md",
+                "before": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
+                "after": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-multi.md",
+                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-multi.md",
+                "before": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS",
+                "after": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-s.md",
+                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-s.md",
+                "before": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS",
+                "after": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member.md",
+                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member.md",
+                "before": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS",
+                "after": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "before": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS",
+                "after": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+              },
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule",
+                "after": "anyone the member chooses, subject to the professional-owner eligibility requirements on the professional LLC forms and the eligible-shareholder rule on the S corporation forms"
+              },
+              {
+                "kind": "replace",
+                "file": "docs/oa-instructions.md",
+                "before": "The beneficiary may be any person or entity, except on the S corporation forms, where the beneficiary must be an eligible S corporation shareholder (§9.3(b)); the owner making the designation may not.",
+                "after": "The beneficiary may be any person or entity eligible under the applicable form: the professional LLC forms require eligibility under Chapter 621, and the S corporation forms also require an eligible S corporation shareholder (§9.3(b)). The owner making the designation must be an individual."
+              },
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch16: professional eligibility is conditional and cumulative"
+              }
+            ]
+          }
         }
       ]
     },
@@ -18485,14 +20726,74 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "FinCEN's March 2025 interim final rule narrowed \"reporting company\" to entities formed under *foreign* law that register to do business here. A Florida series LLC formed in Florida currently files nothing with FinCEN, and its owners report nothing.",
+                "after": "FinCEN’s final rule, effective August 14, 2026, retained the exemption for U.S.-formed companies. A Florida LLC formed in Florida does not file a federal beneficial ownership report under that rule, and its owners do not submit one for that company."
+              },
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "FinCEN interim final rule (Mar. 2025)",
+                "after": "FinCEN final rule (effective Aug. 14, 2026; fincen.gov/boi)"
+              },
+              {
+                "kind": "document",
+                "master": "docs/owners-manual.md",
+                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                "masterPresent": [
+                  "FinCEN’s final rule, effective August 14, 2026, retained the exemption for U.S.-formed companies. A Florida LLC formed in Florida does not file a federal beneficial ownership report under that rule, and its owners do not submit one for that company.",
+                  "FinCEN final rule (effective Aug. 14, 2026; fincen.gov/boi)"
+                ],
+                "wordPresent": [
+                  "FinCEN’s final rule, effective August 14, 2026, retained the exemption for U.S.-formed companies. A Florida LLC formed in Florida does not file a federal beneficial ownership report under that rule, and its owners do not submit one for that company.",
+                  "FinCEN final rule (effective Aug. 14, 2026; fincen.gov/boi)"
+                ]
+              }
+            ]
+          }
         }
       ],
       "correctedReplacement": "Verified: FinCEN's page says the rule is final (alert updated 11 Aug 2026). NOT verified by Claude: the effective date of 14 Aug 2026."
@@ -18512,14 +20813,90 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-21T13:46:34.678Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-21T17:07:05.816Z",
+              "event": "rejected r1",
+              "batch": "27",
+              "revision": 1,
+              "note": "proceed with revision 2"
+            },
+            {
+              "at": "2026-09-21T17:08:00.120Z",
+              "event": "assigned",
+              "batch": "27",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-21T17:08:00.146Z",
+              "event": "implemented",
+              "batch": "27",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "27",
+          "fix": {
+            "batch": "27",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-multi.md",
+                "before": "**11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member and the Manager, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. §365(c)(1) without the prior written consent of the other Members.",
+                "after": "**11.2 Personal Service Agreement; No Assumption or Assignment.** The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. § 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member’s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate’s interest in a Member’s transferable (economic) interest to the extent permitted by applicable law."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-s.md",
+                "before": "**11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member and the Manager, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. §365(c)(1) without the prior written consent of the other Members.",
+                "after": "**11.2 Personal Service Agreement; No Assumption or Assignment.** The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. § 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member’s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate’s interest in a Member’s transferable (economic) interest to the extent permitted by applicable law."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member.md",
+                "before": "**11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. §365(c)(1) without the prior written consent of the other Members.",
+                "after": "**11.2 Personal Service Agreement; No Assumption or Assignment.** The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. § 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member’s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate’s interest in a Member’s transferable (economic) interest to the extent permitted by applicable law."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/templates-oa-member-s.md",
+                "before": "**11.2 Personal Service Agreement; No Assumption or Assignment.** In accordance with *In re Soderstrom*, 484 B.R. 874 (M.D. Fla. 2013), this Agreement is a personal service agreement due to the managerial and governance duties and obligations owed by each Member, and a bankruptcy trustee cannot assume or assign a debtor Member's interest in the Company in accordance with 11 U.S.C. §365(c)(1) without the prior written consent of the other Members.",
+                "after": "**11.2 Personal Service Agreement; No Assumption or Assignment.** The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. § 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member’s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate’s interest in a Member’s transferable (economic) interest to the extent permitted by applicable law."
+              },
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "**Bankruptcy armor (multi-member).** Article 11 of the multi-member agreement declares the agreement an executory contract under 11 U.S.C. §365, catalogs each member's material ongoing duties, and — citing *In re Soderstrom* (M.D. Fla. 2013) — takes the position that a bankruptcy trustee cannot assume or assign a debtor-member's interest without the other members' consent. Understand it honestly: bankruptcy courts wield broad equitable power, and no drafting guarantees an outcome there. Article 11 gives your side the strongest available argument; combined with charging-order exclusivity, it makes the interest an unappetizing target — which is the practical goal.",
+                "after": "**Bankruptcy armor (multi-member).** Article 11 describes the members' continuing managerial and governance obligations and states that the agreement is intended to be an executory contract under 11 U.S.C. §365. Section 11.2 requires the other members' prior written consent before a bankruptcy trustee or debtor in possession may assume or assign a debtor-member's governance or management rights, or cause a substitute to be admitted as a member, under §365(c)(1) and applicable Florida law. This separates control of the company from the economic interest: the section does not limit the bankruptcy estate's interest in the debtor-member's transferable economic interest to the extent permitted by applicable law. It is not a promise that economic rights cannot enter the estate or be sold. The provision's effect depends on applicable law and the bankruptcy court's decision; no drafting guarantees an outcome."
+              },
+              {
+                "kind": "replace",
+                "file": "docs/oa-instructions.md",
+                "before": "Article 11 is bankruptcy armor. It frames the agreement as a contract with ongoing, unperformed duties owed by every member — capital calls (if §6.2 is included), participation in governance, noncompetition (if Alternative A is selected), confidentiality, and non-disparagement — and, citing Florida bankruptcy precedent, takes the position that a bankruptcy trustee for one member cannot take over or sell that member's interest without the other members' consent. Together with the charging-order provision (§10.6), it is designed to keep a co-owner's personal bankruptcy or judgment creditor from putting a stranger in your company.",
+                "after": "Article 11 describes the members' continuing obligations — capital calls (if §6.2 is included), participation in governance, noncompetition (if Alternative A is selected), confidentiality, and non-disparagement — and states that the agreement is intended to be an executory contract. Section 11.2 requires the other members' prior written consent before a bankruptcy trustee or debtor in possession may assume or assign a debtor-member's governance or management rights, or cause a substitute to be admitted as a member, under 11 U.S.C. §365(c)(1) and applicable Florida law. The section distinguishes those rights from the member's transferable economic interest: it does not limit the estate's interest in those economic rights to the extent permitted by applicable law."
+              },
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch16: bankruptcy paragraph is exactly owner approved"
+              }
+            ]
+          }
         }
       ]
     },
@@ -21852,6 +24229,60 @@
       "kind": "ruling",
       "item": "AUD-post-batches-2026-09-20-4a344e2-B3-05",
       "text": "Adam approved Batch 22 item 8 with his whole message \"Go. Approve all\" after the proposal expressly stated: \"Support up to 100 owners consistently in the questionnaire, saving, contribution allocations, and agreement generation. Prevent adding owner 101 and explain the limit before the client enters unsupported information.\" This records that approved capacity for the operating-agreement questionnaire; it is not package acceptance or publication authorization."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N1.09",
+      "text": "Adam approved Batch 11 item 19 with \"I approve all other items\", followed by \"Go\": \"You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC for which you purchased the Services, and no other rights.\""
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.03",
+      "text": "Batch 16 item 10 approved: distinguish company management from protected-series managers; retain who manages."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.05",
+      "text": "Batch 16 item 11 approved: series distributions go solely to the Company; Company distributions to Members remain pro rata."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.08",
+      "text": "Batch 12: Adam approved the proposed fix and then said Go. Approved scope: Correct only W-9 taxpayer identity and separate it from account/contract naming. Exact wording: and an EIN identifies the company for those purposes. **A W-9 identifies the taxpayer.** For a disregarded entity, use the tax owner's name and taxpayer identification number as the W-9 instructions require, and identify the disregarded entity on line 2. / **A counterparty requires an EIN for its records** — a lender, title company, insurer, or property manager. Distinguish that request from a W-9: a W-9 identifies the tax owner under the form's instructions. That tax identification is different from the series' name on its contracts and bank accounts."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.12",
+      "text": "Batch 12: Adam approved the proposed fix and then said Go. Approved scope: Adding a second eligible owner does not itself terminate an existing S election; retain the agreement recommendation. Exact wording: . A disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner joins."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.13",
+      "text": "Batch 12: Adam approved the proposed fix and then said Go. Approved scope: Correct both universal Form 1040 statements to include company and trust tax owners. Exact wording: No separate federal income-tax return for the disregarded LLC. Its activity is reported through its tax owner. An individual generally uses the applicable schedules of Form 1040 or 1040-SR; other owners use their applicable reporting rules. / (where the company itself is disregarded, its activity is reported through its tax owner; an individual generally uses the applicable schedules of Form 1040 or 1040-SR, while other owners use their applicable reporting rules)"
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.22",
+      "text": "Batch 16 item 13 approved: professional-only Chapter 621 purpose, transfer, admission and TOD eligibility restrictions; retain permitted investments and cumulative S-corporation eligibility."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.26",
+      "text": "Batch 12: Adam approved the proposed fix and then said Go. Approved scope: Update the FinCEN rule and source reference to the verified final rule; no Florida filing change. Exact wording: FinCEN’s final rule, effective August 14, 2026, retained the exemption for U.S.-formed companies. A Florida LLC formed in Florida does not file a federal beneficial ownership report under that rule, and its owners do not submit one for that company. / FinCEN final rule (effective Aug. 14, 2026; fincen.gov/boi)"
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.27",
+      "text": "Batch 16 item 14: Use this exact paragraph and update the manual and instructions: The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. § 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member’s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate’s interest in a Member’s transferable (economic) interest to the extent permitted by applicable law."
     }
   ],
   "batches": [
@@ -22591,6 +25022,45 @@
         },
         {
           "at": "2026-09-21T10:41:18.637Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "27",
+      "revision": 1,
+      "frozenHash": "e65140d82fa07148e79b667fab89c78547177b00775d6b378f15429a160d4ca2",
+      "status": "rejected",
+      "model": "Codex",
+      "base": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "history": [
+        {
+          "at": "2026-09-21T13:46:34.681Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-21T17:07:05.816Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-21T17:07 (terminal): proceed with revision 2"
+        }
+      ]
+    },
+    {
+      "id": "27",
+      "revision": 2,
+      "frozenHash": "aeaa83a9788134d0fdbb48e62a5ed29674a138f339df15f7e3110c575ed6362b",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "history": [
+        {
+          "at": "2026-09-21T17:08:00.121Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-21T17:08:00.146Z",
           "event": "implemented"
         }
       ]
