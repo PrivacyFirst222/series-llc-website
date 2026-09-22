@@ -274,8 +274,8 @@ const extendedFormSchema = formationFormSchema
         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: FIRST_AND_LAST });
       }
       const expected = registeredAgentName(data);
-      if ((data.registeredAgentAcceptanceName ?? "").trim() !== expected) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: `The acceptance name must match the registered agent name exactly: ${expected}` });
-      if ((data.registeredAgentElectronicSignature ?? "").trim() !== expected) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentElectronicSignature"], message: `Your electronic signature must match the registered agent name exactly: ${expected}` });
+      if ((data.registeredAgentAcceptanceName ?? "").trim() && hasFirstAndLast(data.registeredAgentAcceptanceName ?? "") && (data.registeredAgentAcceptanceName ?? "").trim() !== expected) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: `The acceptance name must match the registered agent name exactly: ${expected}` });
+      if ((data.registeredAgentElectronicSignature ?? "").trim() && (data.registeredAgentElectronicSignature ?? "").trim() !== expected) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentElectronicSignature"], message: `Your electronic signature must match the registered agent name exactly: ${expected}` });
       if (data.registeredAgentAcceptanceCheckbox !== true) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentAcceptanceCheckbox"], message: "Acceptance is required." });
       }

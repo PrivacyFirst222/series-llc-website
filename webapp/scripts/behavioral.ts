@@ -688,9 +688,17 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
       await page.waitForTimeout(350);
     }
     expect((await stepHeading(page)).includes("Eligibility"), `${run.key}: back-walk reaches the first step`, await stepHeading(page));
-    expect((await page.locator("#client-first-name").inputValue().catch(() => "").then((v) => v)) !== "GONE", `${run.key}: placeholder`, null);
+    let checkedSavedName = false;
     let fwd = 0;
-    while (!(await stepHeading(page)).includes("Certification") && fwd++ < 25) await advance(page);
+    while (!(await stepHeading(page)).includes("Certification") && fwd++ < 25) {
+      if ((await stepHeading(page)).includes("Your information")) {
+        const savedName = await page.locator("#client-first-name").inputValue();
+        expect(savedName === "Casey", `${run.key}: back-walk preserves the saved first name`, savedName);
+        checkedSavedName = true;
+      }
+      await advance(page);
+    }
+    expect(checkedSavedName, `${run.key}: back-walk checked the client information step`);
     expect((await stepHeading(page)).includes("Certification"), `${run.key}: forward replay reaches Certify with every answer intact`, await stepHeading(page));
   }
 
@@ -722,7 +730,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     // refused and the step stays; the exact name clears it.
     const sig3 = page.getByLabel(/electronic signature/i).first();
     if (await sig3.isVisible().catch(() => false)) {
-      await page.locator("main button").filter({ hasText: /^(Continue to payment|Submit intake)$/ }).first().click();
+      await page.locator("main button").filter({ hasText: /^Continue to payment$/ }).first().click();
       await page.waitForTimeout(1500);
       expect(!captured && /Certif/i.test(await stepHeading(page).catch(() => "")), `${run.key}: submitting is refused while the signature does not match the name`, await stepHeading(page).catch(() => "(navigated)"));
       await sig3.fill("Casey Gatecheck");
@@ -742,7 +750,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   // Submit navigates to the (fake) checkout, so the page leaves the SPA —
   // success is the CAPTURED accepted POST, not any heading. A submit that
   // instead bounces to an earlier step is a real finding: dump its errors.
-  await page.locator("main button").filter({ hasText: /^(Continue to payment|Submit intake)$/ }).first().click();
+  await page.locator("main button").filter({ hasText: /^Continue to payment$/ }).first().click();
   for (let i = 0; i < 40 && !captured; i++) await page.waitForTimeout(500);
   if (!captured) {
     const where = await stepHeading(page).catch(() => "(page navigated)");
@@ -1005,7 +1013,7 @@ async function main(): Promise<void> {
         // (Adam, 14 Sep 2026: "stored and shown in the portal").
         const dash = await page.locator("main").innerText();
         const nextYear = String(new Date().getFullYear() + 1);
-        expect(new RegExp(`renews on [A-Z][a-z]+ \\d{1,2}, ${nextYear}`).test(dash) && !/renews annually/.test(dash), "renewal: the portal's agent card names the renewal date a year from formation", dash.match(/registered agent service is active[^.]*\./)?.[0]);
+        expect(new RegExp(`renews on [A-Z][a-z]+ \\d{1,2}, ${nextYear}`).test(dash) && !/renews annually/.test(dash), "renewal: the portal's agent card names the renewal date a year from the recorded appointment", dash.match(/registered agent service is active[^.]*\./)?.[0]);
       }
       // The S election is not the client's to act on until the office has
       // entered the formation date (Form 2553 timing gate, 6 Sep 2026): the

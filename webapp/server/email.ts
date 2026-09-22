@@ -105,12 +105,12 @@ export function welcomeEmail(name: string, setPasswordUrl: string, isConversion 
  *  cancellation deadline, and how to cancel — scheduled 70 days before the date; automatic billing held if fewer than 60 days remain. */
 export function raRenewalNoticeEmail(opts: {
   name: string; llcName: string; renewalDate: string; amount: string; last4: string | null;
-  chargeDate: string; cancelBy: string; linkUrl: string | null; giftCard: boolean; billingHold?: boolean;
+  chargeDate: string; cancelBy: string; linkUrl: string | null; billingHold?: boolean;
 }): { subject: string; html: string } {
   const how = opts.billingHold ? `<p>Your renewal notice was delayed. The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. Automatic charging is on hold; please contact us to resolve the renewal. You may also pay now using <a href="${opts.linkUrl}">this payment link</a>.</p>` : opts.last4
     ? `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong> and will be charged to your card ending
       <strong>${escapeHtml(opts.last4)}</strong> on <strong>${escapeHtml(opts.chargeDate)}</strong>. There is nothing you need to do.</p>`
-    : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. ${opts.giftCard ? "An eligible card is required" : "No eligible card is on file"},
+    : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. No eligible card is on file,
       so please pay it by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below. Paying with a credit or debit
       card keeps that card for the following years, so the renewal is automatic from then on.</p>
       <p><a href="${opts.linkUrl ?? "#"}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the renewal</a></p>`;

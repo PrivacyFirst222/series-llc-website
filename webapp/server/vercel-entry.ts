@@ -1,5 +1,5 @@
 // Source for the Vercel function. `bun run build:api` bundles this (and every
-// dependency) into api/[[...route]].mjs — the deployed function is fully
+// dependency) into api/index.mjs — the deployed function is fully
 // self-contained, so runtime dependency resolution can never fail.
 //
 // The Node req/res → fetch bridge is written out here (rather than using an

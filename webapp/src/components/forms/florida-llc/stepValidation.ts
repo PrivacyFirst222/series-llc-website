@@ -254,11 +254,11 @@ export function validateStep(
       e.registeredAgentAcceptanceName = "Your name is required.";
     else if (!hasFirstAndLast(data.registeredAgentAcceptanceName))
       e.registeredAgentAcceptanceName = FIRST_AND_LAST;
-    if (!data.registeredAgentElectronicSignature)
+    if (!data.registeredAgentElectronicSignature.trim())
       e.registeredAgentElectronicSignature = "Electronic signature required.";
     const expected = registeredAgentName(data);
-    if (data.registeredAgentAcceptanceName.trim() !== expected) e.registeredAgentAcceptanceName = `The acceptance name must match the registered agent name exactly: ${expected}`;
-    if (data.registeredAgentElectronicSignature.trim() !== expected) e.registeredAgentElectronicSignature = `Your electronic signature must match the registered agent name exactly: ${expected}`;
+    if (!e.registeredAgentAcceptanceName && data.registeredAgentAcceptanceName.trim() !== expected) e.registeredAgentAcceptanceName = `The acceptance name must match the registered agent name exactly: ${expected}`;
+    if (!e.registeredAgentElectronicSignature && data.registeredAgentElectronicSignature.trim() !== expected) e.registeredAgentElectronicSignature = `Your electronic signature must match the registered agent name exactly: ${expected}`;
     if (!data.registeredAgentAcceptanceCheckbox)
       e.registeredAgentAcceptanceCheckbox = "Acceptance is required.";
     if (!data.registeredAgentSignatureAuthorizationCheckbox)

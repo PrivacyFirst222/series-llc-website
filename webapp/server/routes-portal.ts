@@ -2578,8 +2578,9 @@ app.post("/auth/verify-email", async (c) => {
 
 /** Online cancellation of registered agent service — required by §501.165
  *  because the service is accepted online. Recording the request is the
- *  §9(g)(i) notice; the agency itself ends only when proof of a successor
- *  designation arrives (handled by hand from the admin notification). */
+ *  cancellation notice under the Terms. The office records verified replacement
+ *  or an effective resignation separately from receipt of the request.
+ *  Submitting a resignation is distinct from its taking effect. */
 app.post("/portal/registered-agent/cancel", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);

@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { env } from "./env";
 import { hmacSha256Base64 } from "./crypto";
 import type { PricedOrder } from "./pricing";
@@ -228,7 +228,9 @@ export function verifyWebhookSignature(opts: {
     env.SQUARE_WEBHOOK_SIGNATURE_KEY,
     opts.notificationUrl + opts.rawBody,
   );
-  return expected === opts.signatureHeader;
+  const expectedBytes = Buffer.from(expected, "utf8");
+  const suppliedBytes = Buffer.from(opts.signatureHeader, "utf8");
+  return expectedBytes.length === suppliedBytes.length && timingSafeEqual(expectedBytes, suppliedBytes);
 }
 
 /** Registered-agent checkout authorizes first; capture waits for card eligibility/storage. */

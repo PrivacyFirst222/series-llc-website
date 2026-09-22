@@ -1,0 +1,24 @@
+CHECK_RESULT {"suite":"batch33","label":"complete personal-agent order still passes","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"blank agent fields show only required errors: registeredAgentAcceptanceName empty","ok":false,"commit":"local","run":"local","detail":{"ui":{"registeredAgentAcceptanceName":"The acceptance name must match the registered agent name exactly: John Smith, Jr."},"messages":["Name required","The acceptance name must match the registered agent name exactly: John Smith, Jr."]}}
+CHECK_RESULT {"suite":"batch33","label":"blank agent fields show only required errors: registeredAgentAcceptanceName spaces","ok":false,"commit":"local","run":"local","detail":{"ui":{"registeredAgentAcceptanceName":"The acceptance name must match the registered agent name exactly: John Smith, Jr."},"messages":["Name required","The acceptance name must match the registered agent name exactly: John Smith, Jr."]}}
+CHECK_RESULT {"suite":"batch33","label":"nonblank mismatch remains refused: registeredAgentAcceptanceName","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"outer whitespace stays accepted: registeredAgentAcceptanceName","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"blank agent fields show only required errors: registeredAgentElectronicSignature empty","ok":false,"commit":"local","run":"local","detail":{"ui":{"registeredAgentElectronicSignature":"Your electronic signature must match the registered agent name exactly: John Smith, Jr."},"messages":["Your electronic signature must match the registered agent name exactly: John Smith, Jr.","Electronic signature required"]}}
+CHECK_RESULT {"suite":"batch33","label":"blank agent fields show only required errors: registeredAgentElectronicSignature spaces","ok":false,"commit":"local","run":"local","detail":{"ui":{"registeredAgentElectronicSignature":"Your electronic signature must match the registered agent name exactly: John Smith, Jr."},"messages":["Your electronic signature must match the registered agent name exactly: John Smith, Jr.","Electronic signature required"]}}
+CHECK_RESULT {"suite":"batch33","label":"nonblank mismatch remains refused: registeredAgentElectronicSignature","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"outer whitespace stays accepted: registeredAgentElectronicSignature","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"first-and-last-name requirement retained","ok":false,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"Square known valid HMAC accepted","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"Square refuses alteredBody signature input","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"Square refuses alteredUrl signature input","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"Square refuses firstByte signature input","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"Square refuses lastByte signature input","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"Square refuses short signature input","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"Square refuses long signature input","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"Square refuses missing signature input","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"Square refuses unicode signature input","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"Square missing key refused in production","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"Square development no-key behavior preserved","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"renewal notice preserves no-card wording","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch33","label":"unused account-wide EIN flag removed","ok":false,"commit":"local","run":"local"}
+17/23 Batch33 checks passed

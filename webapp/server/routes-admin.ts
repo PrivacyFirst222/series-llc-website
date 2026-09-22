@@ -1071,11 +1071,6 @@ app.get("/admin/services", async (c) => {
             so.client_id, so.formation_order_id,
             so.created_at, so.paid_at, so.fulfilled_at,
             (so.ein_secret IS NOT NULL) AS has_secret,
-            (so.type = 's-election' AND EXISTS (
-              SELECT 1 FROM service_orders e
-              WHERE e.client_id = so.client_id AND e.type = 'ein'
-                AND e.status NOT IN ('fulfilled', 'cancelled')
-            )) AS ein_pending,
             cl.email AS client_email, cl.name AS client_name
      FROM service_orders so JOIN clients cl ON cl.id = so.client_id
      ORDER BY so.created_at DESC`,

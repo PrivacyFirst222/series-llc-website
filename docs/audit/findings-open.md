@@ -2,7 +2,7 @@
 
 GENERATED from docs/audit/ledger.json by `bun run docs/audit/ledger-print.ts list`. Do not edit: the commit step refuses a copy that differs from the ledger. The auditors' original files are unchanged under docs/audit/sources/ and docs/audit/runs/.
 
-398 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 64 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 386.
+412 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 78 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 400.
 
 A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.
 For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-session.ts. The historical coverage-check.ts alone does not establish complete prior-item reconciliation. Audit completion does not approve repairs or publication.
@@ -1131,7 +1131,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 
-## Client portal — 89 open of 89
+## Client portal — 90 open of 90
 
 - **115. [A47]** — **implemented**
   - Questionnaire and amendment error "We couldn't find a formed LLC on your account yet" where the check is for a paid order. Replace: "a paid order".
@@ -1826,8 +1826,19 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Fixed: batch 31 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
+- **AUD-claude-reconciled-batch33-reader-6-ra-cancel-route-comment. [housekeeping]** — **implemented** — housekeeping
+  - Server, the registered-agent cancellation route's docstring (no screen) — `webapp/server/routes-portal.ts:2556`
+  - Reads: /** Online cancellation of registered agent service — required by §501.165
+  -  *  because the service is accepted online. Recording the request is the
+  -  *  §9(g)(i) notice; the agency itself ends only when proof of a successor
+  -  *  designation arrives (handled by hand from the admin notification). */
+  - Claims: The Terms have a §9(g)(i), and our agency ends only when proof of a successor designation arrives.
+  - True: Terms 9(g) (terms.md:54) has no (i) sub-item, and it and 10(e) (terms.md:65) with Ruling 28 say that if replacement proof is missing by the renewal date we submit our resignation on that date and charge $99 — the agency also ends by resignation, and the daily job (renewals.ts:114) schedules it. The comment describes the pre-Batch-07 policy.
+  - Proposed replacement (not approved): /** Online cancellation of registered agent service — required by s. 501.165 because the service is accepted online. Recording the request is the Terms 9(g) notice; the agency ends when replacement proof arrives or, if none by the renewal date, when our resignation takes effect (Terms 9(g), 10(e); renewals.ts). */
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
 
-## Office — 33 open of 33
+## Office — 34 open of 34
 
 - **171. [A68]** — **implemented** — related: 184
   - Registered Agent Clients Card column (mine): no permission on the order shows "—", no amber. Replace: "no card — no permission on the order", amber.
@@ -2062,8 +2073,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. routes-admin:904 reads clients.ra_cancellation_requested_at; AdminDashboard:562–564 renders it. Portal route :2635 writes the legacy client column; ra-office:38–40 records email cancellations on orders only. Proposed subquery fixes the missing office event but still collapses multiple companies and drops an appointment whose ra_ended_date is set to a future effective date (ra-office filed action sets date +31). An IS NULL test is not equivalent to not ended yet.
   - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
+- **AUD-claude-reconciled-batch33-reader-5-ein-pending-per-client-unused. [housekeeping]** — **implemented** — housekeeping
+  - Office, Service orders list (GET /admin/services) — the ein_pending column — `webapp/server/routes-admin.ts:1054`
+  - Reads: (so.type = 's-election' AND EXISTS (
+  - Claims: An S election order is 'ein_pending' when the client has an open EIN order.
+  - True: Lines 1054-1058 match any open EIN order on the same client_id, not the same company or target (the defect shape Batch 02 fixed for sElectionPaid at :1094-1097), and nothing reads it: ServiceOrdersSection.tsx:54 only declares `ein_pending: boolean` and git grep finds no other use in webapp/src. The office screens use details.einPending instead (:192, :221). Dead, and wrong if ever used.
+  - Proposed replacement (not approved): Delete lines 1054-1058 and the `ein_pending: boolean;` field at ServiceOrdersSection.tsx:54; or, if wanted, scope it: `(so.type = 's-election' AND EXISTS (SELECT 1 FROM service_orders e WHERE e.client_id = so.client_id AND e.formation_order_id = so.formation_order_id AND e.type = 'ein' AND COALESCE(e.details->>'target','company') = 'company' AND e.status NOT IN ('fulfilled', 'cancelled'))) AS ein_pending,`
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).
 
-## Emails and jobs — 40 open of 41
+## Emails and jobs — 41 open of 42
 
 - **194. [A3]** — **implemented** — related: 212
   - Renewal notice timing (mine). renewals.ts NOTICE_DAYS = 45. Terms 9(d): notice 30–60 days before the cancellation deadline; deadline is renewal − 30 (9(g)); so notice must be 60–90 days before the date. Replace: 60.
@@ -2399,8 +2418,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. rowCounts is computed before document deletion filtering at157 and returned unchanged at164 after publishing the filtered snapshot. A deleted document therefore inflates the completed backup count. This is reporting mismatch, not proof of backup data loss. Historical runtime reports are corroborative; no current rerun claimed.
   - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
+- **AUD-claude-reconciled-batch33-reader-5-gift-card-branch-dead. [housekeeping]** — **implemented** — housekeeping
+  - Registered agent renewal notice email — the no-card paragraph's prepaid-card wording — `webapp/server/email.ts:113`
+  - Reads: ${opts.giftCard ? "An eligible card is required" : "No eligible card is on file"}
+  - Claims: The notice can say 'An eligible card is required' when the card on file was a prepaid card.
+  - True: The only caller, renewals.ts:126, passes `giftCard:false` unconditionally, so the first branch never prints; the giftCard parameter (:108) is dead since Batch 07 made a prepaid card refuse the purchase (ra-checkout.ts:56-64) and Batch 20 removed the gift-card email (prior 220). A card_status of 'gift_card' (renewals.ts:86) can no longer reach a formed order with our service.
+  - Proposed replacement (not approved): Drop the parameter: in email.ts:108 remove `giftCard: boolean;`, at :113 print `No eligible card is on file,` and in renewals.ts:126 remove `giftCard:false,`.
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).
 
-## Agreements and guidance — 89 open of 92
+## Agreements and guidance — 100 open of 103
 
 - **229. [A80]** — **implemented**
   - Manager-managed forms (4), Indemnification: "an act exceeding the authority conferred by Section 5.4"; 5.4 is the approval list, 5.3 the authority. Replace: "an act taken without the approval Section 5.4 requires" (both places).
@@ -3208,3 +3235,103 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Rechecked by Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a: Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim.
   - Fixed: batch 32 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-22 rejected r1: Standing authorization to advance revisions: declare the existing API assertion update for the approved exact contribution fractions.
+- **AUD-claude-reconciled-batch33-reader-2-walk-accepts-retired-submit-label. [housekeeping]** — **implemented** — housekeeping
+  - The browser walk, the final button click in every run (and the refused-signature click at :721) — `webapp/scripts/behavioral.ts:741`
+  - Reads: await page.locator("main button").filter({ hasText: /^(Continue to payment|Submit intake)$/ }).first().click();
+  - Claims: Clicks the form's final button.
+  - True: The regex still accepts 'Submit intake', the label prior item 77 retired (FloridaLLCFormationForm.tsx:739 now reads 'Continue to payment'). The walk would therefore pass unchanged if the old label came back; only batch09-walk.ts:28 asserts the exact new label.
+  - Proposed replacement (not approved): await page.locator("main button").filter({ hasText: /^Continue to payment$/ }).first().click();  (same at :721)
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-reconciled-batch33-reader-2-walk-placeholder-cannot-fail. [housekeeping]** — **implemented** — housekeeping
+  - The browser walk, run A's back-walk block — `webapp/scripts/behavioral.ts:687`
+  - Reads: expect((await page.locator("#client-first-name").inputValue().catch(() => "").then((v) => v)) !== "GONE", `${run.key}: placeholder`, null);
+  - Claims: Counted as one of the walk's checks.
+  - True: The first-name box can never hold the literal string "GONE", so the expectation is always true; it adds one passing check to the count (checks++ at :131) without testing anything. The intended check — that the typed name survives the back-walk — is not made here (the forward replay at :689-690 relies on validation passing, not on the value).
+  - Proposed replacement (not approved): expect((await page.locator("#client-first-name").inputValue()) === "Casey", `${run.key}: back-walk keeps the client's typed first name`, await page.locator("#client-first-name").inputValue());
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-reconciled-batch33-runtime-B-walk-label-year-from-formation. [housekeeping]** — **implemented** — housekeeping
+  - Behavioral walk, the renewal-date assertion on the portal's agent card — `webapp/scripts/behavioral.ts:1035`
+  - Reads:         expect(new RegExp(`renews on [A-Z][a-z]+ \\d{1,2}, ${nextYear}`).test(dash) && !/renews annually/.test(dash), "renewal: the portal's agent card names the renewal date a year from formation", dash.match(/registered agent service is active[^.]*\./)?.[0]);
+  - Claims: The renewal date is a year from formation.
+  - True: Terms 9(c) and ra-office.ts:37 set it a year from the recorded appointment; the walk records the appointment as today (behavioral.ts:998) and forms the company the same day, so the label cannot distinguish the two rules and describes the wrong one. Runtime: appointment 2024-02-29 → renewal 2025-02-28 → after the charge 2026-02-28 (renewal-cancel-and-replacement.md step 1).
+  - Proposed replacement (not approved): "renewal: the portal's agent card names the renewal date a year from the recorded appointment"
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-reconciled-batch33-reader-5-e2e-stale-renewal-comments. [housekeeping]** — **implemented** — housekeeping
+  - Server check suite — the comments introducing the registered-agent renewal section — `webapp/server/e2e.ts:3764`
+  - Reads: // The registered-agent renewal date is set at formation for a client who
+  - Claims: The renewal date is set at formation, and (line 3814) the notice goes '45 days out'.
+  - True: The checks beneath do the opposite: :3791 records the appointment through /admin/orders/:id/agent before forming, :3803 expects the renewal date one year from that appointment, :3823-3829 run the job at 61 and 60 days out and expect the notice at 60 (RA_NOTICE_DAYS = 60, Terms 9(d)). The comments at :3764-3766 and :3814 describe the pre-Batch-07 behaviour (formation-day date, 45-day notice) that priors 194 and 212 replaced; a reader of the suite is told the wrong rule.
+  - Proposed replacement (not approved): // The registered-agent renewal date is the anniversary of the appointment the office
+  - // records (Batch 07); it is shown to the client and named in the cancellation email.
+  - … and at 3814: //      payment, the notice 60 days out, the charge 15 days out, a decline
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-reconciled-batch33-reader-5-migration9-comment-renewal-date. [housekeeping]** — **implemented** — housekeeping
+  - Server database migrations — the comment above migration 9 — `webapp/server/db.ts:420`
+  - Reads: // record, and the registered-agent renewal date is stored when the company is
+  - Claims: The renewal date is stored when the company is formed.
+  - True: Since Batch 07 the date is stored when the office records the appointment (ra-office.ts:37, appointment + 1 year); the formation upload only copies it when an appointment date already exists (routes-admin.ts:809-817, 'The office records the actual appointment separately; never infer it from upload time'). The comment sits outside the frozen statement strings, so it can be corrected without touching the applied migration's checksum.
+  - Proposed replacement (not approved): // record, and the registered-agent renewal date column (set when the office records
+  - // our appointment — the anniversary of the appointment date) so the portal and the
+  - // cancellation email can show it.
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-reconciled-batch33-reader-5-notes-agent-fee-sentence. [housekeeping]** — **implemented** — housekeeping
+  - Chapter 605 reading notes, Administration section, the s. 605.2203(1) bullet — `webapp/server/chapter-605-notes.md:123`
+  - Reads: One agent covers everything. Supports charging no
+  -   separate registered agent designation fee.
+  - Claims: The statute supports charging no separate registered agent designation fee.
+  - True: Read on its own the sentence contradicts the current calculator, which the same file records at :273-275: 'now split the new-company fee into $100 for Articles under (2) plus $25 for the agent designation under (7)' (pricing.ts:75-81 prints 'FL state fee — registered agent designation'). The bullet's point is s. 605.2203(1) — one agent serves every protected series, so no designation fee is charged per series. The missing words 'per series' turn a correct note into one that reads as the retired 'No fee to designate a registered agent' instruction.
+  - Proposed replacement (not approved): One agent covers everything. Supports charging no
+  -   separate per-series registered agent designation fee (the company's own $25 designation fee under s. 605.0213(7) still applies).
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-reconciled-batch33-reader-5-pricing-comment-mailing-only. [housekeeping]** — **implemented** — housekeeping
+  - Server pricing constants — the comment on S_ELECTION_WINDOW_DAYS — `webapp/server/pricing.ts:25`
+  - Reads: election deadline for preparation, signing, and mailing. */
+  - Claims: The client mails the Form 2553 package.
+  - True: Batch 13's owner decision (facts.md:185) is 'Clients fax or mail Form 2553 themselves', and the package instructions and emails were changed to say 'faxing or mailing' (email.ts:385, :496, :513; prior 203). The comment still describes mailing only.
+  - Proposed replacement (not approved): election deadline for preparation, signing, and faxing or mailing. */
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-reconciled-batch33-statutes-0702-stale-note. [housekeeping]** — **implemented** — housekeeping
+  - Internal reading notes (webapp/server/chapter-605-notes.md), s. 605.0702 entries — `webapp/server/chapter-605-notes.md:482`
+  - Reads: and sale of interests." Our Article 13 buy-sell IS such a provision, but it
+  - Claims: Article 13 of the masters 'does not say so or cite s. 605.0702' (and line 546: 'Our Article 13 qualifies but never says so').
+  - True: At commit 4a344e2 all four multi-member masters carry s. 13.x(f): 'This Section is a deadlock sale provision within the meaning of s. 605.0702(2), Florida Statutes, providing for a purchase and sale of interests. Delivery of a Buy-Sell Offer under subsection (b) initiates this deadlock sale provision as of the date of delivery.' (templates-oa-member-s.md:346, templates-oa-member.md:332, templates-oa-multi.md:330, templates-oa-s.md:344). The note's 'drafting opportunity' has been taken; the note is stale. Evidence: evidence/statutes/605.0702-claims.md.
+  - Proposed replacement (not approved): Replace lines 482-484 with: 'Our Article 13 buy-sell IS such a provision, and s. 13.x(f) of each multi-member master now says so and fixes the initiation date (delivery of the Buy-Sell Offer).' Replace line 546 with: '**Our Article 13 qualifies and says so (s. 13.x(f)).**'
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-reconciled-batch33-reader-6-agent-signature-shadowed-messages. [housekeeping]** — **implemented** — housekeeping
+  - Order form, Registered agent acceptance screen — the message for a blank acceptance name or blank electronic signature — `webapp/server/validation.ts:280`
+  - Reads:       if (!(data.registeredAgentElectronicSignature ?? "").trim()) {
+  -         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["registeredAgentElectronicSignature"], message: "Electronic signature required" });
+  -       }
+  - Claims: A blank electronic signature is answered 'Electronic signature required'.
+  - True: Line 276 has already added 'Your electronic signature must match the registered agent name exactly: <name>' on the same path for the blank value, and FloridaLLCFormationForm.tsx:476-477 keeps the first issue per field; the same holds for 'Name required' at :270 versus :275. In the browser stepValidation.ts:254-258 overwrites the required message with the match message. So the two 'required' sentences are never shown; the client sees the match sentence, which is correct but makes :269-270 and :280-282 dead.
+  - Proposed replacement (not approved): Delete lines 280-282 (and 269-270), or guard the match checks with `else if` after the blank checks so each blank answers 'required' and each non-matching answer 'must match exactly'. Mirror the choice in stepValidation.ts:250-258.
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).
+- **AUD-claude-reconciled-batch33-reader-6-vercel-entry-bundle-comment. [housekeeping]** — **implemented** — housekeeping
+  - Server, the Vercel function source header comment (no screen) — `webapp/server/vercel-entry.ts:1`
+  - Reads: // Source for the Vercel function. `bun run build:api` bundles this (and every
+  - // dependency) into api/[[...route]].mjs — the deployed function is fully
+  - // self-contained, so runtime dependency resolution can never fail.
+  - Claims: The API bundle is written to api/[[...route]].mjs.
+  - True: package.json:13 build:api writes `--outfile=api/index.mjs`; vercel.json:2-6 rewrites /api/:path* to /api/index and :42-46 configures the function `api/index.mjs`; the api folder holds index.mjs only. The comment names a file that does not exist (the project CLAUDE.md carries the same stale name).
+  - Proposed replacement (not approved): // Source for the Vercel function. `bun run build:api` bundles this (and every
+  - // dependency) into api/index.mjs — the deployed function is fully
+  - // self-contained, so runtime dependency resolution can never fail.
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-reconciled-batch33-reader-6-webhook-signature-compare. [housekeeping]** — **implemented** — housekeeping
+  - Server, Square webhook signature check (no screen) — `webapp/server/square.ts:231`
+  - Reads: return expected === opts.signatureHeader;
+  - Claims: The signature is verified.
+  - True: It is, but with a plain string comparison: `expected === opts.signatureHeader` returns as soon as bytes differ, so the comparison time depends on how many leading characters match. Square's own guidance and node:crypto provide timingSafeEqual for HMAC checks. No functional failure today; hygiene.
+  - Proposed replacement (not approved): const a = Buffer.from(expected); const b = Buffer.from(opts.signatureHeader); return a.length === b.length && timingSafeEqual(a, b);  (import { timingSafeEqual } from "node:crypto")
+  - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
+  - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).

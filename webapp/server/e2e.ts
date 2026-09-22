@@ -3755,8 +3755,8 @@ if (mint.status === 200) {
   }
 }
 
-// The registered-agent renewal date is set at formation for a client who
-// took our service, shown to the client, and named in the cancellation
+// The registered-agent renewal date is based on the recorded appointment for
+// a client using our service, shown to the client, and named in the cancellation
 // email (Adam, 14 Sep 2026: "The date should be stored and shown in the
 // portal"). A company serving as Manager is offered to the questionnaire
 // as a company, so the signer question appears for it.
@@ -3805,7 +3805,7 @@ if (mint.status === 200) {
   const afterMe = ((await api("/api/portal/companies", { cookies: raPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === raId) as { raRenewalDate?: string | null; raService?: boolean } | undefined;
   check("the client is shown the same renewal date", afterMe?.raRenewalDate === det?.raRenewalDate, afterMe);
   // ---- Automatic renewal (16 Sep 2026): the card kept from the formation
-  //      payment, the notice 45 days out, the charge 15 days out, a decline
+  //      payment, the notice 70 days out, the charge 15 days out, a decline
   //      with its link, the link paid, and the office's view of it all.
   {
     const renewalDate = det?.raRenewalDate as string;

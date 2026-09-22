@@ -51,7 +51,6 @@ export interface AdminServiceOrder {
   paid_at: string | null;
   fulfilled_at: string | null;
   has_secret: boolean;
-  ein_pending: boolean;
   client_email: string;
   client_name: string;
 }

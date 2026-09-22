@@ -417,8 +417,8 @@ const MIGRATION_008_STATEMENTS: string[] = [
 ];
 
 // 9 (14 Sep 2026): the office's "Division rejected the filing" leaves a dated
-// record, and the registered-agent renewal date is stored when the company is
-// formed so the portal and the cancellation email can show it.
+// record, and adds storage for the registered-agent renewal date shown in the
+// portal and cancellation email. Current renewals are based on the recorded agent appointment date.
 const MIGRATION_009_STATEMENTS: string[] = [
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS rejected_at timestamptz`,
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_renewal_date date`,

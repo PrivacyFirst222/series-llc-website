@@ -28912,6 +28912,754 @@
           }
         }
       ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-2-walk-accepts-retired-submit-label",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding reader-2-walk-accepts-retired-submit-label",
+      "text": "The browser walk, the final button click in every run (and the refused-signature click at :721) — `webapp/scripts/behavioral.ts:741`\nReads: await page.locator(\"main button\").filter({ hasText: /^(Continue to payment|Submit intake)$/ }).first().click();\nClaims: Clicks the form's final button.\nTrue: The regex still accepts 'Submit intake', the label prior item 77 retired (FloridaLLCFormationForm.tsx:739 now reads 'Continue to payment'). The walk would therefore pass unchanged if the old label came back; only batch09-walk.ts:28 asserts the exact new label.\nProposed replacement (not approved): await page.locator(\"main button\").filter({ hasText: /^Continue to payment$/ }).first().click();  (same at :721)\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/behavioral.ts",
+                "text": "hasText: /^Continue to payment$/"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-2-walk-placeholder-cannot-fail",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding reader-2-walk-placeholder-cannot-fail",
+      "text": "The browser walk, run A's back-walk block — `webapp/scripts/behavioral.ts:687`\nReads: expect((await page.locator(\"#client-first-name\").inputValue().catch(() => \"\").then((v) => v)) !== \"GONE\", `${run.key}: placeholder`, null);\nClaims: Counted as one of the walk's checks.\nTrue: The first-name box can never hold the literal string \"GONE\", so the expectation is always true; it adds one passing check to the count (checks++ at :131) without testing anything. The intended check — that the typed name survives the back-walk — is not made here (the forward replay at :689-690 relies on validation passing, not on the value).\nProposed replacement (not approved): expect((await page.locator(\"#client-first-name\").inputValue()) === \"Casey\", `${run.key}: back-walk keeps the client's typed first name`, await page.locator(\"#client-first-name\").inputValue());\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/behavioral.ts",
+                "text": "back-walk preserves the saved first name"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-runtime-B-walk-label-year-from-formation",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding runtime-B-walk-label-year-from-formation",
+      "text": "Behavioral walk, the renewal-date assertion on the portal's agent card — `webapp/scripts/behavioral.ts:1035`\nReads:         expect(new RegExp(`renews on [A-Z][a-z]+ \\\\d{1,2}, ${nextYear}`).test(dash) && !/renews annually/.test(dash), \"renewal: the portal's agent card names the renewal date a year from formation\", dash.match(/registered agent service is active[^.]*\\./)?.[0]);\nClaims: The renewal date is a year from formation.\nTrue: Terms 9(c) and ra-office.ts:37 set it a year from the recorded appointment; the walk records the appointment as today (behavioral.ts:998) and forms the company the same day, so the label cannot distinguish the two rules and describes the wrong one. Runtime: appointment 2024-02-29 → renewal 2025-02-28 → after the charge 2026-02-28 (renewal-cancel-and-replacement.md step 1).\nProposed replacement (not approved): \"renewal: the portal's agent card names the renewal date a year from the recorded appointment\"\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/behavioral.ts",
+                "text": "renewal date a year from the recorded appointment"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-5-e2e-stale-renewal-comments",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding reader-5-e2e-stale-renewal-comments",
+      "text": "Server check suite — the comments introducing the registered-agent renewal section — `webapp/server/e2e.ts:3764`\nReads: // The registered-agent renewal date is set at formation for a client who\nClaims: The renewal date is set at formation, and (line 3814) the notice goes '45 days out'.\nTrue: The checks beneath do the opposite: :3791 records the appointment through /admin/orders/:id/agent before forming, :3803 expects the renewal date one year from that appointment, :3823-3829 run the job at 61 and 60 days out and expect the notice at 60 (RA_NOTICE_DAYS = 60, Terms 9(d)). The comments at :3764-3766 and :3814 describe the pre-Batch-07 behaviour (formation-day date, 45-day notice) that priors 194 and 212 replaced; a reader of the suite is told the wrong rule.\nProposed replacement (not approved): // The registered-agent renewal date is the anniversary of the appointment the office\n// records (Batch 07); it is shown to the client and named in the cancellation email.\n… and at 3814: //      payment, the notice 60 days out, the charge 15 days out, a decline\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/e2e.ts",
+                "text": "payment, the notice 70 days out"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-5-ein-pending-per-client-unused",
+      "tag": "housekeeping",
+      "area": "Office",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding reader-5-ein-pending-per-client-unused",
+      "text": "Office, Service orders list (GET /admin/services) — the ein_pending column — `webapp/server/routes-admin.ts:1054`\nReads: (so.type = 's-election' AND EXISTS (\nClaims: An S election order is 'ein_pending' when the client has an open EIN order.\nTrue: Lines 1054-1058 match any open EIN order on the same client_id, not the same company or target (the defect shape Batch 02 fixed for sElectionPaid at :1094-1097), and nothing reads it: ServiceOrdersSection.tsx:54 only declares `ein_pending: boolean` and git grep finds no other use in webapp/src. The office screens use details.einPending instead (:192, :221). Dead, and wrong if ever used.\nProposed replacement (not approved): Delete lines 1054-1058 and the `ein_pending: boolean;` field at ServiceOrdersSection.tsx:54; or, if wanted, scope it: `(so.type = 's-election' AND EXISTS (SELECT 1 FROM service_orders e WHERE e.client_id = so.client_id AND e.formation_order_id = so.formation_order_id AND e.type = 'ein' AND COALESCE(e.details->>'target','company') = 'company' AND e.status NOT IN ('fulfilled', 'cancelled'))) AS ein_pending,`\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/batch33-check.ts",
+                "text": "unused account-wide EIN flag removed"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "scripts/batch33-check.ts"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-5-gift-card-branch-dead",
+      "tag": "housekeeping",
+      "area": "Emails and jobs",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding reader-5-gift-card-branch-dead",
+      "text": "Registered agent renewal notice email — the no-card paragraph's prepaid-card wording — `webapp/server/email.ts:113`\nReads: ${opts.giftCard ? \"An eligible card is required\" : \"No eligible card is on file\"}\nClaims: The notice can say 'An eligible card is required' when the card on file was a prepaid card.\nTrue: The only caller, renewals.ts:126, passes `giftCard:false` unconditionally, so the first branch never prints; the giftCard parameter (:108) is dead since Batch 07 made a prepaid card refuse the purchase (ra-checkout.ts:56-64) and Batch 20 removed the gift-card email (prior 220). A card_status of 'gift_card' (renewals.ts:86) can no longer reach a formed order with our service.\nProposed replacement (not approved): Drop the parameter: in email.ts:108 remove `giftCard: boolean;`, at :113 print `No eligible card is on file,` and in renewals.ts:126 remove `giftCard:false,`.\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/batch33-check.ts",
+                "text": "renewal notice preserves no-card wording"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "scripts/batch33-check.ts"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-5-migration9-comment-renewal-date",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding reader-5-migration9-comment-renewal-date",
+      "text": "Server database migrations — the comment above migration 9 — `webapp/server/db.ts:420`\nReads: // record, and the registered-agent renewal date is stored when the company is\nClaims: The renewal date is stored when the company is formed.\nTrue: Since Batch 07 the date is stored when the office records the appointment (ra-office.ts:37, appointment + 1 year); the formation upload only copies it when an appointment date already exists (routes-admin.ts:809-817, 'The office records the actual appointment separately; never infer it from upload time'). The comment sits outside the frozen statement strings, so it can be corrected without touching the applied migration's checksum.\nProposed replacement (not approved): // record, and the registered-agent renewal date column (set when the office records\n// our appointment — the anniversary of the appointment date) so the portal and the\n// cancellation email can show it.\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/db.ts",
+                "text": "Current renewals are based on the recorded agent appointment date."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-5-notes-agent-fee-sentence",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding reader-5-notes-agent-fee-sentence",
+      "text": "Chapter 605 reading notes, Administration section, the s. 605.2203(1) bullet — `webapp/server/chapter-605-notes.md:123`\nReads: One agent covers everything. Supports charging no\n  separate registered agent designation fee.\nClaims: The statute supports charging no separate registered agent designation fee.\nTrue: Read on its own the sentence contradicts the current calculator, which the same file records at :273-275: 'now split the new-company fee into $100 for Articles under (2) plus $25 for the agent designation under (7)' (pricing.ts:75-81 prints 'FL state fee — registered agent designation'). The bullet's point is s. 605.2203(1) — one agent serves every protected series, so no designation fee is charged per series. The missing words 'per series' turn a correct note into one that reads as the retired 'No fee to designate a registered agent' instruction.\nProposed replacement (not approved): One agent covers everything. Supports charging no\n  separate per-series registered agent designation fee (the company's own $25 designation fee under s. 605.0213(7) still applies).\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/chapter-605-notes.md",
+                "text": "additional registered agent designation fee for each protected series"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-5-pricing-comment-mailing-only",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding reader-5-pricing-comment-mailing-only",
+      "text": "Server pricing constants — the comment on S_ELECTION_WINDOW_DAYS — `webapp/server/pricing.ts:25`\nReads: election deadline for preparation, signing, and mailing. */\nClaims: The client mails the Form 2553 package.\nTrue: Batch 13's owner decision (facts.md:185) is 'Clients fax or mail Form 2553 themselves', and the package instructions and emails were changed to say 'faxing or mailing' (email.ts:385, :496, :513; prior 203). The comment still describes mailing only.\nProposed replacement (not approved): election deadline for preparation, signing, and faxing or mailing. */\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/pricing.ts",
+                "text": "preparation, signing, and faxing or mailing."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-statutes-0702-stale-note",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding statutes-0702-stale-note",
+      "text": "Internal reading notes (webapp/server/chapter-605-notes.md), s. 605.0702 entries — `webapp/server/chapter-605-notes.md:482`\nReads: and sale of interests.\" Our Article 13 buy-sell IS such a provision, but it\nClaims: Article 13 of the masters 'does not say so or cite s. 605.0702' (and line 546: 'Our Article 13 qualifies but never says so').\nTrue: At commit 4a344e2 all four multi-member masters carry s. 13.x(f): 'This Section is a deadlock sale provision within the meaning of s. 605.0702(2), Florida Statutes, providing for a purchase and sale of interests. Delivery of a Buy-Sell Offer under subsection (b) initiates this deadlock sale provision as of the date of delivery.' (templates-oa-member-s.md:346, templates-oa-member.md:332, templates-oa-multi.md:330, templates-oa-s.md:344). The note's 'drafting opportunity' has been taken; the note is stale. Evidence: evidence/statutes/605.0702-claims.md.\nProposed replacement (not approved): Replace lines 482-484 with: 'Our Article 13 buy-sell IS such a provision, and s. 13.x(f) of each multi-member master now says so and fixes the initiation date (delivery of the Buy-Sell Offer).' Replace line 546 with: '**Our Article 13 qualifies and says so (s. 13.x(f)).**'\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/chapter-605-notes.md",
+                "text": "All four multi-member masters identify Section 13.2"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-6-agent-signature-shadowed-messages",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding reader-6-agent-signature-shadowed-messages",
+      "text": "Order form, Registered agent acceptance screen — the message for a blank acceptance name or blank electronic signature — `webapp/server/validation.ts:280`\nReads:       if (!(data.registeredAgentElectronicSignature ?? \"\").trim()) {\n        ctx.addIssue({ code: z.ZodIssueCode.custom, path: [\"registeredAgentElectronicSignature\"], message: \"Electronic signature required\" });\n      }\nClaims: A blank electronic signature is answered 'Electronic signature required'.\nTrue: Line 276 has already added 'Your electronic signature must match the registered agent name exactly: <name>' on the same path for the blank value, and FloridaLLCFormationForm.tsx:476-477 keeps the first issue per field; the same holds for 'Name required' at :270 versus :275. In the browser stepValidation.ts:254-258 overwrites the required message with the match message. So the two 'required' sentences are never shown; the client sees the match sentence, which is correct but makes :269-270 and :280-282 dead.\nProposed replacement (not approved): Delete lines 280-282 (and 269-270), or guard the match checks with `else if` after the blank checks so each blank answers 'required' and each non-matching answer 'must match exactly'. Mirror the choice in stepValidation.ts:250-258.\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/scripts/batch33-check.ts",
+                "text": "blank agent fields show only required errors"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "scripts/batch33-check.ts"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-6-ra-cancel-route-comment",
+      "tag": "housekeeping",
+      "area": "Client portal",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding reader-6-ra-cancel-route-comment",
+      "text": "Server, the registered-agent cancellation route's docstring (no screen) — `webapp/server/routes-portal.ts:2556`\nReads: /** Online cancellation of registered agent service — required by §501.165\n *  because the service is accepted online. Recording the request is the\n *  §9(g)(i) notice; the agency itself ends only when proof of a successor\n *  designation arrives (handled by hand from the admin notification). */\nClaims: The Terms have a §9(g)(i), and our agency ends only when proof of a successor designation arrives.\nTrue: Terms 9(g) (terms.md:54) has no (i) sub-item, and it and 10(e) (terms.md:65) with Ruling 28 say that if replacement proof is missing by the renewal date we submit our resignation on that date and charge $99 — the agency also ends by resignation, and the daily job (renewals.ts:114) schedules it. The comment describes the pre-Batch-07 policy.\nProposed replacement (not approved): /** Online cancellation of registered agent service — required by s. 501.165 because the service is accepted online. Recording the request is the Terms 9(g) notice; the agency ends when replacement proof arrives or, if none by the renewal date, when our resignation takes effect (Terms 9(g), 10(e); renewals.ts). */\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/routes-portal.ts",
+                "text": "Submitting a resignation is distinct from its taking effect."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-6-vercel-entry-bundle-comment",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding reader-6-vercel-entry-bundle-comment",
+      "text": "Server, the Vercel function source header comment (no screen) — `webapp/server/vercel-entry.ts:1`\nReads: // Source for the Vercel function. `bun run build:api` bundles this (and every\n// dependency) into api/[[...route]].mjs — the deployed function is fully\n// self-contained, so runtime dependency resolution can never fail.\nClaims: The API bundle is written to api/[[...route]].mjs.\nTrue: package.json:13 build:api writes `--outfile=api/index.mjs`; vercel.json:2-6 rewrites /api/:path* to /api/index and :42-46 configures the function `api/index.mjs`; the api folder holds index.mjs only. The comment names a file that does not exist (the project CLAUDE.md carries the same stale name).\nProposed replacement (not approved): // Source for the Vercel function. `bun run build:api` bundles this (and every\n// dependency) into api/index.mjs — the deployed function is fully\n// self-contained, so runtime dependency resolution can never fail.\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/vercel-entry.ts",
+                "text": "dependency) into api/index.mjs"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-6-webhook-signature-compare",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch33.json finding reader-6-webhook-signature-compare",
+      "text": "Server, Square webhook signature check (no screen) — `webapp/server/square.ts:231`\nReads: return expected === opts.signatureHeader;\nClaims: The signature is verified.\nTrue: It is, but with a plain string comparison: `expected === opts.signatureHeader` returns as soon as bytes differ, so the comparison time depends on how many leading characters match. Square's own guidance and node:crypto provide timingSafeEqual for HMAC checks. No functional failure today; hygiene.\nProposed replacement (not approved): const a = Buffer.from(expected); const b = Buffer.from(opts.signatureHeader); return a.length === b.length && timingSafeEqual(a, b);  (import { timingSafeEqual } from \"node:crypto\")\nRechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T22:16:37.119233+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch33 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T22:17:45.335Z",
+              "event": "assigned",
+              "batch": "33",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T22:19:23.837Z",
+              "event": "implemented",
+              "batch": "33",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "33",
+          "fix": {
+            "batch": "33",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/square.ts",
+                "text": "timingSafeEqual(expectedBytes, suppliedBytes)"
+              },
+              {
+                "kind": "present",
+                "file": "webapp/package.json",
+                "text": "scripts/batch33-check.ts"
+              }
+            ]
+          }
+        }
+      ]
     }
   ],
   "rulings": [
@@ -30435,6 +31183,25 @@
           "event": "implemented"
         }
       ]
+    },
+    {
+      "id": "33",
+      "revision": 1,
+      "frozenHash": "4b8659b8f3cfe85796aafcfc31deb292f7bd94118390f6e45749ddd4dbfa0fd1",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "3a72f468f54a1ca96de23ddf5587f327fda09e32",
+      "history": [
+        {
+          "at": "2026-09-22T22:17:45.336Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-22T22:19:23.837Z",
+          "event": "implemented"
+        }
+      ]
     }
   ],
   "auditImports": [
@@ -30461,6 +31228,10 @@
     {
       "path": "docs/audit/intakes/claude-reconciled-batch32.json",
       "sha": "4d838e70cc1eac1d9757ba939608002c4915652d977ed70b6d12150f65eafed6"
+    },
+    {
+      "path": "docs/audit/intakes/claude-reconciled-batch33.json",
+      "sha": "6ffc49d105650b8b2ea7ce547dff610d79b73113e58c3770842266225fed68cb"
     }
   ]
 }

@@ -25507,8 +25507,8 @@ var require_timing_safe_equal = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var node_crypto_1 = __require("node:crypto");
-    var timingSafeEqual2 = node_crypto_1.timingSafeEqual;
-    exports.default = timingSafeEqual2;
+    var timingSafeEqual3 = node_crypto_1.timingSafeEqual;
+    exports.default = timingSafeEqual3;
   }
 });
 
@@ -98838,7 +98838,7 @@ function decryptSecret(stored) {
 
 // server/square.ts
 init_env();
-import { createHash as createHash4, randomBytes as randomBytes3 } from "node:crypto";
+import { createHash as createHash4, randomBytes as randomBytes3, timingSafeEqual as timingSafeEqual2 } from "node:crypto";
 
 // ../../../../Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/utils/url.js
 var splitPath = (path) => {
@@ -99433,7 +99433,9 @@ function verifyWebhookSignature(opts) {
     env.SQUARE_WEBHOOK_SIGNATURE_KEY,
     opts.notificationUrl + opts.rawBody
   );
-  return expected === opts.signatureHeader;
+  const expectedBytes = Buffer.from(expected, "utf8");
+  const suppliedBytes = Buffer.from(opts.signatureHeader, "utf8");
+  return expectedBytes.length === suppliedBytes.length && timingSafeEqual2(expectedBytes, suppliedBytes);
 }
 async function agentSquarePayment(action, opts) {
   if (!env.SQUARE_ACCESS_TOKEN) {
@@ -99588,7 +99590,7 @@ function welcomeEmail(name, setPasswordUrl, isConversion = false, raService = tr
 }
 function raRenewalNoticeEmail(opts) {
   const how = opts.billingHold ? `<p>Your renewal notice was delayed. The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. Automatic charging is on hold; please contact us to resolve the renewal. You may also pay now using <a href="${opts.linkUrl}">this payment link</a>.</p>` : opts.last4 ? `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong> and will be charged to your card ending
-      <strong>${escapeHtml(opts.last4)}</strong> on <strong>${escapeHtml(opts.chargeDate)}</strong>. There is nothing you need to do.</p>` : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. ${opts.giftCard ? "An eligible card is required" : "No eligible card is on file"},
+      <strong>${escapeHtml(opts.last4)}</strong> on <strong>${escapeHtml(opts.chargeDate)}</strong>. There is nothing you need to do.</p>` : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. No eligible card is on file,
       so please pay it by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below. Paying with a credit or debit
       card keeps that card for the following years, so the renewal is automatic from then on.</p>
       <p><a href="${opts.linkUrl ?? "#"}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the renewal</a></p>`;
@@ -100622,8 +100624,8 @@ var extendedFormSchema = formationFormSchema.extend({
       ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: FIRST_AND_LAST });
     }
     const expected = registeredAgentName(data);
-    if ((data.registeredAgentAcceptanceName ?? "").trim() !== expected) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: `The acceptance name must match the registered agent name exactly: ${expected}` });
-    if ((data.registeredAgentElectronicSignature ?? "").trim() !== expected) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentElectronicSignature"], message: `Your electronic signature must match the registered agent name exactly: ${expected}` });
+    if ((data.registeredAgentAcceptanceName ?? "").trim() && hasFirstAndLast(data.registeredAgentAcceptanceName ?? "") && (data.registeredAgentAcceptanceName ?? "").trim() !== expected) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentAcceptanceName"], message: `The acceptance name must match the registered agent name exactly: ${expected}` });
+    if ((data.registeredAgentElectronicSignature ?? "").trim() && (data.registeredAgentElectronicSignature ?? "").trim() !== expected) ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentElectronicSignature"], message: `Your electronic signature must match the registered agent name exactly: ${expected}` });
     if (data.registeredAgentAcceptanceCheckbox !== true) {
       ctx.addIssue({ code: external_exports.ZodIssueCode.custom, path: ["registeredAgentAcceptanceCheckbox"], message: "Acceptance is required." });
     }
@@ -101174,7 +101176,7 @@ async function runRenewals(today) {
       if (row.status === "notice_pending") {
         const link = await agentCheckoutLink("renewal", row.id);
         const late2 = row.purpose === "renewal" && today > addDays(date2, -RA_MIN_NOTICE_DAYS);
-        const mail = row.purpose === "resignation" ? { subject: `Registered-agent resignation due \u2014 ${o.llc_name}`, html: `<p>Your timely cancellation has reached its renewal date without replacement proof. A $99 charge for state filing fees and processing is due. This does not purchase another service year. The office must submit the resignation; this notice does not confirm filing.</p><p><a href="${link}">Pay now</a></p>` } : raRenewalNoticeEmail({ name: o.contact_name, llcName: o.llc_name, renewalDate: longDate(date2), amount: raRenewalFeeWords(), last4: hasCard ? o.card_last4 : null, chargeDate: longDate(addDays(date2, -RA_CHARGE_DAYS)), cancelBy: longDate(addDays(date2, -RA_CANCEL_DAYS)), linkUrl: link, giftCard: false, billingHold: late2 });
+        const mail = row.purpose === "resignation" ? { subject: `Registered-agent resignation due \u2014 ${o.llc_name}`, html: `<p>Your timely cancellation has reached its renewal date without replacement proof. A $99 charge for state filing fees and processing is due. This does not purchase another service year. The office must submit the resignation; this notice does not confirm filing.</p><p><a href="${link}">Pay now</a></p>` } : raRenewalNoticeEmail({ name: o.contact_name, llcName: o.llc_name, renewalDate: longDate(date2), amount: raRenewalFeeWords(), last4: hasCard ? o.card_last4 : null, chargeDate: longDate(addDays(date2, -RA_CHARGE_DAYS)), cancelBy: longDate(addDays(date2, -RA_CANCEL_DAYS)), linkUrl: link, billingHold: late2 });
         try {
           await sendMail({ to: await currentAgentNoticeEmail(db, o.id), ...mail });
           await db.query("UPDATE ra_renewals SET status=$2,notice_sent_at=$3,billing_hold=$4,notice_error=NULL,link_url=$5 WHERE id=$1", [row.id, hasCard ? "notice_sent" : "link_sent", `${today}T12:00:00Z`, late2, link]);
@@ -113459,11 +113461,6 @@ function registerAdminRoutes(app2) {
             so.client_id, so.formation_order_id,
             so.created_at, so.paid_at, so.fulfilled_at,
             (so.ein_secret IS NOT NULL) AS has_secret,
-            (so.type = 's-election' AND EXISTS (
-              SELECT 1 FROM service_orders e
-              WHERE e.client_id = so.client_id AND e.type = 'ein'
-                AND e.status NOT IN ('fulfilled', 'cancelled')
-            )) AS ein_pending,
             cl.email AS client_email, cl.name AS client_name
      FROM service_orders so JOIN clients cl ON cl.id = so.client_id
      ORDER BY so.created_at DESC`
