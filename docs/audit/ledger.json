@@ -19383,9 +19383,29 @@
               "batch": "30",
               "revision": 2,
               "note": "Automatic revision under Adam’s standing authorization: combine the preserved office assertion into the new regression check so the baseline proof tests the new defect, without requiring an already-fixed office test to fail."
+            },
+            {
+              "at": "2026-09-22T07:08:54.886Z",
+              "event": "superseded by approved replacement",
+              "batch": "30",
+              "revision": 3,
+              "note": "prior fix 02 r1 at ; approved work order 89553dc2808b2de71117445c52058545007d2ae7a28662057be4aa7fca5d6272"
+            },
+            {
+              "at": "2026-09-22T07:08:54.887Z",
+              "event": "assigned",
+              "batch": "30",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-22T07:08:54.910Z",
+              "event": "implemented",
+              "batch": "30",
+              "revision": 3,
+              "note": "by Codex"
             }
           ],
-          "batch": "02",
+          "batch": "30",
           "supersessions": [
             {
               "prior": {
@@ -19424,18 +19444,37 @@
               "batch": "30",
               "revision": 2,
               "hash": "9f116dbefaf4537acb16be86448bf0e8e85c7d9423092946490e28d823598f43"
+            },
+            {
+              "prior": {
+                "batch": "02",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "server",
+                    "label": "batch02 N1.07: EIN tax instructions do not borrow another entity election"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "30",
+              "revision": 3,
+              "hash": "89553dc2808b2de71117445c52058545007d2ae7a28662057be4aa7fca5d6272"
             }
           ],
           "fix": {
-            "batch": "02",
-            "revision": 1,
+            "batch": "30",
+            "revision": 3,
             "commit": "",
             "doneBy": "Codex",
             "assertions": [
               {
                 "kind": "check",
                 "suite": "server",
-                "label": "batch02 N1.07: EIN tax instructions do not borrow another entity election"
+                "label": "batch30 C03"
               }
             ]
           }
@@ -26938,7 +26977,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -26978,8 +27017,35 @@
               "batch": "30",
               "revision": 2,
               "note": "Automatic revision under Adam’s standing authorization: combine the preserved office assertion into the new regression check so the baseline proof tests the new defect, without requiring an already-fixed office test to fail."
+            },
+            {
+              "at": "2026-09-22T07:08:54.886Z",
+              "event": "assigned",
+              "batch": "30",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-22T07:08:54.910Z",
+              "event": "implemented",
+              "batch": "30",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "30",
+          "fix": {
+            "batch": "30",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch30 C01"
+              }
+            ]
+          }
         }
       ]
     },
@@ -26998,7 +27064,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -27038,8 +27104,35 @@
               "batch": "30",
               "revision": 2,
               "note": "Automatic revision under Adam’s standing authorization: combine the preserved office assertion into the new regression check so the baseline proof tests the new defect, without requiring an already-fixed office test to fail."
+            },
+            {
+              "at": "2026-09-22T07:08:54.886Z",
+              "event": "assigned",
+              "batch": "30",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-22T07:08:54.910Z",
+              "event": "implemented",
+              "batch": "30",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "30",
+          "fix": {
+            "batch": "30",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch30 C02"
+              }
+            ]
+          }
         }
       ]
     }
@@ -28374,6 +28467,25 @@
           "at": "2026-09-22T07:07:50.248Z",
           "event": "rejected by Adam",
           "note": "Adam's record of 2026-09-22T07:07 (terminal): Automatic revision under Adam’s standing authorization: combine the preserved office assertion into the new regression check so the baseline proof tests the new defect, without requiring an already-fixed office test to fail."
+        }
+      ]
+    },
+    {
+      "id": "30",
+      "revision": 3,
+      "frozenHash": "89553dc2808b2de71117445c52058545007d2ae7a28662057be4aa7fca5d6272",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "835aff445f27531b0972f057514ce2b4cb37b993",
+      "history": [
+        {
+          "at": "2026-09-22T07:08:54.887Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-22T07:08:54.910Z",
+          "event": "implemented"
         }
       ]
     }

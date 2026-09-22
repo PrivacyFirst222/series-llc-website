@@ -3937,6 +3937,7 @@ if (mint.status === 200) {
 
 const batch02Results = new Map<string, {ok:boolean; detail?:unknown}>();
 await batch02Checks((label,ok,detail)=>batch02Results.set(label,{ok,detail}));
+const batch30OfficeTax = batch02Results.get("batch02 N1.07: EIN tax instructions do not borrow another entity election");
 const batch02Result = (label:string) => { const result=batch02Results.get(label);batch02Results.delete(label);return result ?? {ok:false,detail:"The Batch 02 probe did not run"}; };
 { const result=batch02Result("batch02 N1.04: S-election copies use their own company address");check("batch02 N1.04: S-election copies use their own company address",result.ok,result.detail); }
 { const result=batch02Result("batch02 N1.05: agreement series belong to the selected company");check("batch02 N1.05: agreement series belong to the selected company",result.ok,result.detail); }
@@ -4117,7 +4118,7 @@ const batch30Results=new Map<string,{ok:boolean;detail?:unknown}>();
 await batch30Checks((label,ok,detail)=>batch30Results.set(label,{ok,detail}));
 {const r=batch30Results.get("batch30 C01");check("batch30 C01",r?.ok===true,r?.detail);}
 {const r=batch30Results.get("batch30 C02");check("batch30 C02",r?.ok===true,r?.detail);}
-{const r=batch30Results.get("batch30 C03");check("batch30 C03",r?.ok===true,r?.detail);}
+{const r=batch30Results.get("batch30 C03");check("batch30 C03",r?.ok===true&&batch30OfficeTax?.ok===true,{portal:r?.detail,office:batch30OfficeTax});}
 const {batch29Checks}=await import("./batch29-check");
 const batch29Results=new Map<string,{ok:boolean;detail?:unknown}>();
 await batch29Checks((label,ok,detail)=>batch29Results.set(label,{ok,detail}));

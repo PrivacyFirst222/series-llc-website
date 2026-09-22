@@ -1755,7 +1755,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
   - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
-- **AUD-claude-reconciled-batch30-reader-6-amendment-latest-generation. [substantive]** — **open** — waits on Adam's ruling
+- **AUD-claude-reconciled-batch30-reader-6-amendment-latest-generation. [substantive]** — **implemented** — waits on Adam's ruling
   - Client portal, Amend your operating agreement — which agreement the amendment's parties and recitals come from — `webapp/server/routes-portal.ts:1733`
   - Reads:   const current = await db.query<{ inputs: unknown }>(
   -     `SELECT inputs FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1`,
@@ -1766,9 +1766,10 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Add `generationId: z.string().uuid()` to amendSchema; load `SELECT inputs FROM oa_generations WHERE id = $1 AND client_id = $2 AND order_id = $3` with [a.generationId, session.clientId, seed.orderId] and refuse with "Choose the agreement you are amending." when absent; the form offers the same generation list the restatement uses, defaulting the confirmed date from the chosen generation. (Design follows Rulings 137/N3.10; the exact wording needs Adam's ruling.)
   - Rechecked by Codex reconciliation of Claude independent evidence: Reopened at 835aff4; original evidence retained in batches/30/evidence/reconciled-source.json. Ask which company-specific agreement supplies the amendment parties and confirm the effective date for that selection. Do not infer adoption from recency. Reject another company’s selection and explicitly handle outside/legacy predecessors.
   - Ruling, 2026-09-22: Approved Batch30 proposal: explicitly select the company agreement, show its parties and confirm its effective date; stop if the required agreement is unavailable. Go. Approve all.
+  - Fixed: batch 30 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Automatic revision under Adam’s standing authorization: declare the consent assertion replacement and joint-signature pagination support.
   - 2026-09-22 rejected r2: Automatic revision under Adam’s standing authorization: combine the preserved office assertion into the new regression check so the baseline proof tests the new defect, without requiring an already-fixed office test to fail.
-- **AUD-claude-reconciled-batch30-runtime-A-consent-from-draft. [substantive]** — **open** — waits on Adam's ruling
+- **AUD-claude-reconciled-batch30-runtime-A-consent-from-draft. [substantive]** — **implemented** — waits on Adam's ruling
   - Client portal → Orders in progress / Your documents → Consent & Series Exhibit (the series consent's members and signature blocks), and the S-election form's owner dropdown — versus Amendment to Operating Agreement (its MEMBERS blocks) — `webapp/server/routes-portal.ts:1594`
   - Reads:   const savedForSeries = await savedOaAnswers(session.clientId, consentCompanyId);
   -   const seriesOwners = effectiveOwners(seed.members, savedForSeries);
@@ -1778,6 +1779,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): In app.post("/portal/series/consent") derive the owners and Managers the way the amendment does: read the most recent oa_generations row for the company (`SELECT inputs FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1`) and take `memberNames` from `inputs.members` (each member's `signatories ?? [name]`, with `entitySigner` for entity owners) and `managerNames`/`managerEntitySigners` from the inputs; fall back to `savedOaAnswers` only when no agreement has been generated, and say so in the dialog (OrdersInProgress.tsx, the Consent & Series Exhibit description) — or, if Adam prefers the draft, make the dialog state that the consent names the owners as currently answered in the questionnaire and that the agreement on file must be regenerated to match. Ruling needed: which record is the source of the members for a signed consent.
   - Rechecked by Codex reconciliation of Claude independent evidence: Reopened at 835aff4; original evidence retained in batches/30/evidence/reconciled-source.json. Show the members/managers the consent will name and require the user to confirm the current authorized parties, using an explicitly selected source. Preserve entity/joint signers. Do not tell users regeneration alone changes legal ownership or fixes adoption.
   - Ruling, 2026-09-22: Approved Batch30 proposal: select an agreement supplying current members/managers, display and confirm them, preserve entity and joint signatures. Go. Approve all.
+  - Fixed: batch 30 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Automatic revision under Adam’s standing authorization: declare the consent assertion replacement and joint-signature pagination support.
   - 2026-09-22 rejected r2: Automatic revision under Adam’s standing authorization: combine the preserved office assertion into the new regression check so the baseline proof tests the new defect, without requiring an already-fixed office test to fail.
 
@@ -1944,11 +1946,13 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: Derive tax classification from the EIN target entity and its actual intended tax treatment. For a company target, match any supporting S-election order by formation_order_id; do not infer the classification of a series from a package purchased for the parent or another company.
   - Previous fix: 02 r1, commit ; 1 assertion(s) retained. Replacement attempt: 30 r1, work order a9d1dd44e9885c7273f956a1cccf4347d3626dc42e7ea293a0918418ffc28ab8.
   - Previous fix: 02 r1, commit ; 1 assertion(s) retained. Replacement attempt: 30 r2, work order 9f116dbefaf4537acb16be86448bf0e8e85c7d9423092946490e28d823598f43.
-  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Previous fix: 02 r1, commit ; 1 assertion(s) retained. Replacement attempt: 30 r3, work order 89553dc2808b2de71117445c52058545007d2ae7a28662057be4aa7fca5d6272.
+  - Fixed: batch 30 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 superseded by approved replacement: prior fix 02 r1 at ; approved work order a9d1dd44e9885c7273f956a1cccf4347d3626dc42e7ea293a0918418ffc28ab8
   - 2026-09-22 rejected r1: Automatic revision under Adam’s standing authorization: declare the consent assertion replacement and joint-signature pagination support.
   - 2026-09-22 superseded by approved replacement: prior fix 02 r1 at ; approved work order 9f116dbefaf4537acb16be86448bf0e8e85c7d9423092946490e28d823598f43
   - 2026-09-22 rejected r2: Automatic revision under Adam’s standing authorization: combine the preserved office assertion into the new regression check so the baseline proof tests the new defect, without requiring an already-fixed office test to fail.
+  - 2026-09-22 superseded by approved replacement: prior fix 02 r1 at ; approved work order 89553dc2808b2de71117445c52058545007d2ae7a28662057be4aa7fca5d6272
 - **N1.14. [substantive]** — **implemented**
   - Office, replacing a formed package; client's Statement of Authorized Representative — `webapp/server/routes-admin.ts:774`
   - Reads: // If the new package fails partway, undo whatever of it landed — rows

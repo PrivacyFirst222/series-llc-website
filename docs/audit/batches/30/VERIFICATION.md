@@ -17,3 +17,5 @@ The former assertion “consent: a company or trust owner with no signer is refu
 ## Limits
 
 Tests use isolated offline databases and mock external services. This is implementation evidence, not legal adoption of an agreement, live-service verification, acceptance or publication. Existing masters are unchanged. Explicit agreement selection does not support an outside agreement or an unassigned legacy copy.
+
+Revision 3 combines the preserved Batch02 office-tax result and new portal result in C03. The original office test remains unchanged and must pass; the baseline fails C03 specifically on the new portal defect. This avoids demanding that an earlier completed repair fail on the baseline. Rejection bookkeeping was committed through the normal hook as a records-only transition, followed by authorization of revision 3.
