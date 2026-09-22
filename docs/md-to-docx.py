@@ -390,6 +390,8 @@ def drafting_choices(md):
             raw = md[start.end():end.start()]
             body = render(start.end(), end.start())
             table = md[md.rfind("\n", 0, start.start()) + 1:start.start()].lstrip().startswith("|")
+            if table:
+                label = {"holding": "If joint", "couple": "If spouses", "purpose": "If additional purpose"}.get(subject, label)
             block = not table and ("\n" in raw or len(re.sub(r"<!--.*?-->", "", raw, flags=re.S)) > 100)
             if block:
                 out.append("\n\n" + annotation("[" + label + ":]") + "\n" + body.strip() +
