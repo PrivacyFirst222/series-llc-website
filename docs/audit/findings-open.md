@@ -699,7 +699,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (housekeeping-only): StepSubmissionPayload.tsx:56–58 promises the agreement with filed documents, but the submit page is unreachable through the normal form flow (65). No current reader sees this page.
   - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
-- **90. [B52]** — **implemented** — waits on Adam's ruling
+- **90. [B52]** — **open** — waits on Adam's ruling
   - Name check result, the "held" verdict line — `webapp/src/components/forms/florida-llc/NameCheck.tsx:45`
   - Reads: Unavailable — this name belongs to a recently dissolved company, and Florida protects it for up to a year. Please choose a different name.
   - Claims: Florida protects a dissolved company's name for up to a year.
@@ -709,9 +709,9 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - **Codex rejected the proposed replacement:** Describe a recently inactive record and this service’s conservative one-year hold; distinguish statutory administrative and other dissolution periods and avoid treating last transaction as proven dissolution.
   - Corrected after Codex's review: Do not assert a dissolution the data does not prove. Describe a recently inactive record and this service's one-year hold; cite s. 605.0715(5) and s. 605.0717(2).
   - Ruling, 2026-09-22: Keep the conservative inactive-name block; describe a recently inactive record without claiming the record proves dissolution. Apply consistently to the client and server explanations.
-  - Fixed: batch 29 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
+  - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
 - **91. [B55]** — **implemented**
   - Order form, Series step (and the portal's add-a-series service): the identifier rule — `webapp/src/components/forms/florida-llc/validation.ts:224`
   - Reads: return /protected\s+series/i.test(name) || /(^|\s)p\.?s\.?(\s|$)/i.test(name);
@@ -761,7 +761,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Part "title" — implemented: The banner title on the existing-LLC path. (waits on ruling:82)
   - Fixed (title): batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
-- **96. [B142]** — **implemented** — same defect as 90
+- **96. [B142]** — **open** — same defect as 90
   - Order form, LLC name step and Submit — why a name is unavailable when the record is inactive — `webapp/server/routes-payments.ts:327`
   - Reads: `The name "${p.name}" is unavailable — ${           p.verdict === "taken"             ? "an existing Florida company already has it"             : "it belongs to a recently dissolved company, and Florida protects it for up to a year"         }. Please choose a different name.`,
   - Claims: Every inactive record within the hold is a dissolved company, and Florida protects its name for up to a year.
@@ -769,9 +769,9 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: "it belongs to a company that recently went inactive in the Division's records, and Florida can protect such a name for up to a year" (routes-payments.ts:330 and NameCheck.tsx:45); sunbiz.ts:245 `; recently inactive — the name may still be protected (s. 605.0715(5), Fla. Stat., for an administrative dissolution)`.
   - Codex (duplicate): Same unsupported dissolved-from-inactive explanation as90, repeated at routes-payments.ts:327–331 and sunbiz.ts:245; not marked same defect as in the open list.
   - Corrected after Codex's review: Also a live copy at stepValidation.ts:123; the hold uses last_txn_date/file_date, not a verified dissolution date.
-  - Fixed: batch 29 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
+  - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
 - **97. [B144]** — **implemented**
   - Office, conversion copy sheet — the Filing statement — `webapp/server/filing.ts:256`
   - Reads: value: "Protected Series Designations for an existing Florida LLC — filed online at the Division, $25 each; no Articles; the $125 Articles-and-agent fee is skipped unless the agent changes",
@@ -1073,26 +1073,26 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current handler inserts contact_messages657-660, then awaits sendMail663-668 without catch. A transport exception escapes before the success response670. The office contact-message listing still exists in routes-admin.ts:883 onward. Retrying can insert a second copy. No current provider failure injection was run.
   - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
-- **AUD-claude-reconciled-batch29-reader-2-series-agreement-not-required-new-self. [substantive]** — **implemented**
+- **AUD-claude-reconciled-batch29-reader-2-series-agreement-not-required-new-self. [substantive]** — **open**
   - Order form, Certify & sign step on a NEW formation where the client serves as their own registered agent: the tick 'I confirm that the company's registered agent has agreed to serve as registered agent for the company and each of its protected series…' — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:372`
   - Reads: {data.registeredAgentChoice === "SELF" ? <AcknowledgeBox id="cert-agent-series" checked={data.registeredAgentSeriesAgreementAcknowledgment === true} onChange={(v) => patch({ registeredAgentSeriesAgreementAcknowledgment: v })} label={AGENT_SERIES_AGREEMENT} error={errors.registeredAgentSeriesAgreementAcknowledgment} /> : null}
   - Claims: The box is one of the certifications the order needs and the client's tick is recorded with the order.
   - True: Current cross-review: NEW SELF checkbox is rendered, but stepValidation.ts:385 requires it only for CONVERT; server/validation.ts:241-248 likewise checks it only under retained; buildPayload.ts:217 forces it false outside conversion. Current s.605.2203(2)-(3), independently opened, requires the company/series agent agreement before a designation and the signer affirms compliance. The code proves a displayed affirmative tick is discarded; no inference that the office actually filed an unlawful designation is made.
   - Proposed replacement (not approved): Require and preserve this displayed confirmation on every SELF path, keeping the current third-person certification unless the actual self-agent flow establishes the applicant is personally the agent. Verify unchecked refuses and checked survives payload/storage.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; NEW SELF checkbox is rendered, but stepValidation.ts:385 requires it only for CONVERT; server/validation.ts:241-248 likewise checks it only under retained; buildPayload.ts:217 forces it false outside conversion. Current s.605.2203(2)-(3), independently opened, requires the company/series agent agreement before a designation and the signer affirms compliance. The code proves a displayed affirmative tick is discarded; no inference that the office actually filed an unlawful designation is made.
-  - Fixed: batch 29 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
-- **AUD-claude-reconciled-batch29-reader-2-series-names-distinguishable-not-identical. [substantive]** — **implemented**
+  - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
+- **AUD-claude-reconciled-batch29-reader-2-series-names-distinguishable-not-identical. [substantive]** — **open**
   - Order form, Series step, the 'How series must be named' box, last bullet; and the duplicate-name refusal on that step — `webapp/src/components/forms/florida-llc/sections/StepSeries.tsx:87`
   - Reads: No two series of the same LLC may share an identical name.
   - Claims: Two series names are acceptable as long as they are not identical.
   - True: Current cross-review: Current seriesDedupeKey at validation.ts:177-180 only strips PS variants/case. New in-memory execution of the extracted current functions returned RENTAL versus RENTALS and SMITH & SONS versus SMITH AND SONS; both pairs remain distinct keys used by client/server duplicate checks. Opened ss.605.2202(1) and605.0112(1)(b): distinguishability applies, but statute includes filed-consent and excluded-filing qualifications. A statement that these particular filings will necessarily be refused was not independently tested. Proposed normalizeEntityName implementation at nameSimilarity.ts:23-39 is heuristic: drops AND completely and strips only final S; it is not a complete legal distinguishability oracle and the local list cannot check all existing filings.
   - Proposed replacement (not approved): Describe distinguishability accurately, preserve the consent exception where relevant, and apply tested local collision checks. Keep a separately identified office/live-record review for existing filings; do not promise complete statutory validation from this normalizer.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; Current seriesDedupeKey at validation.ts:177-180 only strips PS variants/case. New in-memory execution of the extracted current functions returned RENTAL versus RENTALS and SMITH & SONS versus SMITH AND SONS; both pairs remain distinct keys used by client/server duplicate checks. Opened ss.605.2202(1) and605.0112(1)(b): distinguishability applies, but statute includes filed-consent and excluded-filing qualifications. A statement that these particular filings will necessarily be refused was not independently tested. Proposed normalizeEntityName implementation at nameSimilarity.ts:23-39 is heuristic: drops AND completely and strips only final S; it is not a complete legal distinguishability oracle and the local list cannot check all existing filings.
-  - Fixed: batch 29 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
+  - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
 
 ## Client portal — 86 open of 86
 
@@ -1681,57 +1681,57 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current purge filters status fulfilled and fulfilled_at older than14days at574. Pending-EIN saves2419-2422 retain encrypted numbers in_progress with no independent expiry. Privacy15 describes the post-delivery editing window; it does not state an abandonment/cancellation horizon. This is an unbounded pre-delivery state, not evidence that the stated post-delivery14day rule itself is violated. RulingsN1.01/140/150 intentionally permit pending completion but do not specify abandoned pre-delivery retention.
   - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
-- **AUD-claude-reconciled-batch29-reader-4-s-election-officer-title-default. [substantive]** — **implemented**
+- **AUD-claude-reconciled-batch29-reader-4-s-election-officer-title-default. [substantive]** — **open**
   - Client portal → S-election details form → the pre-filled Officer title box beside Signing officer, and the Form 2553 the package prints from it (contact line H, the Sign Here title line, the cover letter and the instruction sheet) — `webapp/src/pages/portal/SElectionDetailsForm.tsx:117`
   - Reads: const [officerTitle, setOfficerTitle] = useState(draft?.officerTitle ?? prior.officerTitle ?? "Manager");
   - Claims: The person signing Form 2553 for this company is its Manager.
   - True: Current cross-review: The form still defaults officerTitle to Manager for every company. services response routes-portal.ts:1876-1904 supplies no management structure; the editable title is then printed by s-election.ts. A member-managed company therefore gets an unsupported Manager default. Current IRS Form2553 instructions require an authorized officer; management form alone does not prove which signer/title is legally appropriate.
   - Proposed replacement (not approved): Use management information to avoid the false Manager assumption, and ask the client to confirm the authorized signer and actual title. A blank required title with clear help is safer than inventing office status from management type.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; The form still defaults officerTitle to Manager for every company. services response routes-portal.ts:1876-1904 supplies no management structure; the editable title is then printed by s-election.ts. A member-managed company therefore gets an unsupported Manager default. Current IRS Form2553 instructions require an authorized officer; management form alone does not prove which signer/title is legally appropriate.
-  - Fixed: batch 29 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
-- **AUD-claude-reconciled-batch29-reader-3-ein-responsible-party-manager. [wording]** — **implemented**
+  - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
+- **AUD-claude-reconciled-batch29-reader-3-ein-responsible-party-manager. [wording]** — **open**
   - Client portal, Orders in progress, the EIN application questionnaire ('EIN application details' dialog), the heading of the first block — `webapp/src/pages/portal/OrdersInProgress.tsx:495`
   - Reads: Responsible party — typically the LLC's manager
   - Claims: The responsible party on the IRS EIN application is usually the LLC's manager.
   - True: Current cross-review: OrdersInProgress:500–506 still names typically the manager while the same questionnaire supports member-managed clients. IRS SS-4 instructions, opened live, define the role through ultimate ownership/control and practical control over funds; they do not establish the frequency claim in either the old or proposed heading. The explanatory paragraph already gives the appropriate functional test. Source comment is evidence of a past request, not a full recorded leave-unchanged ruling.
   - Proposed replacement (not approved): Use the neutral heading “Responsible party” and retain the existing explanation of ultimate ownership or control.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; OrdersInProgress:500–506 still names typically the manager while the same questionnaire supports member-managed clients. IRS SS-4 instructions, opened live, define the role through ultimate ownership/control and practical control over funds; they do not establish the frequency claim in either the old or proposed heading. The explanatory paragraph already gives the appropriate functional test. Source comment is evidence of a past request, not a full recorded leave-unchanged ruling.
-  - Fixed: batch 29 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
-- **AUD-claude-reconciled-batch29-reader-4-s-election-typed-address-on-file. [wording]** — **implemented**
+  - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
+- **AUD-claude-reconciled-batch29-reader-4-s-election-typed-address-on-file. [wording]** — **open**
   - Client portal → S-election details form (the dialog opened by Provide details securely on an S Corporation Election Package order) → an owner card → the line under the Home address box, after the client types an address by hand without choosing a lookup suggestion — `webapp/src/pages/portal/SElectionDetailsForm.tsx:538`
   - Reads: <p className="text-xs text-muted-foreground">Address on file</p>
   - Claims: The address shown is one we already had on file (imported from the order or previously saved).
   - True: Current cross-review: SElectionDetailsForm:520–540 labels every nonempty unverified value Address on file; :526 sets verified false on typing. :120–138 initializes drafts/stored rows and :488 handles imported owners. ServicesCard ShareholderRow lacks provenance fields. The proposed flags address the core defect, but reopened saved-draft semantics and second-address reset paths must be considered rather than treating all draft flags as authoritative.
   - Proposed replacement (not approved): Track whether each address came from saved/imported data; clear that status on typing for both owners; show no on-file label on unsaved typed text. Preserve lookup verification and correctly initialize reopened saved drafts.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; SElectionDetailsForm:520–540 labels every nonempty unverified value Address on file; :526 sets verified false on typing. :120–138 initializes drafts/stored rows and :488 handles imported owners. ServicesCard ShareholderRow lacks provenance fields. The proposed flags address the core defect, but reopened saved-draft semantics and second-address reset paths must be considered rather than treating all draft flags as authoritative.
-  - Fixed: batch 29 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
-- **AUD-claude-reconciled-batch29-runtime-B-agent-card-raw-iso-dates. [wording]** — **implemented**
+  - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
+- **AUD-claude-reconciled-batch29-runtime-B-agent-card-raw-iso-dates. [wording]** — **open**
   - Client portal → Registered agent service card, after the office records a resignation (and the 'appointment ends' sentence) — `webapp/src/pages/portal/PortalDashboard.tsx:421`
   - Reads:         {company.raResignationDue ? <p className="mt-3">{company.raResignationSubmitted ? `Resignation submitted ${company.raResignationSubmitted}.` : `Resignation due ${company.raResignationDue}; submission has not yet been recorded.`} {company.raEndedDate ? `Appointment ends ${company.raEndedDate}.` : ""}</p> : null}
   - Claims: Dates the client can read, in the form the rest of the card uses ('Cancellation requested on August 6, 2026', 'renews on September 20, 2027').
   - True: Current cross-review: PortalDashboard:376 and :421 print raw end/due/submitted dates. routes-portal:992–994 returns ISO calendar strings. datetime.ts:28–38 handles YYYY-MM-DD without a viewer-zone shift. The neighboring cancellation date already uses formatDate. Prior 128 concerns other date displays, not these four locations.
   - Proposed replacement (not approved): Apply formatDate to all four resignation/end-date interpolations in the registered-agent card.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; PortalDashboard:376 and :421 print raw end/due/submitted dates. routes-portal:992–994 returns ISO calendar strings. datetime.ts:28–38 handles YYYY-MM-DD without a viewer-zone shift. The neighboring cancellation date already uses formatDate. Prior 128 concerns other date displays, not these four locations.
-  - Fixed: batch 29 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
-- **AUD-claude-reconciled-batch29-reader-3-portal-footer-download-only. [wording]** — **implemented**
+  - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
+- **AUD-claude-reconciled-batch29-reader-3-portal-footer-download-only. [wording]** — **open**
   - Client portal, the footer sentence under the Account card on the portal page — `webapp/src/pages/portal/PortalDashboard.tsx:814`
   - Reads: Completed S-election forms and EIN letters stay encrypted here until you delete them. Download and keep your copies.
   - Claims: The footer explains retention of the tax documents; nothing tells the client that portal documents are download-only.
   - True: Current cross-review: PortalDashboard:814 omits the sentence. Current rulings.md:12 expressly retains it and defines download-only as uneditable. Batch 03 approves encrypted retention but does not expressly revoke this instruction. This is an instruction/implementation mismatch; interpreting download-only to prohibit deletion would be wrong.
   - Proposed replacement (not approved): Restore “Documents are download-only.” before the current retention explanation, preserving the current support link and encrypted-retention wording.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; PortalDashboard:814 omits the sentence. Current rulings.md:12 expressly retains it and defines download-only as uneditable. Batch 03 approves encrypted retention but does not expressly revoke this instruction. This is an instruction/implementation mismatch; interpreting download-only to prohibit deletion would be wrong.
-  - Fixed: batch 29 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
-- **AUD-claude-reconciled-batch29-runtime-A-generation-number-burned. [wording]** — **implemented**
+  - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
+- **AUD-claude-reconciled-batch29-runtime-A-generation-number-burned. [wording]** — **open**
   - Client portal → Operating agreement questionnaire → Generate Operating Agreement (PDF): the number printed in the agreement's title ("Partnership Operating Agreement (No. N)"), in Your documents, in Your agreements and in the amendment form's "Most recently generated agreement on file" line — `webapp/server/routes-portal.ts:1256`
   - Reads:   const bumped = await db.query<{ oa_generation_seq: number }>(
   -     "UPDATE clients SET oa_generation_seq = oa_generation_seq + 1 WHERE id = $1 RETURNING oa_generation_seq",
@@ -1742,9 +1742,9 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: Current routes-portal:1265–1269 increments before shares/options/capital/stale-base checks and rate limit at ~1488. Historical runtime-A report records first success No.4 after refusals. Current source confirms the same ordering. However the recorded owner rule concerns rate-limit allowance, not a stated requirement that generated identifiers be consecutive; gaps alone do not invalidate an agreement. Later render/storage failure can still consume a number under Claude’s move.
   - Proposed replacement (not approved): Allocate the number after validation, stale-draft and rate-limit refusals, and assign inputs.generationNumber after allocation. Preserve never-reuse behavior; do not promise gap-free numbering after rendering/storage failures.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; Current routes-portal:1265–1269 increments before shares/options/capital/stale-base checks and rate limit at ~1488. Historical runtime-A report records first success No.4 after refusals. Current source confirms the same ordering. However the recorded owner rule concerns rate-limit allowance, not a stated requirement that generated identifiers be consecutive; gaps alone do not invalidate an agreement. Later render/storage failure can still consume a number under Claude’s move.
-  - Fixed: batch 29 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
+  - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
 
 ## Office — 33 open of 33
 
