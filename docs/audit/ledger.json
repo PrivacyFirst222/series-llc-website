@@ -6203,7 +6203,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -6242,22 +6242,15 @@
               "batch": "29",
               "revision": 2,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:06:37.962Z",
+              "event": "rejected r2",
+              "batch": "29",
+              "revision": 2,
+              "note": "Include the fourth copy of the approved inactive-name explanation in the name-check results card."
             }
-          ],
-          "batch": "29",
-          "fix": {
-            "batch": "29",
-            "revision": 2,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch29 B09"
-              }
-            ]
-          }
+          ]
         }
       ],
       "codex": {
@@ -6676,7 +6669,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -6715,25 +6708,18 @@
               "batch": "29",
               "revision": 2,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:06:37.962Z",
+              "event": "rejected r2",
+              "batch": "29",
+              "revision": 2,
+              "note": "Include the fourth copy of the approved inactive-name explanation in the name-check results card."
             }
           ],
           "canonical": {
             "item": "90",
             "part": "all"
-          },
-          "batch": "29",
-          "fix": {
-            "batch": "29",
-            "revision": 2,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch29 B09"
-              }
-            ]
           }
         }
       ],
@@ -25873,7 +25859,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -25913,22 +25899,15 @@
               "batch": "29",
               "revision": 2,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:06:37.962Z",
+              "event": "rejected r2",
+              "batch": "29",
+              "revision": 2,
+              "note": "Include the fourth copy of the approved inactive-name explanation in the name-check results card."
             }
-          ],
-          "batch": "29",
-          "fix": {
-            "batch": "29",
-            "revision": 2,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch29 B01"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -25945,7 +25924,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -25985,22 +25964,15 @@
               "batch": "29",
               "revision": 2,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:06:37.962Z",
+              "event": "rejected r2",
+              "batch": "29",
+              "revision": 2,
+              "note": "Include the fourth copy of the approved inactive-name explanation in the name-check results card."
             }
-          ],
-          "batch": "29",
-          "fix": {
-            "batch": "29",
-            "revision": 2,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch29 B02"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -26017,7 +25989,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -26057,22 +26029,15 @@
               "batch": "29",
               "revision": 2,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:06:37.962Z",
+              "event": "rejected r2",
+              "batch": "29",
+              "revision": 2,
+              "note": "Include the fourth copy of the approved inactive-name explanation in the name-check results card."
             }
-          ],
-          "batch": "29",
-          "fix": {
-            "batch": "29",
-            "revision": 2,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch29 B03"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -26089,7 +26054,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -26129,22 +26094,15 @@
               "batch": "29",
               "revision": 2,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:06:37.962Z",
+              "event": "rejected r2",
+              "batch": "29",
+              "revision": 2,
+              "note": "Include the fourth copy of the approved inactive-name explanation in the name-check results card."
             }
-          ],
-          "batch": "29",
-          "fix": {
-            "batch": "29",
-            "revision": 2,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch29 B04"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -26161,7 +26119,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -26201,22 +26159,15 @@
               "batch": "29",
               "revision": 2,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:06:37.962Z",
+              "event": "rejected r2",
+              "batch": "29",
+              "revision": 2,
+              "note": "Include the fourth copy of the approved inactive-name explanation in the name-check results card."
             }
-          ],
-          "batch": "29",
-          "fix": {
-            "batch": "29",
-            "revision": 2,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch29 B05"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -26233,7 +26184,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -26273,22 +26224,15 @@
               "batch": "29",
               "revision": 2,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:06:37.962Z",
+              "event": "rejected r2",
+              "batch": "29",
+              "revision": 2,
+              "note": "Include the fourth copy of the approved inactive-name explanation in the name-check results card."
             }
-          ],
-          "batch": "29",
-          "fix": {
-            "batch": "29",
-            "revision": 2,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch29 B06"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -26305,7 +26249,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -26345,22 +26289,15 @@
               "batch": "29",
               "revision": 2,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:06:37.962Z",
+              "event": "rejected r2",
+              "batch": "29",
+              "revision": 2,
+              "note": "Include the fourth copy of the approved inactive-name explanation in the name-check results card."
             }
-          ],
-          "batch": "29",
-          "fix": {
-            "batch": "29",
-            "revision": 2,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch29 B07"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -26377,7 +26314,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -26417,22 +26354,15 @@
               "batch": "29",
               "revision": 2,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:06:37.962Z",
+              "event": "rejected r2",
+              "batch": "29",
+              "revision": 2,
+              "note": "Include the fourth copy of the approved inactive-name explanation in the name-check results card."
             }
-          ],
-          "batch": "29",
-          "fix": {
-            "batch": "29",
-            "revision": 2,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch29 B08"
-              }
-            ]
-          }
+          ]
         }
       ]
     }
@@ -27651,7 +27581,7 @@
       "id": "29",
       "revision": 2,
       "frozenHash": "7ce95f936596de0a1444969a70e5da7024df649821159916028d4250aace7227",
-      "status": "implemented",
+      "status": "rejected",
       "model": "Codex",
       "base": "3f178aaad17e9440f1cf6001c66bb32635061fcb",
       "history": [
@@ -27663,6 +27593,11 @@
         {
           "at": "2026-09-22T04:00:56.704Z",
           "event": "implemented"
+        },
+        {
+          "at": "2026-09-22T04:06:37.962Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-22T04:06 (Adam standing authorization for revisions needed within approved Batch29 item9.): Include the fourth copy of the approved inactive-name explanation in the name-check results card."
         }
       ]
     }
