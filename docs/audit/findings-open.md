@@ -408,7 +408,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): After computing the ordinary two-month-plus15day deadline, advance it past Saturdays, Sundays and applicable IRS/DC legal holidays. Use that adjusted date consistently for deadline display, the late decision and the preparation runway; keep the owner-approved formation-date starting point.
   - Rechecked by codex-reader-5: Independently imported real form2553Timing helper; Jan1 deadline is SundayMar15 and nextMondayMar16 is late. Read full relevant helper30–89 and root primary-irs-deadline-read.md. Root current IRS Publication509 evidence establishes weekend/holiday timely-nextday rule; rollover is independent of owner63 startdate decision and65-day purchase cutoff. Proposed adjustment correct, retaining5-day service runway separately.
   - Fixed: batch 24 revision 1, commit , by Codex; protected by 3 assertion(s).
-- **AUD-claude-reconciled-batch31-reader-1-benefits-deed-unconditional. [substantive]** — **implemented** — waits on Adam's ruling
+- **AUD-claude-reconciled-batch31-reader-1-benefits-deed-unconditional. [substantive]** — **open** — waits on Adam's ruling
   - Home page and Benefits page, the benefits grid, card 04 "Real property in the series' name", second sentence — `webapp/src/components/home/BenefitsGrid.tsx:31`
   - Reads: body: "Real estate can be deeded to and held by a protected series in its own name. Under §605.2301, the recorded deed stands as the record that the property belongs to that series.",
   - Claims: That under §605.2301 a recorded deed is, without qualification, the record that the property belongs to the series.
@@ -416,9 +416,9 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): body: "Real estate can be deeded to and held by a protected series in its own name. Under §605.2301(2)(b), a recorded deed in favor of someone who gives value without knowing of any lack of authority is itself the record that the property is an associated asset of that series; your own asset records must show it in every other case.",
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 1: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md.
-  - Fixed: batch 31 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
-- **AUD-claude-reconciled-batch31-reader-1-faq-0905-generalized. [wording]** — **implemented** — waits on Adam's ruling
+  - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
+- **AUD-claude-reconciled-batch31-reader-1-faq-0905-generalized. [wording]** — **open** — waits on Adam's ruling
   - FAQ page, question 10 "Does this work for out-of-state investors?", the sentence citing §605.0905(3) — `webapp/src/pages/FAQ.tsx:52`
   - Reads: a: "A Florida Protected Series LLC works well for Floridians and for Florida businesses and assets. There is no way to guarantee how the courts of another state — particularly one with no series LLC legislation of its own — will interpret it. There is also a registration question that runs in both directions: under §605.0905(3), owning income-producing real property or tangible personal property in a state is itself transacting business there, which means a company formed elsewhere that owns Florida rental property has to qualify here — and a Florida company that buys rental property in another state should expect that state to take the same position. The consequences of skipping it are real: §605.0904 bars a company transacting business in Florida without a certificate of authority from maintaining an action here, and §605.0904(7) adds liability for all back fees plus a civil penalty of at least $500 and not more than $1,000 for each year or part of a year. If you are not a Floridian, or you plan to hold out-of-state property in a Florida Protected Series LLC, you should seek advice from an attorney licensed to practice in the relevant state.",
   - Claims: That §605.0905(3) makes owning income-producing real or tangible personal property "in a state" transacting business "there" — a rule stated for any state.
@@ -426,8 +426,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): There is also a registration question that runs in both directions: under §605.0905(3), owning income-producing real property or tangible personal property in Florida is itself transacting business here, which means a company formed elsewhere that owns Florida rental property has to qualify here — and a Florida company that buys rental property in another state should expect that state to apply its own version of the same rule.
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 4: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md.
-  - Fixed: batch 31 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
+  - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 
 ## Order form and payment — 88 open of 90
 
@@ -1117,7 +1117,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
   - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
-- **AUD-claude-reconciled-batch31-reader-2-series-established-on-effect-not-filing. [wording]** — **implemented** — waits on Adam's ruling
+- **AUD-claude-reconciled-batch31-reader-2-series-established-on-effect-not-filing. [wording]** — **open** — waits on Adam's ruling
   - Order form, Certification step on the adding-series path, the opening paragraph — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:83`
   - Reads: Florida establishes a protected series when the company files a
   - Claims: A protected series exists as of the filing of its Designation.
@@ -1125,8 +1125,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Florida establishes a protected series when a Protected Series Designation, signed for the company and filed with the Division of Corporations with the consent of all of its members, takes effect (§605.2201). There are no Articles to sign: your company already exists.
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 2: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md.
-  - Fixed: batch 31 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
+  - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 
 ## Client portal — 89 open of 89
 
@@ -1812,7 +1812,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Fixed: batch 30 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Automatic revision under Adam’s standing authorization: declare the consent assertion replacement and joint-signature pagination support.
   - 2026-09-22 rejected r2: Automatic revision under Adam’s standing authorization: combine the preserved office assertion into the new regression check so the baseline proof tests the new defect, without requiring an already-fixed office test to fail.
-- **AUD-claude-reconciled-batch31-reader-3-consent-department-wording. [wording]** — **implemented** — waits on Adam's ruling
+- **AUD-claude-reconciled-batch31-reader-3-consent-department-wording. [wording]** — **open** — waits on Adam's ruling
   - Client portal, Orders in progress, the Consent & Series Exhibit dialog for an added series, the note under the 'Protected series name' box — `webapp/src/pages/portal/OrdersInProgress.tsx:340`
   - Reads: Exactly as filed with the Department.
   - Claims: The series name was filed with 'the Department'.
@@ -1820,8 +1820,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Exactly as filed with the Florida Division of Corporations.
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 3: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
-  - Fixed: batch 31 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
+  - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 
 ## Office — 33 open of 33
 
@@ -2736,11 +2736,12 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Ruling, 2026-09-22: Batch 31 review item 5: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
   - Previous fix: 17 r2, commit ; 3 assertion(s) retained. Replacement attempt: 31 r1, work order 07bb828991e40a2256e2d60c66b6665f7d66a648df99323fd68398ae7b90ea6e.
   - Previous fix: 17 r2, commit ; 3 assertion(s) retained. Replacement attempt: 31 r2, work order 348d7c5ed1a04e35163636afcd0522a59d4fdd15954371d1b155c0a0248b9bba.
-  - Fixed: batch 31 revision 2, commit , by Codex; protected by 7 assertion(s).
+  - Fixed: batch 17 revision 2, commit , by Codex; protected by 3 assertion(s).
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
   - 2026-09-22 superseded by approved replacement: prior fix 17 r2 at ; approved work order 07bb828991e40a2256e2d60c66b6665f7d66a648df99323fd68398ae7b90ea6e
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 superseded by approved replacement: prior fix 17 r2 at ; approved work order 348d7c5ed1a04e35163636afcd0522a59d4fdd15954371d1b155c0a0248b9bba
+  - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 - **N2.08. [substantive]** — **implemented** — waits on Adam's ruling
   - Owner's Manual, The EIN Question (§18), counterparties and W-9s — docs/owners-manual.md:344 — `docs/owners-manual.md:344`
   - Reads: - **A counterparty demands a taxpayer number for the named entity** — a lender, title company, insurer, or property manager. Giving them the company's EIN for a series' business stitches the two identities together on paper, the opposite of the separateness you are documenting.
@@ -2763,11 +2764,12 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Ruling, 2026-09-22: Batch 31 review item 10: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
   - Previous fix: 17 r2, commit ; 2 assertion(s) retained. Replacement attempt: 31 r1, work order 07bb828991e40a2256e2d60c66b6665f7d66a648df99323fd68398ae7b90ea6e.
   - Previous fix: 17 r2, commit ; 2 assertion(s) retained. Replacement attempt: 31 r2, work order 348d7c5ed1a04e35163636afcd0522a59d4fdd15954371d1b155c0a0248b9bba.
-  - Fixed: batch 31 revision 2, commit , by Codex; protected by 7 assertion(s).
+  - Fixed: batch 17 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
   - 2026-09-22 superseded by approved replacement: prior fix 17 r2 at ; approved work order 07bb828991e40a2256e2d60c66b6665f7d66a648df99323fd68398ae7b90ea6e
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 superseded by approved replacement: prior fix 17 r2 at ; approved work order 348d7c5ed1a04e35163636afcd0522a59d4fdd15954371d1b155c0a0248b9bba
+  - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 - **N2.10. [substantive]** — **implemented** — waits on Adam's ruling
   - Owner's Manual, Moving Real Estate into a Series (§11), documentary stamps — docs/owners-manual.md:180 — `docs/owners-manual.md:180`
   - Reads: 2. **Documentary stamp tax.** Florida taxes deed transfers (70 cents per $100 of consideration). Transferring *mortgaged* property to your own entity is generally taxed on the mortgage balance, even with no money changing hands. Price this before you transfer — on a $300,000 mortgage that is $2,100. An unencumbered property transferred for no consideration is a different analysis. Confirm the stamp treatment with your closing agent or CPA before recording; do not guess.
@@ -3102,7 +3104,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current submitted branch requires ra_resignation_due. renewals.ts:124 sets it only in the timely-cancellation path; declined nonpayment does not set it. filed/mailed/copy require prior submission at ra-office.ts:47-59, so the office cannot record these actual events for an otherwise permitted nonpayment resignation. Terms9(e)/10(f) still describe such resignations. Current source corroborates historical reproduction; no current route rerun.
   - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
-- **AUD-claude-reconciled-batch31-compare-A-instructions-handle-taxes-differently. [wording]** — **implemented** — waits on Adam's ruling
+- **AUD-claude-reconciled-batch31-compare-A-instructions-handle-taxes-differently. [wording]** — **open** — waits on Adam's ruling
   - Operating Agreement Instructions §2 'Which Agreement to Use', last paragraph — `docs/oa-instructions.md:33`
   - Reads: If you start with the single-member form and later add an owner, adopt the multi-member form at that time — the two forms handle taxes, voting, and creditor protection differently, and the single-member form is not built for two owners.
   - Claims: The single-member and multi-member forms handle taxes differently.
@@ -3110,9 +3112,9 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): If you start with the single-member form and later add an owner, adopt the multi-member form at that time — the two forms handle voting and creditor protection differently (and, unless the company has elected S corporation status, taxes as well), and the single-member form is not built for two owners.
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 6: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
-  - Fixed: batch 31 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
-- **AUD-claude-reconciled-batch31-compare-A-manual-nothing-left-to-add. [wording]** — **implemented** — waits on Adam's ruling
+  - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
+- **AUD-claude-reconciled-batch31-compare-A-manual-nothing-left-to-add. [wording]** — **open** — waits on Adam's ruling
   - Owner's Manual §7 map, Article 10 row — `docs/owners-manual.md:131`
   - Reads: | **Article 10** | **In the multi-member forms:** transfers — family transfers permitted, everything else needs consent, transferees get money rights only, plus the charging-order and involuntary-transfer armor (Section 23). **In the single-owner forms:** admission of an additional member. Those forms have no transfer article, because Chapter 605 already makes a transfer permissible, gives a transferee distributions and nothing else, and binds a transferee who never signs — there was nothing left for the agreement to add |
   - Claims: The single-owner forms add nothing about transfers because Chapter 605 already covers them.
@@ -3120,9 +3122,9 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): | **Article 10** | **In the multi-member forms:** transfers — family transfers permitted, everything else needs consent, transferees get money rights only, plus the charging-order and involuntary-transfer armor (Section 23). **In the single-owner forms:** admission of an additional member. Those forms have no transfer article, because Chapter 605 already makes a transfer permissible, gives a transferee distributions and nothing else, and binds a transferee who never signs; the S corporation versions add only the eligible-shareholder restriction in Section 9.3 |
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 7: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
-  - Fixed: batch 31 revision 2, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
-- **AUD-claude-reconciled-batch31-render-oa-4-1-percentages-vs-fractions. [wording]** — **implemented** — waits on Adam's ruling
+  - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
+- **AUD-claude-reconciled-batch31-render-oa-4-1-percentages-vs-fractions. [wording]** — **open** — waits on Adam's ruling
   - Generated multi-member operating agreements (all four multi-member masters), s. 4.1, when the questionnaire's ownership mode is fractions — `webapp/server/templates-oa-multi.md:130`
   - Reads: **4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes.
   - Claims: Membership interests are expressed as percentages.
@@ -3130,9 +3132,9 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): In all four masters: 'Membership interests are of a single class and are expressed as percentages or fractions of the whole, as set forth on Exhibit A; no certificates shall be issued unless …' (keep the rest of the sentence as each master has it).
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 8: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
-  - Fixed: batch 31 revision 2, commit , by Codex; protected by 8 assertion(s).
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
-- **AUD-claude-reconciled-batch31-statutes-0302-series-property. [wording]** — **implemented** — waits on Adam's ruling
+  - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
+- **AUD-claude-reconciled-batch31-statutes-0302-series-property. [wording]** — **open** — waits on Adam's ruling
   - Operating agreement masters, statement-of-authority section (s. 5.9 member-managed multi; s. 5.7 member-managed single; s. 5.8 manager-managed forms) — all eight masters — `webapp/server/templates-oa-member.md:200`
   - Reads: **5.9 Statement of Authority.** With the consent of all Members required by Section 5.5(i), the Members may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of Members to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and the Members shall cause it to be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4(b) apply among the Members whether or not a statement of authority is filed or recorded.
   - Claims: The Company may file a s. 605.0302 statement of authority stating the authority or limitations on authority to transfer or encumber real property 'held in the name of the Company or of a Protected Series'.
@@ -3140,5 +3142,5 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): In each master, after 'held in the name of the Company or of a Protected Series,' add: 'and, as to real property held in the name of a Protected Series, may cause that Protected Series to file its own statement of authority under s. 605.0302 as applied by s. 605.2108(3), Florida Statutes,' (Adam to confirm the drafting).
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 9: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
-  - Fixed: batch 31 revision 2, commit , by Codex; protected by 16 assertion(s).
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
+  - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
