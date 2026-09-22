@@ -93628,25 +93628,32 @@ function wrapSegs(f, segs, width, size) {
   const lines = [];
   let cur = [];
   let curW = 0;
+  const groups = [];
   for (const seg of segs) {
-    const words = seg.text.split(/(\s+)/).filter((w) => w.length > 0);
-    for (const word of words) {
-      const font = fontFor(f, seg);
-      const w = drawnWidth(font, word, size);
-      if (curW + w > width && cur.length > 0 && word.trim() !== "") {
-        lines.push(cur);
-        cur = [];
-        curW = 0;
-        if (word.trim() === "") continue;
-      }
-      const last2 = cur[cur.length - 1];
-      if (last2 && last2.bold === seg.bold && last2.italic === seg.italic) {
-        last2.text += word;
-      } else {
-        cur.push({ text: word, bold: seg.bold, italic: seg.italic });
-      }
-      curW += w;
+    for (const text of seg.text.split(/(\s+)/).filter(Boolean)) {
+      const part = { ...seg, text };
+      const previous = groups.at(-1);
+      if (previous && !/\s/.test(text) && !/\s/.test(previous[0].text)) previous.push(part);
+      else groups.push([part]);
     }
+  }
+  for (const group of groups) {
+    const whitespace = /^\s+$/.test(group[0].text);
+    const w = group.reduce((sum2, seg) => sum2 + drawnWidth(fontFor(f, seg), seg.text, size), 0);
+    if (!whitespace && curW + w > width && cur.length > 0) {
+      while (cur.length && !cur.at(-1).text.trim()) cur.pop();
+      if (cur.length) cur[cur.length - 1].text = cur[cur.length - 1].text.trimEnd();
+      if (cur.length) lines.push(cur);
+      cur = [];
+      curW = 0;
+    }
+    if (whitespace && cur.length === 0) continue;
+    for (const seg of group) {
+      const last2 = cur.at(-1);
+      if (last2 && last2.bold === seg.bold && last2.italic === seg.italic) last2.text += seg.text;
+      else cur.push({ ...seg });
+    }
+    curW += w;
   }
   if (cur.length > 0) lines.push(cur);
   return lines.map((ln2) => {
@@ -94018,7 +94025,7 @@ function stampPageNumbers(doc, font) {
     p2.drawText(pn, { x: width - MARGIN - w, y: FOOTER_Y, size: 7.5, font, color: rgb(0.55, 0.57, 0.6) });
   });
 }
-function stampFooters(doc, font, wm) {
+function stampFooters(doc, font, wm, preservePageNumbers = false) {
   const pages = doc.getPages();
   const total = pages.length;
   const text = sanitize(`Copyright FLORIDA PROTECTED SERIES, LLC - PS 1${wm.note ? ", " + wm.note.replace(/\s+\u2014\s+/g, ", ") : ""}`);
@@ -94026,6 +94033,7 @@ function stampFooters(doc, font, wm) {
   pages.forEach((p2, i) => {
     const { width } = p2.getSize();
     p2.drawText(text, { x: MARGIN, y: FOOTER_Y, size: 7.5, font, color: grey });
+    if (preservePageNumbers) return;
     const pn = `Page ${i + 1} of ${total}`;
     const w = drawnWidth(font, pn, 7.5);
     p2.drawText(pn, { x: width - MARGIN - w, y: FOOTER_Y, size: 7.5, font, color: grey });
@@ -94121,7 +94129,7 @@ async function finishWithPermissions(doc, title, wm, font) {
 async function stampExistingPdf(opts) {
   const doc = await PDFDocument.load(opts.bytes, { ignoreEncryption: true });
   const font = await doc.embedFont(StandardFonts.Helvetica);
-  stampFooters(doc, font, opts.watermark);
+  stampFooters(doc, font, opts.watermark, opts.preservePageNumbers);
   return finishWithPermissions(doc, opts.title, opts.watermark, font);
 }
 var PAGE_W, PAGE_H, MARGIN, SIG_W, BODY_SIZE, LINE_GAP, FOOTER_Y, glyphWidthCache;
@@ -102213,7 +102221,7 @@ var CONTRIBUTOR_REVIEW = "The owner list changed. Confirm who contributed each a
 var money = (n) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 var joinNames = (names) => names.length <= 1 ? names.join("") : names.length === 2 ? `${names[0]} and ${names[1]}` : `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
 var num = (v2) => typeof v2 === "number" && Number.isFinite(v2) ? v2 : null;
-function computeCapital(assets, unitNames, seriesNames2) {
+function computeCapital(assets, unitNames, seriesNames2, jointUnits = []) {
   const list2 = assets ?? [];
   const errors = [];
   const units = Math.max(1, unitNames.length);
@@ -102245,7 +102253,7 @@ function computeCapital(assets, unitNames, seriesNames2) {
       perUnit[i] += v2 * s / 100;
     });
     totalContributed += v2;
-    const by = units === 1 ? unitNames[0] ?? "" : asset.contributedBy?.mode === "shares" ? joinNames(unitNames.map((n, i) => ({ n, s: shares[i] })).filter((x2) => x2.s > 0).map((x2) => `${x2.n} (${Number(x2.s.toFixed(2))}%)`)) : `${joinNames(unitNames)}, equally`;
+    const by = units === 1 ? unitNames[0] ?? "" : asset.contributedBy?.mode === "shares" ? joinNames(unitNames.map((n, i) => ({ n, s: shares[i] })).filter((x2) => x2.s > 0).map((x2) => `${x2.n} (${Number(x2.s.toFixed(2))}%)`)) : unitNames.map((name, i) => `${name} (${jointUnits[i] ? "jointly: " : ""}1/${units})`).join("; ") + ".";
     let to = "";
     if (asset.kind === "cash") {
       const amounts = seriesNames2.map((_, i) => num(asset.cashAllocations?.[i]) ?? 0);
@@ -102537,10 +102545,20 @@ function fmtEin(ein) {
 function electionDeadline(startIso) {
   return form2553Deadline(startIso);
 }
-function splitAddress(addr2) {
+function splitAddress(addr2, fields) {
+  if (fields?.address1?.trim() && fields.city?.trim() && fields.state?.trim() && fields.zip?.trim()) {
+    return {
+      street: [fields.address1, fields.address2].map((s) => s?.trim()).filter(Boolean).join(", "),
+      cityStateZip: `${fields.city.trim()}, ${fields.state.trim()} ${fields.zip.trim()}`
+    };
+  }
   const parts = addr2.split(",").map((s) => s.trim()).filter(Boolean);
-  if (parts.length >= 2) {
-    return { street: parts.slice(0, parts.length - 2).join(", ") || parts[0], cityStateZip: parts.slice(-2).join(", ") };
+  const last2 = parts.at(-1) ?? "";
+  if (parts.length >= 4 && /^\d{5}(?:-\d{4})?$/.test(last2) && /^[A-Za-z]{2}$/.test(parts.at(-2) ?? "")) {
+    return { street: parts.slice(0, -3).join(", "), cityStateZip: `${parts.at(-3)}, ${parts.at(-2)} ${last2}` };
+  }
+  if (parts.length >= 3 && /^[A-Za-z]{2}\s+\d{5}(?:-\d{4})?$/.test(last2)) {
+    return { street: parts.slice(0, -2).join(", "), cityStateZip: `${parts.at(-2)}, ${last2}` };
   }
   return { street: addr2, cityStateZip: "" };
 }
@@ -102555,7 +102573,7 @@ async function fillForm2553(d2) {
     if (max !== void 0 && value.length > max) field.setMaxLength(void 0);
     field.setText(value);
   };
-  const addr2 = splitAddress(d2.principalAddress);
+  const addr2 = splitAddress(d2.principalAddress, d2.principalAddressParts);
   setText(`${F}.NameAddress[0].f1_01[0]`, d2.llcName);
   setText(`${F}.NameAddress[0].f1_02[0]`, addr2.street);
   setText(`${F}.NameAddress[0].f1_03[0]`, addr2.cityStateZip);
@@ -102679,7 +102697,7 @@ The IRS normally mails an acceptance letter (Notice CP261) within about 60 days.
 `;
 }
 function coverLetterMarkdown(d2) {
-  const addr2 = splitAddress(d2.principalAddress);
+  const addr2 = splitAddress(d2.principalAddress, d2.principalAddressParts);
   return `# ${d2.llcName.toUpperCase()}
 
 ${addr2.street}
@@ -107661,6 +107679,7 @@ async function oaSeed(clientId, orderId) {
     managerEntities,
     suggestedOwners,
     principalAddress,
+    principalAddressParts: { ...addr2 },
     members,
     series
   };
@@ -108096,6 +108115,7 @@ async function postSElectionPackage(args) {
     pdf = await buildSElectionPackage({
       llcName: so2.llc_name,
       principalAddress: seed?.principalAddress ?? "",
+      principalAddressParts: seed.principalAddressParts,
       ein: merged.ein ?? "",
       dateIncorporated: formation,
       effectiveDate,
@@ -108598,7 +108618,7 @@ function registerPortalRoutes(app2) {
     if (a2.assets?.some((asset) => asset.contributedBy?.needsReview || asset.contributedBy?.unitIds && JSON.stringify(asset.contributedBy.unitIds) !== JSON.stringify(contributorIds))) {
       return c.json(err(CONTRIBUTOR_REVIEW, "CONTRIBUTOR_REVIEW"), 400);
     }
-    const capital = computeCapital(a2.assets, members.map((m2) => m2.name), seed.series.map((sr) => sr.name));
+    const capital = computeCapital(a2.assets, members.map((m2) => m2.name), seed.series.map((sr) => sr.name), members.map((m2) => Boolean(m2.jointHolding)));
     if (capital.errors.length > 0) {
       return c.json(err(capital.errors[0], "CAPITAL"), 400);
     }
@@ -108935,7 +108955,10 @@ function registerPortalRoutes(app2) {
       out = await stampExistingPdf({
         bytes: bytes2,
         watermark: { name: clients[0]?.name ?? "", email: clients[0]?.email ?? "", note: rows[0].edition },
-        title: rows[0].title
+        title: rows[0].title,
+        // Keep the Manual's own body-relative numbering (and an uploaded
+        // replacement's authored pagination), while still licensing every page.
+        preservePageNumbers: c.req.param("key") === "owners-manual"
       });
     } catch (e) {
       console.error("[library] stamp failed; serving original:", e);
@@ -113561,6 +113584,7 @@ function registerAdminRoutes(app2) {
     const input = {
       llcName: so2.llc_name,
       principalAddress: seed?.principalAddress ?? "",
+      principalAddressParts: seed.principalAddressParts,
       ein: details.ein ?? "",
       dateIncorporated: details.dateIncorporated,
       effectiveDate: details.effectiveDate || details.dateIncorporated,

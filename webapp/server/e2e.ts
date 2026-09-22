@@ -2517,7 +2517,7 @@ if (mint.status === 200) {
       check("Exhibit A shows each owner's computed contribution",
         inputsRes.status === 200 && /\| Dana Reed \| [^|]*\| 50% \| \$125,000 \|/.test(md) && /\| Jamie Reed \| [^|]*\| 50% \| \$125,000 \|/.test(md), md.match(/\| (?:Dana|Jamie) Reed[^\n]*/g));
       check("Exhibit A lists the assets with who contributed them and where they went",
-        /\| 123 Main Street, Tampa \| \$200,000 \| Dana Reed and Jamie Reed, equally \| E2E Member Managed Holdings, LLC, PS A \|/.test(md) && /\| Cash \| \$50,000 \| Dana Reed and Jamie Reed, equally \| E2E Member Managed Holdings, LLC, PS A: \$10,000; the Company: \$40,000 \|/.test(md), md.match(/\| (?:123 Main|Cash) [^\n]*/g));
+        /\| 123 Main Street, Tampa \| \$200,000 \| Dana Reed \(1\/2\); Jamie Reed \(1\/2\)\. \| E2E Member Managed Holdings, LLC, PS A \|/.test(md) && /\| Cash \| \$50,000 \| Dana Reed \(1\/2\); Jamie Reed \(1\/2\)\. \| E2E Member Managed Holdings, LLC, PS A: \$10,000; the Company: \$40,000 \|/.test(md), md.match(/\| (?:123 Main|Cash) [^\n]*/g));
       check("Exhibit A totals the series and what the company retained",
         /\| E2E Member Managed Holdings, LLC, PS A \| 123 Main Street, Tampa \(\$200,000\); Cash \(\$10,000\) \| \$210,000 \|/.test(md) && /\| \*\*Retained by the Company\*\* \| Cash \(\$40,000\) \| \$40,000 \|/.test(md), md.match(/(PS A \| 123|Retained by the Company)[^\n]*/g));
       check("the Series Exhibit shows what the Company contributed to the series", /By the Company: 123 Main Street, Tampa \(\$200,000\); Cash \(\$10,000\)/.test(md), md.match(/By the Company:[^\n]*/)?.[0]);

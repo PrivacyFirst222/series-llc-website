@@ -26,7 +26,7 @@ const r = computeCapital(
 );
 check("no errors on the example", r.errors.length === 0, r.errors);
 check("each owner contributed $400,000", r.memberContributions.join("|") === "$400,000|$400,000", r.memberContributions);
-check("the assets table names both owners equally", r.assetRows.every((a) => a.by === "Adam Kirwan and Tom Jones, equally"), r.assetRows.map((a) => a.by));
+check("the assets table names both owners equally", r.assetRows.every((a) => a.by === "Adam Kirwan (1/2); Tom Jones (1/2)."), r.assetRows.map((a) => a.by));
 check("the cash row says where it went", r.assetRows[3].to === "ACME LLC - PS 1: $10,000; ACME LLC - PS 2: $15,000; ACME LLC - PS 3: $25,000", r.assetRows[3].to);
 check("Series 1 holds property 1 and $10,000, $210,000 in all", r.seriesRows[0].items === "123 Main Street, Orlando ($200,000); Cash ($10,000)" && r.seriesRows[0].total === "$210,000", r.seriesRows[0]);
 check("Series 2 totals $265,000 and Series 3 $325,000", r.seriesRows[1].total === "$265,000" && r.seriesRows[2].total === "$325,000", r.seriesRows.map((s) => s.total));

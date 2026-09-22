@@ -1224,6 +1224,7 @@ app.get("/admin/services/:id/s-election-draft", async (c) => {
   const input: SElectionDetails = {
     llcName: so.llc_name,
     principalAddress: seed?.principalAddress ?? "",
+    principalAddressParts: seed.principalAddressParts,
     ein: details.ein ?? "",
     dateIncorporated: details.dateIncorporated,
     effectiveDate: details.effectiveDate || details.dateIncorporated,

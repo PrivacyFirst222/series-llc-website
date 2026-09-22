@@ -116,6 +116,17 @@ def esc(s):
 
 def runs(text, P, sz=None, bold=False, italic=False, accent=False):
     """Markdown inline -> w:r elements, carrying bold, italic and the accent."""
+    if DRAFT_START in text:
+        output = []
+        for part in re.split(r"(\x01[^\x02]*\x02)", text):
+            if not part:
+                continue
+            if part.startswith(DRAFT_START):
+                label_runs = runs(part[1:-1], P, sz=sz, italic=True)
+                output.append(label_runs.replace("<w:rPr>", '<w:rPr><w:rStyle w:val="DraftingChoice"/>'))
+            else:
+                output.append(runs(part, P, sz=sz, bold=bold, italic=italic, accent=accent))
+        return "".join(output)
     sz = sz or P["body_sz"]
     color = P.get("accent") if accent else None
     out = []
@@ -328,6 +339,68 @@ def contents(headings, P):
     return "".join(out)
 
 
+# Labels are separate OOXML runs, so review tools can prove that deleting ONLY
+# drafting labels restores every original legal character and table cell.
+DRAFT_START, DRAFT_END = "\x01", "\x02"
+
+
+def drafting_choices(md):
+    labels = {
+        "professional": "Professional company", "purpose": "Additional series purpose",
+        "holding": "Joint holding", "couple": "Married couple", "unit": "Joint ownership unit",
+        "person": "Individual signer", "entity": "Entity signer",
+        "memberperson": "Individual member", "memberentity": "Entity member",
+        "managed": "Manager-managed company", "membermanaged": "Member-managed company",
+        "managermanaged": "Manager-managed company", "restated": "Amended and restated agreement",
+        "typed": "Amendment text entered below", "attached": "Amendment attached as Exhibit A",
+    }
+    token = re.compile(r"<!--\s*(?:(one|many|if):([a-z]+)|/(one|many|if))\s*-->")
+    matches = list(token.finditer(md))
+    stack, spans = [], {}
+    for match in matches:
+        if match.group(1):
+            stack.append(match)
+        else:
+            if not stack or stack[-1].group(1) != match.group(3):
+                raise ValueError("Unbalanced drafting choice: " + match.group(0))
+            start = stack.pop()
+            spans[start.start()] = (start, match)
+    if stack:
+        raise ValueError("Unclosed drafting choice")
+
+    def annotation(text):
+        return DRAFT_START + text + DRAFT_END
+
+    def render(lo, hi):
+        out, cursor = [], lo
+        while cursor < hi:
+            entry = next((spans[m.start()] for m in matches
+                          if cursor <= m.start() < hi and m.start() in spans), None)
+            if entry is None:
+                out.append(md[cursor:hi]); break
+            start, end = entry
+            out.append(md[cursor:start.start()])
+            kind, subject = start.group(1), start.group(2)
+            if kind in ("one", "many"):
+                label = ("One " + subject) if kind == "one" else ("Multiple " + subject + "s")
+            else:
+                if subject not in labels:
+                    raise ValueError("Unlabelled drafting condition: " + subject)
+                label = "If " + labels[subject].lower()
+            raw = md[start.end():end.start()]
+            body = render(start.end(), end.start())
+            table = md[md.rfind("\n", 0, start.start()) + 1:start.start()].lstrip().startswith("|")
+            block = not table and ("\n" in raw or len(re.sub(r"<!--.*?-->", "", raw, flags=re.S)) > 100)
+            if block:
+                out.append("\n\n" + annotation("[" + label + ":]") + "\n" + body.strip() +
+                           "\n" + annotation("[End " + label.lower() + ".]") + "\n\n")
+            else:
+                out.append(" " + annotation("[" + label + ": ") + body.strip() + annotation("]") + ("" if md[end.end():end.end()+1] in ".,;:!?" else " "))
+            cursor = end.end()
+        return "".join(out)
+    return render(0, len(md))
+
+
 def body_xml(md, P):
     header = None
     m = re.search(r"<!--\s*page-header:\s*(.+?)\s*-->", md)
@@ -342,7 +415,7 @@ def body_xml(md, P):
     # repeat:member/asset controls cut a table off immediately after its header.
     # The sentinel also handles multiline comments without removing any text
     # between adjacent inline alternatives in these editable drafting forms.
-    commented = re.sub(r"<!--.*?-->", "\x00", md, flags=re.S)
+    commented = re.sub(r"<!--.*?-->", "\x00", drafting_choices(md), flags=re.S)
     lines = ["\x00" if "\x00" in line and not line.replace("\x00", "").strip()
              else line.replace("\x00", "") for line in commented.split("\n")]
 
@@ -369,6 +442,10 @@ def body_xml(md, P):
         emitted_at = len(out)
 
         line = lines[i].rstrip()
+        if line.startswith(DRAFT_START) and line.endswith(DRAFT_END):
+            out.append(para(line, P, justify=True, after=80, keep_next="[End " not in line))
+            i += 1
+            continue
         stripped = line.strip()
 
         if not stripped or stripped == "\x00":

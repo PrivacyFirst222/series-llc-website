@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "run": "claude-reconciled-batch32",
+  "commit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+  "completedAt": "2026-09-22T17:59:33.642033+00:00",
+  "manifestSha": "16ef2f4e71903341fba6883b4ac641e76abc4b71f3085c985070df2e990bf8fc",
+  "auditSha": "d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1",
+  "findings": [
+    {
+      "key": "render-word-alternatives-glued",
+      "where": "The Word masters in docs/word (all eight agreements, the amendment form and the Statement form) \u2014 every one:/many:/if: alternative and every entity signature block",
+      "file": "docs/md-to-docx.py",
+      "line": 339,
+      "reads": "    md = re.sub(r\"<!--.*?-->\", \"\", md, flags=re.S)",
+      "claims": "Stripping the HTML comments leaves a clean Word rendering of the master.",
+      "truth": "The comments are the markers that separate alternative wordings, so the Word documents print BOTH alternatives back to back with no space or note between them, and the [[indent]] token is printed verbatim. Read off the .docx text (evidence/render/word/*.docx.txt) and the rendered pages: the amendment (page 1) reads 'by the undersigned sole member (the \"Member\")the undersigned members (each a \"Member\" and collectively the \"Members\"), and is acknowledged by the undersigned ManagerManagers.', 'the undersigned hashave executed', 'the datedate(s)', 'MEMBER:MEMBERS:', 'ACKNOWLEDGED AND AGREED BY MANAGER:ACKNOWLEDGED AND AGREED BY MANAGERS:'; every manager-managed agreement reads 'The initial Manager is [MANAGER NAMES].The initial Managers are [MANAGER NAMES].' (s. 5.1) and 'Adopted effective [DATE] by the Company, acting through its Manager:Adopted effective [DATE] by the Company, acting through its Managers:'; the Statement form prints item 5 twice in a row ('\u2026chapter 605, Florida Statutes.All ownership of the Company rests with its members, and all authority \u2026 rests with its manager or managers\u2026'); and '[[indent]][PRINTED NAME]' / '[[indent]][TITLE]' appear in every entity signature block. The repeat-marker table rows of Exhibit A also print as literal pipe text ('| [MEMBER NAME] as [HOLDING] | [MEMBER ADDRESS] | \u2026') under a one-row header table. The zip of each .docx confirms the text (unzip -p \u2026 word/document.xml). A reviewer or client reading the Word master cannot tell where one alternative ends and the other begins.",
+      "replacement": "In md-to-docx.py, before stripping comments, resolve the markers the way the generator does for a blank master: render `<!-- one:X -->A<!-- /one --><!-- many:X -->B<!-- /many -->` as 'A [or: B]' (or on two lines with a bracketed note), render `<!-- if:X -->\u2026<!-- /if -->` blocks with a bracketed '[if X:]' lead-in, drop the `[[indent]]` token (indent the paragraph instead), and treat the lines inside `<!-- repeat -->` blocks as table rows so they join the table above them.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "render-word-3e3310142d63",
+        "render-word-c84b337e29e4",
+        "render-word-eab2e6542ae0",
+        "render-word-0f122c7833da",
+        "render-word-f464fd6da5e6",
+        "render-word-1d613f3a18a5",
+        "render-word-ec531ae5100f",
+        "render-word-184eaac6d8d3",
+        "render-word-8a823388bd88",
+        "render-word-cff1475ccdc5"
+      ],
+      "review": {
+        "reviewer": "Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim."
+      },
+      "bucket": 3,
+      "reader": "reader-3",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "render-2553-address-split",
+      "where": "Client portal, S corporation election package \u2014 IRS Form 2553 page 1 (Name and address block) and the cover letter letterhead",
+      "file": "webapp/server/s-election.ts",
+      "line": 97,
+      "reads": "function splitAddress(addr: string): { street: string; cityStateZip: string } {\n  const parts = addr.split(\",\").map((s) => s.trim()).filter(Boolean);\n  if (parts.length >= 2) {\n    return { street: parts.slice(0, parts.length - 2).join(\", \") || parts[0], cityStateZip: parts.slice(-2).join(\", \") };\n  }",
+      "claims": "The principal address is split into the form's street line and its 'City or town, state, and ZIP code' line.",
+      "truth": "The principal address handed to the package comes from oaSeed (routes-portal.ts:99\u2013101), which joins it as address1, address2, 'City, ST', zip \u2014 the city and state are ONE comma part and the zip another, so the last two parts are 'FL' and '33139'. On the generated Form 2553 (evidence/render/pdf-s-election-package.pdf page 4, image pages/pdf-s-election-package/p-4.png; same on pdf-s-election-package-nine page 4) the street line reads '100 Ocean Drive, Suite 400, Miami' and the city line reads 'FL, 33139' \u2014 the city is on the wrong line and the IRS's city box has no city. The cover letters (page 3 of both packages) show the same split: '100 Ocean Drive, Suite 400, Miami' over 'FL, 33139'.",
+      "replacement": "Split on the last THREE comma parts when the third-from-last is a city and the second-from-last is a two-letter state: `const parts = addr.split(\",\").map((s) => s.trim()).filter(Boolean); if (parts.length >= 3 && /^[A-Z]{2}$/.test(parts[parts.length - 2])) return { street: parts.slice(0, -3).join(\", \"), cityStateZip: `${parts[parts.length - 3]}, ${parts[parts.length - 2]} ${parts[parts.length - 1]}` };` \u2014 or pass the structured principalOfficeAddress (address1, address2, city, state, zip) from the order payload instead of a joined string.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "render-pdf-s-election-package",
+        "render-pdf-s-election-package-nine"
+      ],
+      "review": {
+        "reviewer": "Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim."
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "render-manual-double-page-numbers",
+      "where": "Client portal, Reference Library, the Owner's Manual PDF the client downloads \u2014 every body page's footer",
+      "file": "webapp/server/pdf-render.ts",
+      "line": 535,
+      "reads": "function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo): void {\n  const pages = doc.getPages();\n  const total = pages.length;\n  const text = sanitize(`Copyright FLORIDA PROTECTED SERIES, LLC - PS 1${wm.note ? \", \" + wm.note.replace(/\\s+\\u2014\\s+/g, \", \") : \"\"}`);",
+      "claims": "stampExistingPdf (pdf-render.ts:672\u2013681) stamps the published manual with the license footer and a page number, producing a readable footer on every page.",
+      "truth": "manual-pdf.ts:388\u2013404 already draws 'Page n of 35' at x = PAGE_W \u2212 MARGIN \u2212 w, y = 40 on every body page (numbered from the first body page, cover and contents unnumbered), and stampFooters then draws 'Page N of 37' (numbered from the cover) at the same position. In the downloaded manual (evidence/render/pdf-owners-manual.pdf, pages 3\u201337) the two numbers overprint: pdftotext of page 3 reads 'Page / Page31 of / of 37 / 35', and the images show a smeared footer on every body page. The CONTENTS page (manual's own numbering: 'HOW TO USE THIS MANUAL \u2026 1') no longer matches the only legible number, 'of 37'. Page images: evidence/render/pages/pdf-owners-manual/p-03.png \u2026 p-37.png.",
+      "replacement": "In stampExistingPdf, do not draw a page number when the document already carries its own: either pass a flag from the library route (the manual renders its own footer) so stampFooters draws only the copyright line for that document, or, in stampFooters, skip the `Page N of total` draw when `opts.title` is the manual's title. Simplest: `export async function stampExistingPdf(opts: { bytes; watermark; title; pageNumbers?: boolean })` and in stampFooters `if (pageNumbers !== false) p.drawText(pn, \u2026)`; the library download passes `pageNumbers: false`.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "render-pdf-owners-manual"
+      ],
+      "review": {
+        "reviewer": "Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim."
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "render-capital-equal-couple-wording",
+      "where": "Operating agreement questionnaire \u2192 generated agreement, Exhibit A, 'Contributed assets' table, 'Contributed by' column, when a married couple (one ownership unit) and another owner contribute an asset equally",
+      "file": "webapp/server/oa-capital.ts",
+      "line": 82,
+      "reads": "          : `${joinNames(unitNames)}, equally`;",
+      "claims": "The column names who contributed the asset and in what proportion.",
+      "truth": "A couple's unit name is 'Sam Ortiz and Riley Ortiz'; joinNames of two units yields 'Sam Ortiz and Riley Ortiz and Casey Member, Jr., equally' (evidence/render/pdf-5-ordinary.pdf page 20 and pdf-6-ordinary.pdf page 21; text in pdf-5-ordinary.txt), which reads as three people contributing a third each, while the computation (and the 'Initial contribution to the Company' column: $660,003 for the couple, $629,997 for Casey) is one half per unit. The shares-mode wording on the next row, 'Sam Ortiz and Riley Ortiz (66.67%) and Casey Member, Jr. (33.33%)', is unambiguous.",
+      "replacement": "Print each unit's share in equal mode whenever there is more than one unit: replace line 82 with `: joinNames(unitNames.map((n) => `${n} (${Number((100 / units).toFixed(2))}%)`))` so the row reads 'Sam Ortiz and Riley Ortiz (50%) and Casey Member, Jr. (50%)'.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "render-pdf-5-ordinary",
+        "render-pdf-6-ordinary"
+      ],
+      "review": {
+        "reviewer": "Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim."
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "render-wrap-line-starts-with-punctuation",
+      "where": "Statement of Authorized Representative PDF, opening paragraph, third line (and any paragraph where a bold name ends exactly at the right margin)",
+      "file": "webapp/server/pdf-render.ts",
+      "line": 153,
+      "reads": "      if (curW + w > width && cur.length > 0 && word.trim() !== \"\") {",
+      "claims": "Words wrap at the right margin.",
+      "truth": "The wrapper splits every segment on whitespace, so a segment that begins with punctuation (', a Florida limited liability company' after the bold company name) yields a first 'word' of ','; when the bold name fills the line, that ',' is wrapped to the next line and the Statement reads 'Render Statement Members, LLC' / ', a Florida limited liability company (the \"Company\")' (evidence/render/pdf-statement.pdf page 1; image pages/pdf-statement/p-1.png; text pdf-statement.txt line 5). The manager-managed copy happened to fit ('Render Statement Managers,' / 'LLC, a Florida\u2026').",
+      "replacement": "Never break before a token that is only punctuation: in wrapSegs, when `word` matches /^[,.;:)]+$/ append it to the current line even if it overflows (or merge it with the previous word before measuring): `if (curW + w > width && cur.length > 0 && word.trim() !== \"\" && !/^[,.;:)]+$/.test(word)) {`.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "render-pdf-statement"
+      ],
+      "review": {
+        "reviewer": "Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim."
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    }
+  ]
+}

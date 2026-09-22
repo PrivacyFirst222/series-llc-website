@@ -78,6 +78,7 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
    *  (Adam, 10 Sep 2026): the client who placed it and every Manager. */
   suggestedOwners: { name: string; address: string }[];
   principalAddress: string;
+  principalAddressParts: { address1?: string; address2?: string; city?: string; state?: string; zip?: string };
   members: { name: string; address: string; isEntity?: boolean }[];
   series: { name: string; purpose: string }[];
 } | null> {
@@ -182,6 +183,7 @@ export async function oaSeed(clientId: string, orderId?: string | null): Promise
     managerEntities,
     suggestedOwners,
     principalAddress,
+    principalAddressParts: { ...addr },
     members,
     series,
   };
@@ -802,6 +804,7 @@ export async function postSElectionPackage(args: {
     pdf = await buildSElectionPackage({
       llcName: so.llc_name,
       principalAddress: seed?.principalAddress ?? "",
+      principalAddressParts: seed.principalAddressParts,
       ein: merged.ein ?? "",
       dateIncorporated: formation,
       effectiveDate,
@@ -1420,7 +1423,7 @@ app.post("/portal/oa/generate", async (c) => {
   if (a.assets?.some(asset => asset.contributedBy?.needsReview || (asset.contributedBy?.unitIds && JSON.stringify(asset.contributedBy.unitIds) !== JSON.stringify(contributorIds)))) {
     return c.json(err(CONTRIBUTOR_REVIEW, "CONTRIBUTOR_REVIEW"), 400);
   }
-  const capital = computeCapital(a.assets, members.map((m) => m.name), seed.series.map((sr) => sr.name));
+  const capital = computeCapital(a.assets, members.map((m) => m.name), seed.series.map((sr) => sr.name), members.map(m => Boolean(m.jointHolding)));
   if (capital.errors.length > 0) {
     return c.json(err(capital.errors[0], "CAPITAL"), 400);
   }
@@ -1810,6 +1813,9 @@ app.get("/portal/library/:key/download", async (c) => {
       bytes,
       watermark: { name: clients[0]?.name ?? "", email: clients[0]?.email ?? "", note: rows[0].edition },
       title: rows[0].title,
+      // Keep the Manual's own body-relative numbering (and an uploaded
+      // replacement's authored pagination), while still licensing every page.
+      preservePageNumbers: c.req.param("key") === "owners-manual",
     });
   } catch (e) {
     console.error("[library] stamp failed; serving original:", e);

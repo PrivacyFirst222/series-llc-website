@@ -2,7 +2,7 @@
 
 GENERATED from docs/audit/ledger.json by `bun run docs/audit/ledger-print.ts list`. Do not edit: the commit step refuses a copy that differs from the ledger. The auditors' original files are unchanged under docs/audit/sources/ and docs/audit/runs/.
 
-393 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 59 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 381.
+398 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 64 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 386.
 
 A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.
 For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-session.ts. The historical coverage-check.ts alone does not establish complete prior-item reconciliation. Audit completion does not approve repairs or publication.
@@ -2400,7 +2400,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 
-## Agreements and guidance — 84 open of 87
+## Agreements and guidance — 89 open of 92
 
 - **229. [A80]** — **implemented**
   - Manager-managed forms (4), Indemnification: "an act exceeding the authority conferred by Section 5.4"; 5.4 is the approval list, 5.3 the authority. Replace: "an act taken without the approval Section 5.4 requires" (both places).
@@ -3156,3 +3156,55 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Fixed: batch 31 revision 3, commit , by Codex; protected by 16 assertion(s).
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
+- **AUD-claude-reconciled-batch32-render-word-alternatives-glued. [substantive]** — **implemented**
+  - The Word masters in docs/word (all eight agreements, the amendment form and the Statement form) — every one:/many:/if: alternative and every entity signature block — `docs/md-to-docx.py:339`
+  - Reads:     md = re.sub(r"<!--.*?-->", "", md, flags=re.S)
+  - Claims: Stripping the HTML comments leaves a clean Word rendering of the master.
+  - True: The comments are the markers that separate alternative wordings, so the Word documents print BOTH alternatives back to back with no space or note between them, and the [[indent]] token is printed verbatim. Read off the .docx text (evidence/render/word/*.docx.txt) and the rendered pages: the amendment (page 1) reads 'by the undersigned sole member (the "Member")the undersigned members (each a "Member" and collectively the "Members"), and is acknowledged by the undersigned ManagerManagers.', 'the undersigned hashave executed', 'the datedate(s)', 'MEMBER:MEMBERS:', 'ACKNOWLEDGED AND AGREED BY MANAGER:ACKNOWLEDGED AND AGREED BY MANAGERS:'; every manager-managed agreement reads 'The initial Manager is [MANAGER NAMES].The initial Managers are [MANAGER NAMES].' (s. 5.1) and 'Adopted effective [DATE] by the Company, acting through its Manager:Adopted effective [DATE] by the Company, acting through its Managers:'; the Statement form prints item 5 twice in a row ('…chapter 605, Florida Statutes.All ownership of the Company rests with its members, and all authority … rests with its manager or managers…'); and '[[indent]][PRINTED NAME]' / '[[indent]][TITLE]' appear in every entity signature block. The repeat-marker table rows of Exhibit A also print as literal pipe text ('| [MEMBER NAME] as [HOLDING] | [MEMBER ADDRESS] | …') under a one-row header table. The zip of each .docx confirms the text (unzip -p … word/document.xml). A reviewer or client reading the Word master cannot tell where one alternative ends and the other begins.
+  - Proposed replacement (not approved): In md-to-docx.py, before stripping comments, resolve the markers the way the generator does for a blank master: render `<!-- one:X -->A<!-- /one --><!-- many:X -->B<!-- /many -->` as 'A [or: B]' (or on two lines with a bracketed note), render `<!-- if:X -->…<!-- /if -->` blocks with a bracketed '[if X:]' lead-in, drop the `[[indent]]` token (indent the paragraph instead), and treat the lines inside `<!-- repeat -->` blocks as table rows so they join the table above them.
+  - Rechecked by Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a: Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim.
+  - Fixed: batch 32 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-22 rejected r1: Standing authorization to advance revisions: declare the existing API assertion update for the approved exact contribution fractions.
+- **AUD-claude-reconciled-batch32-render-2553-address-split. [substantive]** — **implemented**
+  - Client portal, S corporation election package — IRS Form 2553 page 1 (Name and address block) and the cover letter letterhead — `webapp/server/s-election.ts:97`
+  - Reads: function splitAddress(addr: string): { street: string; cityStateZip: string } {
+  -   const parts = addr.split(",").map((s) => s.trim()).filter(Boolean);
+  -   if (parts.length >= 2) {
+  -     return { street: parts.slice(0, parts.length - 2).join(", ") || parts[0], cityStateZip: parts.slice(-2).join(", ") };
+  -   }
+  - Claims: The principal address is split into the form's street line and its 'City or town, state, and ZIP code' line.
+  - True: The principal address handed to the package comes from oaSeed (routes-portal.ts:99–101), which joins it as address1, address2, 'City, ST', zip — the city and state are ONE comma part and the zip another, so the last two parts are 'FL' and '33139'. On the generated Form 2553 (evidence/render/pdf-s-election-package.pdf page 4, image pages/pdf-s-election-package/p-4.png; same on pdf-s-election-package-nine page 4) the street line reads '100 Ocean Drive, Suite 400, Miami' and the city line reads 'FL, 33139' — the city is on the wrong line and the IRS's city box has no city. The cover letters (page 3 of both packages) show the same split: '100 Ocean Drive, Suite 400, Miami' over 'FL, 33139'.
+  - Proposed replacement (not approved): Split on the last THREE comma parts when the third-from-last is a city and the second-from-last is a two-letter state: `const parts = addr.split(",").map((s) => s.trim()).filter(Boolean); if (parts.length >= 3 && /^[A-Z]{2}$/.test(parts[parts.length - 2])) return { street: parts.slice(0, -3).join(", "), cityStateZip: `${parts[parts.length - 3]}, ${parts[parts.length - 2]} ${parts[parts.length - 1]}` };` — or pass the structured principalOfficeAddress (address1, address2, city, state, zip) from the order payload instead of a joined string.
+  - Rechecked by Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a: Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim.
+  - Fixed: batch 32 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-22 rejected r1: Standing authorization to advance revisions: declare the existing API assertion update for the approved exact contribution fractions.
+- **AUD-claude-reconciled-batch32-render-manual-double-page-numbers. [substantive]** — **implemented**
+  - Client portal, Reference Library, the Owner's Manual PDF the client downloads — every body page's footer — `webapp/server/pdf-render.ts:535`
+  - Reads: function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo): void {
+  -   const pages = doc.getPages();
+  -   const total = pages.length;
+  -   const text = sanitize(`Copyright FLORIDA PROTECTED SERIES, LLC - PS 1${wm.note ? ", " + wm.note.replace(/\s+\u2014\s+/g, ", ") : ""}`);
+  - Claims: stampExistingPdf (pdf-render.ts:672–681) stamps the published manual with the license footer and a page number, producing a readable footer on every page.
+  - True: manual-pdf.ts:388–404 already draws 'Page n of 35' at x = PAGE_W − MARGIN − w, y = 40 on every body page (numbered from the first body page, cover and contents unnumbered), and stampFooters then draws 'Page N of 37' (numbered from the cover) at the same position. In the downloaded manual (evidence/render/pdf-owners-manual.pdf, pages 3–37) the two numbers overprint: pdftotext of page 3 reads 'Page / Page31 of / of 37 / 35', and the images show a smeared footer on every body page. The CONTENTS page (manual's own numbering: 'HOW TO USE THIS MANUAL … 1') no longer matches the only legible number, 'of 37'. Page images: evidence/render/pages/pdf-owners-manual/p-03.png … p-37.png.
+  - Proposed replacement (not approved): In stampExistingPdf, do not draw a page number when the document already carries its own: either pass a flag from the library route (the manual renders its own footer) so stampFooters draws only the copyright line for that document, or, in stampFooters, skip the `Page N of total` draw when `opts.title` is the manual's title. Simplest: `export async function stampExistingPdf(opts: { bytes; watermark; title; pageNumbers?: boolean })` and in stampFooters `if (pageNumbers !== false) p.drawText(pn, …)`; the library download passes `pageNumbers: false`.
+  - Rechecked by Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a: Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim.
+  - Fixed: batch 32 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-22 rejected r1: Standing authorization to advance revisions: declare the existing API assertion update for the approved exact contribution fractions.
+- **AUD-claude-reconciled-batch32-render-capital-equal-couple-wording. [wording]** — **implemented**
+  - Operating agreement questionnaire → generated agreement, Exhibit A, 'Contributed assets' table, 'Contributed by' column, when a married couple (one ownership unit) and another owner contribute an asset equally — `webapp/server/oa-capital.ts:82`
+  - Reads:           : `${joinNames(unitNames)}, equally`;
+  - Claims: The column names who contributed the asset and in what proportion.
+  - True: A couple's unit name is 'Sam Ortiz and Riley Ortiz'; joinNames of two units yields 'Sam Ortiz and Riley Ortiz and Casey Member, Jr., equally' (evidence/render/pdf-5-ordinary.pdf page 20 and pdf-6-ordinary.pdf page 21; text in pdf-5-ordinary.txt), which reads as three people contributing a third each, while the computation (and the 'Initial contribution to the Company' column: $660,003 for the couple, $629,997 for Casey) is one half per unit. The shares-mode wording on the next row, 'Sam Ortiz and Riley Ortiz (66.67%) and Casey Member, Jr. (33.33%)', is unambiguous.
+  - Proposed replacement (not approved): Print each unit's share in equal mode whenever there is more than one unit: replace line 82 with `: joinNames(unitNames.map((n) => `${n} (${Number((100 / units).toFixed(2))}%)`))` so the row reads 'Sam Ortiz and Riley Ortiz (50%) and Casey Member, Jr. (50%)'.
+  - Rechecked by Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a: Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim.
+  - Fixed: batch 32 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-22 rejected r1: Standing authorization to advance revisions: declare the existing API assertion update for the approved exact contribution fractions.
+- **AUD-claude-reconciled-batch32-render-wrap-line-starts-with-punctuation. [wording]** — **implemented**
+  - Statement of Authorized Representative PDF, opening paragraph, third line (and any paragraph where a bold name ends exactly at the right margin) — `webapp/server/pdf-render.ts:153`
+  - Reads:       if (curW + w > width && cur.length > 0 && word.trim() !== "") {
+  - Claims: Words wrap at the right margin.
+  - True: The wrapper splits every segment on whitespace, so a segment that begins with punctuation (', a Florida limited liability company' after the bold company name) yields a first 'word' of ','; when the bold name fills the line, that ',' is wrapped to the next line and the Statement reads 'Render Statement Members, LLC' / ', a Florida limited liability company (the "Company")' (evidence/render/pdf-statement.pdf page 1; image pages/pdf-statement/p-1.png; text pdf-statement.txt line 5). The manager-managed copy happened to fit ('Render Statement Managers,' / 'LLC, a Florida…').
+  - Proposed replacement (not approved): Never break before a token that is only punctuation: in wrapSegs, when `word` matches /^[,.;:)]+$/ append it to the current line even if it overflows (or merge it with the previous word before measuring): `if (curW + w > width && cur.length > 0 && word.trim() !== "" && !/^[,.;:)]+$/.test(word)) {`.
+  - Rechecked by Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a: Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim.
+  - Fixed: batch 32 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - 2026-09-22 rejected r1: Standing authorization to advance revisions: declare the existing API assertion update for the approved exact contribution fractions.

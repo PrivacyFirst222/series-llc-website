@@ -145,25 +145,34 @@ export function wrapSegs(f: Fonts, segs: Seg[], width: number, size: number): Se
   const lines: Seg[][] = [];
   let cur: Seg[] = [];
   let curW = 0;
+  // A word can cross font boundaries: **Company**, has no break opportunity
+  // before its comma. Measure the complete non-whitespace cluster first.
+  const groups: Seg[][] = [];
   for (const seg of segs) {
-    const words = seg.text.split(/(\s+)/).filter((w) => w.length > 0);
-    for (const word of words) {
-      const font = fontFor(f, seg);
-      const w = drawnWidth(font, word, size);
-      if (curW + w > width && cur.length > 0 && word.trim() !== "") {
-        lines.push(cur);
-        cur = [];
-        curW = 0;
-        if (word.trim() === "") continue;
-      }
-      const last = cur[cur.length - 1];
-      if (last && last.bold === seg.bold && last.italic === seg.italic) {
-        last.text += word;
-      } else {
-        cur.push({ text: word, bold: seg.bold, italic: seg.italic });
-      }
-      curW += w;
+    for (const text of seg.text.split(/(\s+)/).filter(Boolean)) {
+      const part = { ...seg, text };
+      const previous = groups.at(-1);
+      if (previous && !/\s/.test(text) && !/\s/.test(previous[0].text)) previous.push(part);
+      else groups.push([part]);
     }
+  }
+  for (const group of groups) {
+    const whitespace = /^\s+$/.test(group[0].text);
+    const w = group.reduce((sum, seg) => sum + drawnWidth(fontFor(f, seg), seg.text, size), 0);
+    if (!whitespace && curW + w > width && cur.length > 0) {
+      // Trailing whitespace belongs between words, not outside the margin.
+      while (cur.length && !cur.at(-1)!.text.trim()) cur.pop();
+      if (cur.length) cur[cur.length - 1].text = cur[cur.length - 1].text.trimEnd();
+      if (cur.length) lines.push(cur);
+      cur = []; curW = 0;
+    }
+    if (whitespace && cur.length === 0) continue;
+    for (const seg of group) {
+      const last = cur.at(-1);
+      if (last && last.bold === seg.bold && last.italic === seg.italic) last.text += seg.text;
+      else cur.push({ ...seg });
+    }
+    curW += w;
   }
   if (cur.length > 0) lines.push(cur);
   return lines.map((ln) => {
@@ -626,7 +635,7 @@ function stampPageNumbers(doc: PDFDocument, font: PDFFont): void {
   });
 }
 
-function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo): void {
+function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo, preservePageNumbers = false): void {
   const pages = doc.getPages();
   const total = pages.length;
   const text = sanitize(`Copyright FLORIDA PROTECTED SERIES, LLC - PS 1${wm.note ? ", " + wm.note.replace(/\s+\u2014\s+/g, ", ") : ""}`);
@@ -637,6 +646,7 @@ function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo): void 
   pages.forEach((p, i) => {
     const { width } = p.getSize();
     p.drawText(text, { x: MARGIN, y: FOOTER_Y, size: 7.5, font, color: grey });
+    if (preservePageNumbers) return;
     const pn = `Page ${i + 1} of ${total}`;
     const w = drawnWidth(font, pn, 7.5);
     p.drawText(pn, { x: width - MARGIN - w, y: FOOTER_Y, size: 7.5, font, color: grey });
@@ -767,9 +777,11 @@ export async function stampExistingPdf(opts: {
   bytes: Uint8Array | ArrayBuffer;
   watermark: WatermarkInfo;
   title: string;
+  /** Preserve authored pagination, including unnumbered cover/contents pages. */
+  preservePageNumbers?: boolean;
 }): Promise<Uint8Array> {
   const doc = await PDFDocument.load(opts.bytes, { ignoreEncryption: true });
   const font = await doc.embedFont(StandardFonts.Helvetica);
-  stampFooters(doc, font, opts.watermark);
+  stampFooters(doc, font, opts.watermark, opts.preservePageNumbers);
   return finishWithPermissions(doc, opts.title, opts.watermark, font);
 }

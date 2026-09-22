@@ -37,7 +37,8 @@ export interface SElectionShareholder {
 
 export interface SElectionDetails {
   llcName: string;
-  principalAddress: string; // "street, city, ST zip"
+  principalAddress: string; // legacy display address
+  principalAddressParts?: { address1?: string; address2?: string; city?: string; state?: string; zip?: string };
   ein: string; // issued EIN: 9 digits
   dateIncorporated: string; // YYYY-MM-DD (Articles filing date)
   effectiveDate: string; // YYYY-MM-DD (item E)
@@ -92,12 +93,21 @@ export function electionDeadline(startIso: string): string {
   return form2553Deadline(startIso);
 }
 
-/** Split "street, city, ST zip" into the form's two address lines as best we
- *  can; a one-line fallback goes entirely on the street line. */
-function splitAddress(addr: string): { street: string; cityStateZip: string } {
-  const parts = addr.split(",").map((s) => s.trim()).filter(Boolean);
-  if (parts.length >= 2) {
-    return { street: parts.slice(0, parts.length - 2).join(", ") || parts[0], cityStateZip: parts.slice(-2).join(", ") };
+/** Prefer the saved address fields. Legacy comma-separated addresses have two
+ * supported endings: "city, ST ZIP" and "city, ST, ZIP". Unknown layouts
+ * stay intact on the street line; do not guess away an address component. */
+function splitAddress(addr: string, fields?: SElectionDetails["principalAddressParts"]): { street: string; cityStateZip: string } {
+  if (fields?.address1?.trim() && fields.city?.trim() && fields.state?.trim() && fields.zip?.trim()) {
+    return { street: [fields.address1, fields.address2].map(s => s?.trim()).filter(Boolean).join(", "),
+      cityStateZip: `${fields.city.trim()}, ${fields.state.trim()} ${fields.zip.trim()}` };
+  }
+  const parts = addr.split(",").map(s => s.trim()).filter(Boolean);
+  const last = parts.at(-1) ?? "";
+  if (parts.length >= 4 && /^\d{5}(?:-\d{4})?$/.test(last) && /^[A-Za-z]{2}$/.test(parts.at(-2) ?? "")) {
+    return { street: parts.slice(0, -3).join(", "), cityStateZip: `${parts.at(-3)}, ${parts.at(-2)} ${last}` };
+  }
+  if (parts.length >= 3 && /^[A-Za-z]{2}\s+\d{5}(?:-\d{4})?$/.test(last)) {
+    return { street: parts.slice(0, -2).join(", "), cityStateZip: `${parts.at(-2)}, ${last}` };
   }
   return { street: addr, cityStateZip: "" };
 }
@@ -114,7 +124,7 @@ async function fillForm2553(d: SElectionDetails): Promise<PDFDocument> {
     if (max !== undefined && value.length > max) field.setMaxLength(undefined);
     field.setText(value);
   };
-  const addr = splitAddress(d.principalAddress);
+  const addr = splitAddress(d.principalAddress, d.principalAddressParts);
 
   // Part I — Election Information
   setText(`${F}.NameAddress[0].f1_01[0]`, d.llcName);
@@ -248,7 +258,7 @@ The IRS normally mails an acceptance letter (Notice CP261) within about 60 days.
 }
 
 function coverLetterMarkdown(d: SElectionDetails): string {
-  const addr = splitAddress(d.principalAddress);
+  const addr = splitAddress(d.principalAddress, d.principalAddressParts);
   return `# ${d.llcName.toUpperCase()}
 
 ${addr.street}
