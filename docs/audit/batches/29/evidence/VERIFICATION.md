@@ -17,3 +17,5 @@ Names are preliminarily compared locally, not certified as legally available; li
 Full `bun run check` passed on the implementation: typecheck, lint, unit, fact ledger, server and document checks. Exact-commit final review follows the normal-hook commit.
 
 The fourth inactive-name wording copy (NameCheck results card) is also browser-tested. The intermediate rejection state was committed separately through the normal hook before recording its successor implementation, preserving every recorded event and snapshot.
+
+Revision4: full revision3 review caught nine older walkthrough failures, all from the shared third-party agent fixture. Correcting the fixture applicant identity preserves all assertions; rerun Batch06 (27), Batch08 (13) and Batch10 (14) checks all pass. Logs retained here. A fresh exact-commit package is required; the failed revision3 package is not release evidence.

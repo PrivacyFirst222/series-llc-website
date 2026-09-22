@@ -29,3 +29,5 @@ Expects: preliminary local checking does not claim final state approval.
 Revision2 declares the walkthrough update for read-only personal-agent identity and the neutral EIN heading, under Adam’s standing authorization. Two preexisting test orders inherited an applicant suffix but omitted it from their self-agent names/signatures; fixtures now use the same full name, while a separate adversarial case proves a different agent is refused. Existing prefix-normalization tests remain unchanged.
 
 Revision3 includes the fourth client-facing inactive-name copy in NameCheck.tsx. The earlier exact-commit review was stopped before completion and is not acceptance evidence.
+
+Revision4 declares the shared Batch06 fixture correction: its applicant is now John Smith, Jr., matching its personal agent. The actual suite assertions are unchanged. This resolves nine older walkthrough failures caused by the approved new identity restriction. The failed revision3 package is retained; no acceptance was recorded. Revision advancement uses Adam’s standing authorization.

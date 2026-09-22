@@ -6203,7 +6203,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -6269,8 +6269,35 @@
               "batch": "29",
               "revision": 3,
               "note": "Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair."
+            },
+            {
+              "at": "2026-09-22T04:27:56.174Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-22T04:27:56.197Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 4,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 4,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B09"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6689,7 +6716,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -6755,11 +6782,38 @@
               "batch": "29",
               "revision": 3,
               "note": "Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair."
+            },
+            {
+              "at": "2026-09-22T04:27:56.174Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-22T04:27:56.197Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 4,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "90",
             "part": "all"
+          },
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 4,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B09"
+              }
+            ]
           }
         }
       ],
@@ -25899,7 +25953,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -25966,8 +26020,35 @@
               "batch": "29",
               "revision": 3,
               "note": "Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair."
+            },
+            {
+              "at": "2026-09-22T04:27:56.174Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-22T04:27:56.197Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 4,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 4,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B01"
+              }
+            ]
+          }
         }
       ]
     },
@@ -25984,7 +26065,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -26051,8 +26132,35 @@
               "batch": "29",
               "revision": 3,
               "note": "Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair."
+            },
+            {
+              "at": "2026-09-22T04:27:56.174Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-22T04:27:56.197Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 4,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 4,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B02"
+              }
+            ]
+          }
         }
       ]
     },
@@ -26069,7 +26177,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -26136,8 +26244,35 @@
               "batch": "29",
               "revision": 3,
               "note": "Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair."
+            },
+            {
+              "at": "2026-09-22T04:27:56.174Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-22T04:27:56.197Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 4,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 4,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B03"
+              }
+            ]
+          }
         }
       ]
     },
@@ -26154,7 +26289,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -26221,8 +26356,35 @@
               "batch": "29",
               "revision": 3,
               "note": "Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair."
+            },
+            {
+              "at": "2026-09-22T04:27:56.174Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-22T04:27:56.197Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 4,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 4,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B04"
+              }
+            ]
+          }
         }
       ]
     },
@@ -26239,7 +26401,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -26306,8 +26468,35 @@
               "batch": "29",
               "revision": 3,
               "note": "Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair."
+            },
+            {
+              "at": "2026-09-22T04:27:56.174Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-22T04:27:56.197Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 4,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 4,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B05"
+              }
+            ]
+          }
         }
       ]
     },
@@ -26324,7 +26513,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -26391,8 +26580,35 @@
               "batch": "29",
               "revision": 3,
               "note": "Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair."
+            },
+            {
+              "at": "2026-09-22T04:27:56.174Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-22T04:27:56.197Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 4,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 4,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B06"
+              }
+            ]
+          }
         }
       ]
     },
@@ -26409,7 +26625,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -26476,8 +26692,35 @@
               "batch": "29",
               "revision": 3,
               "note": "Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair."
+            },
+            {
+              "at": "2026-09-22T04:27:56.174Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-22T04:27:56.197Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 4,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 4,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B07"
+              }
+            ]
+          }
         }
       ]
     },
@@ -26494,7 +26737,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -26561,8 +26804,35 @@
               "batch": "29",
               "revision": 3,
               "note": "Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair."
+            },
+            {
+              "at": "2026-09-22T04:27:56.174Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-22T04:27:56.197Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 4,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 4,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B08"
+              }
+            ]
+          }
         }
       ]
     }
@@ -27822,6 +28092,25 @@
           "at": "2026-09-22T04:27:13.929Z",
           "event": "rejected by Adam",
           "note": "Adam's record of 2026-09-22T04:27 (terminal): Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair."
+        }
+      ]
+    },
+    {
+      "id": "29",
+      "revision": 4,
+      "frozenHash": "19de5ff95900bd8e2087199dd1349495473fa1d40dfe443c118ea5fddc06442f",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "3f178aaad17e9440f1cf6001c66bb32635061fcb",
+      "history": [
+        {
+          "at": "2026-09-22T04:27:56.174Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-22T04:27:56.197Z",
+          "event": "implemented"
         }
       ]
     }
