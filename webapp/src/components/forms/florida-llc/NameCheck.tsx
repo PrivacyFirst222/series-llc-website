@@ -42,7 +42,7 @@ function VerdictRow({ v, label }: { v: NameCheckResult; label: string }) {
           {v.verdict === "taken"
             ? "Unavailable — an existing Florida company already has this name. Please choose a different name."
             : v.verdict === "held"
-              ? "Unavailable — this name belongs to a recently dissolved company, and Florida protects it for up to a year. Please choose a different name."
+              ? "Unavailable — this name matches a recently inactive company. Our service conservatively treats it as unavailable. Please choose a different name."
               : "No conflict found in the state's records."}
           {v.conflicts.length > 0 ? (
             <ul className="mt-2 space-y-1.5 text-xs leading-relaxed text-muted-foreground">
