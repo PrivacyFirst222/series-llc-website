@@ -2417,9 +2417,9 @@ if (mint.status === 200) {
     clientEmail: mmEmail, confirmClientEmail: mmEmail,
     clientFirstName: "Dana", clientLastName: "Reed",
     confirmCorrespondentEmail: mmEmail,
-    registeredAgentFirstName: "Dana", registeredAgentLastName: "Reed", registeredAgentSuffix: "",
-    registeredAgentAcceptanceName: "Dana Reed",
-    registeredAgentElectronicSignature: "Dana Reed",
+    registeredAgentFirstName: "Dana", registeredAgentLastName: "Reed", registeredAgentSuffix: "Jr.",
+    registeredAgentAcceptanceName: "Dana Reed, Jr.",
+    registeredAgentElectronicSignature: "Dana Reed, Jr.",
     authorizedRepresentativeName: "Dana Reed",
     authorizedRepresentativeSignature: "Dana Reed",
     desiredLlcName: "E2E Member Managed Holdings",
@@ -2574,9 +2574,9 @@ if (mint.status === 200) {
     clientEmail: smEmail, confirmClientEmail: smEmail,
     clientFirstName: "Alex", clientLastName: "Vale",
     confirmCorrespondentEmail: smEmail,
-    registeredAgentFirstName: "Alex", registeredAgentLastName: "Vale", registeredAgentSuffix: "",
-    registeredAgentAcceptanceName: "Alex Vale",
-    registeredAgentElectronicSignature: "Alex Vale",
+    registeredAgentFirstName: "Alex", registeredAgentLastName: "Vale", registeredAgentSuffix: "Jr.",
+    registeredAgentAcceptanceName: "Alex Vale, Jr.",
+    registeredAgentElectronicSignature: "Alex Vale, Jr.",
     authorizedRepresentativeName: "Alex Vale",
     authorizedRepresentativeSignature: "Alex Vale",
     desiredLlcName: "E2E Harbor Single Manager",
@@ -4111,6 +4111,18 @@ batch16Checks((label, ok, detail) => batch16Results.set(label, {ok, detail}));
 { const r = batch16Results.get("batch16: professional eligibility is conditional and cumulative"); check("batch16: professional eligibility is conditional and cumulative", r?.ok === true, r?.detail); }
 { const r = batch16Results.get("batch16: bankruptcy paragraph is exactly owner approved"); check("batch16: bankruptcy paragraph is exactly owner approved", r?.ok === true, r?.detail); }
 
+const {batch29Checks}=await import("./batch29-check");
+const batch29Results=new Map<string,{ok:boolean;detail?:unknown}>();
+await batch29Checks((label,ok,detail)=>batch29Results.set(label,{ok,detail}));
+{const r=batch29Results.get("batch29 B01");check("batch29 B01",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B02");check("batch29 B02",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B03");check("batch29 B03",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B04");check("batch29 B04",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B05");check("batch29 B05",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B06");check("batch29 B06",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B07");check("batch29 B07",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B08");check("batch29 B08",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B09");check("batch29 B09",r?.ok===true,r?.detail);}
 const {batch28Checks}=await import("./batch28-check");
 const batch28Results=new Map<string,{ok:boolean;detail?:unknown}>();
 await batch28Checks((label,ok,detail)=>batch28Results.set(label,{ok,detail}));

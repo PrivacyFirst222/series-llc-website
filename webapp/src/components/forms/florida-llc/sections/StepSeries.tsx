@@ -84,7 +84,7 @@ export function StepSeries({ data, patch, errors }: StepProps) {
             Vehicles).
           </li>
           <li>
-            No two series of the same LLC may share an identical name.
+            Series names must be distinguishable under Florida’s naming rules. Changes such as punctuation or replacing “and” with “&amp;” do not make a name distinguishable. These preliminary checks do not replace our office’s review of existing filings. Florida permits certain nonidentical names with the other entity’s written consent filed with the Division.
           </li>
         </ul>
       </div>

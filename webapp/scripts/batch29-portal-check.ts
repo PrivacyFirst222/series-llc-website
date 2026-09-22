@@ -1,0 +1,42 @@
+/** Actual React components in Chromium, local fixtures only. */
+import {build} from 'esbuild';
+import {chromium} from 'playwright';
+import {resolve} from 'node:path';
+import {mkdirSync} from 'node:fs';
+import {isolateBrowser} from './browser-isolation';
+type Report=(label:string,ok:boolean,detail?:unknown)=>void;
+export async function batch29Browser(report:Report){
+ const web=resolve(import.meta.dir,'..');
+ const entry=`import React,{useState} from 'react';import{createRoot}from'react-dom/client';import{flushSync}from'react-dom';import{MemoryRouter}from'react-router-dom';import{QueryClient,QueryClientProvider}from'@tanstack/react-query';import{SElectionDetailsForm}from'./src/pages/portal/SElectionDetailsForm';import Portal from'./src/pages/portal/PortalDashboard';import{StepRegisteredAgent}from'./src/components/forms/florida-llc/sections/StepRegisteredAgent';import{defaultFormData}from'./src/components/forms/florida-llc/defaults';import{patchAgentConsents}from'./src/components/forms/florida-llc/registeredAgent';
+const q=new QueryClient({defaultOptions:{queries:{retry:false},mutations:{retry:false}}});let root=createRoot(document.getElementById('root'));
+function Agent(){const[data,set]=useState({...structuredClone(defaultFormData),filingPath:'NEW',registeredAgentChoice:'SELF',clientFirstName:'Jane',clientLastName:'Owner',clientSuffix:'Jr.',registeredAgentFirstName:'Other',registeredAgentLastName:'Person'});window.data=data;return <StepRegisteredAgent data={data} patch={p=>set(d=>patchAgentConsents(d,p))} errors={{}}/>;}
+window.mount=(kind,props={})=>{flushSync(()=>root.unmount());q.clear();root=createRoot(document.getElementById('root'));flushSync(()=>root.render(<QueryClientProvider client={q}><MemoryRouter>{kind==='agent'?<Agent/>:kind==='portal'?<Portal/>:<SElectionDetailsForm order={{id:'sel',type:'s-election',status:'awaiting_info',details:props.prior||{}}} members={[]} clientName='Jane Owner' priorFormationDate='2026-09-01' todayEastern='2026-09-21' companyEin='12-3456789' draft={props.draft} onDraftChange={d=>window.draft=d} onDone={()=>{}}/>}</MemoryRouter></QueryClientProvider>));};window.ready=true;`;
+ const js=await build({stdin:{contents:entry,resolveDir:web,loader:'tsx'},bundle:true,write:false,format:'iife',jsx:'automatic',platform:'browser',alias:{'@':resolve(web,'src')},define:{'import.meta.env':'{}','process.env.NODE_ENV':'"production"'},logLevel:'silent'});
+ let submitted=false;
+ const company={orderId:'company',llcName:'Test Company LLC',formed:true,raService:true,raAppointmentDate:'2026-01-01',raRenewalDate:'2027-01-01',raCancellationRequestedAt:null,raResignationDue:'2026-10-01',raEndedDate:'2026-11-01',cardStatus:'none',renewals:[]};
+ const data=(data:unknown)=>Response.json({data});
+ const server=Bun.serve({hostname:'127.0.0.1',port:0,fetch(req){const p=new URL(req.url).pathname;
+ if(p==='/app.js')return new Response(js.outputFiles[0].text,{headers:{'content-type':'text/javascript'}});
+ if(p==='/api/auth/me')return data({name:'Jane Owner',email:'jane@example.test'});
+ if(p==='/api/portal/companies')return data([{...company,raResignationSubmitted:submitted?'2026-10-02':null}]);
+ if(p==='/api/portal/services')return data({orders:[{id:'ein',type:'ein',status:'awaiting_info',amount_cents:5000,details:{target:'company'}}],llcName:company.llcName,llcFormed:true,members:[{name:'Jane Owner',address:'100 Main St'}],series:[],todayEastern:'2026-09-21',pricing:{seriesCents:5000,einCents:5000,sElectionCents:9500,certStatusCents:1500,certifiedCopyCents:4000},sElection:{eligible:false,reason:'already_ordered',orderBy:null},einCompanyOrdered:true});
+ if(p==='/api/portal/oa')return data({seed:{llcName:company.llcName,members:[]},generations:[],saved:null});
+ if(['/api/portal/library','/api/portal/documents'].includes(p))return data([]);
+ if(p.startsWith('/api/'))return Response.json({error:{message:'Unexpected fixture request '+p}},{status:500});
+ return new Response('<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div id="root"></div><script src="/app.js"></script></body></html>',{headers:{'content-type':'text/html'}});}});
+ const browser=await chromium.launch();const{blocked}=isolateBrowser(browser);const page=await browser.newPage({viewport:{width:1100,height:900}});page.setDefaultTimeout(7000);
+ const mount=async(kind:string,props:unknown={})=>page.evaluate(({kind,props})=>window['mount'](kind,props),{kind,props});
+ const scenario=async(label:string,fn:()=>Promise<boolean>)=>{try{report(label,await fn());}catch(e){report(label,false,String(e));}};
+ try{await page.goto(`http://127.0.0.1:${server.port}`);await page.waitForFunction(()=>window['ready']);
+ await scenario('personal-agent-ui',async()=>{await mount('agent');await page.waitForFunction(()=>window['data'].registeredAgentFirstName==='Jane');return await page.locator('#ra-first-name').inputValue()==='Jane'&&await page.locator('#ra-last-name').inputValue()==='Owner'&&await page.locator('#ra-first-name').getAttribute('readonly')!==null;});
+ await scenario('B03',async()=>{await mount('s');const blank=await page.getByText('Officer title',{exact:true}).locator('..').locator('input').inputValue();await page.getByText('Officer title',{exact:true}).locator('..').locator('input').fill('President');const draft=await page.evaluate(()=>window['draft']);await mount('s',{draft});const retained=await page.getByText('Officer title',{exact:true}).locator('..').locator('input').inputValue();await mount('s',{prior:{officerTitle:'Treasurer'}});return blank===''&&retained==='President'&&await page.getByText('Officer title',{exact:true}).locator('..').locator('input').inputValue()==='Treasurer';});
+ await scenario('B05',async()=>{await mount('s');await page.getByPlaceholder('Home address',{exact:true}).fill('100 Unsaved Street');const newNotSaved=await page.getByText('Address on file',{exact:true}).count()===0;const draft=await page.evaluate(()=>window['draft']);await mount('s',{draft});const reopened=await page.getByText('Address on file',{exact:true}).count()===0;
+ const prior={shareholders:[{name:'Jane Owner',name2:'John Owner',joint:'tbe',address:'100 Saved Street',address2:'200 Saved Street',percentage:100}]};await mount('s',{prior});const saved=await page.getByText('Address on file',{exact:true}).count();await page.getByPlaceholder('Home address',{exact:true}).fill('101 Changed Street');let second=false;if(await page.getByPlaceholder("Co-owner's home address",{exact:true}).count()){await page.getByPlaceholder("Co-owner's home address",{exact:true}).fill('201 Changed Street');second=true;}const edited=await page.getByText('Address on file',{exact:true}).count()===0;return newNotSaved&&reopened&&saved===2&&edited&&second;});
+ await scenario('B06',async()=>{await mount('portal');await page.getByText('Registered agent service',{exact:true}).waitFor();let text=await page.locator('body').innerText();const due=text.includes('Resignation due October 1, 2026')&&text.includes('Appointment ends November 1, 2026')&&text.includes('appointment ends on November 1, 2026');submitted=true;await mount('portal');await page.getByText('Registered agent service',{exact:true}).waitFor();text=await page.locator('body').innerText();return due&&text.includes('Resignation submitted October 2, 2026');});
+ await scenario('B07',async()=>{return (await page.locator('body').innerText()).includes('Documents are download-only. Completed S-election forms and EIN letters stay encrypted here until you delete them.');});
+ await scenario('B04',async()=>{await page.getByRole('button',{name:/Provide.*details/i}).first().click();await page.getByTestId('responsible-party-heading').waitFor();return await page.getByTestId('responsible-party-heading').innerText()==='Responsible party';});
+ if(process.env.BATCH29_EVIDENCE_DIR){mkdirSync(process.env.BATCH29_EVIDENCE_DIR,{recursive:true});await page.screenshot({path:resolve(process.env.BATCH29_EVIDENCE_DIR,'ein.png'),fullPage:true});}
+ report('browser-isolation',blocked.size===0,[...blocked]);
+ }finally{await browser.close();server.stop(true);}
+}
+if(import.meta.main){let failed=0;await batch29Browser((label,ok,detail)=>{console.log(JSON.stringify({label,ok,detail}));if(!ok)failed++;});process.exitCode=failed?1:0;}

@@ -99910,6 +99910,37 @@ function hasFirstAndLast(name) {
   return words.length >= 2;
 }
 
+// src/components/forms/florida-llc/nameSimilarity.ts
+var SUFFIXES = /* @__PURE__ */ new Set([
+  "LLC",
+  "L.L.C",
+  "PLLC",
+  "P.L.L.C",
+  "INC",
+  "INCORPORATED",
+  "CORP",
+  "CORPORATION",
+  "CO",
+  "COMPANY",
+  "LTD",
+  "LIMITED",
+  "LP",
+  "L.P",
+  "LLP",
+  "LLLP",
+  "PA",
+  "P.A",
+  "PL",
+  "P.L",
+  "PC",
+  "CHARTERED"
+]);
+var ARTICLES = /* @__PURE__ */ new Set(["THE", "A", "AN"]);
+function normalizeEntityName(name) {
+  const tokens = name.toUpperCase().replace(/&/g, " AND ").replace(/['\u2019]/g, "").replace(/[^A-Z0-9 ]+/g, " ").split(/\s+/).filter(Boolean).filter((t) => !SUFFIXES.has(t) && !ARTICLES.has(t) && t !== "AND").map((t) => t.length > 3 && t.endsWith("S") ? t.slice(0, -1) : t);
+  return tokens.join(" ");
+}
+
 // src/lib/calendar.ts
 var EASTERN_ZONE = "America/New_York";
 function easternToday(now = /* @__PURE__ */ new Date()) {
@@ -100270,6 +100301,10 @@ function canonicalizeSeriesName(name) {
 function seriesDedupeKey(name) {
   return canonicalizeSeriesName(name).toUpperCase().replace(/(^|[^A-Z0-9])(?:PROTECTED\s+SERIES|P\.?S\.?)(?=[^A-Z0-9]|$)[\s-]*/g, "$1").replace(/\s+/g, " ").trim();
 }
+function seriesConflictKey(name) {
+  const identifier = seriesDedupeKey(name);
+  return /^(?:[A-Z]|[0-9]+|AN|THE)$/.test(identifier) ? identifier : normalizeEntityName(identifier) || identifier;
+}
 function fullPersonName(first, last2, suffix) {
   const base = [first, last2].map((s) => (s ?? "").trim()).filter(Boolean).join(" ");
   const sfx = (suffix ?? "").trim().replace(/^,\s*/, "");
@@ -100282,6 +100317,9 @@ var AGENT_RESIDENCY = "I live in Florida, and the Florida street address entered
 var AGENT_EXISTING_RECORD = "This is the registered agent, and the Florida street address, that the Division has on file for my LLC. This order does not change it.";
 var AGENT_ACCEPTANCE = "I accept the appointment as registered agent for this Florida LLC, and I am familiar with and accept the obligations of that position.";
 var AGENT_SERIES_AGREEMENT = "I confirm that the company\u2019s registered agent has agreed to serve as registered agent for the company and each of its protected series, including every protected series in this order.";
+function personalAgentMatches(data) {
+  return data.registeredAgentType === "INDIVIDUAL" && registeredAgentName(data).toLowerCase() === fullPersonName(data.clientFirstName, data.clientLastName, data.clientSuffix).toLowerCase();
+}
 var AGENT_FORM_VERSION = "fl-llc-formation-v2-agent-consent";
 function conversionAuthority(name, changeAgent) {
   const company = name.trim() || "the company";
@@ -100289,37 +100327,6 @@ function conversionAuthority(name, changeAgent) {
 }
 function registeredAgentName(data) {
   return data.registeredAgentType === "ENTITY" ? (data.registeredAgentBusinessEntityName ?? "").trim() : fullPersonName(data.registeredAgentFirstName, data.registeredAgentLastName, data.registeredAgentSuffix);
-}
-
-// src/components/forms/florida-llc/nameSimilarity.ts
-var SUFFIXES = /* @__PURE__ */ new Set([
-  "LLC",
-  "L.L.C",
-  "PLLC",
-  "P.L.L.C",
-  "INC",
-  "INCORPORATED",
-  "CORP",
-  "CORPORATION",
-  "CO",
-  "COMPANY",
-  "LTD",
-  "LIMITED",
-  "LP",
-  "L.P",
-  "LLP",
-  "LLLP",
-  "PA",
-  "P.A",
-  "PL",
-  "P.L",
-  "PC",
-  "CHARTERED"
-]);
-var ARTICLES = /* @__PURE__ */ new Set(["THE", "A", "AN"]);
-function normalizeEntityName(name) {
-  const tokens = name.toUpperCase().replace(/&/g, " AND ").replace(/['\u2019]/g, "").replace(/[^A-Z0-9 ]+/g, " ").split(/\s+/).filter(Boolean).filter((t) => !SUFFIXES.has(t) && !ARTICLES.has(t) && t !== "AND").map((t) => t.length > 3 && t.endsWith("S") ? t.slice(0, -1) : t);
-  return tokens.join(" ");
 }
 
 // src/components/forms/florida-llc/raService.ts
@@ -100510,7 +100517,7 @@ var extendedFormSchema = formationFormSchema.extend({
       });
     }
   });
-  const names = data.series.map((s) => seriesDedupeKey(s.name));
+  const names = data.series.map((s) => seriesConflictKey(s.name));
   if (new Set(names).size !== names.length) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
@@ -100569,6 +100576,8 @@ var extendedFormSchema = formationFormSchema.extend({
       if (data.registeredAgentExistingRecordAcknowledgment !== true) issue("registeredAgentExistingRecordAcknowledgment", "Confirm the agent and address match the Division\u2019s existing record.");
       if (data.registeredAgentSeriesAgreementAcknowledgment !== true) issue("registeredAgentSeriesAgreementAcknowledgment", "Confirm the registered agent has agreed to serve the company and each protected series.");
     } else {
+      if (!personalAgentMatches(data)) issue("registeredAgentFirstName", "To serve personally, use your name from the client information step, or choose our registered agent service.");
+      if (data.registeredAgentSeriesAgreementAcknowledgment !== true) issue("registeredAgentSeriesAgreementAcknowledgment", "Confirm your agreement to serve the company and each protected series.");
       if (data.registeredAgentNotSameAsLlc !== true) issue("registeredAgentNotSameAsLlc", "Acknowledgment is required.");
       if (data.registeredAgentPhysicalAddressAcknowledgment !== true) issue("registeredAgentPhysicalAddressAcknowledgment", "Acknowledgment is required.");
       if (data.registeredAgentResidencyAcknowledgment !== true) issue("registeredAgentResidencyAcknowledgment", "Confirm that you live in Florida and this is your business address and the registered office.");
@@ -100891,7 +100900,7 @@ function buildPayload(source) {
       registeredAgentPhysicalAddressAcknowledgment: !isConversion && data.registeredAgentPhysicalAddressAcknowledgment === true,
       registeredAgentResidencyAcknowledgment: !isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentResidencyAcknowledgment === true,
       registeredAgentExistingRecordAcknowledgment: isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentExistingRecordAcknowledgment === true,
-      registeredAgentSeriesAgreementAcknowledgment: isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentSeriesAgreementAcknowledgment === true,
+      registeredAgentSeriesAgreementAcknowledgment: data.registeredAgentChoice === "SELF" && data.registeredAgentSeriesAgreementAcknowledgment === true,
       registeredAgentAcceptanceCheckbox: !isConversion && data.registeredAgentAcceptanceCheckbox === true,
       registeredAgentSignatureAuthorizationCheckbox: !isConversion && data.registeredAgentSignatureAuthorizationCheckbox === true,
       authorizedRepresentativeSignatureCheckbox: signsSelf && data.authorizedRepresentativeSignatureCheckbox === true,
@@ -101340,7 +101349,7 @@ async function checkName(input) {
         name: r.name,
         docNumber: r.doc_number,
         status: active ? "Active" : "Inactive",
-        reason: active ? conflictReason(input, r.name) : `${conflictReason(input, r.name)}; recently dissolved \u2014 the name may still be protected (s. 605.0715, Fla. Stat.)`,
+        reason: active ? conflictReason(input, r.name) : `${conflictReason(input, r.name)}; recently inactive \u2014 our service conservatively treats this name as unavailable`,
         detailUrl: detailUrl(r.name)
       });
       if (active) verdict = "taken";
@@ -108391,11 +108400,6 @@ function registerPortalRoutes(app2) {
         priorDate = fmtDate3(date2);
       }
     }
-    const bumped = await db.query(
-      "UPDATE clients SET oa_generation_seq = oa_generation_seq + 1 WHERE id = $1 RETURNING oa_generation_seq",
-      [session.clientId]
-    );
-    const nextGenerationNumber = Number(bumped[0]?.oa_generation_seq ?? 1);
     const ownershipMode = a2.ownershipMode ?? "percent";
     const couples = multiOwner ? a2.couples ?? [] : [];
     const pairedIdx = /* @__PURE__ */ new Set();
@@ -108568,12 +108572,17 @@ function registerPortalRoutes(app2) {
       retainedItems: capital.retainedItems,
       retained: capital.retained,
       // ch. 621 companies get the three professional descriptor lines.
-      professional: seed.formationType === "PLLC",
-      generationNumber: nextGenerationNumber
+      professional: seed.formationType === "PLLC"
     };
     if (!await rateLimit(`oagen:${session.clientId}`, 10, 36e5)) {
       return c.json(err("Too many generations. Try again later.", "RATE_LIMITED"), 429);
     }
+    const bumped = await db.query(
+      "UPDATE clients SET oa_generation_seq = oa_generation_seq + 1 WHERE id = $1 RETURNING oa_generation_seq",
+      [session.clientId]
+    );
+    const nextGenerationNumber = Number(bumped[0]?.oa_generation_seq ?? 1);
+    inputs.generationNumber = nextGenerationNumber;
     const clients = await db.query("SELECT email, name FROM clients WHERE id = $1", [
       session.clientId
     ]);
@@ -110005,7 +110014,7 @@ function registerPaymentRoutes(app2) {
       const p2 = nameProblems[0];
       return c.json(
         err(
-          `The name "${p2.name}" is unavailable \u2014 ${p2.verdict === "taken" ? "an existing Florida company already has it" : "it belongs to a recently dissolved company, and Florida protects it for up to a year"}. Please choose a different name.`,
+          `The name "${p2.name}" is unavailable \u2014 ${p2.verdict === "taken" ? "an existing Florida company already has it" : "it matches a recently inactive company and our service conservatively treats it as unavailable"}. Please choose a different name.`,
           "NAME_UNAVAILABLE"
         ),
         400

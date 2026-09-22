@@ -1,9 +1,9 @@
-import { registeredAgentName } from "../src/components/forms/florida-llc/registeredAgent";
+import { registeredAgentName, personalAgentMatches } from "../src/components/forms/florida-llc/registeredAgent";
 import { z } from "zod";
 import { FIRST_AND_LAST, hasFirstAndLast } from "../src/lib/personName";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
 import { isPoBox, formationFormSchema } from "../src/components/forms/florida-llc/schema";
-import { designatorAllowedForFormationType, hasProtectedSeriesPhrase, memberRowIsBlank, nameContainsLegalDesignator, typedDesignatorProblem, seriesDedupeKey, validateRequestedDate } from "../src/components/forms/florida-llc/validation";
+import { designatorAllowedForFormationType, hasProtectedSeriesPhrase, memberRowIsBlank, nameContainsLegalDesignator, typedDesignatorProblem, seriesConflictKey, validateRequestedDate } from "../src/components/forms/florida-llc/validation";
 import { llcDesignators } from "../src/components/forms/florida-llc/schema";
 import { raServicePatch } from "../src/components/forms/florida-llc/raService";
 
@@ -186,7 +186,7 @@ const extendedFormSchema = formationFormSchema
         });
       }
     });
-    const names = data.series.map((s) => seriesDedupeKey(s.name));
+    const names = data.series.map((s) => seriesConflictKey(s.name));
     if (new Set(names).size !== names.length) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -242,6 +242,8 @@ const extendedFormSchema = formationFormSchema
         if (data.registeredAgentExistingRecordAcknowledgment !== true) issue("registeredAgentExistingRecordAcknowledgment", "Confirm the agent and address match the Division’s existing record.");
         if (data.registeredAgentSeriesAgreementAcknowledgment !== true) issue("registeredAgentSeriesAgreementAcknowledgment", "Confirm the registered agent has agreed to serve the company and each protected series.");
       } else {
+        if (!personalAgentMatches(data)) issue("registeredAgentFirstName", "To serve personally, use your name from the client information step, or choose our registered agent service.");
+        if (data.registeredAgentSeriesAgreementAcknowledgment !== true) issue("registeredAgentSeriesAgreementAcknowledgment", "Confirm your agreement to serve the company and each protected series.");
         if (data.registeredAgentNotSameAsLlc !== true) issue("registeredAgentNotSameAsLlc", "Acknowledgment is required.");
         if (data.registeredAgentPhysicalAddressAcknowledgment !== true) issue("registeredAgentPhysicalAddressAcknowledgment", "Acknowledgment is required.");
         if (data.registeredAgentResidencyAcknowledgment !== true) issue("registeredAgentResidencyAcknowledgment", "Confirm that you live in Florida and this is your business address and the registered office.");

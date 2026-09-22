@@ -1,3 +1,4 @@
+import { normalizeEntityName } from "./nameSimilarity";
 import { easternToday, validCalendarDate, isBankingDay, shiftBankingDays, effectiveDateRange } from "../../../lib/calendar";
 import { isPoBox } from "./schema";
 import type {
@@ -178,6 +179,13 @@ export function seriesDedupeKey(name: string): string {
   return canonicalizeSeriesName(name).toUpperCase()
     .replace(/(^|[^A-Z0-9])(?:PROTECTED\s+SERIES|P\.?S\.?)(?=[^A-Z0-9]|$)[\s-]*/g, "$1")
     .replace(/\s+/g, " ").trim();
+}
+
+/** Preliminary distinguishability check, separate from prefix normalization. */
+export function seriesConflictKey(name: string): string {
+  const identifier = seriesDedupeKey(name);
+  // Keep bare A/AN/THE identifiers: they are labels, not articles before a word.
+  return /^(?:[A-Z]|[0-9]+|AN|THE)$/.test(identifier) ? identifier : normalizeEntityName(identifier) || identifier;
 }
 
 /** Same strictness as the server's Zod email rule — no colons, spaces, or

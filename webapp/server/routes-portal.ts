@@ -1244,15 +1244,6 @@ app.post("/portal/oa/generate", async (c) => {
       priorDate = fmtDate(date);
     }
   }
-  // Never reuse a number: it is printed on the PDF, and a client may still hold
-  // a copy of an agreement they later deleted. The counter lives on the client,
-  // so deleting a row cannot roll it back.
-  const bumped = await db.query<{ oa_generation_seq: number }>(
-    "UPDATE clients SET oa_generation_seq = oa_generation_seq + 1 WHERE id = $1 RETURNING oa_generation_seq",
-    [session.clientId],
-  );
-  const nextGenerationNumber = Number(bumped[0]?.oa_generation_seq ?? 1);
-
   // Spousal joint-ownership units: two seed members merge into one marital
   // interest ("A and B, husband and wife, as tenants by the entirety").
   const ownershipMode: OwnershipMode = a.ownershipMode ?? "percent";
@@ -1463,7 +1454,6 @@ app.post("/portal/oa/generate", async (c) => {
     retained: capital.retained,
     // ch. 621 companies get the three professional descriptor lines.
     professional: seed.formationType === "PLLC",
-    generationNumber: nextGenerationNumber,
   };
 
   // Only a request that passed every check spends the allowance (Adam,
@@ -1471,6 +1461,16 @@ app.post("/portal/oa/generate", async (c) => {
   if (!(await rateLimit(`oagen:${session.clientId}`, 10, 3600_000))) {
     return c.json(err("Too many generations. Try again later.", "RATE_LIMITED"), 429);
   }
+  // Never reuse a number: it is printed on the PDF, and a client may still hold
+  // a copy of an agreement they later deleted. The counter lives on the client,
+  // so deleting a row cannot roll it back.
+  const bumped = await db.query<{ oa_generation_seq: number }>(
+    "UPDATE clients SET oa_generation_seq = oa_generation_seq + 1 WHERE id = $1 RETURNING oa_generation_seq",
+    [session.clientId],
+  );
+  const nextGenerationNumber = Number(bumped[0]?.oa_generation_seq ?? 1);
+
+  inputs.generationNumber = nextGenerationNumber;
   const clients = await db.query<{ email: string; name: string }>("SELECT email, name FROM clients WHERE id = $1", [
     session.clientId,
   ]);

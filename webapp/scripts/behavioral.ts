@@ -436,8 +436,12 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     expect((run.path === "convert") === /Enter your agent[’']s name and (?:Florida street )?address exactly as the Division has them on file/i.test(await page.locator("main").innerText()), `${run.key}: the own-agent choice tells a conversion the agent must match the record`, run.path);
     // By id: the choice card's own label CONTAINS phrases like "Florida
     // street address", so label lookup finds the card's hidden radio.
-    await page.locator("#ra-first-name").fill("Casey");
-    await page.locator("#ra-last-name").fill("Gatecheck");
+    if (run.path === "convert") {
+      await page.locator("#ra-first-name").fill("Casey");
+      await page.locator("#ra-last-name").fill("Gatecheck");
+    } else {
+      expect(await page.locator("#ra-first-name").inputValue() === "Casey" && await page.locator("#ra-last-name").inputValue() === "Gatecheck", `${run.key}: personal agent identity follows the applicant`, await page.locator("#ra-first-name").inputValue());
+    }
     await page.locator("#ra-street").fill("200 Biscayne Blvd");
     await page.locator("#ra-city").fill("Miami");
     await page.locator("#ra-zip").fill("33131");
@@ -1048,7 +1052,7 @@ async function main(): Promise<void> {
       await page.waitForTimeout(800);
       const einForm = page.locator('[role="dialog"]').first();
       const rpHeading = await einForm.locator('[data-testid="responsible-party-heading"]').innerText().catch(() => "");
-      expect(/typically the LLC's manager/.test(rpHeading), "EIN form: the responsible party heading says it is typically the manager", rpHeading);
+      expect(rpHeading === "Responsible party", "EIN form: the responsible party heading is neutral", rpHeading);
       expect(!/IRS records/.test(await einForm.innerText()), "EIN form: no 'must match IRS records' anywhere on the form");
       // Every phone box takes the shape as typed and hints it without
       // letters (Adam, 7 Sep 2026).

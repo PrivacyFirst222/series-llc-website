@@ -379,7 +379,7 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-sm text-muted-foreground">
               <p>
-                {company.raEndedDate ? `Our registered-agent appointment ends on ${company.raEndedDate}.` : company.raAppointmentDate ? `Your registered agent service is active${company.raRenewalDate ? ` and renews on ${new Date(`${company.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : ""}.` : "Your appointment date has not yet been recorded. Your first service year begins when our appointment takes effect."} You may give cancellation notice here at any time. Give notice at least 30 days before renewal and provide replacement proof by renewal to avoid a resignation charge.
+                {company.raEndedDate ? `Our registered-agent appointment ends on ${formatDate(company.raEndedDate)}.` : company.raAppointmentDate ? `Your registered agent service is active${company.raRenewalDate ? ` and renews on ${new Date(`${company.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : ""}.` : "Your appointment date has not yet been recorded. Your first service year begins when our appointment takes effect."} You may give cancellation notice here at any time. Give notice at least 30 days before renewal and provide replacement proof by renewal to avoid a resignation charge.
               </p>
             </div>
             <AlertDialog>
@@ -426,7 +426,7 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
                 </p>
               ))}
 <UpdateRenewalCard key={company.orderId} company={company.orderId}/></div>
-        {company.raResignationDue ? <p className="mt-3">{company.raResignationSubmitted ? `Resignation submitted ${company.raResignationSubmitted}.` : `Resignation due ${company.raResignationDue}; submission has not yet been recorded.`} {company.raEndedDate ? `Appointment ends ${company.raEndedDate}.` : ""}</p> : null}
+        {company.raResignationDue ? <p className="mt-3">{company.raResignationSubmitted ? `Resignation submitted ${formatDate(company.raResignationSubmitted)}.` : `Resignation due ${formatDate(company.raResignationDue)}; submission has not yet been recorded.`} {company.raEndedDate ? `Appointment ends ${formatDate(company.raEndedDate)}.` : ""}</p> : null}
         {(company.renewals ?? []).filter(r=>r.linkUrl && !["charged","paid_by_link","cancelled"].includes(r.status)).map(r=><p key={r.date} className="mt-3"><a className="underline text-trust" href={r.linkUrl!}>Pay {r.purpose === "resignation" ? "resignation charge" : "renewal"} now / use another card</a></p>)}
         {cancelMutation.isError ? (
           <p className="mt-2 text-xs text-destructive">
@@ -822,7 +822,7 @@ export default function PortalDashboard() {
       />
 
       <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
-        Completed S-election forms and EIN letters stay encrypted here until you delete them. Download and keep your copies. If something looks wrong or missing, email{" "}
+        Documents are download-only. Completed S-election forms and EIN letters stay encrypted here until you delete them. Download and keep your copies. If something looks wrong or missing, email{" "}
         <a href="mailto:support@myfloridaseriesllc.com" className="underline underline-offset-4">
           support@myfloridaseriesllc.com
         </a>

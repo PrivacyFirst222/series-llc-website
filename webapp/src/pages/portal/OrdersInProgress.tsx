@@ -500,7 +500,7 @@ export function OrdersInProgress({
             {/* Adam, 7 Sep 2026: the IRS holds no record of a company with no
                 EIN yet; say who the person usually is, in the IRS's own terms
                 (Instructions for Form SS-4, "Responsible party defined"). */}
-            <p className="text-sm font-medium" data-testid="responsible-party-heading">Responsible party — typically the LLC's manager</p>
+            <p className="text-sm font-medium" data-testid="responsible-party-heading">Responsible party</p>
             <p className="text-xs text-muted-foreground">
               The person who ultimately owns or controls the LLC and can direct its funds and
               assets. Must be an individual, not a company.

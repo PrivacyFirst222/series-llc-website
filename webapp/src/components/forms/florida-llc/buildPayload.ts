@@ -214,7 +214,7 @@ export function buildPayload(source: FloridaLLCFormData): SubmissionPayload {
       registeredAgentPhysicalAddressAcknowledgment: !isConversion && data.registeredAgentPhysicalAddressAcknowledgment === true,
       registeredAgentResidencyAcknowledgment: !isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentResidencyAcknowledgment === true,
       registeredAgentExistingRecordAcknowledgment: isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentExistingRecordAcknowledgment === true,
-      registeredAgentSeriesAgreementAcknowledgment: isConversion && data.registeredAgentChoice === "SELF" && data.registeredAgentSeriesAgreementAcknowledgment === true,
+      registeredAgentSeriesAgreementAcknowledgment: data.registeredAgentChoice === "SELF" && data.registeredAgentSeriesAgreementAcknowledgment === true,
       registeredAgentAcceptanceCheckbox: !isConversion && data.registeredAgentAcceptanceCheckbox === true,
       registeredAgentSignatureAuthorizationCheckbox: !isConversion && data.registeredAgentSignatureAuthorizationCheckbox === true,
       authorizedRepresentativeSignatureCheckbox: signsSelf && data.authorizedRepresentativeSignatureCheckbox === true,

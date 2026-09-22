@@ -114,7 +114,7 @@ export function SElectionDetailsForm({
   const [officerOther, setOfficerOther] = useState(
     draft ? draft.officerOther : Boolean(prior.officerName) && !knownSigners.includes(prior.officerName ?? ""),
   );
-  const [officerTitle, setOfficerTitle] = useState(draft?.officerTitle ?? prior.officerTitle ?? "Manager");
+  const [officerTitle, setOfficerTitle] = useState(draft?.officerTitle ?? prior.officerTitle ?? "");
   const [phone, setPhone] = useState(formatPhone(draft?.phone ?? prior.phone ?? ""));
   const [rows, setRows] = useState<ShareholderRow[]>(
     draft?.rows.map(row => ({ ...row, verified: false, verified2: false })) ??
@@ -409,7 +409,8 @@ export function SElectionDetailsForm({
         </div>
         <div className="space-y-1.5">
           <label className="text-sm font-medium">Officer title</label>
-          <Input value={officerTitle} onChange={(e) => setOfficerTitle(e.target.value)} autoComplete="off" />
+          <Input aria-label="Officer title" value={officerTitle} onChange={(e) => setOfficerTitle(e.target.value)} autoComplete="off" />
+          <p className="text-xs text-muted-foreground">Enter the actual title of the person authorized to sign Form 2553 for the company.</p>
         </div>
         <div className="space-y-1.5 sm:col-span-2">
           <label className="text-sm font-medium">Phone for IRS questions</label>
@@ -518,6 +519,9 @@ export function SElectionDetailsForm({
           const addressBox = (who: "first" | "second") => {
             const value = who === "first" ? r.address : (r.address2 ?? "");
             const verified = who === "first" ? r.verified : r.verified2;
+            const saved = prior.shareholders?.find(s => s.name === r.name && (s.name2 ?? "") === (r.name2 ?? ""));
+            const savedAddress = who === "first" ? saved?.address : saved?.address2;
+            const onFile = Boolean(savedAddress && value === savedAddress);
             return (
               <div className="space-y-1">
                 <AddressAutocomplete
@@ -534,9 +538,9 @@ export function SElectionDetailsForm({
                     <p className="flex items-center gap-1 text-xs text-trust">
                       <CheckCircle2 className="h-3 w-3" /> Verified address
                     </p>
-                  ) : (
+                  ) : onFile ? (
                     <p className="text-xs text-muted-foreground">Address on file</p>
-                  )
+                  ) : null
                 ) : null}
               </div>
             );

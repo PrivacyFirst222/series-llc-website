@@ -1,0 +1,217 @@
+{
+  "schema": 1,
+  "run": "claude-reconciled-batch29",
+  "commit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+  "completedAt": "2026-09-22T03:51:40.456991+00:00",
+  "manifestSha": "d321643d263f9ef32f133ecd8241d1b1661318f0f27ec05f26c2f4810ea9dd45",
+  "auditSha": "d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1",
+  "findings": [
+    {
+      "key": "reader-2-series-agreement-not-required-new-self",
+      "where": "Order form, Certify & sign step on a NEW formation where the client serves as their own registered agent: the tick 'I confirm that the company's registered agent has agreed to serve as registered agent for the company and each of its protected series\u2026'",
+      "file": "webapp/src/components/forms/florida-llc/sections/StepCertification.tsx",
+      "line": 372,
+      "reads": "{data.registeredAgentChoice === \"SELF\" ? <AcknowledgeBox id=\"cert-agent-series\" checked={data.registeredAgentSeriesAgreementAcknowledgment === true} onChange={(v) => patch({ registeredAgentSeriesAgreementAcknowledgment: v })} label={AGENT_SERIES_AGREEMENT} error={errors.registeredAgentSeriesAgreementAcknowledgment} /> : null}",
+      "claims": "The box is one of the certifications the order needs and the client's tick is recorded with the order.",
+      "truth": "Current cross-review: NEW SELF checkbox is rendered, but stepValidation.ts:385 requires it only for CONVERT; server/validation.ts:241-248 likewise checks it only under retained; buildPayload.ts:217 forces it false outside conversion. Current s.605.2203(2)-(3), independently opened, requires the company/series agent agreement before a designation and the signer affirms compliance. The code proves a displayed affirmative tick is discarded; no inference that the office actually filed an unlawful designation is made.",
+      "replacement": "Require and preserve this displayed confirmation on every SELF path, keeping the current third-person certification unless the actual self-agent flow establishes the applicant is personally the agent. Verify unchecked refuses and checked survives payload/storage.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "reader-2-finding-series-agreement-new-self",
+        "reader-2-statute-605-2203"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; NEW SELF checkbox is rendered, but stepValidation.ts:385 requires it only for CONVERT; server/validation.ts:241-248 likewise checks it only under retained; buildPayload.ts:217 forces it false outside conversion. Current s.605.2203(2)-(3), independently opened, requires the company/series agent agreement before a designation and the signer affirms compliance. The code proves a displayed affirmative tick is discarded; no inference that the office actually filed an unlawful designation is made.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 2,
+      "reader": "reader-2",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-2-series-names-distinguishable-not-identical",
+      "where": "Order form, Series step, the 'How series must be named' box, last bullet; and the duplicate-name refusal on that step",
+      "file": "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx",
+      "line": 87,
+      "reads": "No two series of the same LLC may share an identical name.",
+      "claims": "Two series names are acceptable as long as they are not identical.",
+      "truth": "Current cross-review: Current seriesDedupeKey at validation.ts:177-180 only strips PS variants/case. New in-memory execution of the extracted current functions returned RENTAL versus RENTALS and SMITH & SONS versus SMITH AND SONS; both pairs remain distinct keys used by client/server duplicate checks. Opened ss.605.2202(1) and605.0112(1)(b): distinguishability applies, but statute includes filed-consent and excluded-filing qualifications. A statement that these particular filings will necessarily be refused was not independently tested. Proposed normalizeEntityName implementation at nameSimilarity.ts:23-39 is heuristic: drops AND completely and strips only final S; it is not a complete legal distinguishability oracle and the local list cannot check all existing filings.",
+      "replacement": "Describe distinguishability accurately, preserve the consent exception where relevant, and apply tested local collision checks. Keep a separately identified office/live-record review for existing filings; do not promise complete statutory validation from this normalizer.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "reader-2-finding-series-name-distinguishable",
+        "reader-2-statute-605-2202",
+        "reader-2-statute-605-0112"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; Current seriesDedupeKey at validation.ts:177-180 only strips PS variants/case. New in-memory execution of the extracted current functions returned RENTAL versus RENTALS and SMITH & SONS versus SMITH AND SONS; both pairs remain distinct keys used by client/server duplicate checks. Opened ss.605.2202(1) and605.0112(1)(b): distinguishability applies, but statute includes filed-consent and excluded-filing qualifications. A statement that these particular filings will necessarily be refused was not independently tested. Proposed normalizeEntityName implementation at nameSimilarity.ts:23-39 is heuristic: drops AND completely and strips only final S; it is not a complete legal distinguishability oracle and the local list cannot check all existing filings.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 2,
+      "reader": "reader-2",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-4-s-election-officer-title-default",
+      "where": "Client portal \u2192 S-election details form \u2192 the pre-filled Officer title box beside Signing officer, and the Form 2553 the package prints from it (contact line H, the Sign Here title line, the cover letter and the instruction sheet)",
+      "file": "webapp/src/pages/portal/SElectionDetailsForm.tsx",
+      "line": 117,
+      "reads": "const [officerTitle, setOfficerTitle] = useState(draft?.officerTitle ?? prior.officerTitle ?? \"Manager\");",
+      "claims": "The person signing Form 2553 for this company is its Manager.",
+      "truth": "Current cross-review: The form still defaults officerTitle to Manager for every company. services response routes-portal.ts:1876-1904 supplies no management structure; the editable title is then printed by s-election.ts. A member-managed company therefore gets an unsupported Manager default. Current IRS Form2553 instructions require an authorized officer; management form alone does not prove which signer/title is legally appropriate.",
+      "replacement": "Use management information to avoid the false Manager assumption, and ask the client to confirm the authorized signer and actual title. A blank required title with clear help is safer than inventing office status from management type.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "reader-4-f-officer-title"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; The form still defaults officerTitle to Manager for every company. services response routes-portal.ts:1876-1904 supplies no management structure; the editable title is then printed by s-election.ts. A member-managed company therefore gets an unsupported Manager default. Current IRS Form2553 instructions require an authorized officer; management form alone does not prove which signer/title is legally appropriate.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 4,
+      "reader": "reader-4",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-3-ein-responsible-party-manager",
+      "where": "Client portal, Orders in progress, the EIN application questionnaire ('EIN application details' dialog), the heading of the first block",
+      "file": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "line": 495,
+      "reads": "Responsible party \u2014 typically the LLC's manager",
+      "claims": "The responsible party on the IRS EIN application is usually the LLC's manager.",
+      "truth": "Current cross-review: OrdersInProgress:500\u2013506 still names typically the manager while the same questionnaire supports member-managed clients. IRS SS-4 instructions, opened live, define the role through ultimate ownership/control and practical control over funds; they do not establish the frequency claim in either the old or proposed heading. The explanatory paragraph already gives the appropriate functional test. Source comment is evidence of a past request, not a full recorded leave-unchanged ruling.",
+      "replacement": "Use the neutral heading \u201cResponsible party\u201d and retain the existing explanation of ultimate ownership or control.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "reader-3-f-responsible"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; OrdersInProgress:500\u2013506 still names typically the manager while the same questionnaire supports member-managed clients. IRS SS-4 instructions, opened live, define the role through ultimate ownership/control and practical control over funds; they do not establish the frequency claim in either the old or proposed heading. The explanatory paragraph already gives the appropriate functional test. Source comment is evidence of a past request, not a full recorded leave-unchanged ruling.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 3,
+      "reader": "reader-3",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-4-s-election-typed-address-on-file",
+      "where": "Client portal \u2192 S-election details form (the dialog opened by Provide details securely on an S Corporation Election Package order) \u2192 an owner card \u2192 the line under the Home address box, after the client types an address by hand without choosing a lookup suggestion",
+      "file": "webapp/src/pages/portal/SElectionDetailsForm.tsx",
+      "line": 538,
+      "reads": "<p className=\"text-xs text-muted-foreground\">Address on file</p>",
+      "claims": "The address shown is one we already had on file (imported from the order or previously saved).",
+      "truth": "Current cross-review: SElectionDetailsForm:520\u2013540 labels every nonempty unverified value Address on file; :526 sets verified false on typing. :120\u2013138 initializes drafts/stored rows and :488 handles imported owners. ServicesCard ShareholderRow lacks provenance fields. The proposed flags address the core defect, but reopened saved-draft semantics and second-address reset paths must be considered rather than treating all draft flags as authoritative.",
+      "replacement": "Track whether each address came from saved/imported data; clear that status on typing for both owners; show no on-file label on unsaved typed text. Preserve lookup verification and correctly initialize reopened saved drafts.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "reader-4-f-address-on-file",
+        "reader-4-pN3-06"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; SElectionDetailsForm:520\u2013540 labels every nonempty unverified value Address on file; :526 sets verified false on typing. :120\u2013138 initializes drafts/stored rows and :488 handles imported owners. ServicesCard ShareholderRow lacks provenance fields. The proposed flags address the core defect, but reopened saved-draft semantics and second-address reset paths must be considered rather than treating all draft flags as authoritative.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 4,
+      "reader": "reader-4",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "runtime-B-agent-card-raw-iso-dates",
+      "where": "Client portal \u2192 Registered agent service card, after the office records a resignation (and the 'appointment ends' sentence)",
+      "file": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "line": 421,
+      "reads": "        {company.raResignationDue ? <p className=\"mt-3\">{company.raResignationSubmitted ? `Resignation submitted ${company.raResignationSubmitted}.` : `Resignation due ${company.raResignationDue}; submission has not yet been recorded.`} {company.raEndedDate ? `Appointment ends ${company.raEndedDate}.` : \"\"}</p> : null}",
+      "claims": "Dates the client can read, in the form the rest of the card uses ('Cancellation requested on August 6, 2026', 'renews on September 20, 2027').",
+      "truth": "Current cross-review: PortalDashboard:376 and :421 print raw end/due/submitted dates. routes-portal:992\u2013994 returns ISO calendar strings. datetime.ts:28\u201338 handles YYYY-MM-DD without a viewer-zone shift. The neighboring cancellation date already uses formatDate. Prior 128 concerns other date displays, not these four locations.",
+      "replacement": "Apply formatDate to all four resignation/end-date interpolations in the registered-agent card.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "runtime-B-screens",
+        "runtime-B-renewal-cancel-and-replacement"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; PortalDashboard:376 and :421 print raw end/due/submitted dates. routes-portal:992\u2013994 returns ISO calendar strings. datetime.ts:28\u201338 handles YYYY-MM-DD without a viewer-zone shift. The neighboring cancellation date already uses formatDate. Prior 128 concerns other date displays, not these four locations.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 3,
+      "reader": "reader-3",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-3-portal-footer-download-only",
+      "where": "Client portal, the footer sentence under the Account card on the portal page",
+      "file": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "line": 814,
+      "reads": "Completed S-election forms and EIN letters stay encrypted here until you delete them. Download and keep your copies.",
+      "claims": "The footer explains retention of the tax documents; nothing tells the client that portal documents are download-only.",
+      "truth": "Current cross-review: PortalDashboard:814 omits the sentence. Current rulings.md:12 expressly retains it and defines download-only as uneditable. Batch 03 approves encrypted retention but does not expressly revoke this instruction. This is an instruction/implementation mismatch; interpreting download-only to prohibit deletion would be wrong.",
+      "replacement": "Restore \u201cDocuments are download-only.\u201d before the current retention explanation, preserving the current support link and encrypted-retention wording.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "reader-3-f-footer",
+        "reader-3-decisions"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; PortalDashboard:814 omits the sentence. Current rulings.md:12 expressly retains it and defines download-only as uneditable. Batch 03 approves encrypted retention but does not expressly revoke this instruction. This is an instruction/implementation mismatch; interpreting download-only to prohibit deletion would be wrong.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 3,
+      "reader": "reader-3",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "runtime-A-generation-number-burned",
+      "where": "Client portal \u2192 Operating agreement questionnaire \u2192 Generate Operating Agreement (PDF): the number printed in the agreement's title (\"Partnership Operating Agreement (No. N)\"), in Your documents, in Your agreements and in the amendment form's \"Most recently generated agreement on file\" line",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 1256,
+      "reads": "  const bumped = await db.query<{ oa_generation_seq: number }>(\n    \"UPDATE clients SET oa_generation_seq = oa_generation_seq + 1 WHERE id = $1 RETURNING oa_generation_seq\",\n    [session.clientId],\n  );\n  const nextGenerationNumber = Number(bumped[0]?.oa_generation_seq ?? 1);",
+      "claims": "The comment above it (lines 1253-1255) says the counter exists so a number is never reused because it is printed on the PDF; the client expects their first generated agreement to be No. 1 and successive agreements to be numbered consecutively.",
+      "truth": "Current cross-review: Current routes-portal:1265\u20131269 increments before shares/options/capital/stale-base checks and rate limit at ~1488. Historical runtime-A report records first success No.4 after refusals. Current source confirms the same ordering. However the recorded owner rule concerns rate-limit allowance, not a stated requirement that generated identifiers be consecutive; gaps alone do not invalidate an agreement. Later render/storage failure can still consume a number under Claude\u2019s move.",
+      "replacement": "Allocate the number after validation, stale-draft and rate-limit refusals, and assign inputs.generationNumber after allocation. Preserve never-reuse behavior; do not promise gap-free numbering after rendering/storage failures.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "runtime-A-oa-save-reopen-generate",
+        "runtime-A-findings-sources"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; Current routes-portal:1265\u20131269 increments before shares/options/capital/stale-base checks and rate limit at ~1488. Historical runtime-A report records first success No.4 after refusals. Current source confirms the same ordering. However the recorded owner rule concerns rate-limit allowance, not a stated requirement that generated identifiers be consecutive; gaps alone do not invalidate an agreement. Later render/storage failure can still consume a number under Claude\u2019s move.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 6,
+      "reader": "reader-6",
+      "link": null,
+      "presentedAs": "new"
+    }
+  ]
+}

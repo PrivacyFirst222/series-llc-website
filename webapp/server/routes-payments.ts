@@ -324,7 +324,7 @@ app.post("/orders", async (c) => {
         `The name "${p.name}" is unavailable — ${
           p.verdict === "taken"
             ? "an existing Florida company already has it"
-            : "it belongs to a recently dissolved company, and Florida protects it for up to a year"
+            : "it matches a recently inactive company and our service conservatively treats it as unavailable"
         }. Please choose a different name.`,
         "NAME_UNAVAILABLE",
       ),

@@ -6203,14 +6203,61 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-22T03:51:55.397Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T03:53:29.939Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:00:56.611Z",
+              "event": "rejected r1",
+              "batch": "29",
+              "revision": 1,
+              "note": "Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading."
+            },
+            {
+              "at": "2026-09-22T04:00:56.678Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T04:00:56.704Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 2,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B09"
+              }
+            ]
+          }
         }
       ],
       "codex": {
@@ -6629,17 +6676,64 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
               "at": "2026-09-17T15:33:57.152Z",
               "event": "recorded"
+            },
+            {
+              "at": "2026-09-22T03:51:55.397Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T03:53:29.939Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:00:56.611Z",
+              "event": "rejected r1",
+              "batch": "29",
+              "revision": 1,
+              "note": "Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading."
+            },
+            {
+              "at": "2026-09-22T04:00:56.678Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T04:00:56.704Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 2,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "90",
             "part": "all"
+          },
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B09"
+              }
+            ]
           }
         }
       ],
@@ -25765,6 +25859,582 @@
           }
         }
       ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-reader-2-series-agreement-not-required-new-self",
+      "tag": "substantive",
+      "area": "Order form and payment",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch29.json finding reader-2-series-agreement-not-required-new-self",
+      "text": "Order form, Certify & sign step on a NEW formation where the client serves as their own registered agent: the tick 'I confirm that the company's registered agent has agreed to serve as registered agent for the company and each of its protected series…' — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:372`\nReads: {data.registeredAgentChoice === \"SELF\" ? <AcknowledgeBox id=\"cert-agent-series\" checked={data.registeredAgentSeriesAgreementAcknowledgment === true} onChange={(v) => patch({ registeredAgentSeriesAgreementAcknowledgment: v })} label={AGENT_SERIES_AGREEMENT} error={errors.registeredAgentSeriesAgreementAcknowledgment} /> : null}\nClaims: The box is one of the certifications the order needs and the client's tick is recorded with the order.\nTrue: Current cross-review: NEW SELF checkbox is rendered, but stepValidation.ts:385 requires it only for CONVERT; server/validation.ts:241-248 likewise checks it only under retained; buildPayload.ts:217 forces it false outside conversion. Current s.605.2203(2)-(3), independently opened, requires the company/series agent agreement before a designation and the signer affirms compliance. The code proves a displayed affirmative tick is discarded; no inference that the office actually filed an unlawful designation is made.\nProposed replacement (not approved): Require and preserve this displayed confirmation on every SELF path, keeping the current third-person certification unless the actual self-agent flow establishes the applicant is personally the agent. Verify unchecked refuses and checked survives payload/storage.\nRechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; NEW SELF checkbox is rendered, but stepValidation.ts:385 requires it only for CONVERT; server/validation.ts:241-248 likewise checks it only under retained; buildPayload.ts:217 forces it false outside conversion. Current s.605.2203(2)-(3), independently opened, requires the company/series agent agreement before a designation and the signer affirms compliance. The code proves a displayed affirmative tick is discarded; no inference that the office actually filed an unlawful designation is made.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T03:51:40.456991+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch29 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T03:51:55.397Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T03:53:29.939Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:00:56.611Z",
+              "event": "rejected r1",
+              "batch": "29",
+              "revision": 1,
+              "note": "Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading."
+            },
+            {
+              "at": "2026-09-22T04:00:56.678Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T04:00:56.704Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B01"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-reader-2-series-names-distinguishable-not-identical",
+      "tag": "substantive",
+      "area": "Order form and payment",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch29.json finding reader-2-series-names-distinguishable-not-identical",
+      "text": "Order form, Series step, the 'How series must be named' box, last bullet; and the duplicate-name refusal on that step — `webapp/src/components/forms/florida-llc/sections/StepSeries.tsx:87`\nReads: No two series of the same LLC may share an identical name.\nClaims: Two series names are acceptable as long as they are not identical.\nTrue: Current cross-review: Current seriesDedupeKey at validation.ts:177-180 only strips PS variants/case. New in-memory execution of the extracted current functions returned RENTAL versus RENTALS and SMITH & SONS versus SMITH AND SONS; both pairs remain distinct keys used by client/server duplicate checks. Opened ss.605.2202(1) and605.0112(1)(b): distinguishability applies, but statute includes filed-consent and excluded-filing qualifications. A statement that these particular filings will necessarily be refused was not independently tested. Proposed normalizeEntityName implementation at nameSimilarity.ts:23-39 is heuristic: drops AND completely and strips only final S; it is not a complete legal distinguishability oracle and the local list cannot check all existing filings.\nProposed replacement (not approved): Describe distinguishability accurately, preserve the consent exception where relevant, and apply tested local collision checks. Keep a separately identified office/live-record review for existing filings; do not promise complete statutory validation from this normalizer.\nRechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; Current seriesDedupeKey at validation.ts:177-180 only strips PS variants/case. New in-memory execution of the extracted current functions returned RENTAL versus RENTALS and SMITH & SONS versus SMITH AND SONS; both pairs remain distinct keys used by client/server duplicate checks. Opened ss.605.2202(1) and605.0112(1)(b): distinguishability applies, but statute includes filed-consent and excluded-filing qualifications. A statement that these particular filings will necessarily be refused was not independently tested. Proposed normalizeEntityName implementation at nameSimilarity.ts:23-39 is heuristic: drops AND completely and strips only final S; it is not a complete legal distinguishability oracle and the local list cannot check all existing filings.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T03:51:40.456991+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch29 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T03:51:55.397Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T03:53:29.939Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:00:56.611Z",
+              "event": "rejected r1",
+              "batch": "29",
+              "revision": 1,
+              "note": "Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading."
+            },
+            {
+              "at": "2026-09-22T04:00:56.678Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T04:00:56.704Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B02"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-reader-4-s-election-officer-title-default",
+      "tag": "substantive",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch29.json finding reader-4-s-election-officer-title-default",
+      "text": "Client portal → S-election details form → the pre-filled Officer title box beside Signing officer, and the Form 2553 the package prints from it (contact line H, the Sign Here title line, the cover letter and the instruction sheet) — `webapp/src/pages/portal/SElectionDetailsForm.tsx:117`\nReads: const [officerTitle, setOfficerTitle] = useState(draft?.officerTitle ?? prior.officerTitle ?? \"Manager\");\nClaims: The person signing Form 2553 for this company is its Manager.\nTrue: Current cross-review: The form still defaults officerTitle to Manager for every company. services response routes-portal.ts:1876-1904 supplies no management structure; the editable title is then printed by s-election.ts. A member-managed company therefore gets an unsupported Manager default. Current IRS Form2553 instructions require an authorized officer; management form alone does not prove which signer/title is legally appropriate.\nProposed replacement (not approved): Use management information to avoid the false Manager assumption, and ask the client to confirm the authorized signer and actual title. A blank required title with clear help is safer than inventing office status from management type.\nRechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; The form still defaults officerTitle to Manager for every company. services response routes-portal.ts:1876-1904 supplies no management structure; the editable title is then printed by s-election.ts. A member-managed company therefore gets an unsupported Manager default. Current IRS Form2553 instructions require an authorized officer; management form alone does not prove which signer/title is legally appropriate.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T03:51:40.456991+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch29 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T03:51:55.397Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T03:53:29.939Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:00:56.611Z",
+              "event": "rejected r1",
+              "batch": "29",
+              "revision": 1,
+              "note": "Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading."
+            },
+            {
+              "at": "2026-09-22T04:00:56.678Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T04:00:56.704Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B03"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-reader-3-ein-responsible-party-manager",
+      "tag": "wording",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch29.json finding reader-3-ein-responsible-party-manager",
+      "text": "Client portal, Orders in progress, the EIN application questionnaire ('EIN application details' dialog), the heading of the first block — `webapp/src/pages/portal/OrdersInProgress.tsx:495`\nReads: Responsible party — typically the LLC's manager\nClaims: The responsible party on the IRS EIN application is usually the LLC's manager.\nTrue: Current cross-review: OrdersInProgress:500–506 still names typically the manager while the same questionnaire supports member-managed clients. IRS SS-4 instructions, opened live, define the role through ultimate ownership/control and practical control over funds; they do not establish the frequency claim in either the old or proposed heading. The explanatory paragraph already gives the appropriate functional test. Source comment is evidence of a past request, not a full recorded leave-unchanged ruling.\nProposed replacement (not approved): Use the neutral heading “Responsible party” and retain the existing explanation of ultimate ownership or control.\nRechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; OrdersInProgress:500–506 still names typically the manager while the same questionnaire supports member-managed clients. IRS SS-4 instructions, opened live, define the role through ultimate ownership/control and practical control over funds; they do not establish the frequency claim in either the old or proposed heading. The explanatory paragraph already gives the appropriate functional test. Source comment is evidence of a past request, not a full recorded leave-unchanged ruling.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T03:51:40.456991+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch29 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T03:51:55.397Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T03:53:29.939Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:00:56.611Z",
+              "event": "rejected r1",
+              "batch": "29",
+              "revision": 1,
+              "note": "Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading."
+            },
+            {
+              "at": "2026-09-22T04:00:56.678Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T04:00:56.704Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B04"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-reader-4-s-election-typed-address-on-file",
+      "tag": "wording",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch29.json finding reader-4-s-election-typed-address-on-file",
+      "text": "Client portal → S-election details form (the dialog opened by Provide details securely on an S Corporation Election Package order) → an owner card → the line under the Home address box, after the client types an address by hand without choosing a lookup suggestion — `webapp/src/pages/portal/SElectionDetailsForm.tsx:538`\nReads: <p className=\"text-xs text-muted-foreground\">Address on file</p>\nClaims: The address shown is one we already had on file (imported from the order or previously saved).\nTrue: Current cross-review: SElectionDetailsForm:520–540 labels every nonempty unverified value Address on file; :526 sets verified false on typing. :120–138 initializes drafts/stored rows and :488 handles imported owners. ServicesCard ShareholderRow lacks provenance fields. The proposed flags address the core defect, but reopened saved-draft semantics and second-address reset paths must be considered rather than treating all draft flags as authoritative.\nProposed replacement (not approved): Track whether each address came from saved/imported data; clear that status on typing for both owners; show no on-file label on unsaved typed text. Preserve lookup verification and correctly initialize reopened saved drafts.\nRechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; SElectionDetailsForm:520–540 labels every nonempty unverified value Address on file; :526 sets verified false on typing. :120–138 initializes drafts/stored rows and :488 handles imported owners. ServicesCard ShareholderRow lacks provenance fields. The proposed flags address the core defect, but reopened saved-draft semantics and second-address reset paths must be considered rather than treating all draft flags as authoritative.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T03:51:40.456991+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch29 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T03:51:55.397Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T03:53:29.939Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:00:56.611Z",
+              "event": "rejected r1",
+              "batch": "29",
+              "revision": 1,
+              "note": "Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading."
+            },
+            {
+              "at": "2026-09-22T04:00:56.678Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T04:00:56.704Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B05"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-runtime-B-agent-card-raw-iso-dates",
+      "tag": "wording",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch29.json finding runtime-B-agent-card-raw-iso-dates",
+      "text": "Client portal → Registered agent service card, after the office records a resignation (and the 'appointment ends' sentence) — `webapp/src/pages/portal/PortalDashboard.tsx:421`\nReads:         {company.raResignationDue ? <p className=\"mt-3\">{company.raResignationSubmitted ? `Resignation submitted ${company.raResignationSubmitted}.` : `Resignation due ${company.raResignationDue}; submission has not yet been recorded.`} {company.raEndedDate ? `Appointment ends ${company.raEndedDate}.` : \"\"}</p> : null}\nClaims: Dates the client can read, in the form the rest of the card uses ('Cancellation requested on August 6, 2026', 'renews on September 20, 2027').\nTrue: Current cross-review: PortalDashboard:376 and :421 print raw end/due/submitted dates. routes-portal:992–994 returns ISO calendar strings. datetime.ts:28–38 handles YYYY-MM-DD without a viewer-zone shift. The neighboring cancellation date already uses formatDate. Prior 128 concerns other date displays, not these four locations.\nProposed replacement (not approved): Apply formatDate to all four resignation/end-date interpolations in the registered-agent card.\nRechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; PortalDashboard:376 and :421 print raw end/due/submitted dates. routes-portal:992–994 returns ISO calendar strings. datetime.ts:28–38 handles YYYY-MM-DD without a viewer-zone shift. The neighboring cancellation date already uses formatDate. Prior 128 concerns other date displays, not these four locations.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T03:51:40.456991+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch29 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T03:51:55.397Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T03:53:29.939Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:00:56.611Z",
+              "event": "rejected r1",
+              "batch": "29",
+              "revision": 1,
+              "note": "Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading."
+            },
+            {
+              "at": "2026-09-22T04:00:56.678Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T04:00:56.704Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B06"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-reader-3-portal-footer-download-only",
+      "tag": "wording",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch29.json finding reader-3-portal-footer-download-only",
+      "text": "Client portal, the footer sentence under the Account card on the portal page — `webapp/src/pages/portal/PortalDashboard.tsx:814`\nReads: Completed S-election forms and EIN letters stay encrypted here until you delete them. Download and keep your copies.\nClaims: The footer explains retention of the tax documents; nothing tells the client that portal documents are download-only.\nTrue: Current cross-review: PortalDashboard:814 omits the sentence. Current rulings.md:12 expressly retains it and defines download-only as uneditable. Batch 03 approves encrypted retention but does not expressly revoke this instruction. This is an instruction/implementation mismatch; interpreting download-only to prohibit deletion would be wrong.\nProposed replacement (not approved): Restore “Documents are download-only.” before the current retention explanation, preserving the current support link and encrypted-retention wording.\nRechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; PortalDashboard:814 omits the sentence. Current rulings.md:12 expressly retains it and defines download-only as uneditable. Batch 03 approves encrypted retention but does not expressly revoke this instruction. This is an instruction/implementation mismatch; interpreting download-only to prohibit deletion would be wrong.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T03:51:40.456991+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch29 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T03:51:55.397Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T03:53:29.939Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:00:56.611Z",
+              "event": "rejected r1",
+              "batch": "29",
+              "revision": 1,
+              "note": "Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading."
+            },
+            {
+              "at": "2026-09-22T04:00:56.678Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T04:00:56.704Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B07"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-runtime-A-generation-number-burned",
+      "tag": "wording",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch29.json finding runtime-A-generation-number-burned",
+      "text": "Client portal → Operating agreement questionnaire → Generate Operating Agreement (PDF): the number printed in the agreement's title (\"Partnership Operating Agreement (No. N)\"), in Your documents, in Your agreements and in the amendment form's \"Most recently generated agreement on file\" line — `webapp/server/routes-portal.ts:1256`\nReads:   const bumped = await db.query<{ oa_generation_seq: number }>(\n    \"UPDATE clients SET oa_generation_seq = oa_generation_seq + 1 WHERE id = $1 RETURNING oa_generation_seq\",\n    [session.clientId],\n  );\n  const nextGenerationNumber = Number(bumped[0]?.oa_generation_seq ?? 1);\nClaims: The comment above it (lines 1253-1255) says the counter exists so a number is never reused because it is printed on the PDF; the client expects their first generated agreement to be No. 1 and successive agreements to be numbered consecutively.\nTrue: Current cross-review: Current routes-portal:1265–1269 increments before shares/options/capital/stale-base checks and rate limit at ~1488. Historical runtime-A report records first success No.4 after refusals. Current source confirms the same ordering. However the recorded owner rule concerns rate-limit allowance, not a stated requirement that generated identifiers be consecutive; gaps alone do not invalidate an agreement. Later render/storage failure can still consume a number under Claude’s move.\nProposed replacement (not approved): Allocate the number after validation, stale-draft and rate-limit refusals, and assign inputs.generationNumber after allocation. Preserve never-reuse behavior; do not promise gap-free numbering after rendering/storage failures.\nRechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; Current routes-portal:1265–1269 increments before shares/options/capital/stale-base checks and rate limit at ~1488. Historical runtime-A report records first success No.4 after refusals. Current source confirms the same ordering. However the recorded owner rule concerns rate-limit allowance, not a stated requirement that generated identifiers be consecutive; gaps alone do not invalidate an agreement. Later render/storage failure can still consume a number under Claude’s move.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T03:51:40.456991+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch29 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T03:51:55.397Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T03:53:29.939Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T04:00:56.611Z",
+              "event": "rejected r1",
+              "batch": "29",
+              "revision": 1,
+              "note": "Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading."
+            },
+            {
+              "at": "2026-09-22T04:00:56.678Z",
+              "event": "assigned",
+              "batch": "29",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T04:00:56.704Z",
+              "event": "implemented",
+              "batch": "29",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "29",
+          "fix": {
+            "batch": "29",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch29 B08"
+              }
+            ]
+          }
+        }
+      ]
     }
   ],
   "rulings": [
@@ -26083,6 +26753,12 @@
       "text": "Record the independently identified staged-package cleanup remaining beside the preserved Batch05 replacement ordering fix",
       "migration": "003-batch28-staged-package",
       "migrationHash": "cd5634fb32c551b277b29676bbe828958e193aa37ba858c1284325653ebf7b6a"
+    },
+    {
+      "date": "2026-09-22",
+      "kind": "ruling",
+      "item": "90",
+      "text": "Keep the conservative inactive-name block; describe a recently inactive record without claiming the record proves dissolution. Apply consistently to the client and server explanations."
     }
   ],
   "batches": [
@@ -26946,6 +27622,49 @@
           "event": "implemented"
         }
       ]
+    },
+    {
+      "id": "29",
+      "revision": 1,
+      "frozenHash": "a862a15347e7642e11c595382a0297835c1ed785225b31999e96252c0b5bb720",
+      "status": "rejected",
+      "model": "Codex",
+      "base": "3f178aaad17e9440f1cf6001c66bb32635061fcb",
+      "history": [
+        {
+          "at": "2026-09-22T03:51:55.398Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-22T03:53:29.939Z",
+          "event": "implemented"
+        },
+        {
+          "at": "2026-09-22T04:00:56.611Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-22T04:00 (Adam standing authorization for necessary revisions within approved work.): Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading."
+        }
+      ]
+    },
+    {
+      "id": "29",
+      "revision": 2,
+      "frozenHash": "7ce95f936596de0a1444969a70e5da7024df649821159916028d4250aace7227",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "3f178aaad17e9440f1cf6001c66bb32635061fcb",
+      "history": [
+        {
+          "at": "2026-09-22T04:00:56.678Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-22T04:00:56.704Z",
+          "event": "implemented"
+        }
+      ]
     }
   ],
   "auditImports": [
@@ -26956,6 +27675,10 @@
     {
       "path": "docs/audit/intakes/claude-reconciled-batch28.json",
       "sha": "117b390811705a22a484c9cf911ae5b831f03b8bda61c8e08792345afef74dd1"
+    },
+    {
+      "path": "docs/audit/intakes/claude-reconciled-batch29.json",
+      "sha": "1801aa5c28a547c09ee49de2a9f79955dd031450176b39d267c61c7939d5a75e"
     }
   ]
 }
