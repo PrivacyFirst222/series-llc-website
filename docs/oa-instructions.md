@@ -16,7 +16,7 @@ In practice:
 **Every asset must be properly associated with the series that owns it.** The best way to do that is to title it in the full legal name of that series — exactly as filed, for example: *[COMPANY NAME], LLC - PS 1*.
 **Deposit each series' income to that series' account** and pay its expenses from that account.
 **Do not move assets between series.** Treat each series as though it were a separate limited liability company — its own account, its own assets, its own contracts, its own records.
-**Keep the mothership (the company itself) asset-light.** Under §8.5(b) of your agreement, any asset you fail to associate with a series defaults to the company, where it is exposed to the company's creditors. Owning assets at the series level, with clean records, is the whole point of the structure.
+**Keep the mothership (the company itself) asset-light.** Under §8.5(b) of your agreement, any asset you fail to associate with a series defaults to the company, where it is exposed to the company's creditors. Missing records can leave an asset non-associated; the default rule does not replace the identifying, acquisition, and transfer information the statute requires. Owning assets at the series level, with clean records, is the whole point of the structure.
 **Review your records once a year.** Neither the statute nor your agreement requires it; do it anyway — it is the cheapest way to find a gap while it can still be fixed.
 The free MyFloridaSeriesLLC recordkeeping app and the Series LLC Owner's Manual included with your formation package are built around these requirements.
 ## 2. Which Agreement to Use
@@ -30,7 +30,7 @@ The free MyFloridaSeriesLLC recordkeeping app and the Series LLC Owner's Manual 
 
 If the company has elected S corporation treatment, each of these four forms has an S corporation version — eight forms in all. Your portal builds the right one from your answers; you do not choose the file yourself.
 
-If you start with the single-member form and later add an owner, adopt the multi-member form at that time — the two forms handle taxes, voting, and creditor protection differently, and the single-member form is not built for two owners.
+If you start with the single-member form and later add an owner, adopt the multi-member form at that time. The forms handle voting and creditor protection differently, and the single-member form is not built for two owners. A disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner joins.
 ## 3. Filling in the Blanks
 Every blank appears in [BRACKETS]. Complete all of them:
 **[COMPANY NAME]** — exactly as shown on your filed Articles of Organization, everywhere it appears, including in each Series Exhibit name.

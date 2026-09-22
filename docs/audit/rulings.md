@@ -125,3 +125,23 @@ Adam. A new ruling is added the day it is given.
 - Ruling AUD-claude-reconciled-batch30-reader-6-amendment-latest-generation: "Approved Batch30 proposal: explicitly select the company agreement, show its parties and confirm its effective date; stop if the required agreement is unavailable. Go. Approve all."
 
 - Ruling AUD-claude-reconciled-batch30-runtime-A-consent-from-draft: "Approved Batch30 proposal: select an agreement supplying current members/managers, display and confirm them, preserve entity and joint signatures. Go. Approve all."
+
+- Ruling N2.07: "Batch 31 review item 5: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling N2.09: "Batch 31 review item 10: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling AUD-claude-reconciled-batch31-reader-1-benefits-deed-unconditional: "Batch 31 review item 1: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md."
+
+- Ruling AUD-claude-reconciled-batch31-reader-2-series-established-on-effect-not-filing: "Batch 31 review item 2: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md."
+
+- Ruling AUD-claude-reconciled-batch31-reader-3-consent-department-wording: "Batch 31 review item 3: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling AUD-claude-reconciled-batch31-reader-1-faq-0905-generalized: "Batch 31 review item 4: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md."
+
+- Ruling AUD-claude-reconciled-batch31-compare-A-instructions-handle-taxes-differently: "Batch 31 review item 6: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling AUD-claude-reconciled-batch31-compare-A-manual-nothing-left-to-add: "Batch 31 review item 7: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling AUD-claude-reconciled-batch31-render-oa-4-1-percentages-vs-fractions: "Batch 31 review item 8: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling AUD-claude-reconciled-batch31-statutes-0302-series-property: "Batch 31 review item 9: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."

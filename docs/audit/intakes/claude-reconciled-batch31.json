@@ -1,0 +1,225 @@
+{
+  "schema": 1,
+  "run": "claude-reconciled-batch31",
+  "commit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+  "completedAt": "2026-09-22T10:16:44.061343+00:00",
+  "manifestSha": "7cbe0143fe2e49331177d30650a17616f0650351699d1d45edcf2c81ea5691cb",
+  "auditSha": "d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1",
+  "findings": [
+    {
+      "key": "reader-1-benefits-deed-unconditional",
+      "where": "Home page and Benefits page, the benefits grid, card 04 \"Real property in the series' name\", second sentence",
+      "file": "webapp/src/components/home/BenefitsGrid.tsx",
+      "line": 31,
+      "reads": "body: \"Real estate can be deeded to and held by a protected series in its own name. Under \u00a7605.2301, the recorded deed stands as the record that the property belongs to that series.\",",
+      "claims": "That under \u00a7605.2301 a recorded deed is, without qualification, the record that the property belongs to the series.",
+      "truth": "s. 605.2301(2)(b) (2026 Florida Statutes, opened on Online Sunshine) makes the recorded deed conclusive and \"a record that such interest in real property is an associated asset\" only \"to the extent such deed or other instrument is in favor of a person who gives value without knowledge of the lack of authority of the person signing\"; otherwise association rests on the records of (2)(a). Batch 17 (Ruling 14; docs/facts.md:212 \"The recorded-real-property-instrument exception has the giving-value and lack-of-knowledge qualifications stated in s.605.2301(2)(b)\") rewrote The Statute page (TheStatute.tsx:59) to carry those conditions; this card, shown on the Home and Benefits pages, still states the unconditional version.",
+      "replacement": "body: \"Real estate can be deeded to and held by a protected series in its own name. Under \u00a7605.2301(2)(b), a recorded deed in favor of someone who gives value without knowing of any lack of authority is itself the record that the property is an associated asset of that series; your own asset records must show it in every other case.\",",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "reader-1-finding-deed-unconditional",
+        "reader-1-statute-605-part3",
+        "reader-1-rulings"
+      ],
+      "review": {
+        "reviewer": "Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf",
+        "priorCompared": true,
+        "replacement": "needs owner ruling",
+        "evidence": "Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5\u201310. The work order, not this historical proposed replacement, determines approved scope."
+      },
+      "bucket": 1,
+      "reader": "reader-1",
+      "link": {
+        "rep": "reader-1-benefits-deed-unconditional",
+        "note": "one defect in two places (reader-1); the statutes agent's statutes-2301-deed-qualifiers is the same and is kept in notes/statutes-findings.json with the s. 605.2301 page as evidence"
+      },
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-2-series-established-on-effect-not-filing",
+      "where": "Order form, Certification step on the adding-series path, the opening paragraph",
+      "file": "webapp/src/components/forms/florida-llc/sections/StepCertification.tsx",
+      "line": 83,
+      "reads": "Florida establishes a protected series when the company files a",
+      "claims": "A protected series exists as of the filing of its Designation.",
+      "truth": "The 2026 s. 605.2201(3) (Online Sunshine, opened 20 Sep 2026): 'A protected series is established when the protected series designation takes effect under s. 605.0207' \u2014 a Designation may carry a delayed effective date, and s. 605.2201(2) requires it to be 'signed by the company'. The sentence is right about consent (s. 605.2201(1)) but places establishment at filing rather than at the effective date.",
+      "replacement": "Florida establishes a protected series when a Protected Series Designation, signed for the company and filed with the Division of Corporations with the consent of all of its members, takes effect (\u00a7605.2201). There are no Articles to sign: your company already exists.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "reader-2-finding-series-established-when",
+        "reader-2-statute-605-2201"
+      ],
+      "review": {
+        "reviewer": "Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf",
+        "priorCompared": true,
+        "replacement": "needs owner ruling",
+        "evidence": "Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5\u201310. The work order, not this historical proposed replacement, determines approved scope."
+      },
+      "bucket": 2,
+      "reader": "reader-2",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-3-consent-department-wording",
+      "where": "Client portal, Orders in progress, the Consent & Series Exhibit dialog for an added series, the note under the 'Protected series name' box",
+      "file": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "line": 340,
+      "reads": "Exactly as filed with the Department.",
+      "claims": "The series name was filed with 'the Department'.",
+      "truth": "Every other client-facing sentence names the filing office as the Florida Division of Corporations or 'the state': the same dialog says 'The designation filed with the state is signed by the company' (OrdersInProgress.tsx:316), the Registered agent card says 'with the Florida Division of Corporations' (PortalDashboard.tsx:363-364), and docs/facts.md:211 fixes the name: 'The filing office is the Florida Division of Corporations.' 'The Department' is the statute's defined term (s. 605.0102(16), 'Department of State'), which the client has never been given. Evidence reader-3-f-department.",
+      "replacement": "Exactly as filed with the Florida Division of Corporations.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "reader-3-f-department",
+        "reader-3-st-605-0102"
+      ],
+      "review": {
+        "reviewer": "Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf",
+        "priorCompared": true,
+        "replacement": "needs owner ruling",
+        "evidence": "Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5\u201310. The work order, not this historical proposed replacement, determines approved scope."
+      },
+      "bucket": 3,
+      "reader": "reader-3",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-1-faq-0905-generalized",
+      "where": "FAQ page, question 10 \"Does this work for out-of-state investors?\", the sentence citing \u00a7605.0905(3)",
+      "file": "webapp/src/pages/FAQ.tsx",
+      "line": 52,
+      "reads": "a: \"A Florida Protected Series LLC works well for Floridians and for Florida businesses and assets. There is no way to guarantee how the courts of another state \u2014 particularly one with no series LLC legislation of its own \u2014 will interpret it. There is also a registration question that runs in both directions: under \u00a7605.0905(3), owning income-producing real property or tangible personal property in a state is itself transacting business there, which means a company formed elsewhere that owns Florida rental property has to qualify here \u2014 and a Florida company that buys rental property in another state should expect that state to take the same position. The consequences of skipping it are real: \u00a7605.0904 bars a company transacting business in Florida without a certificate of authority from maintaining an action here, and \u00a7605.0904(7) adds liability for all back fees plus a civil penalty of at least $500 and not more than $1,000 for each year or part of a year. If you are not a Floridian, or you plan to hold out-of-state property in a Florida Protected Series LLC, you should seek advice from an attorney licensed to practice in the relevant state.\",",
+      "claims": "That \u00a7605.0905(3) makes owning income-producing real or tangible personal property \"in a state\" transacting business \"there\" \u2014 a rule stated for any state.",
+      "truth": "s. 605.0905(3) (2026 Florida Statutes, opened on Online Sunshine) reads \"The ownership in this state of income-producing real property or tangible personal property, other than property excluded under subsection (1), constitutes transacting business in this state for purposes of s. 605.0902(1).\" It speaks only of Florida. The answer's second half (another state \"should expect \u2026 the same position\") is a prediction about other states' law, which the Florida section does not support; the citation should carry only the Florida rule.",
+      "replacement": "There is also a registration question that runs in both directions: under \u00a7605.0905(3), owning income-producing real property or tangible personal property in Florida is itself transacting business here, which means a company formed elsewhere that owns Florida rental property has to qualify here \u2014 and a Florida company that buys rental property in another state should expect that state to apply its own version of the same rule.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "reader-1-finding-faq-0905",
+        "reader-1-statute-605-part2"
+      ],
+      "review": {
+        "reviewer": "Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf",
+        "priorCompared": true,
+        "replacement": "needs owner ruling",
+        "evidence": "Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5\u201310. The work order, not this historical proposed replacement, determines approved scope."
+      },
+      "bucket": 1,
+      "reader": "reader-1",
+      "link": {
+        "rep": "reader-1-faq-0905-generalized",
+        "note": "the statutes agent's statutes-0905-in-a-state is the same defect, kept in notes/statutes-findings.json"
+      },
+      "presentedAs": "new"
+    },
+    {
+      "key": "compare-A-instructions-handle-taxes-differently",
+      "where": "Operating Agreement Instructions \u00a72 'Which Agreement to Use', last paragraph",
+      "file": "docs/oa-instructions.md",
+      "line": 33,
+      "reads": "If you start with the single-member form and later add an owner, adopt the multi-member form at that time \u2014 the two forms handle taxes, voting, and creditor protection differently, and the single-member form is not built for two owners.",
+      "claims": "The single-member and multi-member forms handle taxes differently.",
+      "truth": "True of the disregarded (master 3 \u00a79.1) versus partnership (master 4 \u00a79.1) pair; the S corporation single-member form (master 2 \u00a79.1 'S corporation status \u2026 remain continuously in effect') and the S corporation multi-member form (master 1 \u00a79.1, same sentence) handle taxes the same way. Same substance as the Manual's line 146 (ledger N2.12).",
+      "replacement": "If you start with the single-member form and later add an owner, adopt the multi-member form at that time \u2014 the two forms handle voting and creditor protection differently (and, unless the company has elected S corporation status, taxes as well), and the single-member form is not built for two owners.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "compare-A-instructions-1",
+        "compare-A-instructions-2"
+      ],
+      "review": {
+        "reviewer": "Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf",
+        "priorCompared": true,
+        "replacement": "needs owner ruling",
+        "evidence": "Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5\u201310. The work order, not this historical proposed replacement, determines approved scope."
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "compare-A-manual-nothing-left-to-add",
+      "where": "Owner's Manual \u00a77 map, Article 10 row",
+      "file": "docs/owners-manual.md",
+      "line": 131,
+      "reads": "| **Article 10** | **In the multi-member forms:** transfers \u2014 family transfers permitted, everything else needs consent, transferees get money rights only, plus the charging-order and involuntary-transfer armor (Section 23). **In the single-owner forms:** admission of an additional member. Those forms have no transfer article, because Chapter 605 already makes a transfer permissible, gives a transferee distributions and nothing else, and binds a transferee who never signs \u2014 there was nothing left for the agreement to add |",
+      "claims": "The single-owner forms add nothing about transfers because Chapter 605 already covers them.",
+      "truth": "The single-member S corporation forms do add a transfer rule: master 2 \u00a79.3(a) (templates-oa-member-single-s.md:220) 'no Transfer of all or any part of the Membership Interest, or of any transferable interest, may be made to any person who is not an eligible S corporation shareholder \u2026 null and void ab initio'; master 7 \u00a79.3(a) (templates-oa-single-s.md:234) is the same. The Manual itself describes that restriction at line 328.",
+      "replacement": "| **Article 10** | **In the multi-member forms:** transfers \u2014 family transfers permitted, everything else needs consent, transferees get money rights only, plus the charging-order and involuntary-transfer armor (Section 23). **In the single-owner forms:** admission of an additional member. Those forms have no transfer article, because Chapter 605 already makes a transfer permissible, gives a transferee distributions and nothing else, and binds a transferee who never signs; the S corporation versions add only the eligible-shareholder restriction in Section 9.3 |",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "compare-A-manual-2"
+      ],
+      "review": {
+        "reviewer": "Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf",
+        "priorCompared": true,
+        "replacement": "needs owner ruling",
+        "evidence": "Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5\u201310. The work order, not this historical proposed replacement, determines approved scope."
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "render-oa-4-1-percentages-vs-fractions",
+      "where": "Generated multi-member operating agreements (all four multi-member masters), s. 4.1, when the questionnaire's ownership mode is fractions",
+      "file": "webapp/server/templates-oa-multi.md",
+      "line": 130,
+      "reads": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes.",
+      "claims": "Membership interests are expressed as percentages.",
+      "truth": "The questionnaire offers fractions (ownershipMode 'fraction', routes-portal.ts:186 and 2.13's own definition 'the percentage or fractional interest set forth for that Member on Exhibit A'), and the generated Exhibit A then prints '2/3' and '1/3' (evidence/render/pdf-5-ordinary.pdf page 20, pdf-6-ordinary.pdf page 21, and both professional copies) while s. 4.1 on page 5 still says 'expressed as percentages'. The same sentence is at templates-oa-s.md:130, templates-oa-member.md:128 and templates-oa-member-s.md:128 (both ', unless the Manager' and ', unless a Majority in Interest' variants).",
+      "replacement": "In all four masters: 'Membership interests are of a single class and are expressed as percentages or fractions of the whole, as set forth on Exhibit A; no certificates shall be issued unless \u2026' (keep the rest of the sentence as each master has it).",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "render-pdf-5-ordinary",
+        "render-pdf-6-ordinary"
+      ],
+      "review": {
+        "reviewer": "Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf",
+        "priorCompared": true,
+        "replacement": "needs owner ruling",
+        "evidence": "Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5\u201310. The work order, not this historical proposed replacement, determines approved scope."
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "statutes-0302-series-property",
+      "where": "Operating agreement masters, statement-of-authority section (s. 5.9 member-managed multi; s. 5.7 member-managed single; s. 5.8 manager-managed forms) \u2014 all eight masters",
+      "file": "webapp/server/templates-oa-member.md",
+      "line": 200,
+      "reads": "**5.9 Statement of Authority.** With the consent of all Members required by Section 5.5(i), the Members may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of Members to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and the Members shall cause it to be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4(b) apply among the Members whether or not a statement of authority is filed or recorded.",
+      "claims": "The Company may file a s. 605.0302 statement of authority stating the authority or limitations on authority to transfer or encumber real property 'held in the name of the Company or of a Protected Series'.",
+      "truth": "s. 605.0302(1)(b)-(c) and (7) address 'real property held in the name of the company' / 'held in the name of a limited liability company'; the section never mentions a protected series. A protected series is 'a person distinct from' the company (s. 605.2103), and s. 605.0302 reaches it only through s. 605.2108(3) ('the provisions of this chapter applicable to limited liability companies in general \u2026 are applicable \u2026 to each protected series'), under which the protected series would file its own statement for property held in its name. Same text in templates-oa-member-s.md:200, templates-oa-member-single-s.md:154, templates-oa-member-single.md:148, templates-oa-multi.md:194, templates-oa-s.md:194, templates-oa-single-s.md:168, templates-oa-single.md:162. Evidence: evidence/statutes/605.0302.txt, 605.2103.txt, 605.2108.txt.",
+      "replacement": "In each master, after 'held in the name of the Company or of a Protected Series,' add: 'and, as to real property held in the name of a Protected Series, may cause that Protected Series to file its own statement of authority under s. 605.0302 as applied by s. 605.2108(3), Florida Statutes,' (Adam to confirm the drafting).",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "statutes-605-0302",
+        "statutes-605-0302-claims",
+        "statutes-605-2108"
+      ],
+      "review": {
+        "reviewer": "Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf",
+        "priorCompared": true,
+        "replacement": "needs owner ruling",
+        "evidence": "Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5\u201310. The work order, not this historical proposed replacement, determines approved scope."
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    }
+  ]
+}

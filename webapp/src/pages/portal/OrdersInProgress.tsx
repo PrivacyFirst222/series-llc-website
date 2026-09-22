@@ -353,7 +353,7 @@ export function OrdersInProgress({
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Protected series name</label>
               <Input name="seriesName" defaultValue={consentFor?.details.seriesName ?? ""} required />
-              <p className="text-xs text-muted-foreground">Exactly as filed with the Department.</p>
+              <p className="text-xs text-muted-foreground">Exactly as filed with the Florida Division of Corporations.</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
