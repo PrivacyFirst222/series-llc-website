@@ -1,0 +1,131 @@
+PASS all twelve published Word mappings checked: 12
+CHECK_RESULT {"suite": "batch25-word", "label": "all twelve published Word mappings checked", "ok": true, "detail": 12, "commit": "", "run": ""}
+PASS Word generator baseline available for independent preservation check: {'batch': '32', 'base': '4754c5116dcc2a0105acd4a0adede646d3c6f41a', 'unchanged': False}
+CHECK_RESULT {"suite": "batch25-word", "label": "Word generator baseline available for independent preservation check", "ok": true, "detail": {"batch": "32", "base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a", "unchanged": false}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-single.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "", "run": ""}
+PASS webapp/server/templates-oa-single.md complete table cell matrix: {'expectedRows': [8, 2, 7, 6], 'actualRows': [8, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [8, 2, 7, 6], "actualRows": [8, 2, 7, 6]}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-single.md entity signature controls become indents: {'expected': 6, 'actual': 6, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single.md entity signature controls become indents", "ok": true, "detail": {"expected": 6, "actual": 6, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-single.md source is exactly its batch base plus declared replacements: {'batch': '32', 'revision': 2, 'replacements': 0, 'missing': [], 'expectedChars': 52244, 'actualChars': 52244}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single.md source is exactly its batch base plus declared replacements", "ok": true, "detail": {"batch": "32", "revision": 2, "replacements": 0, "missing": [], "expectedChars": 52244, "actualChars": 52244}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-single.md all baseline text and drafting choices retained: {'base': '4754c5116dcc2a0105acd4a0adede646d3c6f41a', 'expectedChars': 48105, 'afterChars': 48110}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single.md all baseline text and drafting choices retained", "ok": true, "detail": {"base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a", "expectedChars": 48105, "afterChars": 48110}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-multi.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-multi.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "", "run": ""}
+PASS webapp/server/templates-oa-multi.md complete table cell matrix: {'expectedRows': [3, 2, 3, 2, 7, 6], 'actualRows': [3, 2, 3, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-multi.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [3, 2, 3, 2, 7, 6], "actualRows": [3, 2, 3, 2, 7, 6]}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-multi.md entity signature controls become indents: {'expected': 6, 'actual': 6, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-multi.md entity signature controls become indents", "ok": true, "detail": {"expected": 6, "actual": 6, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-multi.md source is exactly its batch base plus declared replacements: {'batch': '32', 'revision': 2, 'replacements': 0, 'missing': [], 'expectedChars': 77597, 'actualChars': 77597}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-multi.md source is exactly its batch base plus declared replacements", "ok": true, "detail": {"batch": "32", "revision": 2, "replacements": 0, "missing": [], "expectedChars": 77597, "actualChars": 77597}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-multi.md all baseline text and drafting choices retained: {'base': '4754c5116dcc2a0105acd4a0adede646d3c6f41a', 'expectedChars': 72763, 'afterChars': 72767}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-multi.md all baseline text and drafting choices retained", "ok": true, "detail": {"base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a", "expectedChars": 72763, "afterChars": 72767}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-s.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-s.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "", "run": ""}
+PASS webapp/server/templates-oa-s.md complete table cell matrix: {'expectedRows': [3, 2, 3, 2, 7, 6], 'actualRows': [3, 2, 3, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-s.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [3, 2, 3, 2, 7, 6], "actualRows": [3, 2, 3, 2, 7, 6]}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-s.md entity signature controls become indents: {'expected': 6, 'actual': 6, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-s.md entity signature controls become indents", "ok": true, "detail": {"expected": 6, "actual": 6, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-s.md source is exactly its batch base plus declared replacements: {'batch': '32', 'revision': 2, 'replacements': 0, 'missing': [], 'expectedChars': 80591, 'actualChars': 80591}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-s.md source is exactly its batch base plus declared replacements", "ok": true, "detail": {"batch": "32", "revision": 2, "replacements": 0, "missing": [], "expectedChars": 80591, "actualChars": 80591}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-s.md all baseline text and drafting choices retained: {'base': '4754c5116dcc2a0105acd4a0adede646d3c6f41a', 'expectedChars': 75721, 'afterChars': 75725}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-s.md all baseline text and drafting choices retained", "ok": true, "detail": {"base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a", "expectedChars": 75721, "afterChars": 75725}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member.md complete table cell matrix: {'expectedRows': [3, 2, 3, 2, 7, 6], 'actualRows': [3, 2, 3, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [3, 2, 3, 2, 7, 6], "actualRows": [3, 2, 3, 2, 7, 6]}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member.md entity signature controls become indents: {'expected': 4, 'actual': 4, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member.md entity signature controls become indents", "ok": true, "detail": {"expected": 4, "actual": 4, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member.md source is exactly its batch base plus declared replacements: {'batch': '32', 'revision': 2, 'replacements': 0, 'missing': [], 'expectedChars': 75056, 'actualChars': 75056}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member.md source is exactly its batch base plus declared replacements", "ok": true, "detail": {"batch": "32", "revision": 2, "replacements": 0, "missing": [], "expectedChars": 75056, "actualChars": 75056}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member.md all baseline text and drafting choices retained: {'base': '4754c5116dcc2a0105acd4a0adede646d3c6f41a', 'expectedChars': 70772, 'afterChars': 70773}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member.md all baseline text and drafting choices retained", "ok": true, "detail": {"base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a", "expectedChars": 70772, "afterChars": 70773}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-s.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-s.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-s.md complete table cell matrix: {'expectedRows': [3, 2, 3, 2, 7, 6], 'actualRows': [3, 2, 3, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-s.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [3, 2, 3, 2, 7, 6], "actualRows": [3, 2, 3, 2, 7, 6]}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-s.md entity signature controls become indents: {'expected': 4, 'actual': 4, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-s.md entity signature controls become indents", "ok": true, "detail": {"expected": 4, "actual": 4, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-s.md source is exactly its batch base plus declared replacements: {'batch': '32', 'revision': 2, 'replacements': 0, 'missing': [], 'expectedChars': 77995, 'actualChars': 77995}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-s.md source is exactly its batch base plus declared replacements", "ok": true, "detail": {"batch": "32", "revision": 2, "replacements": 0, "missing": [], "expectedChars": 77995, "actualChars": 77995}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-s.md all baseline text and drafting choices retained: {'base': '4754c5116dcc2a0105acd4a0adede646d3c6f41a', 'expectedChars': 73675, 'afterChars': 73676}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-s.md all baseline text and drafting choices retained", "ok": true, "detail": {"base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a", "expectedChars": 73675, "afterChars": 73676}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-single-s.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single-s.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "", "run": ""}
+PASS webapp/server/templates-oa-single-s.md complete table cell matrix: {'expectedRows': [8, 2, 7, 6], 'actualRows': [8, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single-s.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [8, 2, 7, 6], "actualRows": [8, 2, 7, 6]}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-single-s.md entity signature controls become indents: {'expected': 6, 'actual': 6, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single-s.md entity signature controls become indents", "ok": true, "detail": {"expected": 6, "actual": 6, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-single-s.md source is exactly its batch base plus declared replacements: {'batch': '32', 'revision': 2, 'replacements': 0, 'missing': [], 'expectedChars': 57643, 'actualChars': 57643}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single-s.md source is exactly its batch base plus declared replacements", "ok": true, "detail": {"batch": "32", "revision": 2, "replacements": 0, "missing": [], "expectedChars": 57643, "actualChars": 57643}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-single-s.md all baseline text and drafting choices retained: {'base': '4754c5116dcc2a0105acd4a0adede646d3c6f41a', 'expectedChars': 53448, 'afterChars': 53453}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-single-s.md all baseline text and drafting choices retained", "ok": true, "detail": {"base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a", "expectedChars": 53448, "afterChars": 53453}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-single.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-single.md complete table cell matrix: {'expectedRows': [8, 2, 7, 6], 'actualRows': [8, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [8, 2, 7, 6], "actualRows": [8, 2, 7, 6]}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-single.md entity signature controls become indents: {'expected': 4, 'actual': 4, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single.md entity signature controls become indents", "ok": true, "detail": {"expected": 4, "actual": 4, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-single.md source is exactly its batch base plus declared replacements: {'batch': '32', 'revision': 2, 'replacements': 0, 'missing': [], 'expectedChars': 46884, 'actualChars': 46884}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single.md source is exactly its batch base plus declared replacements", "ok": true, "detail": {"batch": "32", "revision": 2, "replacements": 0, "missing": [], "expectedChars": 46884, "actualChars": 46884}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-single.md all baseline text and drafting choices retained: {'base': '4754c5116dcc2a0105acd4a0adede646d3c6f41a', 'expectedChars': 43313, 'afterChars': 43315}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single.md all baseline text and drafting choices retained", "ok": true, "detail": {"base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a", "expectedChars": 43313, "afterChars": 43315}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-single-s.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single-s.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-single-s.md complete table cell matrix: {'expectedRows': [8, 2, 7, 6], 'actualRows': [8, 2, 7, 6]}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single-s.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [8, 2, 7, 6], "actualRows": [8, 2, 7, 6]}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-single-s.md entity signature controls become indents: {'expected': 4, 'actual': 4, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single-s.md entity signature controls become indents", "ok": true, "detail": {"expected": 4, "actual": 4, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-single-s.md source is exactly its batch base plus declared replacements: {'batch': '32', 'revision': 2, 'replacements': 0, 'missing': [], 'expectedChars': 52057, 'actualChars': 52057}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single-s.md source is exactly its batch base plus declared replacements", "ok": true, "detail": {"batch": "32", "revision": 2, "replacements": 0, "missing": [], "expectedChars": 52057, "actualChars": 52057}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-member-single-s.md all baseline text and drafting choices retained: {'base': '4754c5116dcc2a0105acd4a0adede646d3c6f41a', 'expectedChars': 48426, 'afterChars': 48428}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-member-single-s.md all baseline text and drafting choices retained", "ok": true, "detail": {"base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a", "expectedChars": 48426, "afterChars": 48428}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-amendment.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-amendment.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "", "run": ""}
+PASS webapp/server/templates-oa-amendment.md complete table cell matrix: {'expectedRows': [], 'actualRows': []}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-amendment.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [], "actualRows": []}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-amendment.md entity signature controls become indents: {'expected': 4, 'actual': 4, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-amendment.md entity signature controls become indents", "ok": true, "detail": {"expected": 4, "actual": 4, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-amendment.md source is exactly its batch base plus declared replacements: {'batch': '32', 'revision': 2, 'replacements': 0, 'missing': [], 'expectedChars': 3158, 'actualChars': 3158}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-amendment.md source is exactly its batch base plus declared replacements", "ok": true, "detail": {"batch": "32", "revision": 2, "replacements": 0, "missing": [], "expectedChars": 3158, "actualChars": 3158}, "commit": "", "run": ""}
+PASS webapp/server/templates-oa-amendment.md all baseline text and drafting choices retained: {'base': '4754c5116dcc2a0105acd4a0adede646d3c6f41a', 'expectedChars': 2090, 'afterChars': 2099}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-oa-amendment.md all baseline text and drafting choices retained", "ok": true, "detail": {"base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a", "expectedChars": 2090, "afterChars": 2099}, "commit": "", "run": ""}
+PASS docs/owners-manual.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/owners-manual.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "", "run": ""}
+PASS docs/owners-manual.md complete table cell matrix: {'expectedRows': [14, 5, 12, 5, 5, 4, 5, 7, 5], 'actualRows': [14, 5, 12, 5, 5, 4, 5, 7, 5]}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/owners-manual.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [14, 5, 12, 5, 5, 4, 5, 7, 5], "actualRows": [14, 5, 12, 5, 5, 4, 5, 7, 5]}, "commit": "", "run": ""}
+PASS docs/owners-manual.md entity signature controls become indents: {'expected': 0, 'actual': 116, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/owners-manual.md entity signature controls become indents", "ok": true, "detail": {"expected": 0, "actual": 116, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS docs/owners-manual.md source is exactly its batch base plus declared replacements: {'batch': '32', 'revision': 2, 'replacements': 0, 'missing': [], 'expectedChars': 103006, 'actualChars': 103006}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/owners-manual.md source is exactly its batch base plus declared replacements", "ok": true, "detail": {"batch": "32", "revision": 2, "replacements": 0, "missing": [], "expectedChars": 103006, "actualChars": 103006}, "commit": "", "run": ""}
+PASS docs/owners-manual.md all baseline text and drafting choices retained: {'base': '4754c5116dcc2a0105acd4a0adede646d3c6f41a', 'expectedChars': 101652, 'afterChars': 101652}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/owners-manual.md all baseline text and drafting choices retained", "ok": true, "detail": {"base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a", "expectedChars": 101652, "afterChars": 101652}, "commit": "", "run": ""}
+PASS webapp/server/templates-statement-of-authorized-representative.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-statement-of-authorized-representative.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "", "run": ""}
+PASS webapp/server/templates-statement-of-authorized-representative.md complete table cell matrix: {'expectedRows': [], 'actualRows': []}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-statement-of-authorized-representative.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [], "actualRows": []}, "commit": "", "run": ""}
+PASS webapp/server/templates-statement-of-authorized-representative.md entity signature controls become indents: {'expected': 2, 'actual': 2, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-statement-of-authorized-representative.md entity signature controls become indents", "ok": true, "detail": {"expected": 2, "actual": 2, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS webapp/server/templates-statement-of-authorized-representative.md source is exactly its batch base plus declared replacements: {'batch': '32', 'revision': 2, 'replacements': 0, 'missing': [], 'expectedChars': 3418, 'actualChars': 3418}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-statement-of-authorized-representative.md source is exactly its batch base plus declared replacements", "ok": true, "detail": {"batch": "32", "revision": 2, "replacements": 0, "missing": [], "expectedChars": 3418, "actualChars": 3418}, "commit": "", "run": ""}
+PASS webapp/server/templates-statement-of-authorized-representative.md all baseline text and drafting choices retained: {'base': '4754c5116dcc2a0105acd4a0adede646d3c6f41a', 'expectedChars': 3035, 'afterChars': 3036}
+CHECK_RESULT {"suite": "batch25-word", "label": "webapp/server/templates-statement-of-authorized-representative.md all baseline text and drafting choices retained", "ok": true, "detail": {"base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a", "expectedChars": 3035, "afterChars": 3036}, "commit": "", "run": ""}
+PASS docs/oa-instructions.md tracked Word contains the current generator output: []
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/oa-instructions.md tracked Word contains the current generator output", "ok": true, "detail": [], "commit": "", "run": ""}
+PASS docs/oa-instructions.md complete table cell matrix: {'expectedRows': [5, 7], 'actualRows': [5, 7]}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/oa-instructions.md complete table cell matrix", "ok": true, "detail": {"expectedRows": [5, 7], "actualRows": [5, 7]}, "commit": "", "run": ""}
+PASS docs/oa-instructions.md entity signature controls become indents: {'expected': 0, 'actual': 0, 'controlLeaks': 0}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/oa-instructions.md entity signature controls become indents", "ok": true, "detail": {"expected": 0, "actual": 0, "controlLeaks": 0}, "commit": "", "run": ""}
+PASS docs/oa-instructions.md source is exactly its batch base plus declared replacements: {'batch': '32', 'revision': 2, 'replacements': 0, 'missing': [], 'expectedChars': 17579, 'actualChars': 17579}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/oa-instructions.md source is exactly its batch base plus declared replacements", "ok": true, "detail": {"batch": "32", "revision": 2, "replacements": 0, "missing": [], "expectedChars": 17579, "actualChars": 17579}, "commit": "", "run": ""}
+PASS docs/oa-instructions.md all baseline text and drafting choices retained: {'base': '4754c5116dcc2a0105acd4a0adede646d3c6f41a', 'expectedChars': 16906, 'afterChars': 16906}
+CHECK_RESULT {"suite": "batch25-word", "label": "docs/oa-instructions.md all baseline text and drafting choices retained", "ok": true, "detail": {"base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a", "expectedChars": 16906, "afterChars": 16906}, "commit": "", "run": ""}
+PASS comment-wrapped data and totals remain in first table; blank separates second table: [[['Owner', 'Share'], ['[NAME]', '100%'], ['Total', '100%']], [['Other', 'Value'], ['A', 'B']]]
+CHECK_RESULT {"suite": "batch25-word", "label": "comment-wrapped data and totals remain in first table; blank separates second table", "ok": true, "detail": [[["Owner", "Share"], ["[NAME]", "100%"], ["Total", "100%"]], [["Other", "Value"], ["A", "B"]]], "commit": "", "run": ""}
+PASS intervening ordinary paragraph stays outside tables: ['Outside paragraph.']
+CHECK_RESULT {"suite": "batch25-word", "label": "intervening ordinary paragraph stays outside tables", "ok": true, "detail": ["Outside paragraph."], "commit": "", "run": ""}
+PASS table header repeat and body row no-split survive: all fixture rows
+CHECK_RESULT {"suite": "batch25-word", "label": "table header repeat and body row no-split survive", "ok": true, "detail": "all fixture rows", "commit": "", "run": ""}
+Batch 25 Word: 65/65 checks passed

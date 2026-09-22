@@ -1,0 +1,49 @@
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-single.md each drafting choice explicitly opens and closes", "ok": true, "detail": {"choices": 14, "labels": 28}, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-single.md no glued alternatives or controls", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-single.md closing labels stay with preceding text", "ok": true, "detail": [], "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-single.md legal characters and choices identical after removing labels", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-multi.md each drafting choice explicitly opens and closes", "ok": true, "detail": {"choices": 17, "labels": 34}, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-multi.md no glued alternatives or controls", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-multi.md closing labels stay with preceding text", "ok": true, "detail": [], "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-multi.md legal characters and choices identical after removing labels", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-s.md each drafting choice explicitly opens and closes", "ok": true, "detail": {"choices": 17, "labels": 34}, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-s.md no glued alternatives or controls", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-s.md closing labels stay with preceding text", "ok": true, "detail": [], "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-s.md legal characters and choices identical after removing labels", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member.md each drafting choice explicitly opens and closes", "ok": true, "detail": {"choices": 9, "labels": 18}, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member.md no glued alternatives or controls", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member.md closing labels stay with preceding text", "ok": true, "detail": [], "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member.md legal characters and choices identical after removing labels", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member-s.md each drafting choice explicitly opens and closes", "ok": true, "detail": {"choices": 9, "labels": 18}, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member-s.md no glued alternatives or controls", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member-s.md closing labels stay with preceding text", "ok": true, "detail": [], "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member-s.md legal characters and choices identical after removing labels", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-single-s.md each drafting choice explicitly opens and closes", "ok": true, "detail": {"choices": 14, "labels": 28}, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-single-s.md no glued alternatives or controls", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-single-s.md closing labels stay with preceding text", "ok": true, "detail": [], "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-single-s.md legal characters and choices identical after removing labels", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member-single.md each drafting choice explicitly opens and closes", "ok": true, "detail": {"choices": 6, "labels": 12}, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member-single.md no glued alternatives or controls", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member-single.md closing labels stay with preceding text", "ok": true, "detail": [], "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member-single.md legal characters and choices identical after removing labels", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member-single-s.md each drafting choice explicitly opens and closes", "ok": true, "detail": {"choices": 6, "labels": 12}, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member-single-s.md no glued alternatives or controls", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member-single-s.md closing labels stay with preceding text", "ok": true, "detail": [], "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-member-single-s.md legal characters and choices identical after removing labels", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-amendment.md each drafting choice explicitly opens and closes", "ok": true, "detail": {"choices": 26, "labels": 52}, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-amendment.md no glued alternatives or controls", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-amendment.md closing labels stay with preceding text", "ok": true, "detail": [], "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-oa-amendment.md legal characters and choices identical after removing labels", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "docs/owners-manual.md each drafting choice explicitly opens and closes", "ok": true, "detail": {"choices": 0, "labels": 0}, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "docs/owners-manual.md no glued alternatives or controls", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "docs/owners-manual.md closing labels stay with preceding text", "ok": true, "detail": [], "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "docs/owners-manual.md legal characters and choices identical after removing labels", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-statement-of-authorized-representative.md each drafting choice explicitly opens and closes", "ok": true, "detail": {"choices": 2, "labels": 4}, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-statement-of-authorized-representative.md no glued alternatives or controls", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-statement-of-authorized-representative.md closing labels stay with preceding text", "ok": true, "detail": [], "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "webapp/server/templates-statement-of-authorized-representative.md legal characters and choices identical after removing labels", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "docs/oa-instructions.md each drafting choice explicitly opens and closes", "ok": true, "detail": {"choices": 0, "labels": 0}, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "docs/oa-instructions.md no glued alternatives or controls", "ok": true, "detail": null, "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "docs/oa-instructions.md closing labels stay with preceding text", "ok": true, "detail": [], "commit": "", "run": ""}
+CHECK_RESULT {"suite": "batch32-word", "label": "docs/oa-instructions.md legal characters and choices identical after removing labels", "ok": true, "detail": null, "commit": "", "run": ""}
+48/48 Batch32 Word checks passed

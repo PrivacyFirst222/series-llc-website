@@ -22,6 +22,11 @@ def verify(generator=None):
   check(source+' each drafting choice explicitly opens and closes',len(labels)==2*count,{'choices':count,'labels':len(labels)})
   visible=''.join(t.text or '' for t in root.iter(W+'t'))
   check(source+' no glued alternatives or controls',not any(x in visible for x in ['hashave','MEMBER:MEMBERS:','Manager:Adopted','[MANAGER NAMES].The initial Managers','[[indent]]','\x01','\x02']))
+  paragraphs=list(root.findall(W+'p'));orphanable=[]
+  for n,paragraph in enumerate(paragraphs):
+   value=''.join(t.text or '' for t in paragraph.iter(W+'t'))
+   if value.startswith('[End ') and (n==0 or paragraphs[n-1].find(W+'pPr/'+W+'keepNext') is None):orphanable.append(value)
+  check(source+' closing labels stay with preceding text',not orphanable,orphanable)
   # Independent reference: same source with ONLY conditional markers removed.
   # This bypasses the new choice formatter and preserves all original text.
   plain=re.sub(r'<!--\s*(?:(?:one|many|if):[a-z]+|/(?:one|many|if))\s*-->','',md)

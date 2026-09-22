@@ -443,6 +443,11 @@ def body_xml(md, P):
 
         line = lines[i].rstrip()
         if line.startswith(DRAFT_START) and line.endswith(DRAFT_END):
+            if "[End " in line and out and out[-1].startswith("<w:p"):
+                # A closing label belongs to the preceding paragraph, never
+                # alone on a new page. Preserve that paragraph's other rules.
+                if "<w:keepNext/>" not in out[-1]:
+                    out[-1] = out[-1].replace("<w:pPr>", "<w:pPr><w:keepNext/>", 1)
             out.append(para(line, P, justify=True, after=80, keep_next="[End " not in line))
             i += 1
             continue
