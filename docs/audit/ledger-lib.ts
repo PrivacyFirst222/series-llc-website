@@ -93,7 +93,7 @@ export interface Part {
   waitsOn: string[];
   history: HistoryEntry[];
   fix?: Fix;
-  /** Append-only attempts to replace a released fix. Rejection restores prior
+  /** Append-only attempts to replace an implemented or released fix. Rejection restores prior
    * but keeps this entry and the part's whole history. */
   supersessions?: Supersession[];
   /** Set when this part is a second sighting of another item's part: the
@@ -103,6 +103,8 @@ export interface Part {
 
 export interface Supersession {
   prior: Fix;
+  /** Omitted in historical archives, which always referred to released fixes. */
+  priorStatus?: "implemented" | "released";
   batch: string;
   revision: number;
   hash: string;
@@ -384,7 +386,11 @@ function supersessionProblems(l: Ledger, item: string, part: string, s: Superses
   const parse = (id: string, revision: number): BatchFile | null => { try { const t = read(`docs/audit/batches/${id}/revisions/r${revision}.json`); return t ? JSON.parse(t) : null; } catch { return null; } };
   const ob = parse(s.prior.batch, s.prior.revision), nb = parse(s.batch, s.revision);
   const oldPart = ob?.items.find(x => x.id === item && x.part === part), newPart = nb?.items.find(x => x.id === item && x.part === part);
-  if (!old || old.status !== "released" || old.release?.git.commit !== s.prior.commit || old.model !== s.prior.doneBy || !same(oldPart?.assertions, s.prior.assertions)) out.push(`${name}: archived prior fix is not the released work order`);
+  const priorStatus = s.priorStatus ?? "released";
+  const validPrior = priorStatus === "released"
+    ? old?.status === "released" && old.release?.git.commit === s.prior.commit
+    : priorStatus === "implemented" && (old?.status === "implemented" || (old?.status === "released" && next?.status === "rejected")) && s.prior.commit === "";
+  if (!validPrior || !old || !ob || frozenHashOf(ob) !== old.frozenHash || old.model !== s.prior.doneBy || !same(oldPart?.assertions, s.prior.assertions)) out.push(`${name}: archived prior fix is not its frozen ${priorStatus} work order`);
   if (!next || next.id === old?.id || next.frozenHash !== s.hash || !nb || frozenHashOf(nb) !== s.hash || !same(newPart?.replaces, s.prior) || !newPart?.assertions.length) out.push(`${name}: exact prior fix and new work order are not bound by the retained snapshot`);
   if (nb && external === "required" && !hasReplacementApproval(nb)) out.push(`${name}: no owner approval names this exact replacement work order`);
   return out;
@@ -468,37 +474,49 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
       const priorAttempts = bp.supersessions ?? [], attempts = ap.supersessions ?? [];
       if (!isPrefix(priorAttempts, attempts)) out.push(`${name}: supersession archive was rewritten`);
       const appendedAttempts = isPrefix(priorAttempts, attempts) ? attempts.slice(priorAttempts.length) : [];
-      // Replay exact attempts across the compared commits. A cancelled
-      // attempt retains its archive but returns to the same released fix.
-      const completedBeforeReplacement = bp.fix && bp.status === "implemented" && owner && nextOwner?.status === "released" && nextOwner.release
-        && isPrefix(owner.history, nextOwner.history) && replayEvents(owner.status, nextOwner.history.slice(owner.history.length).map(h => h.event)) === "released"
-        && ap.history.slice(bp.history.length).some(h => h.event === "released" && h.batch === owner.id && h.revision === owner.revision);
-      let cursor = completedBeforeReplacement ? { ...bp.fix!, commit: nextOwner!.release!.git.commit } : bp.fix;
-      let cursorBatch = bp.batch, cursorStatus: PartStatus = completedBeforeReplacement ? "released" : bp.status;
-      let replaced = appendedAttempts.length > 0 && cursorStatus === "released" && !!cursor;
+      // Replay replacements in part-history order. A predecessor can be
+      // replaced and restored while implemented, then released later in the
+      // same compared range. Its final batch state is not its earlier state.
+      const events = ap.history.slice(bp.history.length);
+      let eventOffset = 0;
+      let cursor = bp.fix;
+      let cursorBatch = bp.batch, cursorStatus: PartStatus = bp.status;
+      const advanceRelease = (until: number) => {
+        if (cursorStatus !== "implemented" || !cursor) return;
+        const current = after.batches.find(x => x.id === cursor!.batch && x.revision === cursor!.revision);
+        if (current?.status === "released" && current.release && events.slice(eventOffset, until).some(h => h.event === "released" && h.batch === current.id && h.revision === current.revision)) {
+          cursor = { ...cursor, commit: current.release.git.commit };
+          cursorStatus = "released";
+        }
+      };
+      let replaced = appendedAttempts.length > 0 && ["implemented", "released"].includes(cursorStatus) && !!cursor;
       for (const attempt of appendedAttempts) {
         const target = after.batches.find(x => x.id === attempt.batch && x.revision === attempt.revision);
-        const events = ap.history.slice(bp.history.length);
-        if (!target || cursorStatus !== "released" || !same(attempt.prior, cursor)
+        const assignedAt = events.findIndex((h, i) => i >= eventOffset && h.event === "superseded by approved replacement" && h.batch === attempt.batch && h.revision === attempt.revision);
+        if (assignedAt >= 0) advanceRelease(assignedAt);
+        if (!target || assignedAt < 0 || !["implemented", "released"].includes(cursorStatus) || (attempt.priorStatus ?? "released") !== cursorStatus || !same(attempt.prior, cursor)
           || before.batches.some(x => x.id === target.id && x.revision === target.revision)
-          || supersessionProblems(after, b.id, bp.key, attempt, read, external).length
-          || !events.some(h => h.event === "superseded by approved replacement" && h.batch === target.id && h.revision === target.revision)) { replaced = false; break; }
+          || supersessionProblems(after, b.id, bp.key, attempt, read, external).length) { replaced = false; break; }
+        eventOffset = assignedAt + 1;
         if (target.status === "rejected") {
-          if (!events.some(h => h.event === `rejected r${target.revision}` && h.batch === target.id && h.revision === target.revision)) replaced = false;
+          const rejectedAt = events.findIndex((h, i) => i >= eventOffset && h.event === `rejected r${target.revision}` && h.batch === target.id && h.revision === target.revision);
+          if (rejectedAt < 0) { replaced = false; break; }
+          eventOffset = rejectedAt + 1;
           continue;
         }
         cursorBatch = target.id;
-        cursorStatus = target.status === "authorized" ? "assigned" : target.status as PartStatus;
+        cursorStatus = target.status === "authorized" ? "assigned" : "implemented";
         const work = JSON.parse(read(`docs/audit/batches/${target.id}/revisions/r${target.revision}.json`)!) as BatchFile;
         const entry = work.items.find(x => x.id === b.id && x.part === bp.key)!;
-        cursor = target.status === "authorized" ? undefined : { batch: target.id, revision: target.revision, commit: target.release?.git.commit ?? "", doneBy: target.model, assertions: entry.assertions };
+        cursor = target.status === "authorized" ? undefined : { batch: target.id, revision: target.revision, commit: "", doneBy: target.model, assertions: entry.assertions };
       }
+      advanceRelease(events.length);
       replaced = replaced && cursorStatus === ap.status && cursorBatch === ap.batch && same(cursor, ap.fix);
       if (appendedAttempts.length && !replaced) out.push(`${name}: invalid replacement transition or archived prior fix`);
       if (replaced && opts.strict && (bp.status !== ap.status || bp.batch !== ap.batch || !same(bp.fix, ap.fix))) out.push(`${name}: replacement needs acceptance; never records-only publication`);
       const restore = bp.supersessions?.at(-1);
       const restored = restore && owner && restore.batch === owner.id && restore.revision === owner.revision
-        && ap.status === "released" && same(ap.fix, restore.prior) && ap.batch === restore.prior.batch;
+        && ap.status === (restore.priorStatus ?? "released") && same(ap.fix, restore.prior) && ap.batch === restore.prior.batch;
       const rejected = owner && nextOwner && !FINAL_STATES.includes(owner.status) && nextOwner.status === "rejected"
         && isPrefix(owner.history, nextOwner.history) && replayEvents(owner.status, nextOwner.history.slice(owner.history.length).map(h => h.event)) === "rejected"
         && ((ap.status === "open" && !ap.fix && !ap.batch && !restore) || restored)
@@ -544,7 +562,7 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
     }
     const previous = before.items.find(i => i.id === it.id)?.parts.find(q => q.key === p.key);
     const lastAttempt = p.supersessions?.at(-1);
-    const restoration = lastAttempt && p.status === "released" && same(p.fix, lastAttempt.prior)
+    const restoration = lastAttempt && p.status === (lastAttempt.priorStatus ?? "released") && same(p.fix, lastAttempt.prior)
       && after.batches.some(b => b.id === lastAttempt.batch && b.revision === lastAttempt.revision && b.status === "rejected")
       && p.history.slice(previous?.history.length ?? 0).some(h => h.event === `rejected r${lastAttempt.revision}` && h.batch === lastAttempt.batch && h.revision === lastAttempt.revision);
     if (previous?.status !== p.status && !restoration) {
@@ -648,8 +666,9 @@ export function defectGroup(l: Ledger, ref: PartRef): { item: Item; part: Part }
   return out;
 }
 /** Another batch already working on this defect, if any. */
-export function familyClaim(l: Ledger, ref: PartRef, myBatch: string): string | null {
+export function familyClaim(l: Ledger, ref: PartRef, myBatch: string, replacing?: Fix): string | null {
   for (const { item, part } of defectGroup(l, ref)) {
+    if (replacing && item.id === ref.item && part.key === ref.part && same(part.fix, replacing) && part.status === "implemented") continue;
     if (part.batch && part.batch !== myBatch && (part.status === "assigned" || part.status === "implemented")) return `item ${item.id}${part.key === "all" ? "" : ` (${part.key})`} is ${part.status} in batch ${part.batch}`;
   }
   return null;

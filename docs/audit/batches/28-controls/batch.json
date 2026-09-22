@@ -1,0 +1,66 @@
+{
+  "id": "28-controls",
+  "revision": 1,
+  "title": "Reviewed replacement of implemented unpublished fixes",
+  "model": "Codex Astra",
+  "base": "e405da48435c3171430fe5021662017857fbc097",
+  "items": [],
+  "files": [
+    {
+      "path": "docs/audit/ledger-lib.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved narrow extension to archived, exact-work-order replacement of unpublished implemented fixes; preserve existing released replacement and approval enforcement."
+    },
+    {
+      "path": "docs/audit/accept.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved narrow extension to archived, exact-work-order replacement of unpublished implemented fixes; preserve existing released replacement and approval enforcement."
+    },
+    {
+      "path": "docs/audit/batch.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved narrow extension to archived, exact-work-order replacement of unpublished implemented fixes; preserve existing released replacement and approval enforcement."
+    },
+    {
+      "path": "docs/audit/guard.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved narrow extension to archived, exact-work-order replacement of unpublished implemented fixes; preserve existing released replacement and approval enforcement."
+    },
+    {
+      "path": "docs/audit/lifecycle-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved narrow extension to archived, exact-work-order replacement of unpublished implemented fixes; preserve existing released replacement and approval enforcement."
+    },
+    {
+      "path": "docs/audit/repair-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved narrow extension to archived, exact-work-order replacement of unpublished implemented fixes; preserve existing released replacement and approval enforcement."
+    },
+    {
+      "path": "docs/audit/README.md",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved narrow extension to archived, exact-work-order replacement of unpublished implemented fixes; preserve existing released replacement and approval enforcement."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved narrow extension to archived, exact-work-order replacement of unpublished implemented fixes; preserve existing released replacement and approval enforcement."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Owner-approved narrow extension to archived, exact-work-order replacement of unpublished implemented fixes; preserve existing released replacement and approval enforcement."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": []
+}

@@ -25888,6 +25888,25 @@
           "event": "implemented"
         }
       ]
+    },
+    {
+      "id": "28-controls",
+      "revision": 1,
+      "frozenHash": "e80750104ee1dda88d234e29e1e8b38a788389213b71a5353876607ae4ffd5e2",
+      "status": "implemented",
+      "model": "Codex Astra",
+      "base": "e405da48435c3171430fe5021662017857fbc097",
+      "history": [
+        {
+          "at": "2026-09-22T00:12:25.949Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-22T00:21:41.775Z",
+          "event": "implemented"
+        }
+      ]
     }
   ],
   "auditImports": [

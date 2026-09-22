@@ -120,8 +120,8 @@ change.
   recorded fix's assertions from implementation onward. A part's state must
   match its owning batch and retained work order; a session-written reopening
   cannot discard its fix. An authenticated rejection can reopen unfinished
-  work, or restore the prior released fix when a replacement is rejected.
-  A released fix changes only through the exact replacement workflow below. A wait is satisfied by a ruling, never edited. A
+  work, or restore the prior fix and its implemented/released state when a replacement is rejected.
+  An implemented or released fix changes only through the exact replacement workflow below. A wait is satisfied by a ruling, never edited. A
   part can be replaced only by a migration, which keeps the old part under
   `retiredParts` with its whole history.
 - **A migration** is a file, `migrations/<id>.json`, declaring the exact
@@ -285,7 +285,7 @@ change.
    `batch.ts released <id> <commit> --deployed "…" --documents "…"` and a
    records-only push.
 
-### Replacing a released fix, with Adam's approval
+### Replacing an implemented or released fix, with Adam's approval
 
 A later correction uses a NEW batch id. Its item entry includes `replaces`,
 the complete existing Fix object (old batch, revision, commit, author,
@@ -298,7 +298,7 @@ work order displays both. The old batch and its snapshot remain unchanged.
    This records a hash of the entire work order outside the repository.
    An ordinary ruling or a free-form `--supersedes` flag cannot authorize it.
 2. `batch.ts authorize <batch>` requires that approval and the exact currently
-   released fix. It appends the old fix to the part's `supersessions` history,
+   implemented or released fix. It appends the old fix and prior state to the part's `supersessions` history,
    identifies the new work order and assigns the part. While only assigned,
    both static and runtime checks still replay the old assertions.
 3. Make the declared change; `batch.ts implemented <batch>` installs the new
@@ -309,12 +309,17 @@ work order displays both. The old batch and its snapshot remain unchanged.
    until Adam accepts the exact complete package and separately authorizes
    publication. Approval to replace is permission to build, not to publish.
 5. Release uses the ordinary acceptance and release gate. If Adam rejects
-   the attempt instead, `batch.ts reject` restores the most recent released
-   fix and its assertions. The implementer must also restore the product
+   the attempt instead, `batch.ts reject` restores the most recent prior
+   fix, its assertions and its actual implemented/released state. The implementer must also restore the product
    behavior; the guard refuses until it matches the restored assertions.
    The rejected attempt remains in history. A cancellation that leaves all
    live protections unchanged may be recorded as bookkeeping; it requires
    both the replacement approval and the actual rejection record.
+
+An unpublished predecessor is never falsely marked released. An active successor
+prevents its predecessor batch from being rejected or released underneath it.
+Historical archives that omit priorStatus still mean released, unchanged.
+The mandatory lifecycle suite exercises both predecessor states.
 
 Every local guard rechecks retained replacement approvals against the frozen
 work orders. CI checks structure, history and exact work orders but cannot

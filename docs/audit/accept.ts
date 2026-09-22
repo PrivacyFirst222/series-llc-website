@@ -64,11 +64,11 @@ if (cmd === "accept") {
   let batch; try { batch = loadBatch(a); } catch { refuse("replacement work order is missing or unreadable"); }
   if (batch.id !== a || batch.revision !== Number(revisionOpt)) refuse("replacement batch/revision does not match the work order");
   const entries = batch.items.filter(x => x.replaces);
-  if (!entries.length) refuse("work order names no released fix to replace");
+  if (!entries.length) refuse("work order names no implemented or released fix to replace");
   const l = loadLedger();
   for (const bi of entries) {
     const p = l.items.find(i => i.id === bi.id)?.parts.find(p => p.key === bi.part);
-    if (!p || p.status !== "released" || JSON.stringify(p.fix) !== JSON.stringify(bi.replaces) || !bi.assertions.length || p.fix?.batch === batch.id) refuse(`item ${bi.id} (${bi.part}): requires the exact currently released fix and nonempty new assertions in a new batch`);
+    if (!p || !["implemented", "released"].includes(p.status) || JSON.stringify(p.fix) !== JSON.stringify(bi.replaces) || !bi.assertions.length || p.fix?.batch === batch.id) refuse(`item ${bi.id} (${bi.part}): requires the exact current implemented or released fix and nonempty new assertions in a new batch`);
   }
   write(RULINGS_FILE, { kind: "replacement", batch: batch.id, revision: batch.revision, hash: frozenHashOf(batch) });
   console.log(`replacement approved: batch ${batch.id} revision ${batch.revision}, work order ${frozenHashOf(batch)}; implementation only, publication still needs exact-package acceptance`);

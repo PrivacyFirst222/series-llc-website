@@ -177,12 +177,12 @@ if (id) {
       if (!it || !part) { refusals.push(`${name}: not in the ledger`); continue; }
       if (it.verdict === "dropped") refusals.push(`${name}: was dropped — ${it.verdictReason}`);
       if (part.batch !== id) refusals.push(`${name}: not assigned to batch ${id} in the ledger — assignment is recorded before work starts`);
-      const claim = familyClaim(ledger, { item: bi.id, part: bi.part }, id);
+      const claim = familyClaim(ledger, { item: bi.id, part: bi.part }, id, bi.replaces);
       if (claim) refusals.push(`${name}: the same defect is already being worked on — ${claim}`);
       for (const o of others) {
         const ob = loadBatch(o);
         const oi = ledger.batches.find((x) => x.id === o && x.revision === ob.revision);
-        if (oi && oi.status !== "rejected" && oi.status !== "released" && ob.items.some((x) => x.id === bi.id && x.part === bi.part)) refusals.push(`${name}: already claimed by batch ${o}`);
+        if (oi && oi.status !== "rejected" && oi.status !== "released" && !(part.supersessions ?? []).some(s => s.prior.batch === o && s.prior.revision === ob.revision) && ob.items.some((x) => x.id === bi.id && x.part === bi.part)) refusals.push(`${name}: already claimed by batch ${o}`);
       }
       for (const w of unmetWaits(ledger, it, part)) refusals.push(`${name}: waits on ${w.startsWith("ruling:") ? `Adam's ruling on item ${w.slice(7)}` : `item ${w}`}`);
       if (bi.assertions.length === 0) refusals.push(`${name}: no assertion — a deletion records what must stay absent; an empty list does not switch verification off`);

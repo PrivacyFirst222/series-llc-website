@@ -7,6 +7,8 @@ import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+const unpublished = process.argv.includes('--unpublished');
+const priorState = unpublished ? 'implemented' : 'released';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const temp = mkdtempSync(join(tmpdir(), 'ledger-lifecycle-'));
 const repo = join(temp, 'repo'), home = join(temp, 'owner');
@@ -25,7 +27,7 @@ const freeze = (x:unknown) => hash(JSON.stringify(stable(x)));
 const record = (name:string,ok:boolean,observed:unknown) => { rows.push({name,ok,observed});console.log(`${ok?'PASS':'FAIL'} ${name}: ${JSON.stringify(observed)}`); };
 const pass = (name:string,r:ReturnType<typeof sh>) => {record(name,r.code===0,r); if(r.code!==0) throw Error(`positive control failed: ${name}`);};
 const refuse = (name:string,r:ReturnType<typeof sh>,reason:RegExp) => record(name,r.code!==0&&reason.test(r.output),r);
-const commit = () => {git('add','-A');git('commit','--no-verify','-qm','simulated lifecycle fixture');return git('rev-parse','HEAD');};
+const commit = () => {git('add','-A');git('commit','--allow-empty','--no-verify','-qm','simulated lifecycle fixture');return git('rev-parse','HEAD');};
 const jsonLines = () => readFileSync(join(home,'rulings.jsonl'),'utf8').trim().split('\n').filter(Boolean).map(s=>JSON.parse(s));
 const lp=join(repo,'docs/audit/ledger.json');
 const save = (l:unknown) => {put(lp,l);must(run('docs/audit/ledger-print.ts','list'));};
@@ -54,12 +56,14 @@ try {
  if(ai<0){save({...real,items:[],rulings:[]});commit();pass('N1: mandatory tests survive no real audit items',run('docs/audit/repair-check.ts','--fixtures-only'));}
  const file='webapp/src/pages/LedgerFixture.tsx';put(join(repo,file),'// old fixture\n// companion fixture\n');
  const oldAssertion={kind:'present',file,text:'old fixture'}, runtimeAssertion={kind:'check',suite:'server',label:'simulated prior behavior'}, companion={kind:'present',file,text:'companion fixture'};
- const fix={batch:'past',revision:1,commit:source,doneBy:'fixture',assertions:[oldAssertion,runtimeAssertion]};
+ const fix={batch:'past',revision:1,commit:unpublished?'':source,doneBy:'fixture',assertions:[oldAssertion,runtimeAssertion]};
  const oldBatch={id:'past',revision:1,title:'simulated released batch',model:'fixture',base:source,items:[{id:'9001',part:'all',scope:'fixture',assertions:[oldAssertion,runtimeAssertion]},{id:'9002',part:'all',scope:'companion',assertions:[companion]}],files:[{path:file,mode:'code',why:'fixture'}],requiredChecks:[]};
  put(join(repo,'docs/audit/batches/past/batch.json'),oldBatch);put(join(repo,'docs/audit/batches/past/revisions/r1.json'),oldBatch);
- const entry=(id:string,f:any)=>({id,tag:'SYNTHETIC',area:'Public pages, Terms and Privacy',housekeeping:true,source:'disposable fixture',text:'Synthetic fixture, not an audit finding.',verdict:'open',waitsOn:[],parts:[{key:'all',scope:'fixture',status:'released',batch:'past',waitsOn:[],fix:f,history:[{at:'2026-01-01T00:00:00Z',event:'released',batch:'past',revision:1}]}]});
- const seed={version:2,builtFrom:['synthetic lifecycle fixture'],items:[entry('9001',fix),entry('9002',{...fix,assertions:[companion]})],rulings:[],batches:[{id:'past',revision:1,base:source,model:'fixture',frozenHash:freeze(oldBatch),status:'released',history:['authorized','implemented','accepted by Adam','released'].map(event=>({at:'2026-01-01T00:00:00Z',event})),release:{git:{at:'2026-01-01T00:00:00Z',remoteMain:source,commit:source,packageId:'simulated-old'},deployment:null,documents:null}}]};
+ const entry=(id:string,f:any)=>({id,tag:'SYNTHETIC',area:'Public pages, Terms and Privacy',housekeeping:true,source:'disposable fixture',text:'Synthetic fixture, not an audit finding.',verdict:'open',waitsOn:[],parts:[{key:'all',scope:'fixture',status:priorState,batch:'past',waitsOn:[],fix:f,history:[{at:'2026-01-01T00:00:00Z',event:priorState,batch:'past',revision:1}]}]});
+ const seed={version:2,builtFrom:['synthetic lifecycle fixture'],items:[entry('9001',fix),entry('9002',{...fix,assertions:[companion]})],rulings:[],batches:[{id:'past',revision:1,base:source,model:'fixture',frozenHash:freeze(oldBatch),status:priorState,history:(unpublished?['authorized','implemented']:['authorized','implemented','accepted by Adam','released']).map(event=>({at:'2026-01-01T00:00:00Z',event})),...(unpublished?{}:{release:{git:{at:'2026-01-01T00:00:00Z',remoteMain:source,commit:source,packageId:'simulated-old'},deployment:null,documents:null}})}]};
  save(seed);const base=commit();
+ const remote=join(temp,'remote.git');execFileSync('git',['init','--quiet','--bare',remote]);git('remote','add','origin',remote);git('push','--quiet','--no-verify','origin',`${base}:refs/heads/main`);
+ console.log('Fixture setup: one remote seed push bypassed the hook; subsequent pushes use the hook. Fixture commits bypass commit hooks.');
  const replacement={id:'replacement',revision:1,title:'replace the old fixture',model:'fixture',base,items:[{id:'9001',part:'all',scope:'approved replacement',replaces:fix,assertions:[{kind:'present',file,text:'new fixture'}]}],files:[{path:file,mode:'code',why:'fixture'}],requiredChecks:[]};
  const bp=join(repo,'docs/audit/batches/replacement/batch.json');put(bp,replacement);
  if(ai>=0){
@@ -67,7 +71,7 @@ try {
   // not an unavailable new command or a missing helper.
   put(join(home,'rulings.jsonl'),JSON.stringify({kind:'replacement',batch:'replacement',revision:1,hash:freeze(replacement),at:new Date().toISOString(),source:'SIMULATED'})+'\n');
   const r=run('docs/audit/batch.ts','authorize','replacement');
-  record('N2: owner-approved released fix can enter its replacement batch',r.code===0,r);
+  record(`N2: owner-approved ${priorState} fix can enter its replacement batch`,r.code===0,r);
  }else{
   refuse('N2: no owner approval refuses',run('docs/audit/batch.ts','authorize','replacement'),/replacement|approval|record/i);
   must(run('docs/audit/accept.ts','ruling','9001','Unrelated ordinary ruling.'));
@@ -75,6 +79,13 @@ try {
   refuse('N2: free-form supersedes flag is not authority',run('docs/audit/batch.ts','ruling','9001','Unrelated ordinary ruling.','--supersedes','anything'),/supersedes|replacement/i);
   refuse('N2: wrong revision cannot be approved',run('docs/audit/accept.ts','approve-replacement','replacement','--revision','2'),/revision|work order/i);
   refuse('N2: unrelated terminal option cannot be ignored',run('docs/audit/accept.ts','approve-replacement','replacement','--revision','1','--reason','only if approved later'),/usage/);
+  for(const invalid of ['open','assigned','accepted']){
+   const tampered=structuredClone(seed);tampered.items[0].parts[0].status=invalid;save(tampered);
+   refuse(`replacement: prior ${invalid} is ineligible`,run('docs/audit/accept.ts','approve-replacement','replacement','--revision','1'),/requires the exact|fix/i);
+  }
+  save(seed);
+  const stale={...replacement,items:[{...replacement.items[0],replaces:{...fix,assertions:[companion]}}]};put(bp,stale);
+  refuse('replacement: stale prior assertions refused',run('docs/audit/accept.ts','approve-replacement','replacement','--revision','1'),/requires the exact|fix/i);put(bp,replacement);
   pass('N2: exact work order can be approved' ,run('docs/audit/accept.ts','approve-replacement','replacement','--revision','1'));
   const exactRecords=readFileSync(join(home,'rulings.jsonl'),'utf8');
   for(const key of ['batch','revision','hash']) {
@@ -88,7 +99,7 @@ try {
   const hook=spawnSync('bash',['.claude/hooks/accept-prompt.sh'],{cwd:repo,env,input:JSON.stringify({prompt:'Approve replacement replacement, revision 1'}),encoding:'utf8'});
   record('N2: exact whole-message hook binds work order',jsonLines().some(x=>x.kind==='replacement'&&x.hash===freeze(replacement)),hook.stdout);
   put(bp,{...replacement,title:'altered after approval'});refuse('N2: changed work order refuses',run('docs/audit/batch.ts','authorize','replacement'),/approval|record|hash/i);put(bp,replacement);
-  pass('N2: owner-approved released fix can enter its replacement batch',run('docs/audit/batch.ts','authorize','replacement'));
+  pass(`N2: owner-approved ${priorState} fix can enter its replacement batch`,run('docs/audit/batch.ts','authorize','replacement'));
   pass('N2: assigned replacement keeps prior static assertions',guard('replacement'));
   put(join(repo,file),'// premature change\n// companion fixture\n');refuse('N2: removing old wording before implementation refuses',guard('replacement'),/fixed wording/);put(join(repo,file),'// old fixture\n// companion fixture\n');
   const resultFile=join(temp,'simulated-results.jsonl');
@@ -98,6 +109,8 @@ try {
   pass('N2: prior runtime assertion positive control',run('webapp/scripts/audit-assert.ts','--commit',source,'--run','SIMULATED','--results',resultFile));
   const assigned=commit();
   refuse('N2: replacement assignment is not records-only publication',run('docs/audit/release-check.ts','--range',base,assigned),/acceptance|accepted|supersess|replacement/i);
+  refuse('replacement: push hook refuses assigned replacement',sh(['git','push','origin','HEAD:refs/heads/main']),/acceptance|accepted|replacement/i);
+  record('replacement: rejected assignment leaves remote unchanged',git('ls-remote','origin','refs/heads/main').split('\t')[0]===base,base);
   put(join(repo,file),'// new fixture\n// companion fixture\n');pass('N2: implement replacement',run('docs/audit/batch.ts','implemented','replacement'));pass('N2: implemented replacement passes guard',guard('replacement'));
   pass('N2: implemented replacement uses new runtime assertion set',run('webapp/scripts/audit-assert.ts','--commit',source,'--run','SIMULATED'));
   const good=json(lp);const archived=good.items[0].parts[0].supersessions;
@@ -106,11 +119,31 @@ try {
   const wrongFix=structuredClone(good);wrongFix.items[0].parts[0].fix.assertions=[{kind:'present',file,text:'companion fixture'}];save(wrongFix);refuse('N2: implemented assertions cannot diverge from approved work order',guard('replacement'),/frozen assertions|recorded fix/);save(good);
   const tamper=structuredClone(good);tamper.items[0].parts[0].supersessions[0].prior.assertions=[];save(tamper);refuse('N2: archived fix cannot be edited',guard('replacement'),/supersess|archive|prior|replacement/i);save(good);
   const ownerText=readFileSync(join(home,'rulings.jsonl'),'utf8');put(join(home,'rulings.jsonl'),'');refuse('N2: missing approval still refuses after assignment commit',guard('replacement'),/replacement|approval|record/i);put(join(home,'rulings.jsonl'),ownerText);
+  if(unpublished){
+   for(const state of ['assigned','implemented']){
+    const id=`unpublished-reject-${state}`,start=commit(),prior=json(lp).items[0].parts[0].fix;
+    const b={...replacement,id,base:start,items:[{...replacement.items[0],replaces:prior,assertions:[{kind:'present',file,text:'third fixture'}]}]};put(join(repo,`docs/audit/batches/${id}/batch.json`),b);
+    pass(`unpublished: approve ${state} successor`,run('docs/audit/accept.ts','approve-replacement',id,'--revision','1'));
+    pass(`unpublished: authorize ${state} successor`,run('docs/audit/batch.ts','authorize',id));
+    pass(`unpublished: assigned ${state} successor guard`,guard(id));
+    refuse('unpublished: superseded predecessor cannot be rejected',run('docs/audit/batch.ts','reject','replacement'),/superseded predecessor|another batch/);
+    refuse('unpublished: superseded predecessor cannot be released',run('docs/audit/batch.ts','released','replacement',start),/superseded predecessor|another batch/);
+    if(state==='implemented'){put(join(repo,file),'// third fixture\n// companion fixture\n');pass('unpublished: implement second successor',run('docs/audit/batch.ts','implemented',id));pass('unpublished: second successor guard',guard(id));}
+    const attempt=commit();pass(`unpublished: record ${state} rejection`,run('docs/audit/accept.ts','reject',id,'--revision','1','--reason','simulated rejection'));
+    pass(`unpublished: restore ${state} predecessor`,run('docs/audit/batch.ts','reject',id));put(join(repo,file),'// new fixture\n// companion fixture\n');
+    const restored=json(lp).items[0].parts[0];record(`unpublished: ${state} restored exact implemented fix`,restored.status==='implemented'&&JSON.stringify(restored.fix)===JSON.stringify(prior),restored);
+    pass(`unpublished: ${state} restoration guard`,guard(''));
+    const end=commit();pass(`unpublished: ${state} rejection CI`,run('docs/audit/guard.ts','--against',`${attempt}..${end}`));
+    pass(`unpublished: ${state} complete attempt CI`,run('docs/audit/guard.ts','--against',`${start}..${end}`));
+    pass(`unpublished: ${state} cancelled attempt is records-only`,run('docs/audit/release-check.ts','--range',start,end));
+   }
+  }
   const implemented=commit();packageFor('replacement',base,implemented);
   refuse('N2: implemented replacement cannot publish before acceptance',run('docs/audit/release-check.ts','--range',base,implemented),/acceptance|accepted/i);
+  refuse('replacement: push hook refuses unaccepted implementation',sh(['git','push','origin','HEAD:refs/heads/main']),/acceptance|accepted/i);
+  record('replacement: rejected implementation leaves remote unchanged',git('ls-remote','origin','refs/heads/main').split('\t')[0]===base,base);
   pass('N2: review package accepted in simulated owner home',run('docs/audit/accept.ts','accept','replacement','1',implemented));
   pass('N2: accepted replacement passes release gate',run('docs/audit/release-check.ts','--range',base,implemented));
-  const remote=join(temp,'remote.git');execFileSync('git',['init','--quiet','--bare',remote]);git('remote','add','origin',remote);git('push','--quiet','--no-verify','origin',`${base}:refs/heads/main`);
   pass('N2: actual push through hook to local remote',sh(['git','push','origin','HEAD:refs/heads/main']));
   pass('N2: record replacement release',run('docs/audit/batch.ts','released','replacement',implemented));
   const released=commit();pass('N2: release bookkeeping is publishable',run('docs/audit/release-check.ts','--range',implemented,released));
