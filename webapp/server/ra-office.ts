@@ -1,3 +1,4 @@
+import { agentCheckoutLink } from './ra-checkout';
 import type { Hono } from 'hono';
 import { z } from 'zod';
 import { getDb } from './db';
@@ -10,7 +11,7 @@ const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(s=>!Number.isNaN(Dat
 export function registerAgentOffice(app:Hono) {
  app.get('/admin/orders/:id/agent',async c=>{
   if(!await requireAdmin(c))return c.json(err('Not signed in','UNAUTHENTICATED'),401);
-  const db=await getDb();const [o]=await db.query('SELECT ra_appointment_date,ra_renewal_date,ra_cancellation_requested_at,ra_cancellation_note,ra_replaced_at,ra_proof_received_at,ra_proof_note,ra_resignation_due,ra_resignation_submitted,ra_resignation_filed,ra_resignation_mailed,ra_resignation_emailed_at,ra_resignation_document,ra_ended_date,card_status,card_note FROM orders WHERE id=$1',[c.req.param('id')]);
+  const db=await getDb();const [o]=await db.query('SELECT ra_appointment_date,ra_renewal_date,ra_cancellation_requested_at,ra_cancellation_note,ra_replaced_at,ra_proof_received_at,ra_proof_note,ra_resignation_due,ra_resignation_submitted,ra_resignation_filed,ra_resignation_mailed,ra_resignation_emailed_at,ra_resignation_document,ra_resignation_reason,ra_resignation_note,ra_ended_date,card_status,card_note FROM orders WHERE id=$1',[c.req.param('id')]);
   return o?c.json({data:o}):c.json(err('Not found','NOT_FOUND'),404);
  });
  app.post('/admin/orders/:id/agent',async c=>{
@@ -24,7 +25,7 @@ export function registerAgentOffice(app:Hono) {
    z.object({action:z.literal('appointment'),date}),
    z.object({action:z.literal('cancellation'),date,note:z.string().trim().min(1).max(3000)}),
    z.object({action:z.literal('replacement'),date,note:z.string().trim().min(1).max(3000)}),
-   z.object({action:z.literal('submitted'),date}),
+   z.object({action:z.literal('submitted'),date,reason:z.enum(['timely-cancellation','nonpayment','inaccurate-contact','unlawful-use']).optional(),note:z.string().trim().max(3000).optional()}),
    z.object({action:z.literal('filed'),date}),
    z.object({action:z.literal('mailed'),date}),
   ]).safeParse(body);
@@ -37,13 +38,29 @@ export function registerAgentOffice(app:Hono) {
    await db.query('UPDATE orders SET ra_appointment_date=COALESCE(ra_appointment_date,$2),ra_renewal_date=COALESCE(ra_renewal_date,$3) WHERE id=$1',[id,b.date,addYears(b.date,1)]);
   }else if(b.action==='cancellation') {
    await db.query("UPDATE orders SET ra_cancellation_requested_at=LEAST(COALESCE(ra_cancellation_requested_at,$2::timestamptz),$2::timestamptz) WHERE id=$1",[id,b.date+'T12:00:00Z']);
-   await db.query("UPDATE orders SET ra_cancellation_note=$2 WHERE id=$1",[id,b.note]);
+   await db.query("UPDATE orders SET ra_cancellation_note=$2, ra_cancellation_renewal_date=LEAST(ra_renewal_date,(SELECT min(renewal_date) FROM ra_renewals WHERE order_id=$1 AND purpose='renewal' AND renewal_date >= (orders.ra_cancellation_requested_at AT TIME ZONE 'America/New_York')::date)) WHERE id=$1",[id,b.note]);
   }else if(b.action==='replacement') {
    await db.query('UPDATE orders SET ra_replaced_at=$2,ra_ended_date=$2,ra_proof_received_at=now(),ra_proof_note=$3 WHERE id=$1',[id,b.date,b.note]);
    await db.query("UPDATE ra_renewals SET status='cancelled',retry_after=NULL WHERE order_id=$1 AND purpose='renewal' AND status IN ('notice_pending','notice_sent','link_sent','declined')",[id]);
   }else if(b.action==='submitted') {
-   if(!o.ra_resignation_due||b.date<isoOf(o.ra_resignation_due)!)return c.json(err('The cancellation resignation is not due yet.','NOT_DUE'),400);
-   await db.query('UPDATE orders SET ra_resignation_submitted=$2 WHERE id=$1',[id,b.date]);
+   const reason=b.reason || 'timely-cancellation';
+   if(reason==='timely-cancellation' && (!o.ra_resignation_due||b.date<isoOf(o.ra_resignation_due)!))return c.json(err('The cancellation resignation is not due yet.','NOT_DUE'),400);
+   if(reason!=='timely-cancellation' && !b.note?.trim())return c.json(err('Record the Terms ground and supporting record for this resignation.','SUPPORT_REQUIRED'),400);
+   if(o.ra_appointment_date && b.date<isoOf(o.ra_appointment_date)!)return c.json(err('Submission cannot precede our appointment.','BAD_STATE'),400);
+   if(o.ra_resignation_submitted && b.date!==isoOf(o.ra_resignation_submitted))return c.json(err('The actual submission date is already recorded.','ALREADY_RECORDED'),409);
+   // One resignation charge per appointment, independently of any annual debt.
+   const [fee]=await db.query<{id:string;notice_sent_at:unknown}>(`WITH recorded AS (
+     UPDATE orders SET ra_resignation_submitted=COALESCE(ra_resignation_submitted,$2::date),
+       ra_resignation_reason=COALESCE(ra_resignation_reason,$3),ra_resignation_note=COALESCE(ra_resignation_note,$4)
+     WHERE id=$1 RETURNING id)
+     INSERT INTO ra_renewals(order_id,renewal_date,amount_cents,status,purpose,charge_due)
+     SELECT id,$2::date,9900,'notice_pending','resignation',$2::date FROM recorded
+     ON CONFLICT(order_id) WHERE purpose='resignation' DO UPDATE SET order_id=EXCLUDED.order_id RETURNING id,notice_sent_at`,[id,b.date,reason,b.note||'Timely cancellation without replacement proof']);
+   if(!fee.notice_sent_at)try {
+     const link=await agentCheckoutLink('renewal',fee.id);
+     await sendMail({to:await currentAgentNoticeEmail(db,id),subject:'Registered-agent resignation charge',html:`<p>We submitted our registered-agent resignation. The $99 charge represents state fees and processing fees. It does not purchase another year of service. Any unpaid service fees remain due separately.</p><p><a href="${link}">Pay the resignation charge</a></p>`});
+     await db.query("UPDATE ra_renewals SET notice_sent_at=now(),status=CASE WHEN status='notice_pending' THEN 'link_sent' ELSE status END,notice_error=NULL,link_url=$2 WHERE id=$1",[fee.id,link]);
+   }catch(e){await db.query('UPDATE ra_renewals SET notice_error=$2 WHERE id=$1',[fee.id,String(e).slice(0,300)]);}
   }else if(b.action==='filed') {
    if(!o.ra_resignation_submitted||b.date<isoOf(o.ra_resignation_submitted)!)return c.json(err('Record submission first, then the actual state filing date.','BAD_STATE'),400);
    await db.query('UPDATE orders SET ra_resignation_filed=$2,ra_ended_date=CASE WHEN ra_replaced_at IS NOT NULL THEN LEAST(ra_replaced_at,$3::date) ELSE $3::date END WHERE id=$1',[id,b.date,addDays(b.date,31)]);

@@ -1,0 +1,289 @@
+{
+  "code": 0,
+  "rows": [
+    {
+      "label": "A06",
+      "ok": false,
+      "detail": {
+        "before": [],
+        "failed": [],
+        "recovered": [],
+        "held": [
+          {
+            "id": "d815ec97-6ac8-467a-992b-fff45ea82636",
+            "order_id": "f4a48756-337e-4e4a-8e32-5b033dee5c89",
+            "renewal_date": "2030-06-01T00:00:00.000Z",
+            "amount_cents": 9900,
+            "status": "notice_sent",
+            "charge_due": "2030-05-17T00:00:00.000Z",
+            "notice_sent_at": "2030-04-03T12:00:00.000Z",
+            "charged_at": null,
+            "square_payment_id": null,
+            "square_order_id": null,
+            "link_url": "http://localhost:8000/agent-checkout?kind=renewal&id=d815ec97-6ac8-467a-992b-fff45ea82636&token=VT6O0l46bE1DFuuUrJgLTNeMP2g7-y_AIt1cpVLQsY0",
+            "decline_code": null,
+            "retry_after": null,
+            "retries": 0,
+            "created_at": "2026-09-22T02:06:27.620Z",
+            "updated_at": "2026-09-22T02:06:27.620Z",
+            "purpose": "renewal",
+            "billing_hold": true,
+            "notice_error": null,
+            "lock_until": null,
+            "checkout_token": "VT6O0l46bE1DFuuUrJgLTNeMP2g7-y_AIt1cpVLQsY0"
+          }
+        ]
+      }
+    },
+    {
+      "label": "A03",
+      "ok": false,
+      "detail": {
+        "status": 500,
+        "stored": {
+          "id": "8949d79f-e236-486c-abdd-633f64f6956e",
+          "name": "Message Sender",
+          "email": "sender@example.test",
+          "message": "Please record this one message.",
+          "created_at": "2026-09-22T02:06:27.626Z"
+        },
+        "contacts": [
+          {
+            "id": "8949d79f-e236-486c-abdd-633f64f6956e",
+            "name": "Message Sender",
+            "email": "sender@example.test",
+            "message": "Please record this one message.",
+            "created_at": "2026-09-22T02:06:27.626Z"
+          }
+        ]
+      }
+    },
+    {
+      "label": "A02",
+      "ok": false,
+      "detail": {
+        "mailDoc": {
+          "id": "e1df2fd9-b771-4207-8ba4-9044b05a3592",
+          "client_id": "99e63db6-78be-4877-8cf4-44849237b66e",
+          "kind": "legal_mail",
+          "title": "Service of process",
+          "storage_key": "dev:bdead45ccdbd2c7ede9e08ca-mail.pdf",
+          "content_type": "application/pdf",
+          "size_bytes": 681,
+          "created_at": "2026-09-22T02:06:27.648Z",
+          "meta": {
+            "receivedOn": "2026-09-20"
+          },
+          "order_id": "cd12a617-553e-4d3a-85d9-4dcba4122435",
+          "mirrored_at": null,
+          "deleted_at": null,
+          "mirror_path": null,
+          "mirror_hash": null,
+          "mirror_error": null,
+          "mirror_attempted_at": null
+        },
+        "afterMail": {
+          "id": "e1df2fd9-b771-4207-8ba4-9044b05a3592",
+          "client_id": "99e63db6-78be-4877-8cf4-44849237b66e",
+          "kind": "legal_mail",
+          "title": "Service of process",
+          "storage_key": "dev:bdead45ccdbd2c7ede9e08ca-mail.pdf",
+          "content_type": "application/pdf",
+          "size_bytes": 681,
+          "created_at": "2026-09-22T02:06:27.648Z",
+          "meta": {
+            "receivedOn": "2026-09-20"
+          },
+          "order_id": "cd12a617-553e-4d3a-85d9-4dcba4122435",
+          "mirrored_at": null,
+          "deleted_at": null,
+          "mirror_path": null,
+          "mirror_hash": null,
+          "mirror_error": null,
+          "mirror_attempted_at": null
+        },
+        "forbidden": 404
+      }
+    },
+    {
+      "label": "A04",
+      "ok": false,
+      "detail": {
+        "noNote": 400,
+        "submitted": 400,
+        "fees": [
+          {
+            "id": "b6c23da7-e53d-4cfc-b026-9c99b81cdc1c",
+            "order_id": "ee6bc235-b567-4a00-b6a4-506a1c5ec618",
+            "renewal_date": "2030-06-01T00:00:00.000Z",
+            "amount_cents": 9900,
+            "status": "declined",
+            "charge_due": null,
+            "notice_sent_at": null,
+            "charged_at": null,
+            "square_payment_id": null,
+            "square_order_id": null,
+            "link_url": null,
+            "decline_code": null,
+            "retry_after": null,
+            "retries": 0,
+            "created_at": "2026-09-22T02:06:27.654Z",
+            "updated_at": "2026-09-22T02:06:27.654Z",
+            "purpose": "renewal",
+            "billing_hold": false,
+            "notice_error": null,
+            "lock_until": null,
+            "checkout_token": null
+          }
+        ]
+      }
+    },
+    {
+      "label": "A05",
+      "ok": false,
+      "detail": {
+        "cancelView": {
+          "orderId": "edce1972-4ab6-4b5c-b853-a6424f9b8ab4",
+          "llcName": "Late Cancel LLC",
+          "formed": true,
+          "raService": true,
+          "raAppointmentDate": "2026-01-01",
+          "raResignationDue": null,
+          "raResignationSubmitted": null,
+          "raEndedDate": null,
+          "cardNote": null,
+          "raRenewalDate": "2027-09-26",
+          "raCancellationRequestedAt": "2026-09-22T02:06:27.663Z",
+          "cardStatus": "on_file",
+          "cardLast4": "1111",
+          "cardBrand": null,
+          "renewals": [
+            {
+              "id": "0740438f-924e-4c18-b966-e52061671396",
+              "date": "2026-09-26",
+              "status": "charged",
+              "linkUrl": null,
+              "purpose": "renewal",
+              "chargedAt": "2026-09-21T21:06:27.661-05:00",
+              "amountCents": 9900
+            }
+          ]
+        },
+        "officeView": {
+          "orderId": "3309d654-a623-4bcb-9c1b-578b597cc9b4",
+          "llcName": "Office Cancel LLC",
+          "formed": true,
+          "raService": true,
+          "raAppointmentDate": "2026-01-01",
+          "raResignationDue": null,
+          "raResignationSubmitted": null,
+          "raEndedDate": null,
+          "cardNote": null,
+          "raRenewalDate": "2027-09-26",
+          "raCancellationRequestedAt": "2026-09-21T12:00:00.000Z",
+          "cardStatus": "on_file",
+          "cardLast4": "1111",
+          "cardBrand": null,
+          "renewals": [
+            {
+              "id": "ff35008c-b8a1-4ae0-b9df-fe5ba12fb817",
+              "date": "2026-09-26",
+              "status": "charged",
+              "linkUrl": null,
+              "purpose": "renewal",
+              "chargedAt": "2026-09-21T21:06:27.667-05:00",
+              "amountCents": 9900
+            }
+          ]
+        }
+      }
+    },
+    {
+      "label": "A07",
+      "ok": false,
+      "detail": [
+        "Ended LLC (renews Jun 1, 2030 — cancellation requested Sep 21, 2026)",
+        "Late Cancel LLC (renews Sep 26, 2027 — cancellation requested Sep 21, 2026)",
+        "Late Notice LLC (renews Jun 1, 2030)",
+        "Nonpayment LLC (renews Jun 1, 2030)",
+        "Notice Test LLC (renews Jun 1, 2030 — cancellation requested Sep 21, 2026)",
+        "Office Cancel LLC (renews Sep 26, 2027 — cancellation requested Sep 21, 2026)"
+      ]
+    },
+    {
+      "label": "A10",
+      "ok": false,
+      "detail": {
+        "defect": "No standalone card-update route",
+        "status": 404
+      }
+    },
+    {
+      "label": "A11",
+      "ok": false,
+      "detail": {
+        "expired": {
+          "id": "941a3a6d-06ec-40e9-bfb2-66c8a86ef478",
+          "ein_secret": "v2:RlBTTExDLUVOQy0xCnsia2V5IjoiZGV2IiwiaXYiOiJydTBUSU9FRDhjTkFYN3d2IiwidGFnIjoiL2hiLzV3N240akN5bWwySUlFYlBSUT09IiwiZGF0YSI6IlVpVDBJT05WMUVKcmxqQi8rZz09In0=",
+          "details": {
+            "phone": "4075550100",
+            "shareholders": [
+              {
+                "name": "Test Client",
+                "ssnLast4": "6789"
+              }
+            ]
+          }
+        },
+        "freshHasSecret": true,
+        "deliveredHasSecret": false
+      }
+    },
+    {
+      "label": "A09",
+      "ok": false,
+      "detail": [
+        {
+          "injected": true,
+          "clientDocumentsBefore": 2,
+          "clientDocumentsAfter": 3,
+          "defect": "Order-update failure leaves an unassociated delivered document"
+        }
+      ]
+    },
+    {
+      "label": "A08",
+      "ok": false,
+      "detail": {
+        "counts": {
+          "clients": 1,
+          "orders": 7,
+          "service_orders": 3,
+          "documents": 5,
+          "oa_profiles": 0,
+          "oa_generations": 0,
+          "library_documents": 0,
+          "webhook_events": 0,
+          "fl_sync_state": 0,
+          "contact_messages": 1,
+          "email_log": 6,
+          "ra_renewals": 5,
+          "ra_payment_attempts": 0,
+          "document_deletions": 1
+        },
+        "documents": 4
+      }
+    },
+    {
+      "label": "A01",
+      "ok": false,
+      "detail": {
+        "code": 1,
+        "out": "[email:dev] to=updated@example.test subject=\"Action needed for your S election — Card Test LLC\"\n<div style=\"font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px\"><p><strong>MyFloridaSeriesLLC</strong></p><p>We need the owners’ Social Security numbers again to complete the S corporation election package for <strong>Card Test LLC</strong>. Your other saved answers remain available.</p><p>Sign in to your client portal, select this company, and open <strong>Re-enter taxpayer numbers</strong> under <strong>Orders in progress</strong>. Enter each owner’s number and submit the form securely.</p><p>Do not send Social Security numbers by email.</p><p><a href=\"http://localhost:8000/portal\">Open your client portal</a></p></div>\n[email:dev] to=updated@example.test subject=\"Action needed for your S election — Card Test LLC\"\n<div style=\"font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px\"><p><strong>MyFloridaSeriesLLC</strong></p><p>We need the owners’ Social Security numbers again to complete the S corporation election package for <strong>Card Test LLC</strong>. Your other saved answers remain available.</p><p>Sign in to your client portal, select this company, and open <strong>Re-enter taxpayer numbers</strong> under <strong>Orders in progress</strong>. Enter each owner’s number and submit the form securely.</p><p>Do not send Social Security numbers by email.</p><p><a href=\"http://localhost:8000/portal\">Open your client portal</a></p></div>\n",
+        "err": "122 |  const oldRoot=process.env.DEV_STORAGE_DIR!;renameSync(oldRoot,oldRoot+'.lost');mkdirSync(oldRoot);\n123 |  const proc=Bun.spawn([process.execPath,import.meta.filename,'--restore'],{env:{...process.env,DEV_PG_DIR:join(process.env.BATCH28_DIR!,'restored')},stdout:'pipe',stderr:'pipe'});const[out,err,code]=await Promise.all([new Response(proc.stdout).text(),new Response(proc.stderr).text(),proc.exited]);check('A01',deletedBefore&&code===0&&out.includes('RESTORE_OK'),{code,out,err});\n124 | }\n125 | async function restore(){\n126 |  const {getDb}=await import('./db'),{restoreBackup}=await import('./restore');const db=await getDb();const dump=JSON.parse(readFileSync(join(process.env.BATCH28_DIR!,'dump.json'),'utf8'));const want=JSON.parse(readFileSync(join(process.env.BATCH28_DIR!,'want.json'),'utf8'));\n127 |  const journal=join(process.env.DEV_MIRROR_DIR!,'recovery/deletion-journal-v1.json');if(!existsSync(journal)){try{await restoreBackup(db,dump);}catch(e){throw Error('Actual restore after primary loss: '+String(e));}const revived=await db.query('SELECT id FROM documents WHERE id=$1',[want.goneId]);throw Error('Restore after primary loss revived '+revived.length+' deleted document(s); no independent deletion journal consulted');}renameSync(journal,journal+'.hold');let missing=false;try{await restoreBackup(db,dump);}catch{missing=true;}renameSync(journal+'.hold',journal);if(!missing)throw Error('Missing journal accepted');\n\nerror: Restore after primary loss revived 1 deleted document(s); no independent deletion journal consulted\n      at restore (/Users/adam/Documents/FLPSLLC Website Review/batch-28-implementation-2026-09-21/red-before-28/webapp/server/batch28-check.ts:127:305)\n\nBun v1.3.14 (macOS arm64)\n"
+      }
+    }
+  ],
+  "out": "B28:{\"label\":\"A06\",\"ok\":false,\"detail\":{\"before\":[],\"failed\":[],\"recovered\":[],\"held\":[{\"id\":\"d815ec97-6ac8-467a-992b-fff45ea82636\",\"order_id\":\"f4a48756-337e-4e4a-8e32-5b033dee5c89\",\"renewal_date\":\"2030-06-01T00:00:00.000Z\",\"amount_cents\":9900,\"status\":\"notice_sent\",\"charge_due\":\"2030-05-17T00:00:00.000Z\",\"notice_sent_at\":\"2030-04-03T12:00:00.000Z\",\"charged_at\":null,\"square_payment_id\":null,\"square_order_id\":null,\"link_url\":\"http://localhost:8000/agent-checkout?kind=renewal&id=d815ec97-6ac8-467a-992b-fff45ea82636&token=VT6O0l46bE1DFuuUrJgLTNeMP2g7-y_AIt1cpVLQsY0\",\"decline_code\":null,\"retry_after\":null,\"retries\":0,\"created_at\":\"2026-09-22T02:06:27.620Z\",\"updated_at\":\"2026-09-22T02:06:27.620Z\",\"purpose\":\"renewal\",\"billing_hold\":true,\"notice_error\":null,\"lock_until\":null,\"checkout_token\":\"VT6O0l46bE1DFuuUrJgLTNeMP2g7-y_AIt1cpVLQsY0\"}]}}\nB28:{\"label\":\"A03\",\"ok\":false,\"detail\":{\"status\":500,\"stored\":{\"id\":\"8949d79f-e236-486c-abdd-633f64f6956e\",\"name\":\"Message Sender\",\"email\":\"sender@example.test\",\"message\":\"Please record this one message.\",\"created_at\":\"2026-09-22T02:06:27.626Z\"},\"contacts\":[{\"id\":\"8949d79f-e236-486c-abdd-633f64f6956e\",\"name\":\"Message Sender\",\"email\":\"sender@example.test\",\"message\":\"Please record this one message.\",\"created_at\":\"2026-09-22T02:06:27.626Z\"}]}}\nB28:{\"label\":\"A02\",\"ok\":false,\"detail\":{\"mailDoc\":{\"id\":\"e1df2fd9-b771-4207-8ba4-9044b05a3592\",\"client_id\":\"99e63db6-78be-4877-8cf4-44849237b66e\",\"kind\":\"legal_mail\",\"title\":\"Service of process\",\"storage_key\":\"dev:bdead45ccdbd2c7ede9e08ca-mail.pdf\",\"content_type\":\"application/pdf\",\"size_bytes\":681,\"created_at\":\"2026-09-22T02:06:27.648Z\",\"meta\":{\"receivedOn\":\"2026-09-20\"},\"order_id\":\"cd12a617-553e-4d3a-85d9-4dcba4122435\",\"mirrored_at\":null,\"deleted_at\":null,\"mirror_path\":null,\"mirror_hash\":null,\"mirror_error\":null,\"mirror_attempted_at\":null},\"afterMail\":{\"id\":\"e1df2fd9-b771-4207-8ba4-9044b05a3592\",\"client_id\":\"99e63db6-78be-4877-8cf4-44849237b66e\",\"kind\":\"legal_mail\",\"title\":\"Service of process\",\"storage_key\":\"dev:bdead45ccdbd2c7ede9e08ca-mail.pdf\",\"content_type\":\"application/pdf\",\"size_bytes\":681,\"created_at\":\"2026-09-22T02:06:27.648Z\",\"meta\":{\"receivedOn\":\"2026-09-20\"},\"order_id\":\"cd12a617-553e-4d3a-85d9-4dcba4122435\",\"mirrored_at\":null,\"deleted_at\":null,\"mirror_path\":null,\"mirror_hash\":null,\"mirror_error\":null,\"mirror_attempted_at\":null},\"forbidden\":404}}\nB28:{\"label\":\"A04\",\"ok\":false,\"detail\":{\"noNote\":400,\"submitted\":400,\"fees\":[{\"id\":\"b6c23da7-e53d-4cfc-b026-9c99b81cdc1c\",\"order_id\":\"ee6bc235-b567-4a00-b6a4-506a1c5ec618\",\"renewal_date\":\"2030-06-01T00:00:00.000Z\",\"amount_cents\":9900,\"status\":\"declined\",\"charge_due\":null,\"notice_sent_at\":null,\"charged_at\":null,\"square_payment_id\":null,\"square_order_id\":null,\"link_url\":null,\"decline_code\":null,\"retry_after\":null,\"retries\":0,\"created_at\":\"2026-09-22T02:06:27.654Z\",\"updated_at\":\"2026-09-22T02:06:27.654Z\",\"purpose\":\"renewal\",\"billing_hold\":false,\"notice_error\":null,\"lock_until\":null,\"checkout_token\":null}]}}\nB28:{\"label\":\"A05\",\"ok\":false,\"detail\":{\"cancelView\":{\"orderId\":\"edce1972-4ab6-4b5c-b853-a6424f9b8ab4\",\"llcName\":\"Late Cancel LLC\",\"formed\":true,\"raService\":true,\"raAppointmentDate\":\"2026-01-01\",\"raResignationDue\":null,\"raResignationSubmitted\":null,\"raEndedDate\":null,\"cardNote\":null,\"raRenewalDate\":\"2027-09-26\",\"raCancellationRequestedAt\":\"2026-09-22T02:06:27.663Z\",\"cardStatus\":\"on_file\",\"cardLast4\":\"1111\",\"cardBrand\":null,\"renewals\":[{\"id\":\"0740438f-924e-4c18-b966-e52061671396\",\"date\":\"2026-09-26\",\"status\":\"charged\",\"linkUrl\":null,\"purpose\":\"renewal\",\"chargedAt\":\"2026-09-21T21:06:27.661-05:00\",\"amountCents\":9900}]},\"officeView\":{\"orderId\":\"3309d654-a623-4bcb-9c1b-578b597cc9b4\",\"llcName\":\"Office Cancel LLC\",\"formed\":true,\"raService\":true,\"raAppointmentDate\":\"2026-01-01\",\"raResignationDue\":null,\"raResignationSubmitted\":null,\"raEndedDate\":null,\"cardNote\":null,\"raRenewalDate\":\"2027-09-26\",\"raCancellationRequestedAt\":\"2026-09-21T12:00:00.000Z\",\"cardStatus\":\"on_file\",\"cardLast4\":\"1111\",\"cardBrand\":null,\"renewals\":[{\"id\":\"ff35008c-b8a1-4ae0-b9df-fe5ba12fb817\",\"date\":\"2026-09-26\",\"status\":\"charged\",\"linkUrl\":null,\"purpose\":\"renewal\",\"chargedAt\":\"2026-09-21T21:06:27.667-05:00\",\"amountCents\":9900}]}}}\nB28:{\"label\":\"A07\",\"ok\":false,\"detail\":[\"Ended LLC (renews Jun 1, 2030 — cancellation requested Sep 21, 2026)\",\"Late Cancel LLC (renews Sep 26, 2027 — cancellation requested Sep 21, 2026)\",\"Late Notice LLC (renews Jun 1, 2030)\",\"Nonpayment LLC (renews Jun 1, 2030)\",\"Notice Test LLC (renews Jun 1, 2030 — cancellation requested Sep 21, 2026)\",\"Office Cancel LLC (renews Sep 26, 2027 — cancellation requested Sep 21, 2026)\"]}\nB28:{\"label\":\"A10\",\"ok\":false,\"detail\":{\"defect\":\"No standalone card-update route\",\"status\":404}}\nB28:{\"label\":\"A11\",\"ok\":false,\"detail\":{\"expired\":{\"id\":\"941a3a6d-06ec-40e9-bfb2-66c8a86ef478\",\"ein_secret\":\"v2:RlBTTExDLUVOQy0xCnsia2V5IjoiZGV2IiwiaXYiOiJydTBUSU9FRDhjTkFYN3d2IiwidGFnIjoiL2hiLzV3N240akN5bWwySUlFYlBSUT09IiwiZGF0YSI6IlVpVDBJT05WMUVKcmxqQi8rZz09In0=\",\"details\":{\"phone\":\"4075550100\",\"shareholders\":[{\"name\":\"Test Client\",\"ssnLast4\":\"6789\"}]}},\"freshHasSecret\":true,\"deliveredHasSecret\":false}}\nB28:{\"label\":\"A09\",\"ok\":false,\"detail\":[{\"injected\":true,\"clientDocumentsBefore\":2,\"clientDocumentsAfter\":3,\"defect\":\"Order-update failure leaves an unassociated delivered document\"}]}\nB28:{\"label\":\"A08\",\"ok\":false,\"detail\":{\"counts\":{\"clients\":1,\"orders\":7,\"service_orders\":3,\"documents\":5,\"oa_profiles\":0,\"oa_generations\":0,\"library_documents\":0,\"webhook_events\":0,\"fl_sync_state\":0,\"contact_messages\":1,\"email_log\":6,\"ra_renewals\":5,\"ra_payment_attempts\":0,\"document_deletions\":1},\"documents\":4}}\nB28:{\"label\":\"A01\",\"ok\":false,\"detail\":{\"code\":1,\"out\":\"[email:dev] to=updated@example.test subject=\\\"Action needed for your S election — Card Test LLC\\\"\\n<div style=\\\"font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px\\\"><p><strong>MyFloridaSeriesLLC</strong></p><p>We need the owners’ Social Security numbers again to complete the S corporation election package for <strong>Card Test LLC</strong>. Your other saved answers remain available.</p><p>Sign in to your client portal, select this company, and open <strong>Re-enter taxpayer numbers</strong> under <strong>Orders in progress</strong>. Enter each owner’s number and submit the form securely.</p><p>Do not send Social Security numbers by email.</p><p><a href=\\\"http://localhost:8000/portal\\\">Open your client portal</a></p></div>\\n[email:dev] to=updated@example.test subject=\\\"Action needed for your S election — Card Test LLC\\\"\\n<div style=\\\"font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px\\\"><p><strong>MyFloridaSeriesLLC</strong></p><p>We need the owners’ Social Security numbers again to complete the S corporation election package for <strong>Card Test LLC</strong>. Your other saved answers remain available.</p><p>Sign in to your client portal, select this company, and open <strong>Re-enter taxpayer numbers</strong> under <strong>Orders in progress</strong>. Enter each owner’s number and submit the form securely.</p><p>Do not send Social Security numbers by email.</p><p><a href=\\\"http://localhost:8000/portal\\\">Open your client portal</a></p></div>\\n\",\"err\":\"122 |  const oldRoot=process.env.DEV_STORAGE_DIR!;renameSync(oldRoot,oldRoot+'.lost');mkdirSync(oldRoot);\\n123 |  const proc=Bun.spawn([process.execPath,import.meta.filename,'--restore'],{env:{...process.env,DEV_PG_DIR:join(process.env.BATCH28_DIR!,'restored')},stdout:'pipe',stderr:'pipe'});const[out,err,code]=await Promise.all([new Response(proc.stdout).text(),new Response(proc.stderr).text(),proc.exited]);check('A01',deletedBefore&&code===0&&out.includes('RESTORE_OK'),{code,out,err});\\n124 | }\\n125 | async function restore(){\\n126 |  const {getDb}=await import('./db'),{restoreBackup}=await import('./restore');const db=await getDb();const dump=JSON.parse(readFileSync(join(process.env.BATCH28_DIR!,'dump.json'),'utf8'));const want=JSON.parse(readFileSync(join(process.env.BATCH28_DIR!,'want.json'),'utf8'));\\n127 |  const journal=join(process.env.DEV_MIRROR_DIR!,'recovery/deletion-journal-v1.json');if(!existsSync(journal)){try{await restoreBackup(db,dump);}catch(e){throw Error('Actual restore after primary loss: '+String(e));}const revived=await db.query('SELECT id FROM documents WHERE id=$1',[want.goneId]);throw Error('Restore after primary loss revived '+revived.length+' deleted document(s); no independent deletion journal consulted');}renameSync(journal,journal+'.hold');let missing=false;try{await restoreBackup(db,dump);}catch{missing=true;}renameSync(journal+'.hold',journal);if(!missing)throw Error('Missing journal accepted');\\n\\nerror: Restore after primary loss revived 1 deleted document(s); no independent deletion journal consulted\\n      at restore (/Users/adam/Documents/FLPSLLC Website Review/batch-28-implementation-2026-09-21/red-before-28/webapp/server/batch28-check.ts:127:305)\\n\\nBun v1.3.14 (macOS arm64)\\n\"}}\n",
+  "err": "[api] 57 |     }),\n58 |   });\n59 |   if (!res.ok) {\n60 |     const body = await res.text();\n61 |     await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));\n62 |     throw new Error(`Resend ${res.status}: ${body}`);\n                   ^\nerror: Resend 503: Injected mail outage\n      at sendMail (/Users/adam/Documents/FLPSLLC Website Review/batch-28-implementation-2026-09-21/red-before-28/webapp/server/email.ts:62:15)\n      at async <anonymous> (/Users/adam/Documents/FLPSLLC Website Review/batch-28-implementation-2026-09-21/red-before-28/webapp/server/routes-payments.ts:663:11)\n      at async dispatch (/Users/adam/Documents/Claude Projects/Series LLC Website/webapp/node_modules/hono/dist/compose.js:22:23)\n\n[admin] document alert email failed: 57 |     }),\n58 |   });\n59 |   if (!res.ok) {\n60 |     const body = await res.text();\n61 |     await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));\n62 |     throw new Error(`Resend ${res.status}: ${body}`);\n                   ^\nerror: Resend 503: Injected mail outage\n      at sendMail (/Users/adam/Documents/FLPSLLC Website Review/batch-28-implementation-2026-09-21/red-before-28/webapp/server/email.ts:62:15)\n\nRemoving XFA form data as pdf-lib does not support reading or writing XFA. Set preserveXFA: true in load options to keep XFA data.\n"
+}

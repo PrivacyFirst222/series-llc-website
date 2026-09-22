@@ -61,7 +61,7 @@ job a completed snapshot.
    before changing the production database configuration.
 
 A restore cannot recover records created after the snapshot. Do not remove the
-external `deletions/` journal: it is authoritative even when restoring an older
+independent Dropbox `/recovery/deletion-journal-v1.json` journal: it is authoritative even when restoring an older
 database. Expired questionnaire numbers remain absent. Client-deleted tax
 files stay unavailable even if older snapshots refer to them.
 
@@ -70,9 +70,15 @@ dumps are left alone and are not silently certified as complete backups.
 
 ## Deletion and provider recovery copies
 
-Client deletion writes the external journal before hiding the document, then
+Client deletion appends to the independently stored Dropbox journal using a revision-matched write, verifies that decision, and writes its primary-storage marker before hiding the document, then
 removes active Blob and Dropbox copies. Cleanup failures remain pending and
 are retried automatically; the Office reports them. This controls application
 access and our active stored copies. Provider-maintained recovery/version
 history may have its own retention. The Privacy Policy does not promise immediate
 physical erasure of every provider-held recovery copy.
+
+## Batch 28 recovery protections
+
+The live source initializes the independent journal from its existing primary deletion records before a new backup or deletion. Restoration never initializes an empty journal. A missing, corrupt or inaccessible journal aborts before restoring any file or row. Each completed backup records its deletion checkpoint, and recovery refuses a journal missing any checkpoint or snapshot deletion. Concurrent journal writers use Dropbox revision matching, so one cannot overwrite another decision. Primary storage loss therefore does not lose the journal; simultaneous loss of the independent journal still requires recovery of that journal before restoration.
+
+Completed row counts are calculated after deleted-document filtering. Counts for an unfinished job, when returned, are explicitly provisional. Staged S-election replacement files have durable cleanup intents before upload; an abandoned or failed replacement is retried by the cleanup job without removing the prior usable package.

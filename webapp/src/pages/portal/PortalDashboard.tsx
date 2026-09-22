@@ -1,3 +1,4 @@
+import { UpdateRenewalCard } from './UpdateRenewalCard';
 import { RA_CANCELLATION, cardStatusWords } from "@/lib/agentBilling";
 import { AgreementLoadError } from "./AgreementLoadError";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
@@ -320,6 +321,7 @@ interface CompanyInfo {
   raEndedDate?:string|null;
   cardNote?:string|null;
   raCancellationRequestedAt: string | null;
+  raCancellationLate?: boolean;
   /** The card kept with Square for the renewal (16 Sep 2026). */
   cardStatus?: "on_file" | "none" | "gift_card" | null;
   cardLast4?: string | null;
@@ -379,18 +381,6 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
               <p>
                 {company.raEndedDate ? `Our registered-agent appointment ends on ${company.raEndedDate}.` : company.raAppointmentDate ? `Your registered agent service is active${company.raRenewalDate ? ` and renews on ${new Date(`${company.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : ""}.` : "Your appointment date has not yet been recorded. Your first service year begins when our appointment takes effect."} You may give cancellation notice here at any time. Give notice at least 30 days before renewal and provide replacement proof by renewal to avoid a resignation charge.
               </p>
-              {/* The card kept for the renewal, or why none is (16 Sep 2026). */}
-              {company.cardStatus === "on_file" ? (
-                <p className="mt-1" data-testid="renewal-card">Renewal card: {brandWord(company.cardBrand)} ending {company.cardLast4}.</p>
-              ) : <p className="mt-1" data-testid="renewal-card">{cardStatusWords(company.cardStatus,company.cardNote)}.</p>}
-
-              {(company.renewals ?? []).filter((r) => r.status === "charged" || r.status === "paid_by_link" || r.status === "declined").map((r) => (
-                <p key={`${r.date}-${r.status}`} className="mt-1" data-testid="renewal-line">
-                  {r.status === "declined"
-                    ? `${r.purpose === "resignation" ? "Resignation" : "Renewal"} charge declined for ${r.date ? new Date(`${r.date}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""} — pay with the link in your email.`
-                    : `${r.purpose === "resignation" ? "Resignation payment received on" : "Renewed on"} ${r.chargedAt ? new Date(r.chargedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""} for $${(r.amountCents / 100).toFixed(0)}.`}
-                </p>
-              ))}
             </div>
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -422,6 +412,20 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
             </AlertDialog>
           </div>
         )}
+        {company.raCancellationLate ? <p className="mt-3 text-sm font-medium">Your cancellation notice arrived less than 30 days before renewal. The full annual renewal fee remains due; any payment already received is shown below.</p> : null}
+        <div className="mt-3 text-sm">              {/* The card kept for the renewal, or why none is (16 Sep 2026). */}
+              {company.cardStatus === "on_file" ? (
+                <p className="mt-1" data-testid="renewal-card">Renewal card: {brandWord(company.cardBrand)} ending {company.cardLast4}.</p>
+              ) : <p className="mt-1" data-testid="renewal-card">{cardStatusWords(company.cardStatus,company.cardNote)}.</p>}
+
+              {(company.renewals ?? []).filter((r) => r.status === "charged" || r.status === "paid_by_link" || r.status === "declined").map((r) => (
+                <p key={`${r.date}-${r.status}`} className="mt-1" data-testid="renewal-line">
+                  {r.status === "declined"
+                    ? `${r.purpose === "resignation" ? "Resignation" : "Renewal"} charge declined for ${r.date ? new Date(`${r.date}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""} — pay with the link in your email.`
+                    : `${r.purpose === "resignation" ? "Resignation payment received on" : "Renewed on"} ${r.chargedAt ? new Date(r.chargedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""} for $${(r.amountCents / 100).toFixed(0)}.`}
+                </p>
+              ))}
+<UpdateRenewalCard key={company.orderId} company={company.orderId}/></div>
         {company.raResignationDue ? <p className="mt-3">{company.raResignationSubmitted ? `Resignation submitted ${company.raResignationSubmitted}.` : `Resignation due ${company.raResignationDue}; submission has not yet been recorded.`} {company.raEndedDate ? `Appointment ends ${company.raEndedDate}.` : ""}</p> : null}
         {(company.renewals ?? []).filter(r=>r.linkUrl && !["charged","paid_by_link","cancelled"].includes(r.status)).map(r=><p key={r.date} className="mt-3"><a className="underline text-trust" href={r.linkUrl!}>Pay {r.purpose === "resignation" ? "resignation charge" : "renewal"} now / use another card</a></p>)}
         {cancelMutation.isError ? (

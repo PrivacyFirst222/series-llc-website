@@ -520,6 +520,28 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
       UNIQUE(target_id, id))`,
     `CREATE UNIQUE INDEX IF NOT EXISTS ra_payment_one_active ON ra_payment_attempts(target_id) WHERE status IN ('pending','approved','completed')`,
   ]},
+  { id: 16, name: "notice-recovery-and-renewal-card-updates", statements: [
+    `ALTER TABLE documents ADD COLUMN IF NOT EXISTS notice_status text`,
+    `ALTER TABLE documents ADD COLUMN IF NOT EXISTS notice_error text`,
+    `ALTER TABLE documents ADD COLUMN IF NOT EXISTS notice_sent_at timestamptz`,
+    `ALTER TABLE documents ADD COLUMN IF NOT EXISTS notice_recipient text`,
+    `ALTER TABLE documents ADD COLUMN IF NOT EXISTS notice_lock_until timestamptz`,
+    `ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS notice_status text`,
+    `ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS notice_error text`,
+    `ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS notice_sent_at timestamptz`,
+    `ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS notice_lock_until timestamptz`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_reason text`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_resignation_note text`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_cancellation_renewal_date date`,
+    `ALTER TABLE service_orders ADD COLUMN IF NOT EXISTS questionnaire_updated_at timestamptz`,
+    `CREATE TABLE IF NOT EXISTS renewal_card_attempts (id uuid PRIMARY KEY, order_id uuid NOT NULL, source_token text NOT NULL, consent text NOT NULL, status text NOT NULL DEFAULT 'pending', card jsonb, error text, lock_until timestamptz, created_at timestamptz NOT NULL DEFAULT now())`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS renewal_card_one_active ON renewal_card_attempts(order_id) WHERE status='pending'`,
+    `CREATE TABLE IF NOT EXISTS staged_documents (id uuid PRIMARY KEY, service_order_id uuid NOT NULL, storage_path text NOT NULL, storage_key text, prior_document_id uuid, state text NOT NULL DEFAULT 'staged', created_at timestamptz NOT NULL DEFAULT now(), error text)`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS staged_document_one_active ON staged_documents(service_order_id) WHERE state='staged'`,
+    `ALTER TABLE ra_renewals DROP CONSTRAINT IF EXISTS ra_renewals_order_id_renewal_date_key`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS ra_renewal_date_purpose ON ra_renewals(order_id,renewal_date,purpose)`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS ra_one_resignation ON ra_renewals(order_id) WHERE purpose='resignation'`,
+  ]},
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

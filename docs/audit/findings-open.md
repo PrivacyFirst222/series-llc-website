@@ -2,7 +2,7 @@
 
 GENERATED from docs/audit/ledger.json by `bun run docs/audit/ledger-print.ts list`. Do not edit: the commit step refuses a copy that differs from the ledger. The auditors' original files are unchanged under docs/audit/sources/ and docs/audit/runs/.
 
-365 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 31 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 353.
+375 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 41 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 363.
 
 A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.
 For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-session.ts. The historical coverage-check.ts alone does not establish complete prior-item reconciliation. Audit completion does not approve repairs or publication.
@@ -31,9 +31,14 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 - **5. [A34]** — **implemented**
   - Terms "Last updated: August 13, 2026" and Privacy "Last updated: August 4, 2026" predate the last edits (Sep 15; Aug 9). Replace the dates.
   - **Codex rejected the proposed replacement:** Use the actual effective/publication dates of the revised policies. A commit date establishes an edit, not by itself the legally effective date.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Previous fix: 27 r3, commit ; 2 assertion(s) retained. Replacement attempt: 28 r1, work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57.
+  - Previous fix: 27 r3, commit ; 2 assertion(s) retained. Replacement attempt: 28 r2, work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b.
+  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 2 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
+  - 2026-09-22 superseded by approved replacement: prior fix 27 r3 at ; approved work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
+  - 2026-09-22 superseded by approved replacement: prior fix 27 r3 at ; approved work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b
 - **6. [A35]** — **dropped** — waits on Adam's ruling
   - Benefits "Side by side": "One state filing covers 10 series". Each series is its own filing. Ruling needed (a Benefits row was ruled correct on 15 Sep).
   - Codex (disputed): Benefits.tsx still contains "One state filing covers 10 series", but rulings.md expressly protects the Benefits Side by side row. The user prohibits flagging ruled wording.
@@ -404,7 +409,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Rechecked by codex-reader-5: Independently imported real form2553Timing helper; Jan1 deadline is SundayMar15 and nextMondayMar16 is late. Read full relevant helper30–89 and root primary-irs-deadline-read.md. Root current IRS Publication509 evidence establishes weekend/holiday timely-nextday rule; rollover is independent of owner63 startdate decision and65-day purchase cutoff. Proposed adjustment correct, retaining5-day service runway separately.
   - Fixed: batch 24 revision 1, commit , by Codex; protected by 3 assertion(s).
 
-## Order form and payment — 84 open of 86
+## Order form and payment — 85 open of 87
 
 - **45. [A1]** — **optional — implemented**
   - Registered agent step, card tick (mine). Reads "…and I can cancel at any time in my portal." Terms 9(g) and the code stop the charge only on 30 days' notice. Replace: "…and I can cancel in my portal with at least 30 days' notice before the renewal date." (StepRegisteredAgent.tsx)
@@ -795,9 +800,14 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Fixed (unused-code): batch 19 revision 2, commit , by Codex; protected by 3 assertion(s).
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
   - Part "fact-ledger" — implemented: The fact ledger lacks the $99 renewal, the 15- and 30-day rules and the four optional prices.
-  - Fixed (fact-ledger): batch 27 revision 3, commit , by Codex; protected by 1 assertion(s).
+  - Previous fix (fact-ledger): 27 r3, commit ; 1 assertion(s) retained. Replacement attempt: 28 r1, work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57.
+  - Previous fix (fact-ledger): 27 r3, commit ; 1 assertion(s) retained. Replacement attempt: 28 r2, work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b.
+  - Fixed (fact-ledger): batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
+  - 2026-09-22 superseded by approved replacement: prior fix 27 r3 at ; approved work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
+  - 2026-09-22 superseded by approved replacement: prior fix 27 r3 at ; approved work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b
 - **101. [B18]** — **implemented** — housekeeping
   - Order form, the payload built at submit (conversion branch) — `webapp/src/components/forms/florida-llc/buildPayload.ts:29`
   - Reads: ? { desiredName: "", designator: "", finalName, alternateNames: [], exactNameOnly: false }
@@ -1047,8 +1057,17 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Ignore both success and failure completions from superseded lookup requests. Update looking only for the current request. Keep the current name’s matching response visible until that name changes.
   - Rechecked by codex-reader-5: Read full ConversionName effect46–64: cleanup cancels only timer; success/failure always set state for captured typed; stale A after B hides B through current-name comparison, with no rerun triggered by lookup change. Cancellation/current request guard handles both looking and result. No existing lookup race prior found; not address-state prior69.
   - Fixed: batch 22 revision 1, commit , by Codex; protected by 2 assertion(s).
+- **AUD-claude-reconciled-batch28-runtime-B-contact-form-fails-after-storing. [substantive]** — **implemented**
+  - Contact page → Send, when the office email cannot be sent — `webapp/server/routes-payments.ts:663`
+  - Reads:     await sendMail({
+  - Claims: routes-payments.ts:637-640 (comment): 'Now: stored (and so backed up nightly), emailed to the notify address, and acknowledged only after both.'
+  - True: Current cross-review: Current handler inserts contact_messages657-660, then awaits sendMail663-668 without catch. A transport exception escapes before the success response670. The office contact-message listing still exists in routes-admin.ts:883 onward. Retrying can insert a second copy. No current provider failure injection was run.
+  - Proposed replacement (not approved): Acknowledge durable message receipt even when the separate office notification fails, and retain a visible retryable delivery failure for the office. Update the comment that currently promises acknowledgment only after both. Idempotency is useful if added, but no claim of exactly-once delivery is warranted.
+  - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current handler inserts contact_messages657-660, then awaits sendMail663-668 without catch. A transport exception escapes before the success response670. The office contact-message listing still exists in routes-admin.ts:883 onward. Retrying can insert a second copy. No current provider failure injection was run.
+  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 
-## Client portal — 78 open of 78
+## Client portal — 80 open of 80
 
 - **115. [A47]** — **implemented**
   - Questionnaire and amendment error "We couldn't find a formed LLC on your account yet" where the check is for a paid order. Replace: "a paid order".
@@ -1477,7 +1496,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: Regeneration safely replaces the earlier filing copy.
   - True: The previous document row and file are deleted at:867–868 before putFile at:872–876 and the replacement insert at:880–884. If storage or insertion fails, the original is already gone and the stored documentId still names it. This can occur during the promised14-day edit window.
   - Replace with: Upload and insert the new package first, atomically update the service order's documentId/details, then retire the old document. On failure remove only the staged replacement and retain the existing filing copy.
-  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Part "all" — implemented: The whole finding.
+  - Previous fix (all): 05 r1, commit ; 1 assertion(s) retained. Replacement attempt: 28 r1, work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57.
+  - Previous fix (all): 05 r1, commit ; 1 assertion(s) retained. Replacement attempt: 28 r2, work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b.
+  - Fixed (all): batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - 2026-09-22 superseded by approved replacement: prior fix 05 r1 at ; approved work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
+  - 2026-09-22 superseded by approved replacement: prior fix 05 r1 at ; approved work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b
+  - Part "staged-cleanup" — implemented: Remove only an unsuccessful newly staged S-election replacement, preserving the existing usable package and recorded Batch05 repair.
+  - Fixed (staged-cleanup): batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 - **N1.16. [substantive]** — **implemented**
   - Client portal, S-election shareholder Social Security number validation — `webapp/src/lib/ssn.ts:28`
   - Reads: return ssnTypingProblem(value) || (d.length !== 9 ? SSN_LENGTH_MESSAGE : "");
@@ -1608,8 +1636,26 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Distinguish omitted company from explicitly supplied invalid/nonowned company. Return400/404 for failed explicit resolution before calling seed/name/profile helpers or writing records. Use a resolved owned company ID for every generated document and purchased service; preserve intended default selection only when no company was supplied. Exercise nonexistent and another-client UUIDs against all company-scoped routes.
   - Rechecked by codex-reader-5: routes-portal.ts:390–402 resolves explicit nonexistent/nonowned UUID to null. oaSeed81–93 and clientLlcName374–385 interpret null as latest owned paid order. GET1058, generation1174, consent1572, amendment1729 and purchases1897/1956/2023/2080 pass this null onward; PUT1133 refuses. Actual source confirms latent wrong-company fallback WITHIN signed-in account, not access to another client data. PriorN1.04 is service association for tax package addresses; N1.05 extra series scoping; N1.06 company-specific duplicate check. None addresses invalid requested-company fallback. No live route mutation performed.
   - Fixed: batch 22 revision 1, commit , by Codex; protected by 2 assertion(s).
+- **AUD-claude-reconciled-batch28-runtime-B-no-way-to-replace-the-renewal-card. [substantive]** — **implemented**
+  - Client portal → Registered agent service card ('Renewal card: Visa ending 1111'); the renewal notice email; Terms 9(c) and 9(e) — `webapp/src/pages/portal/PortalDashboard.tsx:380`
+  - Reads:                 <p className="mt-1" data-testid="renewal-card">Renewal card: {brandWord(company.cardBrand)} ending {company.cardLast4}.</p>
+  - Claims: terms.md:46: 'You must agree to automatic renewal and keep an eligible payment card on file with Square; we will not undertake the appointment without both.'; the notice email (email.ts:111-113): 'will be charged to your card ending 1111 on <date>. There is nothing you need to do.'
+  - True: Current cross-review: No dedicated card-update control is present. However PortalDashboard:422 offers Pay renewal now / use another card whenever an open link exists. renewals.ts:127-141 creates that link with the60-day notice, before decline, and ra-checkout.ts:55-62 saves a new eligible card during payment. Historical claim that replacement is possible only after decline is false. email.ts:111-112 still says nothing needs doing and there is no independent replacement path outside an open payable renewal. No provider or payment route run.
+  - Proposed replacement (not approved): A standalone card-update action requires a supported token-to-card design, saved-card consent and eligible-card checks. Explain the existing pre-decline payment option accurately. Do not promise an office payment link outside a payable renewal unless implemented.
+  - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. No dedicated card-update control is present. However PortalDashboard:422 offers Pay renewal now / use another card whenever an open link exists. renewals.ts:127-141 creates that link with the60-day notice, before decline, and ra-checkout.ts:55-62 saves a new eligible card during payment. Historical claim that replacement is possible only after decline is false. email.ts:111-112 still says nothing needs doing and there is no independent replacement path outside an open payable renewal. No provider or payment route run.
+  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
+- **AUD-claude-reconciled-batch28-runtime-B-undelivered-s-election-numbers-never-expire. [substantive]** — **implemented**
+  - Client portal → Orders in progress → S corporation election details saved while we are obtaining the company EIN; Privacy Policy §2 — `webapp/server/routes-portal.ts:568`
+  - Reads:     WHERE type='s-election' AND status='fulfilled' AND fulfilled_at < now()-interval '14 days'
+  - Claims: privacy.md:15: 'You may correct your answers and regenerate the package for fourteen (14) days after delivery. After that editing window, our scheduled cleanup removes the full numbers from the questionnaire records.'; the S election dialog (OrdersInProgress.tsx:279): 'the questionnaire numbers are removed after the fourteen-day editing window.'
+  - True: Current cross-review: Current purge filters status fulfilled and fulfilled_at older than14days at574. Pending-EIN saves2419-2422 retain encrypted numbers in_progress with no independent expiry. Privacy15 describes the post-delivery editing window; it does not state an abandonment/cancellation horizon. This is an unbounded pre-delivery state, not evidence that the stated post-delivery14day rule itself is violated. RulingsN1.01/140/150 intentionally permit pending completion but do not specify abandoned pre-delivery retention.
+  - Proposed replacement (not approved): Choose a finite pre-delivery/abandonment retention rule or clearly disclose retention through delivery, then make cleanup and re-entry behavior match. Any purge path must return the order to a usable re-entry state and remove full numbers rather than completed retained PDFs.
+  - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current purge filters status fulfilled and fulfilled_at older than14days at574. Pending-EIN saves2419-2422 retain encrypted numbers in_progress with no independent expiry. Privacy15 describes the post-delivery editing window; it does not state an abandonment/cancellation horizon. This is an unbounded pre-delivery state, not evidence that the stated post-delivery14day rule itself is violated. RulingsN1.01/140/150 intentionally permit pending completion but do not specify abandoned pre-delivery retention.
+  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 
-## Office — 31 open of 31
+## Office — 33 open of 33
 
 - **171. [A68]** — **implemented** — related: 184
   - Registered Agent Clients Card column (mine): no permission on the order shows "—", no amber. Replace: "no card — no permission on the order", amber.
@@ -1818,12 +1864,32 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Preserve existing validated documentNumber when replacing Articles, or replace it with a newly supplied validated number. Store it on replacement Articles for both signing paths. Verify self-signed and office-signed replacement retain the number.
   - Rechecked by codex-root-independent: Root independently reopened routes-admin.ts385–414,488–510,724–760. Initial upload stores documentNumber; replacement writes empty JSON. Detail reads Articles then Statement; self-signed replacement lacks fallback. Compared prior177,208,N1.14; distinct metadata loss. Source proof, no external incident claimed.
   - Fixed: batch 23 revision 1, commit , by Codex; protected by 2 assertion(s).
+- **AUD-claude-reconciled-batch28-runtime-B-legal-mail-notice-lost-with-no-resend. [substantive]** — **implemented**
+  - Office → Clients → Upload → Legal mail (and other documents) when the email provider fails; Terms 10(b) — `webapp/server/routes-admin.ts:1565`
+  - Reads:     notified = await sendMail({ to: clients[0].email, ...mail }).then(
+  - Claims: terms.md:59: 'Our sole obligations as registered agent are to accept service of process… to post scanned copies to your client portal, and to send a notification email to the address on file.'; AdminDashboard.tsx:362: 'The client is emailed the moment legal mail is posted.'
+  - True: Current cross-review: Current upload stores the document at1565-1570 then records notified false when sending rejects at1580-1585. Search of all routes in routes-admin.ts found no existing-document notify route; current UI toast is transient. Uploading again is not a retry of the same document. Existing email logs record failures, but matching only a subject cannot reliably associate a generic new-document subject with one specific document.
+  - Proposed replacement (not approved): Add an authenticated office resend action keyed to document ID, preserve legal-mail context and current recipient, and retain delivery status keyed to that document. Reuse the existing stored document; report send acceptance truthfully.
+  - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current upload stores the document at1565-1570 then records notified false when sending rejects at1580-1585. Search of all routes in routes-admin.ts found no existing-document notify route; current UI toast is transient. Uploading again is not a retry of the same document. Existing email logs record failures, but matching only a subject cannot reliably associate a generic new-document subject with one specific document.
+  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
+- **AUD-claude-reconciled-batch28-reader-5-clients-tab-cancel-chip. [wording]** — **implemented**
+  - Office, Clients tab — the amber 'RA cancel requested …' chip beside a client's name — `webapp/server/routes-admin.ts:895`
+  - Reads: `SELECT cl.id, cl.email, cl.name, cl.created_at, cl.ra_cancellation_requested_at,
+  - Claims: The client-level column says whether a cancellation of registered agent service has been requested.
+  - True: Current cross-review: routes-admin:904 reads clients.ra_cancellation_requested_at; AdminDashboard:562–564 renders it. Portal route :2635 writes the legacy client column; ra-office:38–40 records email cancellations on orders only. Proposed subquery fixes the missing office event but still collapses multiple companies and drops an appointment whose ra_ended_date is set to a future effective date (ra-office filed action sets date +31). An IS NULL test is not equivalent to not ended yet.
+  - Proposed replacement (not approved): Derive cancellation summaries from company order records and identify the affected company; if keeping an account summary, use a clearly defined active/pending-company rule that handles a future appointment-end date.
+  - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. routes-admin:904 reads clients.ra_cancellation_requested_at; AdminDashboard:562–564 renders it. Portal route :2635 writes the legacy client column; ra-office:38–40 records email cancellations on orders only. Proposed subquery fixes the missing office event but still collapses multiple companies and drops an appointment whose ra_ended_date is set to a future effective date (ra-office filed action sets date +31). An IS NULL test is not equivalent to not ended yet.
+  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 
-## Emails and jobs — 37 open of 38
+## Emails and jobs — 40 open of 41
 
 - **194. [A3]** — **implemented** — related: 212
   - Renewal notice timing (mine). renewals.ts NOTICE_DAYS = 45. Terms 9(d): notice 30–60 days before the cancellation deadline; deadline is renewal − 30 (9(g)); so notice must be 60–90 days before the date. Replace: 60.
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Previous fix: 07 r1, commit ; 1 assertion(s) retained. Replacement attempt: 28 r2, work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b.
+  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - 2026-09-22 superseded by approved replacement: prior fix 07 r1 at ; approved work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b
 - **195. [A4]** — **implemented**
   - Renewal retry (mine). The retry reuses idempotency key `ren-<id>-1`; Square returns the first decline; the email promises a retry. Replace: store the attempt count on every decline; retry key numbered 2.
   - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
@@ -2126,8 +2192,35 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Resolve current clients.email through order.client_id for account notices, payment receipts and resignation copies; preserve original intake contact fields as historical records. Test both portalverified and adminoverride address changes before each notice path.
   - Rechecked by codex-root-independent: Root independently reopened renewals.ts94–176, email.ts187–200, portal2536–2554 and admin1025–1039. Account-change promise expressly includes notices while jobs/receipt read original order.contact_email. Historical intake should remain; resolve active client address for new notices. Distinct prior200 token invalidation.
   - Fixed: batch 23 revision 1, commit , by Codex; protected by 2 assertion(s).
+- **AUD-claude-reconciled-batch28-runtime-B-late-cancellation-charged-without-saying-so. [substantive]** — **implemented**
+  - Client portal → Registered agent service card → Cancel registered agent service (fewer than 30 days before the renewal date); the confirmation email 'Your registered agent cancellation request' — `webapp/server/email.ts:264`
+  - Reads:       <p>We received your request to cancel registered agent service${llcName ? ` for <strong>${escapeHtml(llcName)}</strong>` : ""}.</p>
+  - Claims: That the cancellation request has been received and (with the quoted rule) will be acted on; the card (PortalDashboard.tsx:360) says 'Cancellation requested on …'.
+  - True: Current cross-review: Current cancellation email only acknowledges receipt, reports renewal date and repeats general RA_CANCELLATION; routes-portal.ts:2637 passes no timeliness result. renewals.ts:118-128 evaluates saved cancellation relative to each anniversary. A late request can permit this renewal then become timely for the following year. PortalDashboard.tsx:355-389 hides renewal receipt lines in the cancellation branch. This confirms the source mechanism and missing disclosure; no new charge executed.
+  - Proposed replacement (not approved): Show a charged renewal even when cancellation exists. Give an explicit current renewal/cancellation result using approved policy. Do not state cancellation guarantees another full service year irrespective of replacement or other termination events.
+  - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current cancellation email only acknowledges receipt, reports renewal date and repeats general RA_CANCELLATION; routes-portal.ts:2637 passes no timeliness result. renewals.ts:118-128 evaluates saved cancellation relative to each anniversary. A late request can permit this renewal then become timely for the following year. PortalDashboard.tsx:355-389 hides renewal receipt lines in the cancellation branch. This confirms the source mechanism and missing disclosure; no new charge executed.
+  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
+- **AUD-claude-reconciled-batch28-reader-5-late-notice-omits-amount. [wording]** — **implemented**
+  - Registered agent renewal notice email, the version sent when the notice is late (billing hold) — the paragraph that replaces the fee sentence — `webapp/server/email.ts:110`
+  - Reads: const how = opts.billingHold ? `<p>Your renewal notice was delayed. Automatic charging is on hold; please contact us to resolve the renewal. You may also pay now using <a href="${opts.linkUrl}">this payment link</a>.</p>`
+  - Claims: This is the renewal notice the Terms promise, sent when it is late.
+  - True: Current cross-review: email.ts:110 selects billingHold text without amount; :111–115 have amount only in other branches. Entire returned HTML :117–130 adds dates/cancellation/support but no fee. renewals:138 passes amount and billingHold:late. Terms:48 promises the amount even when the reminder is delayed.
+  - Proposed replacement (not approved): Include the formatted renewal amount in the delayed-notice branch while keeping automatic billing on hold and retaining the payment/contact options.
+  - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. email.ts:110 selects billingHold text without amount; :111–115 have amount only in other branches. Entire returned HTML :117–130 adds dates/cancellation/support but no fee. renewals:138 passes amount and billingHold:late. Terms:48 promises the amount even when the reminder is delayed.
+  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
+- **AUD-claude-reconciled-batch28-runtime-B-backup-rowcounts-count-deleted-documents. [housekeeping]** — **implemented** — housekeeping
+  - The nightly backup job's report (/api/cron/db-backup log line and /api/admin/backups/run response) — `webapp/server/backup.ts:150`
+  - Reads:   const rowCounts=Object.fromEntries(BACKUP_TABLES.map(t=>[t,job!.dump.tables[t].length]));
+  - Claims: That rowCounts describes the snapshot written (routes-ops.ts:317 logs it as '[backup] <key>: <bytes> bytes' with the counts; e2e.ts:3234-3238 reads rowCounts.clients).
+  - True: Current cross-review: rowCounts is computed before document deletion filtering at157 and returned unchanged at164 after publishing the filtered snapshot. A deleted document therefore inflates the completed backup count. This is reporting mismatch, not proof of backup data loss. Historical runtime reports are corroborative; no current rerun claimed.
+  - Proposed replacement (not approved): Calculate completed counts after the final filters. Keep pending-job counts separately labeled as provisional if they are returned before completion.
+  - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. rowCounts is computed before document deletion filtering at157 and returned unchanged at164 after publishing the filtered snapshot. A deleted document therefore inflates the completed backup count. This is reporting mismatch, not proof of backup data loss. Historical runtime reports are corroborative; no current rerun claimed.
+  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 
-## Agreements and guidance — 78 open of 81
+## Agreements and guidance — 80 open of 83
 
 - **229. [A80]** — **implemented**
   - Manager-managed forms (4), Indemnification: "an act exceeding the authority conferred by Section 5.4"; 5.4 is the approval list, 5.3 the authority. Replace: "an act taken without the approval Section 5.4 requires" (both places).
@@ -2803,3 +2896,21 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Reserve the full measured signature unit before drawing its first rule, including wrapped name and optional date and entity By/name/title variants. Break before the unit if it will not fit. Preserve owner-approved tight signature spacing. Verify this exact normal fixture plus long-name and entity blocks; do not add an unconditional blank signature page.
   - Rechecked by codex-coordinator: Reopened actual frozen renderer source and inspected native pages independently: consent1/2 shows first signature rule separated from Casey name/date; manual8/9 and15/16 show stranded headers and headerless continuation. These are reproduced layout issues, not legal invalidity. Compared original ledger findings including230 and earlier heading/tail fixes; no same defect found. Corrected consent source line to372.
   - Fixed: batch 25 revision 1, commit , by Codex; protected by 2 assertion(s).
+- **AUD-claude-reconciled-batch28-runtime-B-restore-aborts-when-journal-lost. [substantive]** — **implemented**
+  - Office → Reference Library → Database backups, and docs/db-restore.md 'Restore into an empty database': recovering after the Blob store is lost — `webapp/server/restore.ts:28`
+  - Reads:   if(!data||!f.sha||hashBytes(isEncrypted(data)?unseal(data):data)!==f.sha)throw new Error(`Backup file missing or changed: ${f.path}`);
+  - Claims: LibrarySection.tsx:190-191 'Complete backups include business records, email and renewal history, and a verified manifest of retained documents'; docs/db-restore.md:59 'It fails closed if the journal, a required file, or a key is unavailable'; privacy.md:17 'We keep a deletion record so restoring an older backup does not make your deleted document available again.'
+  - True: Current cross-review: Current deletionJournal reads only deletions/ object keys (document-retention.ts:7-9); deletions write object storage17 then DB23 and remove mirror file36. Restore reads current journal15, skips its keys30, and requires every other mirror file32. Contrary to the absolute historical description, backup.ts:21-35 DOES snapshot document_deletions. But an older snapshot cannot contain later deletions; no independent post-snapshot tombstone mirror is present. With lost Blob journal and a post-snapshot completed mirror deletion, required file verification aborts before row insertion. If its mirror removal was still pending, absent tombstone information can allow restoration. Source mechanism remains; historical runtime not rerun.
+  - Proposed replacement (not approved): Durably mirror every deletion decision independently of file deletion, and consult that journal even when the old file is still available. Require a trustworthy complete journal before recovery; reconcile snapshot plus later records and verify deleted documents stay unavailable. Merely checking .deleted when a file is missing fails the pending-deletion case.
+  - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current deletionJournal reads only deletions/ object keys (document-retention.ts:7-9); deletions write object storage17 then DB23 and remove mirror file36. Restore reads current journal15, skips its keys30, and requires every other mirror file32. Contrary to the absolute historical description, backup.ts:21-35 DOES snapshot document_deletions. But an older snapshot cannot contain later deletions; no independent post-snapshot tombstone mirror is present. With lost Blob journal and a post-snapshot completed mirror deletion, required file verification aborts before row insertion. If its mirror removal was still pending, absent tombstone information can allow restoration. Source mechanism remains; historical runtime not rerun.
+  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
+- **AUD-claude-reconciled-batch28-reader-5-office-nonpayment-resignation. [substantive]** — **implemented**
+  - Office, order detail, 'Registered-agent appointment and cancellation' panel — recording 'Resignation submitted' for a client whose renewal was never paid (Terms 9(e) and 10(f) resignation for nonpayment) — `webapp/server/ra-office.ts:45`
+  - Reads: if(!o.ra_resignation_due||b.date<isoOf(o.ra_resignation_due)!)return c.json(err('The cancellation resignation is not due yet.','NOT_DUE'),400);
+  - Claims: A resignation can be recorded only when a cancellation resignation is due.
+  - True: Current cross-review: Current submitted branch requires ra_resignation_due. renewals.ts:124 sets it only in the timely-cancellation path; declined nonpayment does not set it. filed/mailed/copy require prior submission at ra-office.ts:47-59, so the office cannot record these actual events for an otherwise permitted nonpayment resignation. Terms9(e)/10(f) still describe such resignations. Current source corroborates historical reproduction; no current route rerun.
+  - Proposed replacement (not approved): Allow the office to record an actual resignation with a documented Terms ground, required event dates and existing chronology safeguards. Do not gate every actual resignation on a timely-cancellation schedule. Separately resolve any automatic scheduling or fee rule.
+  - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current submitted branch requires ra_resignation_due. renewals.ts:124 sets it only in the timely-cancellation path; declined nonpayment does not set it. filed/mailed/copy require prior submission at ra-office.ts:47-59, so the office cannot record these actual events for an otherwise permitted nonpayment resignation. Terms9(e)/10(f) still describe such resignations. Current source corroborates historical reproduction; no current route rerun.
+  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.

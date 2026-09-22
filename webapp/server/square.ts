@@ -254,3 +254,25 @@ export async function agentSquarePayment(action: 'authorize' | 'get' | 'complete
   return out.payment;
 }
 export class SquareDecline extends Error { constructor(public code: string) { super(code); } }
+
+/** Store-only card update. Stable request identities survive lost responses;
+ * this function never calls the Payments API. */
+export async function storeRenewalCard(opts:{attemptId:string;source:string;customerId:string|null;referenceId:string;email:string;name:string}):Promise<SavedCard> {
+ const key=(kind:string)=>createHash('sha256').update(`${kind}:${opts.attemptId}`).digest('hex').slice(0,40);
+ if(!env.SQUARE_ACCESS_TOKEN){
+  if(opts.source.includes('decline'))throw new SquareDecline('CARD_DECLINED');
+  return {customerId:opts.customerId||`dev-customer-${opts.referenceId}`,cardId:`dev-card-${opts.attemptId}`,last4:opts.source.includes('prepaid')?'0005':'4242',brand:'VISA',prepaid:opts.source.includes('prepaid')};
+ }
+ const post=async(path:string,body:unknown)=>{
+  const res=await fetch(API_BASE+path,{method:'POST',headers:squareHeaders(),body:JSON.stringify(body),signal:AbortSignal.timeout(30000)});
+  const out=await res.json() as {customer?:{id:string};card?:{id:string;last_4?:string;card_brand?:string;prepaid_type?:string;enabled?:boolean};errors?:{code:string}[]};
+  if(!res.ok){const code=out.errors?.[0]?.code||`HTTP_${res.status}`;if(['CARD_DECLINED','CARD_EXPIRED','CARD_TOKEN_EXPIRED','CARD_TOKEN_USED','INVALID_CARD','CARD_NOT_SUPPORTED','VERIFY_CVV_FAILURE','VERIFY_AVS_FAILURE','GENERIC_DECLINE'].includes(code))throw new SquareDecline(code);throw new Error('Card storage could not be confirmed; retry this update.');}return out;
+ };
+ const customerId=opts.customerId||(await post('/v2/customers',{idempotency_key:key('customer'),given_name:opts.name,email_address:opts.email,reference_id:opts.referenceId})).customer?.id;
+ if(!customerId)throw new Error('Card customer could not be confirmed; retry this update.');
+ const body=await post('/v2/cards',{idempotency_key:key('card'),source_id:opts.source,card:{customer_id:customerId,cardholder_name:opts.name,reference_id:opts.referenceId}});
+ if(!body.card?.id||body.card.enabled===false)throw new Error('Saved card could not be confirmed; retry this update.');
+ // Unknown prepaid classification is not positive evidence of eligibility.
+ if(!['PREPAID','NOT_PREPAID'].includes(body.card.prepaid_type||'')){await disableCard(body.card.id);throw new SquareDecline('CARD_NOT_SUPPORTED');}
+ return {customerId,cardId:body.card.id,last4:body.card.last_4||'',brand:body.card.card_brand||'',prepaid:body.card.prepaid_type==='PREPAID'};
+}

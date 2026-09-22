@@ -1,3 +1,4 @@
+import { cleanupStagedDocuments } from './s-election-package-storage';
 // Split from app.ts on 29 Aug 2026 — one domain per file, code moved
 // verbatim (the two dev test flags became shared.testHooks so they stay
 // mutable across modules). Routes register inside registerOpsRoutes(app),
@@ -297,6 +298,7 @@ app.get("/cron/purge", async (c) => {
   const secret = env.CRON_SECRET;
   if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
   if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
+  await cleanupStagedDocuments();
   const purged = await purgeExpiredSElections();
   // Rate-limit windows are minutes-to-hours; anything older than two days is
   // inert bookkeeping. Swept here so the table cannot grow without bound.
@@ -339,6 +341,7 @@ app.get("/cron/backup-continue", async (c) => {
   const { mirrorStatus } = await import('./dropbox');
   const { retryDocumentDeletions } = await import('./document-retention');
   await retryDocumentDeletions();
+  await cleanupStagedDocuments();
   const backup = await runDbBackup({resumeOnly:true,budgetMs:90000});
   const status = await mirrorStatus();
   if (!status.complete) await runFileMirror({budgetMs:90000});

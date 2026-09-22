@@ -1,3 +1,4 @@
+import { notifyContact, notifyLegalMail } from './office-notifications';
 import { addYears, isoOf as agentIso } from "./renewals";
 import { recoveryDetails, notifyTaxpayerNumbersRequired } from "./s-election-recovery";
 import { associateLegacyServices, serviceCompanyId } from "./company-scope";
@@ -23,12 +24,12 @@ import { decryptSecret } from "./crypto";
 import { createSession, rateLimit, clientIp } from "./auth";
 
 import { deleteFile, putFile, readFileStream } from "./storage";
-import { sendMail, newDocumentEmail, legalMailEmail, emailChangedEmail, serviceFulfilledClientEmail, llcFormedEmail, sElectionEinAddedEmail, sElectionEinArrivedLateEmail } from "./email";
+import { sendMail, newDocumentEmail, emailChangedEmail, serviceFulfilledClientEmail, llcFormedEmail, sElectionEinAddedEmail, sElectionEinArrivedLateEmail } from "./email";
 import { einDigits, fmtEinDisplay, isValidEin } from "../src/lib/ein";
 import { filingGroups, seriesNames, AR_SIGNER } from "./filing";
 import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, requireAdmin } from "./shared";
 import { loadSummaryRow } from "./order-summary";
-import { oaSeed, purgeExpiredSElections, postSElectionPackage, isoDate, fmtDate, type SElectionStoredDetails } from "./routes-portal";
+import { oaSeed, purgeExpiredSElections, postSElectionPackage, isoDate, type SElectionStoredDetails } from "./routes-portal";
 import { evaluate2553Timing } from "../src/lib/form2553Timing";
 import { unpackSsns } from "../src/lib/jointOwner";
 import { easternDateIso } from "./datetime";
@@ -887,9 +888,18 @@ app.get("/admin/contact-messages", async (c) => {
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
   const rows = await db.query(
-    "SELECT id, name, email, message, created_at FROM contact_messages ORDER BY created_at DESC LIMIT 200",
+    "SELECT id, name, email, message, created_at, notice_status, notice_error, notice_sent_at FROM contact_messages ORDER BY created_at DESC LIMIT 200",
   );
   return c.json({ data: rows });
+});
+
+app.post('/admin/contact-messages/:id/resend', async c=>{
+ if(!await requireAdmin(c))return c.json(err('Not signed in','UNAUTHENTICATED'),401);
+ return c.json({data:{notified:await notifyContact(c.req.param('id'))}});
+});
+app.post('/admin/documents/:id/resend-notice', async c=>{
+ if(!await requireAdmin(c))return c.json(err('Not signed in','UNAUTHENTICATED'),401);
+ return c.json({data:{notified:await notifyLegalMail(c.req.param('id'))}});
 });
 
 app.get("/admin/clients", async (c) => {
@@ -901,7 +911,8 @@ app.get("/admin/clients", async (c) => {
   // client who requested cancellation stays listed until we are replaced as
   // agent of record (the cancellation chip carries that state).
   const rows = await db.query(
-    `SELECT cl.id, cl.email, cl.name, cl.created_at, cl.ra_cancellation_requested_at,
+    `SELECT cl.id, cl.email, cl.name, cl.created_at,
+            (SELECT min(o.ra_cancellation_requested_at) FROM orders o WHERE o.client_id=cl.id AND o.paid_at IS NOT NULL AND o.payload->'registeredAgent'->>'choice'='SERVICE' AND (o.ra_ended_date IS NULL OR o.ra_ended_date > (now() AT TIME ZONE 'America/New_York')::date)) AS ra_cancellation_requested_at,
             (cl.password_hash IS NOT NULL) AS has_password,
             -- The name in parts, from the account's earliest paid order (the
             -- Clients tab shows and sorts by last name — Adam, 10 Sep 2026).
@@ -914,7 +925,7 @@ app.get("/admin/clients", async (c) => {
             (SELECT COALESCE(jsonb_agg(DISTINCT (o.llc_name || CASE WHEN o.ra_renewal_date IS NULL AND o.ra_cancellation_requested_at IS NULL THEN '' ELSE ' (' || concat_ws(' — ', 'renews ' || to_char(o.ra_renewal_date, 'FMMon FMDD, YYYY'), 'cancellation requested ' || to_char(o.ra_cancellation_requested_at, 'FMMon FMDD, YYYY')) || ')' END)), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
-                AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_llcs,
+                AND o.payload->'registeredAgent'->>'choice' = 'SERVICE' AND (o.ra_ended_date IS NULL OR o.ra_ended_date > (now() AT TIME ZONE 'America/New_York')::date)) AS ra_llcs,
             -- The card kept for each agent company and its latest renewal (16 Sep 2026).
             (SELECT COALESCE(jsonb_agg(jsonb_build_object(
                 'order_id', o.id, 'consent', o.payload->'registeredAgent'->'renewalCardConsent', 'resignation_due', o.ra_resignation_due, 'resignation_submitted', o.ra_resignation_submitted, 'llc_name', o.llc_name, 'card_status', o.card_status, 'card_last4', o.card_last4, 'card_brand', o.card_brand, 'card_note', o.card_note,
@@ -1504,7 +1515,7 @@ app.get("/admin/clients/:id/documents", async (c) => {
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
   const rows = await db.query(
-    "SELECT id, kind, title, size_bytes, created_at FROM documents WHERE client_id = $1 ORDER BY created_at DESC",
+    "SELECT id, kind, title, size_bytes, created_at, notice_status, notice_error, notice_sent_at, notice_recipient FROM documents WHERE deleted_at IS NULL AND client_id = $1 ORDER BY created_at DESC",
     [c.req.param("id")],
   );
   return c.json({ data: rows });
@@ -1570,13 +1581,10 @@ app.post("/admin/documents", async (c) => {
   );
 
   let notified = false;
-  if (notify) {
-    // Legal mail says what arrived and that the clock is running; a package
-    // keeps the plain new-document notice (Adam, 10 Sep 2026).
-    const mail =
-      kind === "legal_mail"
-        ? legalMailEmail({ clientName: clients[0].name, title, portalUrl: `${env.PUBLIC_BASE_URL}/portal`, receivedOn: fmtDate(receivedOn) })
-        : newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
+  if (kind === "legal_mail") {
+    notified = await notifyLegalMail(rows[0].id).catch(()=>false);
+  } else if (notify) {
+    const mail = newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
     notified = await sendMail({ to: clients[0].email, ...mail }).then(
       () => true,
       (e) => {

@@ -155,3 +155,27 @@ export async function runFileMirror(options: {budgetMs?:number} = {}): Promise<{
  }finally{await db.query("UPDATE backup_progress SET lease_until=NULL WHERE id='mirror'");}
  return {mirrored,failed,skipped:false,complete};
 }
+
+/** Versioned object operations for the deletion journal. An old writer cannot
+ * overwrite a concurrently appended decision. Missing is distinct from failure. */
+export async function readMirrorVersion(path:string):Promise<{data:Buffer;rev:string}|null>{
+ if(!configured()){const data=await readMirror(path);return data?{data,rev:hashBytes(data)}:null;}
+ const r=await fetch('https://content.dropboxapi.com/2/files/download',{method:'POST',headers:{Authorization:`Bearer ${await accessToken()}`,'Dropbox-API-Arg':headerSafeJson({path})},signal:AbortSignal.timeout(20000)});
+ if(r.status===409&&(await r.text()).includes('not_found'))return null;
+ if(!r.ok)throw new Error(`Deletion journal read failed (${r.status})`);
+ const meta=JSON.parse(r.headers.get('dropbox-api-result')||'null');if(!meta?.rev)throw new Error('Deletion journal revision missing');
+ return {data:Buffer.from(await r.arrayBuffer()),rev:meta.rev};
+}
+export async function compareWriteMirror(path:string,data:Buffer,rev:string|null):Promise<boolean>{
+ if(!configured()){
+  if(env.isProd)throw new Error('Dropbox is not connected');
+  const fs=await import('node:fs'),{dirname}=await import('node:path');const file=await devMirror(path);fs.mkdirSync(dirname(file),{recursive:true});
+  // No await while holding the local lock; another fixture process cannot
+  // interleave its read/compare/rename. A stale lock refuses rather than guesses.
+  const lock=file+'.lock';let handle:number;try{handle=fs.openSync(lock,'wx');}catch(e){if((e as NodeJS.ErrnoException).code==='EEXIST')return false;throw e;}
+  try{const current=fs.existsSync(file)?fs.readFileSync(file):null;if((current?hashBytes(current):null)!==rev)return false;const tmp=file+'.'+crypto.randomUUID();fs.writeFileSync(tmp,data);fs.renameSync(tmp,file);return true;}
+  finally{fs.closeSync(handle);fs.unlinkSync(lock);}
+ }
+ const r=await fetch('https://content.dropboxapi.com/2/files/upload',{method:'POST',headers:{Authorization:`Bearer ${await accessToken()}`,'Content-Type':'application/octet-stream','Dropbox-API-Arg':headerSafeJson({path,mode:rev?{'.tag':'update',update:rev}:{'.tag':'add'},autorename:false,strict_conflict:true,mute:true})},body:new Uint8Array(data),signal:AbortSignal.timeout(20000)});
+ if(r.status===409)return false;if(!r.ok)throw new Error(`Deletion journal write failed (${r.status})`);return true;
+}

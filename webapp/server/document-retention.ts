@@ -1,3 +1,4 @@
+import { ensureDeletionMirror, appendDeletionMirror, readDeletionMirror } from './backup-deletions';
 /** An append-only deletion marker outside database snapshots prevents an old
  * restore from reviving a client's deleted document. Cleanup is retryable. */
 import { getDb } from './db';
@@ -13,6 +14,8 @@ export async function requestDocumentDeletion(id:string,clientId:string):Promise
  const [d]=await db.query<{id:string;storage_key:string;mirror_path:string|null;title:string;kind:string;llc_name:string|null;email:string|null;meta:{sensitive?:boolean}|null}>(`SELECT d.*,o.llc_name,c.email FROM documents d LEFT JOIN orders o ON o.id=d.order_id AND o.client_id=d.client_id LEFT JOIN clients c ON c.id=d.client_id WHERE d.id=$1 AND d.client_id=$2`,[id,clientId]);
  if(!d || !d.meta?.sensitive)return false;
  const record:Deletion={storageKey:d.storage_key,documentId:d.id,mirrorPath:d.mirror_path||documentMirrorPath(d),requestedAt:new Date().toISOString()};
+ await ensureDeletionMirror(await deletionJournal());
+ await appendDeletionMirror(record);
  const path=deletionPath(d.storage_key);
  if(!await readObject(path))await putObject(path,Buffer.from(JSON.stringify(record)));
  await registerDeletion(record);
@@ -29,7 +32,13 @@ export async function retryDocumentDeletions(options:{documentId?:string;budgetM
  const db=await getDb();
  // Replay the external journal after a restore, including previously completed
  // deletions absent from the restored database. No existing test-copy cleanup.
- if(!options.documentId)for(const r of await deletionJournal())await registerDeletion(r);
+ if(!options.documentId){
+  const local=await deletionJournal();await ensureDeletionMirror(local);
+  for(const r of await readDeletionMirror()){
+   if(!await readObject(deletionPath(r.storageKey)))await putObject(deletionPath(r.storageKey),Buffer.from(JSON.stringify(r)),true);
+   await registerDeletion(r);
+  }
+ }
  const rows=await db.query<{storage_key:string;mirror_path:string|null}>('SELECT storage_key,mirror_path FROM document_deletions WHERE completed_at IS NULL AND ($1::text IS NULL OR document_id::text=$1)',[options.documentId||null]);
  const started=Date.now();
  for(const r of rows){if(Date.now()-started>=(options.budgetMs??30000))break;try{

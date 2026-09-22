@@ -1,3 +1,5 @@
+import { ensureDeletionMirror, readDeletionMirror } from './backup-deletions';
+import { deletionJournal } from './document-retention';
 import { isEncrypted, unseal } from "./encryption";
 import { gzipSync } from "node:zlib";
 import { env } from "./env";
@@ -94,7 +96,7 @@ export async function listBackups(): Promise<BackupInfo[]> {
  *  you needed. The admin panel shows the newest dump's date so a stall is
  *  visible. */
 
-export interface BackupDump {version:1; dumpedAt:string; tables:Record<string,Record<string,unknown>[]>; files:BackupFile[]; fileManifestVersion:1}
+export interface BackupDump {version:1; dumpedAt:string; tables:Record<string,Record<string,unknown>[]>; files:BackupFile[]; fileManifestVersion:1; deletionCheckpoint?:string[]}
 interface BackupJob {key:string; dump:BackupDump; done:Record<string,string>; errors:Record<string,string>}
 const JOB='backup-jobs/current.json';
 const backupKey=(iso:string)=>`db-${iso.slice(0,10)}-${iso.slice(11, 19).replace(/:/g, "")}.json.gz`;
@@ -113,11 +115,12 @@ export async function backupProgress(){
  const raw=await readObject(JOB);const j:BackupJob|null=raw?JSON.parse(raw.toString()):null;
  return {complete:!!r?.completed_at&&!r.error,startedAt:r?.started_at||null,completedAt:r?.completed_at||null,pending:j?j.dump.files.filter(f=>!j.done[f.storageKey]).length:0,errors:j?Object.values(j.errors):[],error:r?.error||null};
 }
-export async function runDbBackup(options:{resumeOnly?:boolean;budgetMs?:number}={}):Promise<{key:string;sizeBytes:number;rowCounts:Record<string,number>;complete:boolean;pending:number}>{
+export async function runDbBackup(options:{resumeOnly?:boolean;budgetMs?:number}={}):Promise<{key:string;sizeBytes:number;rowCounts:Record<string,number>;provisionalRowCounts?:Record<string,number>;complete:boolean;pending:number}>{
  const db=await getDb();await db.query("INSERT INTO backup_progress(id) VALUES('database') ON CONFLICT DO NOTHING");
  const locked=await db.query(`UPDATE backup_progress SET lease_until=now()+interval '10 minutes' WHERE id='database' AND (lease_until IS NULL OR lease_until<now()) RETURNING id`);
  if(!locked.length)return {key:'',sizeBytes:0,rowCounts:{},complete:false,pending:0};
  try{
+  await ensureDeletionMirror(await deletionJournal());
   const saved=await readObject(JOB);let job:BackupJob|null=saved?JSON.parse(saved.toString()):null;
   if(!job&&options.resumeOnly)return {key:'',sizeBytes:0,rowCounts:{},complete:(await backupProgress()).complete,pending:0};
   if(!job){
@@ -147,14 +150,16 @@ export async function runDbBackup(options:{resumeOnly?:boolean;budgetMs?:number}
    await putObject(JOB,Buffer.from(JSON.stringify(job)),true);
   }
   const pending=job.dump.files.filter(f=>!job!.done[f.storageKey]).length;
-  const rowCounts=Object.fromEntries(BACKUP_TABLES.map(t=>[t,job!.dump.tables[t].length]));
-  if(pending){await db.query("UPDATE backup_progress SET error=$1 WHERE id='database'",[`${pending} file(s) pending; automatic continuation scheduled`]);return {key:job.key,sizeBytes:0,rowCounts,complete:false,pending};}
+  let rowCounts=Object.fromEntries(BACKUP_TABLES.map(t=>[t,job!.dump.tables[t].length]));
+  if(pending){await db.query("UPDATE backup_progress SET error=$1 WHERE id='database'",[`${pending} file(s) pending; automatic continuation scheduled`]);return {key:job.key,sizeBytes:0,rowCounts:{},provisionalRowCounts:rowCounts,complete:false,pending};}
   // Deletions may arrive after a file was verified. Omit them from the final
   // manifest and rows; a later deletion is additionally enforced on restore.
   const deleted=new Set<string>();
   for(const f of job.dump.files)if(await storageWasDeleted(f.storageKey))deleted.add(f.storageKey);
   job.dump.files=job.dump.files.filter(f=>!deleted.has(f.storageKey));
   job.dump.tables.documents=job.dump.tables.documents.filter(d=>!d.deleted_at&&!deleted.has(String(d.storage_key)));
+  job.dump.deletionCheckpoint=(await readDeletionMirror()).map(r=>r.storageKey);
+  rowCounts=Object.fromEntries(BACKUP_TABLES.map(t=>[t,job!.dump.tables[t].length]));
   const data=gzipSync(Buffer.from(JSON.stringify(job.dump)));
   const existing=await readObject(PREFIX+job.key);
   if(existing&&!existing.equals(data))throw new Error('Refusing to overwrite a different completed backup');

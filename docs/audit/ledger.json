@@ -439,24 +439,114 @@
               "batch": "27",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "superseded by approved replacement",
+              "batch": "28",
+              "revision": 1,
+              "note": "prior fix 27 r3 at ; approved work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.966Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "superseded by approved replacement",
+              "batch": "28",
+              "revision": 2,
+              "note": "prior fix 27 r3 at ; approved work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b"
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
             }
           ],
-          "batch": "27",
+          "batch": "28",
+          "supersessions": [
+            {
+              "prior": {
+                "batch": "27",
+                "revision": 3,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/content/terms.md",
+                    "text": "Last updated: **September 20, 2026**"
+                  },
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/content/privacy.md",
+                    "text": "Last updated: **September 19, 2026**"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "28",
+              "revision": 1,
+              "hash": "1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57"
+            },
+            {
+              "prior": {
+                "batch": "27",
+                "revision": 3,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/content/terms.md",
+                    "text": "Last updated: **September 20, 2026**"
+                  },
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/content/privacy.md",
+                    "text": "Last updated: **September 19, 2026**"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "hash": "262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b"
+            }
+          ],
           "fix": {
-            "batch": "27",
-            "revision": 3,
+            "batch": "28",
+            "revision": 2,
             "commit": "",
-            "doneBy": "Codex",
+            "doneBy": "Codex Astra",
             "assertions": [
               {
                 "kind": "present",
                 "file": "webapp/src/content/terms.md",
-                "text": "Last updated: **September 20, 2026**"
+                "text": "Last updated: **September 21, 2026**"
               },
               {
                 "kind": "present",
                 "file": "webapp/src/content/privacy.md",
-                "text": "Last updated: **September 19, 2026**"
+                "text": "Last updated: **September 21, 2026**"
               }
             ]
           }
@@ -6925,19 +7015,99 @@
               "batch": "27",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T01:21:52.749Z",
+              "event": "superseded by approved replacement",
+              "batch": "28",
+              "revision": 1,
+              "note": "prior fix 27 r3 at ; approved work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57"
+            },
+            {
+              "at": "2026-09-22T01:21:52.749Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.967Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "superseded by approved replacement",
+              "batch": "28",
+              "revision": 2,
+              "note": "prior fix 27 r3 at ; approved work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b"
+            },
+            {
+              "at": "2026-09-22T02:31:41.435Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
             }
           ],
-          "batch": "27",
+          "batch": "28",
+          "supersessions": [
+            {
+              "prior": {
+                "batch": "27",
+                "revision": 3,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "docs/facts.md",
+                    "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts — `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md — `currently $99`\n- where: webapp/src/content/terms.md — `60 days before your renewal date`\n- where: webapp/src/content/terms.md — `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md — `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts — `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts — `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts — `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts — `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md — `add a $50 series per property`\n- where: docs/owners-manual.md — `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "28",
+              "revision": 1,
+              "hash": "1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57"
+            },
+            {
+              "prior": {
+                "batch": "27",
+                "revision": 3,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "docs/facts.md",
+                    "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts — `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md — `currently $99`\n- where: webapp/src/content/terms.md — `60 days before your renewal date`\n- where: webapp/src/content/terms.md — `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md — `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts — `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts — `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts — `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts — `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md — `add a $50 series per property`\n- where: docs/owners-manual.md — `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "hash": "262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b"
+            }
+          ],
           "fix": {
-            "batch": "27",
-            "revision": 3,
+            "batch": "28",
+            "revision": 2,
             "commit": "",
-            "doneBy": "Codex",
+            "doneBy": "Codex Astra",
             "assertions": [
               {
                 "kind": "present",
                 "file": "docs/facts.md",
-                "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts — `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md — `currently $99`\n- where: webapp/src/content/terms.md — `60 days before your renewal date`\n- where: webapp/src/content/terms.md — `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md — `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts — `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts — `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts — `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts — `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md — `add a $50 series per property`\n- where: docs/owners-manual.md — `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
+                "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder scheduled 70 days before renewal; automatic charging held if sent less than 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts — `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md — `currently $99`\n- where: webapp/src/content/terms.md — `70 days before your renewal date`\n- where: webapp/src/content/terms.md — `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md — `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts — `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts — `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts — `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts — `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md — `add a $50 series per property`\n- where: docs/owners-manual.md — `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
               }
             ]
           }
@@ -13157,19 +13327,60 @@
               "batch": "07",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T02:31:41.435Z",
+              "event": "superseded by approved replacement",
+              "batch": "28",
+              "revision": 2,
+              "note": "prior fix 07 r1 at ; approved work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b"
+            },
+            {
+              "at": "2026-09-22T02:31:41.435Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
             }
           ],
-          "batch": "07",
+          "batch": "28",
+          "supersessions": [
+            {
+              "prior": {
+                "batch": "07",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "walk",
+                    "label": "batch07 194: notice precedes cancellation deadline by thirty days"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "hash": "262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b"
+            }
+          ],
           "fix": {
-            "batch": "07",
-            "revision": 1,
+            "batch": "28",
+            "revision": 2,
             "commit": "",
-            "doneBy": "Codex",
+            "doneBy": "Codex Astra",
             "assertions": [
               {
                 "kind": "check",
-                "suite": "walk",
-                "label": "batch07 194: notice precedes cancellation deadline by thirty days"
+                "suite": "server",
+                "label": "batch28 A06"
               }
             ]
           }
@@ -19353,19 +19564,151 @@
               "batch": "05",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "superseded by approved replacement",
+              "batch": "28",
+              "revision": 1,
+              "note": "prior fix 05 r1 at ; approved work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57"
+            },
+            {
+              "at": "2026-09-22T01:21:52.749Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.967Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "superseded by approved replacement",
+              "batch": "28",
+              "revision": 2,
+              "note": "prior fix 05 r1 at ; approved work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b"
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
             }
           ],
-          "batch": "05",
+          "batch": "28",
+          "supersessions": [
+            {
+              "prior": {
+                "batch": "05",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "webapp/server/routes-portal.ts",
+                    "text": "  const stored = await putFile(\n    `${title.replace(/[^\\w-]+/g, \"_\")}_${stampForFilename()}.pdf`,\n    buf,\n    \"application/pdf\",\n    true,\n  );\n  // The package belongs to the company the order was placed for (Adam,\n  // 7 Sep 2026): without it, it showed under every tab of the account.\n  const docRows = await db.query<{ id: string }>(\n    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)\n     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4, $6) RETURNING id`,\n    [so.client_id, title, stored.storageKey, stored.sizeBytes, companyId, JSON.stringify({sensitive:true,serviceOrderId:so.id})],\n  );\n  merged.documentId = docRows[0].id;\n\n  // fulfilled_at starts the two-week clock, and a re-edit must not extend it.\n  await db.query(\n    `UPDATE service_orders\n        SET details = $1, ein_secret = $2, status = 'fulfilled',\n            fulfilled_at = COALESCE(fulfilled_at, now())\n      WHERE id = $3`,\n    [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id],\n  );\n  if (args.priorDocumentId) await requestDocumentDeletion(args.priorDocumentId, so.client_id);\n"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "28",
+              "revision": 1,
+              "hash": "1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57"
+            },
+            {
+              "prior": {
+                "batch": "05",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "webapp/server/routes-portal.ts",
+                    "text": "  const stored = await putFile(\n    `${title.replace(/[^\\w-]+/g, \"_\")}_${stampForFilename()}.pdf`,\n    buf,\n    \"application/pdf\",\n    true,\n  );\n  // The package belongs to the company the order was placed for (Adam,\n  // 7 Sep 2026): without it, it showed under every tab of the account.\n  const docRows = await db.query<{ id: string }>(\n    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)\n     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4, $6) RETURNING id`,\n    [so.client_id, title, stored.storageKey, stored.sizeBytes, companyId, JSON.stringify({sensitive:true,serviceOrderId:so.id})],\n  );\n  merged.documentId = docRows[0].id;\n\n  // fulfilled_at starts the two-week clock, and a re-edit must not extend it.\n  await db.query(\n    `UPDATE service_orders\n        SET details = $1, ein_secret = $2, status = 'fulfilled',\n            fulfilled_at = COALESCE(fulfilled_at, now())\n      WHERE id = $3`,\n    [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id],\n  );\n  if (args.priorDocumentId) await requestDocumentDeletion(args.priorDocumentId, so.client_id);\n"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "hash": "262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b"
+            }
+          ],
           "fix": {
-            "batch": "05",
-            "revision": 1,
+            "batch": "28",
+            "revision": 2,
             "commit": "",
-            "doneBy": "Codex",
+            "doneBy": "Codex Astra",
             "assertions": [
               {
-                "kind": "present",
-                "file": "webapp/server/routes-portal.ts",
-                "text": "  const stored = await putFile(\n    `${title.replace(/[^\\w-]+/g, \"_\")}_${stampForFilename()}.pdf`,\n    buf,\n    \"application/pdf\",\n    true,\n  );\n  // The package belongs to the company the order was placed for (Adam,\n  // 7 Sep 2026): without it, it showed under every tab of the account.\n  const docRows = await db.query<{ id: string }>(\n    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)\n     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4, $6) RETURNING id`,\n    [so.client_id, title, stored.storageKey, stored.sizeBytes, companyId, JSON.stringify({sensitive:true,serviceOrderId:so.id})],\n  );\n  merged.documentId = docRows[0].id;\n\n  // fulfilled_at starts the two-week clock, and a re-edit must not extend it.\n  await db.query(\n    `UPDATE service_orders\n        SET details = $1, ein_secret = $2, status = 'fulfilled',\n            fulfilled_at = COALESCE(fulfilled_at, now())\n      WHERE id = $3`,\n    [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id],\n  );\n  if (args.priorDocumentId) await requestDocumentDeletion(args.priorDocumentId, so.client_id);\n"
+                "kind": "check",
+                "suite": "server",
+                "label": "batch28 A09"
+              }
+            ]
+          }
+        },
+        {
+          "key": "staged-cleanup",
+          "scope": "Remove only an unsuccessful newly staged S-election replacement, preserving the existing usable package and recorded Batch05 repair.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T00:25:40.761Z",
+              "event": "recorded by migration 003-batch28-staged-package"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.966Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
+            }
+          ],
+          "batch": "28",
+          "fix": {
+            "batch": "28",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex Astra",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch28 A09"
               }
             ]
           }
@@ -24772,6 +25115,656 @@
           }
         }
       ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-restore-aborts-when-journal-lost",
+      "tag": "substantive",
+      "area": "Agreements and guidance",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch28.json finding runtime-B-restore-aborts-when-journal-lost",
+      "text": "Office → Reference Library → Database backups, and docs/db-restore.md 'Restore into an empty database': recovering after the Blob store is lost — `webapp/server/restore.ts:28`\nReads:   if(!data||!f.sha||hashBytes(isEncrypted(data)?unseal(data):data)!==f.sha)throw new Error(`Backup file missing or changed: ${f.path}`);\nClaims: LibrarySection.tsx:190-191 'Complete backups include business records, email and renewal history, and a verified manifest of retained documents'; docs/db-restore.md:59 'It fails closed if the journal, a required file, or a key is unavailable'; privacy.md:17 'We keep a deletion record so restoring an older backup does not make your deleted document available again.'\nTrue: Current cross-review: Current deletionJournal reads only deletions/ object keys (document-retention.ts:7-9); deletions write object storage17 then DB23 and remove mirror file36. Restore reads current journal15, skips its keys30, and requires every other mirror file32. Contrary to the absolute historical description, backup.ts:21-35 DOES snapshot document_deletions. But an older snapshot cannot contain later deletions; no independent post-snapshot tombstone mirror is present. With lost Blob journal and a post-snapshot completed mirror deletion, required file verification aborts before row insertion. If its mirror removal was still pending, absent tombstone information can allow restoration. Source mechanism remains; historical runtime not rerun.\nProposed replacement (not approved): Durably mirror every deletion decision independently of file deletion, and consult that journal even when the old file is still available. Require a trustworthy complete journal before recovery; reconcile snapshot plus later records and verify deleted documents stay unavailable. Merely checking .deleted when a file is missing fails the pending-deletion case.\nRechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current deletionJournal reads only deletions/ object keys (document-retention.ts:7-9); deletions write object storage17 then DB23 and remove mirror file36. Restore reads current journal15, skips its keys30, and requires every other mirror file32. Contrary to the absolute historical description, backup.ts:21-35 DOES snapshot document_deletions. But an older snapshot cannot contain later deletions; no independent post-snapshot tombstone mirror is present. With lost Blob journal and a post-snapshot completed mirror deletion, required file verification aborts before row insertion. If its mirror removal was still pending, absent tombstone information can allow restoration. Source mechanism remains; historical runtime not rerun.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T23:43:01.725194+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch28 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.966Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
+            }
+          ],
+          "batch": "28",
+          "fix": {
+            "batch": "28",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex Astra",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch28 A01"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-legal-mail-notice-lost-with-no-resend",
+      "tag": "substantive",
+      "area": "Office",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch28.json finding runtime-B-legal-mail-notice-lost-with-no-resend",
+      "text": "Office → Clients → Upload → Legal mail (and other documents) when the email provider fails; Terms 10(b) — `webapp/server/routes-admin.ts:1565`\nReads:     notified = await sendMail({ to: clients[0].email, ...mail }).then(\nClaims: terms.md:59: 'Our sole obligations as registered agent are to accept service of process… to post scanned copies to your client portal, and to send a notification email to the address on file.'; AdminDashboard.tsx:362: 'The client is emailed the moment legal mail is posted.'\nTrue: Current cross-review: Current upload stores the document at1565-1570 then records notified false when sending rejects at1580-1585. Search of all routes in routes-admin.ts found no existing-document notify route; current UI toast is transient. Uploading again is not a retry of the same document. Existing email logs record failures, but matching only a subject cannot reliably associate a generic new-document subject with one specific document.\nProposed replacement (not approved): Add an authenticated office resend action keyed to document ID, preserve legal-mail context and current recipient, and retain delivery status keyed to that document. Reuse the existing stored document; report send acceptance truthfully.\nRechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current upload stores the document at1565-1570 then records notified false when sending rejects at1580-1585. Search of all routes in routes-admin.ts found no existing-document notify route; current UI toast is transient. Uploading again is not a retry of the same document. Existing email logs record failures, but matching only a subject cannot reliably associate a generic new-document subject with one specific document.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T23:43:01.725194+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch28 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.966Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
+            }
+          ],
+          "batch": "28",
+          "fix": {
+            "batch": "28",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex Astra",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch28 A02"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-contact-form-fails-after-storing",
+      "tag": "substantive",
+      "area": "Order form and payment",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch28.json finding runtime-B-contact-form-fails-after-storing",
+      "text": "Contact page → Send, when the office email cannot be sent — `webapp/server/routes-payments.ts:663`\nReads:     await sendMail({\nClaims: routes-payments.ts:637-640 (comment): 'Now: stored (and so backed up nightly), emailed to the notify address, and acknowledged only after both.'\nTrue: Current cross-review: Current handler inserts contact_messages657-660, then awaits sendMail663-668 without catch. A transport exception escapes before the success response670. The office contact-message listing still exists in routes-admin.ts:883 onward. Retrying can insert a second copy. No current provider failure injection was run.\nProposed replacement (not approved): Acknowledge durable message receipt even when the separate office notification fails, and retain a visible retryable delivery failure for the office. Update the comment that currently promises acknowledgment only after both. Idempotency is useful if added, but no claim of exactly-once delivery is warranted.\nRechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current handler inserts contact_messages657-660, then awaits sendMail663-668 without catch. A transport exception escapes before the success response670. The office contact-message listing still exists in routes-admin.ts:883 onward. Retrying can insert a second copy. No current provider failure injection was run.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T23:43:01.725194+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch28 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.966Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
+            }
+          ],
+          "batch": "28",
+          "fix": {
+            "batch": "28",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex Astra",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch28 A03"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-reader-5-office-nonpayment-resignation",
+      "tag": "substantive",
+      "area": "Agreements and guidance",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch28.json finding reader-5-office-nonpayment-resignation",
+      "text": "Office, order detail, 'Registered-agent appointment and cancellation' panel — recording 'Resignation submitted' for a client whose renewal was never paid (Terms 9(e) and 10(f) resignation for nonpayment) — `webapp/server/ra-office.ts:45`\nReads: if(!o.ra_resignation_due||b.date<isoOf(o.ra_resignation_due)!)return c.json(err('The cancellation resignation is not due yet.','NOT_DUE'),400);\nClaims: A resignation can be recorded only when a cancellation resignation is due.\nTrue: Current cross-review: Current submitted branch requires ra_resignation_due. renewals.ts:124 sets it only in the timely-cancellation path; declined nonpayment does not set it. filed/mailed/copy require prior submission at ra-office.ts:47-59, so the office cannot record these actual events for an otherwise permitted nonpayment resignation. Terms9(e)/10(f) still describe such resignations. Current source corroborates historical reproduction; no current route rerun.\nProposed replacement (not approved): Allow the office to record an actual resignation with a documented Terms ground, required event dates and existing chronology safeguards. Do not gate every actual resignation on a timely-cancellation schedule. Separately resolve any automatic scheduling or fee rule.\nRechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current submitted branch requires ra_resignation_due. renewals.ts:124 sets it only in the timely-cancellation path; declined nonpayment does not set it. filed/mailed/copy require prior submission at ra-office.ts:47-59, so the office cannot record these actual events for an otherwise permitted nonpayment resignation. Terms9(e)/10(f) still describe such resignations. Current source corroborates historical reproduction; no current route rerun.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T23:43:01.725194+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch28 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.966Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
+            }
+          ],
+          "batch": "28",
+          "fix": {
+            "batch": "28",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex Astra",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch28 A04"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-late-cancellation-charged-without-saying-so",
+      "tag": "substantive",
+      "area": "Emails and jobs",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch28.json finding runtime-B-late-cancellation-charged-without-saying-so",
+      "text": "Client portal → Registered agent service card → Cancel registered agent service (fewer than 30 days before the renewal date); the confirmation email 'Your registered agent cancellation request' — `webapp/server/email.ts:264`\nReads:       <p>We received your request to cancel registered agent service${llcName ? ` for <strong>${escapeHtml(llcName)}</strong>` : \"\"}.</p>\nClaims: That the cancellation request has been received and (with the quoted rule) will be acted on; the card (PortalDashboard.tsx:360) says 'Cancellation requested on …'.\nTrue: Current cross-review: Current cancellation email only acknowledges receipt, reports renewal date and repeats general RA_CANCELLATION; routes-portal.ts:2637 passes no timeliness result. renewals.ts:118-128 evaluates saved cancellation relative to each anniversary. A late request can permit this renewal then become timely for the following year. PortalDashboard.tsx:355-389 hides renewal receipt lines in the cancellation branch. This confirms the source mechanism and missing disclosure; no new charge executed.\nProposed replacement (not approved): Show a charged renewal even when cancellation exists. Give an explicit current renewal/cancellation result using approved policy. Do not state cancellation guarantees another full service year irrespective of replacement or other termination events.\nRechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current cancellation email only acknowledges receipt, reports renewal date and repeats general RA_CANCELLATION; routes-portal.ts:2637 passes no timeliness result. renewals.ts:118-128 evaluates saved cancellation relative to each anniversary. A late request can permit this renewal then become timely for the following year. PortalDashboard.tsx:355-389 hides renewal receipt lines in the cancellation branch. This confirms the source mechanism and missing disclosure; no new charge executed.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T23:43:01.725194+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch28 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.966Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
+            }
+          ],
+          "batch": "28",
+          "fix": {
+            "batch": "28",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex Astra",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch28 A05"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-reader-5-late-notice-omits-amount",
+      "tag": "wording",
+      "area": "Emails and jobs",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch28.json finding reader-5-late-notice-omits-amount",
+      "text": "Registered agent renewal notice email, the version sent when the notice is late (billing hold) — the paragraph that replaces the fee sentence — `webapp/server/email.ts:110`\nReads: const how = opts.billingHold ? `<p>Your renewal notice was delayed. Automatic charging is on hold; please contact us to resolve the renewal. You may also pay now using <a href=\"${opts.linkUrl}\">this payment link</a>.</p>`\nClaims: This is the renewal notice the Terms promise, sent when it is late.\nTrue: Current cross-review: email.ts:110 selects billingHold text without amount; :111–115 have amount only in other branches. Entire returned HTML :117–130 adds dates/cancellation/support but no fee. renewals:138 passes amount and billingHold:late. Terms:48 promises the amount even when the reminder is delayed.\nProposed replacement (not approved): Include the formatted renewal amount in the delayed-notice branch while keeping automatic billing on hold and retaining the payment/contact options.\nRechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. email.ts:110 selects billingHold text without amount; :111–115 have amount only in other branches. Entire returned HTML :117–130 adds dates/cancellation/support but no fee. renewals:138 passes amount and billingHold:late. Terms:48 promises the amount even when the reminder is delayed.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T23:43:01.725194+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch28 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.966Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
+            }
+          ],
+          "batch": "28",
+          "fix": {
+            "batch": "28",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex Astra",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch28 A06"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-reader-5-clients-tab-cancel-chip",
+      "tag": "wording",
+      "area": "Office",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch28.json finding reader-5-clients-tab-cancel-chip",
+      "text": "Office, Clients tab — the amber 'RA cancel requested …' chip beside a client's name — `webapp/server/routes-admin.ts:895`\nReads: `SELECT cl.id, cl.email, cl.name, cl.created_at, cl.ra_cancellation_requested_at,\nClaims: The client-level column says whether a cancellation of registered agent service has been requested.\nTrue: Current cross-review: routes-admin:904 reads clients.ra_cancellation_requested_at; AdminDashboard:562–564 renders it. Portal route :2635 writes the legacy client column; ra-office:38–40 records email cancellations on orders only. Proposed subquery fixes the missing office event but still collapses multiple companies and drops an appointment whose ra_ended_date is set to a future effective date (ra-office filed action sets date +31). An IS NULL test is not equivalent to not ended yet.\nProposed replacement (not approved): Derive cancellation summaries from company order records and identify the affected company; if keeping an account summary, use a clearly defined active/pending-company rule that handles a future appointment-end date.\nRechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. routes-admin:904 reads clients.ra_cancellation_requested_at; AdminDashboard:562–564 renders it. Portal route :2635 writes the legacy client column; ra-office:38–40 records email cancellations on orders only. Proposed subquery fixes the missing office event but still collapses multiple companies and drops an appointment whose ra_ended_date is set to a future effective date (ra-office filed action sets date +31). An IS NULL test is not equivalent to not ended yet.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T23:43:01.725194+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch28 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.966Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
+            }
+          ],
+          "batch": "28",
+          "fix": {
+            "batch": "28",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex Astra",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch28 A07"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-backup-rowcounts-count-deleted-documents",
+      "tag": "housekeeping",
+      "area": "Emails and jobs",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-reconciled-batch28.json finding runtime-B-backup-rowcounts-count-deleted-documents",
+      "text": "The nightly backup job's report (/api/cron/db-backup log line and /api/admin/backups/run response) — `webapp/server/backup.ts:150`\nReads:   const rowCounts=Object.fromEntries(BACKUP_TABLES.map(t=>[t,job!.dump.tables[t].length]));\nClaims: That rowCounts describes the snapshot written (routes-ops.ts:317 logs it as '[backup] <key>: <bytes> bytes' with the counts; e2e.ts:3234-3238 reads rowCounts.clients).\nTrue: Current cross-review: rowCounts is computed before document deletion filtering at157 and returned unchanged at164 after publishing the filtered snapshot. A deleted document therefore inflates the completed backup count. This is reporting mismatch, not proof of backup data loss. Historical runtime reports are corroborative; no current rerun claimed.\nProposed replacement (not approved): Calculate completed counts after the final filters. Keep pending-job counts separately labeled as provisional if they are returned before completion.\nRechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. rowCounts is computed before document deletion filtering at157 and returned unchanged at164 after publishing the filtered snapshot. A deleted document therefore inflates the completed backup count. This is reporting mismatch, not proof of backup data loss. Historical runtime reports are corroborative; no current rerun claimed.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T23:43:01.725194+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch28 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.966Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
+            }
+          ],
+          "batch": "28",
+          "fix": {
+            "batch": "28",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex Astra",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch28 A08"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-no-way-to-replace-the-renewal-card",
+      "tag": "substantive",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch28.json finding runtime-B-no-way-to-replace-the-renewal-card",
+      "text": "Client portal → Registered agent service card ('Renewal card: Visa ending 1111'); the renewal notice email; Terms 9(c) and 9(e) — `webapp/src/pages/portal/PortalDashboard.tsx:380`\nReads:                 <p className=\"mt-1\" data-testid=\"renewal-card\">Renewal card: {brandWord(company.cardBrand)} ending {company.cardLast4}.</p>\nClaims: terms.md:46: 'You must agree to automatic renewal and keep an eligible payment card on file with Square; we will not undertake the appointment without both.'; the notice email (email.ts:111-113): 'will be charged to your card ending 1111 on <date>. There is nothing you need to do.'\nTrue: Current cross-review: No dedicated card-update control is present. However PortalDashboard:422 offers Pay renewal now / use another card whenever an open link exists. renewals.ts:127-141 creates that link with the60-day notice, before decline, and ra-checkout.ts:55-62 saves a new eligible card during payment. Historical claim that replacement is possible only after decline is false. email.ts:111-112 still says nothing needs doing and there is no independent replacement path outside an open payable renewal. No provider or payment route run.\nProposed replacement (not approved): A standalone card-update action requires a supported token-to-card design, saved-card consent and eligible-card checks. Explain the existing pre-decline payment option accurately. Do not promise an office payment link outside a payable renewal unless implemented.\nRechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. No dedicated card-update control is present. However PortalDashboard:422 offers Pay renewal now / use another card whenever an open link exists. renewals.ts:127-141 creates that link with the60-day notice, before decline, and ra-checkout.ts:55-62 saves a new eligible card during payment. Historical claim that replacement is possible only after decline is false. email.ts:111-112 still says nothing needs doing and there is no independent replacement path outside an open payable renewal. No provider or payment route run.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T23:43:01.725194+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch28 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.966Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
+            }
+          ],
+          "batch": "28",
+          "fix": {
+            "batch": "28",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex Astra",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch28 A10"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-undelivered-s-election-numbers-never-expire",
+      "tag": "substantive",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch28.json finding runtime-B-undelivered-s-election-numbers-never-expire",
+      "text": "Client portal → Orders in progress → S corporation election details saved while we are obtaining the company EIN; Privacy Policy §2 — `webapp/server/routes-portal.ts:568`\nReads:     WHERE type='s-election' AND status='fulfilled' AND fulfilled_at < now()-interval '14 days'\nClaims: privacy.md:15: 'You may correct your answers and regenerate the package for fourteen (14) days after delivery. After that editing window, our scheduled cleanup removes the full numbers from the questionnaire records.'; the S election dialog (OrdersInProgress.tsx:279): 'the questionnaire numbers are removed after the fourteen-day editing window.'\nTrue: Current cross-review: Current purge filters status fulfilled and fulfilled_at older than14days at574. Pending-EIN saves2419-2422 retain encrypted numbers in_progress with no independent expiry. Privacy15 describes the post-delivery editing window; it does not state an abandonment/cancellation horizon. This is an unbounded pre-delivery state, not evidence that the stated post-delivery14day rule itself is violated. RulingsN1.01/140/150 intentionally permit pending completion but do not specify abandoned pre-delivery retention.\nProposed replacement (not approved): Choose a finite pre-delivery/abandonment retention rule or clearly disclose retention through delivery, then make cleanup and re-entry behavior match. Any purge path must return the order to a usable re-entry state and remove full numbers rather than completed retained PDFs.\nRechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current purge filters status fulfilled and fulfilled_at older than14days at574. Pending-EIN saves2419-2422 retain encrypted numbers in_progress with no independent expiry. Privacy15 describes the post-delivery editing window; it does not state an abandonment/cancellation horizon. This is an unbounded pre-delivery state, not evidence that the stated post-delivery14day rule itself is violated. RulingsN1.01/140/150 intentionally permit pending completion but do not specify abandoned pre-delivery retention.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-21T23:43:01.725194+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch28 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1"
+            },
+            {
+              "at": "2026-09-22T01:21:52.748Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T02:31:29.966Z",
+              "event": "rejected r1",
+              "batch": "28",
+              "revision": 1,
+              "note": "Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+            },
+            {
+              "at": "2026-09-22T02:31:41.434Z",
+              "event": "assigned",
+              "batch": "28",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T02:31:41.460Z",
+              "event": "implemented",
+              "batch": "28",
+              "revision": 2,
+              "note": "by Codex Astra"
+            }
+          ],
+          "batch": "28",
+          "fix": {
+            "batch": "28",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex Astra",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch28 A11"
+              }
+            ]
+          }
+        }
+      ]
     }
   ],
   "rulings": [
@@ -25083,6 +26076,13 @@
       "kind": "ruling",
       "item": "N2.27",
       "text": "Batch 16 item 14: Use this exact paragraph and update the manual and instructions: The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. § 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member’s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate’s interest in a Member’s transferable (economic) interest to the extent permitted by applicable law."
+    },
+    {
+      "date": "2026-09-21",
+      "kind": "migration",
+      "text": "Record the independently identified staged-package cleanup remaining beside the preserved Batch05 replacement ordering fix",
+      "migration": "003-batch28-staged-package",
+      "migrationHash": "cd5634fb32c551b277b29676bbe828958e193aa37ba858c1284325653ebf7b6a"
     }
   ],
   "batches": [
@@ -25907,12 +26907,55 @@
           "event": "implemented"
         }
       ]
+    },
+    {
+      "id": "28",
+      "revision": 1,
+      "frozenHash": "1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57",
+      "status": "rejected",
+      "model": "Codex Astra",
+      "base": "00663979fc6559eda50d3de9317f42a52de46953",
+      "history": [
+        {
+          "at": "2026-09-22T01:21:52.749Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-22T02:31:29.967Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-22T02:31 (Adam: From now on if a later revision is what is needed, do it and stop asking me to approve it. Standing authorization for revisions within already-approved scope.): Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule."
+        }
+      ]
+    },
+    {
+      "id": "28",
+      "revision": 2,
+      "frozenHash": "262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b",
+      "status": "implemented",
+      "model": "Codex Astra",
+      "base": "00663979fc6559eda50d3de9317f42a52de46953",
+      "history": [
+        {
+          "at": "2026-09-22T02:31:41.435Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-22T02:31:41.460Z",
+          "event": "implemented"
+        }
+      ]
     }
   ],
   "auditImports": [
     {
       "path": "docs/audit/intakes/post-batches-2026-09-20-4a344e2.json",
       "sha": "a72a548340ac753ce9f2ae323a7d61699db3d8f12e6ea49ebe54acc6b732edee"
+    },
+    {
+      "path": "docs/audit/intakes/claude-reconciled-batch28.json",
+      "sha": "117b390811705a22a484c9cf911ae5b831f03b8bda61c8e08792345afef74dd1"
     }
   ]
 }

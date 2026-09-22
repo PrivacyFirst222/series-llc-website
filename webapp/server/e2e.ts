@@ -3813,13 +3813,13 @@ if (mint.status === 200) {
     const co0 = await companiesOf();
     check("renewal: the card the formation was paid with is kept, with its last four", co0?.cardStatus === "on_file" && co0?.cardLast4 === "1111", co0);
     // Too early: nothing happens.
-    const early = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -61)}`)).body?.data as { notices: number } | undefined;
+    const early = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -71)}`)).body?.data as { notices: number } | undefined;
     const co1 = await companiesOf();
-    check("renewal: 61 days out, no notice yet", (co1?.renewals ?? []).length === 0, { early, renewals: co1?.renewals });
-    // 45 days out: the notice.
-    const noticeRun = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -60)}`)).body?.data as { notices: number } | undefined;
+    check("renewal: 71 days out, no notice yet", (co1?.renewals ?? []).length === 0, { early, renewals: co1?.renewals });
+    // 70 days out: the scheduled notice.
+    const noticeRun = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -70)}`)).body?.data as { notices: number } | undefined;
     const co2 = await companiesOf();
-    check("renewal: 60 days out, the notice goes and the renewal is recorded", (noticeRun?.notices ?? 0) >= 1 && co2?.renewals?.[0]?.status === "notice_sent", { noticeRun, renewals: co2?.renewals });
+    check("renewal: 70 days out, the notice goes and the renewal is recorded", (noticeRun?.notices ?? 0) >= 1 && co2?.renewals?.[0]?.status === "notice_sent", { noticeRun, renewals: co2?.renewals });
     {
       const mails = ((await api("/api/dev/outbox")).body?.data ?? []) as { to: string; subject: string; html: string }[];
       const notice = mails.filter((m) => m.to === raEmail && /renews on/.test(m.subject)).at(-1);
@@ -3829,7 +3829,7 @@ if (mint.status === 200) {
       check("renewal: the notice names the date, $99, the card's last four, the charge day and the cancellation deadline", !!notice && /\$99/.test(flat) && /card ending 1111/.test(flat) && flat.includes(`on ${chargeWords}`) && flat.includes(`by ${cancelWords}`), { subject: notice?.subject, flat: flat.slice(0, 400) });
     }
     // The same day again: nothing doubles.
-    const again = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -60)}`)).body?.data as { notices: number } | undefined;
+    const again = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -70)}`)).body?.data as { notices: number } | undefined;
     check("renewal: running the job twice sends nothing twice", again?.notices === 0 && (await companiesOf())?.renewals?.length === 1, again);
     // 15 days out: declined first (a plain decline, no retry), with a link.
     await api("/api/dev/renewal-decline", { method: "POST", body: JSON.stringify({ code: "GENERIC_DECLINE" }) });
@@ -3902,11 +3902,11 @@ if (mint.status === 200) {
     const after = ((await api("/api/portal/companies", { cookies: raPw.cookie })).body?.data as { orderId: string; raRenewalDate: string | null; renewals: { date: string; status: string }[] }[]).find((x) => x.orderId === raId);
     check("renewal: after a timely cancellation no notice goes and nothing is charged", run45?.notices === 0 && run15?.charged === 0 && run15?.declined === 0 && after?.raRenewalDate === next && !(after?.renewals ?? []).some((r) => r.date === next), { run45, run15, renewals: after?.renewals });
   }
-  // The renewal above moved the date a year on (16 Sep 2026): the email
-  // names the date the company now carries.
-  const renewalNow = ((await api("/api/portal/companies", { cookies: raPw.cookie })).body?.data as { orderId: string; raRenewalDate: string | null }[]).find((x) => x.orderId === raId)?.raRenewalDate ?? "";
-  const year = renewalNow.slice(0, 4);
-  check("the cancellation email names the renewal date", !!cancelMail && year.length === 4 && cancelMail.html.includes(year) && /renew/i.test(cancelMail.html), cancelMail && { subject: cancelMail.subject, snippet: cancelMail.html.replace(/<[^>]+>/g, " ").match(/[^.]*renew[^.]*\./i)?.[0] });
+  // The job simulated a future advance payment. Cancellation still refers
+  // to that upcoming paid cycle, not the following anniversary now on the order.
+  const cancellationCycle = String(det?.raRenewalDate ?? '');
+  const cycleWords = new Date(cancellationCycle+'T12:00:00Z').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric',timeZone:'UTC'});
+  check("the cancellation email names the renewal date", !!cancelMail && cancellationCycle.length === 10 && cancelMail.html.includes(cycleWords) && /renew/i.test(cancelMail.html), cancelMail && { expected:cycleWords, subject: cancelMail.subject, snippet: cancelMail.html.replace(/<[^>]+>/g, " ").match(/[^.]*renew[^.]*\./i)?.[0] });
 }
 
 // An abandoned S election checkout does not lock the client out, and refused
@@ -4110,6 +4110,21 @@ batch16Checks((label, ok, detail) => batch16Results.set(label, {ok, detail}));
 { const r = batch16Results.get("batch16: restatement recitals remain sequential"); check("batch16: restatement recitals remain sequential", r?.ok === true, r?.detail); }
 { const r = batch16Results.get("batch16: professional eligibility is conditional and cumulative"); check("batch16: professional eligibility is conditional and cumulative", r?.ok === true, r?.detail); }
 { const r = batch16Results.get("batch16: bankruptcy paragraph is exactly owner approved"); check("batch16: bankruptcy paragraph is exactly owner approved", r?.ok === true, r?.detail); }
+
+const {batch28Checks}=await import("./batch28-check");
+const batch28Results=new Map<string,{ok:boolean;detail?:unknown}>();
+await batch28Checks((label,ok,detail)=>batch28Results.set(label,{ok,detail}));
+{const r=batch28Results.get("batch28 A01");check("batch28 A01",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A02");check("batch28 A02",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A03");check("batch28 A03",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A04");check("batch28 A04",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A05");check("batch28 A05",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A06");check("batch28 A06",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A07");check("batch28 A07",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A08");check("batch28 A08",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A09");check("batch28 A09",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A10");check("batch28 A10",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A11");check("batch28 A11",r?.ok===true,r?.detail);}
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

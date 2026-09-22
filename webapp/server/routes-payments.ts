@@ -1,3 +1,4 @@
+import { notifyContact } from './office-notifications';
 import { agentCheckoutLink, payAgentTarget } from "./ra-checkout";
 // Split from app.ts on 29 Aug 2026 — one domain per file, code moved
 // verbatim (the two dev test flags became shared.testHooks so they stay
@@ -637,7 +638,7 @@ app.post("/orders/:id/resend-welcome", async (c) => {
 // The public contact form. Until 30 Aug 2026 this form SENT NOTHING — it
 // told the visitor a specialist would reply within a business day, then
 // discarded the message (P51). Now: stored (and so backed up nightly),
-// emailed to the notify address, and acknowledged only after both.
+// acknowledged once stored; the office notification is a separate retryable step.
 const contactSchema = z.object({
   name: z.string().trim().min(1).max(200).refine(hasFirstAndLast, FIRST_AND_LAST),
   email: z.string().trim().email().max(320),
@@ -654,19 +655,13 @@ app.post("/contact", async (c) => {
   }
   const { name, email, message } = body.data;
   const db = await getDb();
-  await db.query(
-    "INSERT INTO contact_messages (name, email, message) VALUES ($1, $2, $3)",
+  const [saved] = await db.query<{id:string}>(
+    "INSERT INTO contact_messages (name, email, message, notice_status) VALUES ($1, $2, $3, 'pending') RETURNING id",
     [name, email, message],
   );
-  if (env.ADMIN_NOTIFY_EMAIL) {
-    const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    await sendMail({
-      to: env.ADMIN_NOTIFY_EMAIL,
-      subject: `Contact form: ${name}`,
-      replyTo: email,
-      html: `<p><strong>${esc(name)}</strong> &lt;${esc(email)}&gt; wrote:</p><p>${esc(message).replace(/\n/g, "<br>")}</p>`,
-    });
-  }
+  // The visitor's message is already durable. A notification outage must not
+  // ask them to submit it again. The office can retry the recorded message.
+  await notifyContact(saved.id).catch(e=>console.error('[contact] notification pending',e));
   return c.json({ data: { ok: true } });
 });
 

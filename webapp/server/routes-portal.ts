@@ -1,3 +1,5 @@
+import { storeElectionPackage } from './s-election-package-storage';
+import { registerRenewalCard } from './renewal-card';
 import { MAX_OA_OWNERS } from "../src/lib/oaLimits";
 import { agreementManagers, managerProblem } from "../src/lib/oaManagers";
 import { ensureOwnersManual } from "./owners-manual";
@@ -573,7 +575,12 @@ export async function purgeExpiredSElections(): Promise<number> {
     details=COALESCE(details,'{}'::jsonb)||jsonb_build_object('purgedAt',now()::text)
     WHERE type='s-election' AND status='fulfilled' AND fulfilled_at < now()-interval '14 days'
       AND (ein_secret IS NOT NULL OR details->>'purgedAt' IS NULL) RETURNING id`);
-  return rows.length;
+  const pending = await db.query(`UPDATE service_orders SET ein_secret=NULL, status='awaiting_info',
+    details=COALESCE(details,'{}'::jsonb)||jsonb_build_object('taxpayerNumbersRequired',true,'taxpayerNumbersExpiredAt',now()::text,
+      'shareholders',COALESCE((SELECT jsonb_agg(s||jsonb_build_object('ssnLast4','','ssnLast4Second','')) FROM jsonb_array_elements(COALESCE(details->'shareholders','[]'::jsonb)) s),'[]'::jsonb))
+    WHERE type='s-election' AND status IN ('awaiting_info','in_progress') AND fulfilled_at IS NULL AND ein_secret IS NOT NULL
+      AND COALESCE(questionnaire_updated_at,created_at) <= now()-interval '90 days' RETURNING id`);
+  return rows.length + pending.length;
 }
 
 /** Everything the IRS EIN application asks that the formation record cannot
@@ -817,31 +824,7 @@ export async function postSElectionPackage(args: {
   }
 
   const title = `S Corporation Election Package (Form 2553) — ${so.llc_name}`;
-  const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
-  const stored = await putFile(
-    `${title.replace(/[^\w-]+/g, "_")}_${stampForFilename()}.pdf`,
-    buf,
-    "application/pdf",
-    true,
-  );
-  // The package belongs to the company the order was placed for (Adam,
-  // 7 Sep 2026): without it, it showed under every tab of the account.
-  const docRows = await db.query<{ id: string }>(
-    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4, $6) RETURNING id`,
-    [so.client_id, title, stored.storageKey, stored.sizeBytes, companyId, JSON.stringify({sensitive:true,serviceOrderId:so.id})],
-  );
-  merged.documentId = docRows[0].id;
-
-  // fulfilled_at starts the two-week clock, and a re-edit must not extend it.
-  await db.query(
-    `UPDATE service_orders
-        SET details = $1, ein_secret = $2, status = 'fulfilled',
-            fulfilled_at = COALESCE(fulfilled_at, now())
-      WHERE id = $3`,
-    [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id],
-  );
-  if (args.priorDocumentId) await requestDocumentDeletion(args.priorDocumentId, so.client_id);
+  merged.documentId = await storeElectionPackage(db,{serviceId:so.id,clientId:so.client_id,companyId,title,pdf:Buffer.from(pdf),details:merged as unknown as Record<string,unknown>,ssns,priorDocumentId:args.priorDocumentId});
   const after = await db.query<{ fulfilled_at: unknown }>(
     "SELECT fulfilled_at FROM service_orders WHERE id = $1",
     [so.id],
@@ -860,6 +843,7 @@ export async function postSElectionPackage(args: {
 }
 
 export function registerPortalRoutes(app: Hono) {
+registerRenewalCard(app);
 
 app.post("/auth/login", async (c) => {
   if (!(await rateLimit(`login:${clientIp(c)}`, 10, 900_000))) {
@@ -971,10 +955,10 @@ app.get("/portal/companies", async (c) => {
   const db = await getDb();
   // The registered agent facts belong to the company (15 Sep 2026: the
   // card showed one company's service under every tab).
-  const rows = await db.query<{ id: string; llc_name: string; formed_at: string | null; filing_path: string | null; ra_service: boolean; ra_renewal_date: unknown; ra_cancellation_requested_at: string | null; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note:string|null; ra_appointment_date:unknown;ra_resignation_due:unknown;ra_resignation_submitted:unknown;ra_ended_date:unknown; renewals: unknown }>(
+  const rows = await db.query<{ id: string; llc_name: string; formed_at: string | null; filing_path: string | null; ra_service: boolean; ra_renewal_date: unknown; cancellation_date?:unknown; ra_cancellation_requested_at: string | null; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note:string|null; ra_appointment_date:unknown;ra_resignation_due:unknown;ra_resignation_submitted:unknown;ra_ended_date:unknown; renewals: unknown }>(
     `SELECT id, llc_name, formed_at, payload->>'filingPath' AS filing_path,
             (payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
-            ra_renewal_date, ra_cancellation_requested_at, ra_appointment_date,ra_resignation_due,ra_resignation_submitted,ra_ended_date,card_note,
+            ra_renewal_date, COALESCE(ra_cancellation_renewal_date,ra_renewal_date) AS cancellation_date, ra_cancellation_requested_at, ra_appointment_date,ra_resignation_due,ra_resignation_submitted,ra_ended_date,card_note,
             card_status, card_last4, card_brand,
             -- The renewals, newest first (16 Sep 2026).
             (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', r.id, 'purpose',r.purpose,'linkUrl',r.link_url,'date', r.renewal_date, 'amountCents', r.amount_cents, 'status', r.status, 'chargedAt', r.charged_at) ORDER BY r.renewal_date DESC), '[]'::jsonb)
@@ -995,6 +979,7 @@ app.get("/portal/companies", async (c) => {
     cardNote:r.card_note,
     raRenewalDate: r.ra_renewal_date ? isoDate(r.ra_renewal_date) : null,
     raCancellationRequestedAt: r.ra_cancellation_requested_at ?? null,
+    raCancellationLate: !!r.ra_cancellation_requested_at && !!r.cancellation_date && easternDateIso(new Date(r.ra_cancellation_requested_at)) > new Date(new Date(isoDate(r.cancellation_date)+'T12:00:00Z').getTime()-30*86400000).toISOString().slice(0,10),
     cardStatus: r.card_status ?? null,
     cardLast4: r.card_last4 ?? null,
     cardBrand: r.card_brand ?? null,
@@ -2417,7 +2402,7 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
   // Adam, Batch 13: collect answers while we obtain the EIN, but publish no
   // filing PDF without the issued number. The edit clock starts at fulfillment.
   if (!merged.ein) {
-    await db.query("UPDATE service_orders SET details=$1, ein_secret=$2, status='in_progress' WHERE id=$3",
+    await db.query("UPDATE service_orders SET details=$1, ein_secret=$2, questionnaire_updated_at=now(), status='in_progress' WHERE id=$3",
       [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id]);
     return c.json({ data: { ok: true, awaitingEin: true, documentId: null, editableUntil: null } });
   }
@@ -2628,13 +2613,16 @@ app.post("/portal/registered-agent/cancel", async (c) => {
     return c.json({ data: { raCancellationRequestedAt: order.ra_cancellation_requested_at } });
   }
   const updated = await db.query<{ ra_cancellation_requested_at: string }>(
-    "UPDATE orders SET ra_cancellation_requested_at = now() WHERE id = $1 RETURNING ra_cancellation_requested_at",
+    "UPDATE orders SET ra_cancellation_requested_at = now(), ra_cancellation_renewal_date = LEAST(ra_renewal_date,(SELECT min(renewal_date) FROM ra_renewals WHERE order_id=$1 AND purpose='renewal' AND renewal_date >= (now() AT TIME ZONE 'America/New_York')::date)) WHERE id = $1 RETURNING ra_cancellation_requested_at",
     [order.id],
   );
   const requestedAt = updated[0]?.ra_cancellation_requested_at ?? new Date().toISOString();
   await db.query("UPDATE clients SET ra_cancellation_requested_at = COALESCE(ra_cancellation_requested_at, $2) WHERE id = $1", [session.clientId, requestedAt]);
   // Confirmation + admin notice must not unwind the recorded request.
-  const confirmation = raCancellationEmail(client.name, order.ra_renewal_date ? fmtDate(isoDate(order.ra_renewal_date)) : null, order.llc_name);
+  const [cycle]=await db.query<{ra_cancellation_renewal_date:unknown}>("SELECT ra_cancellation_renewal_date FROM orders WHERE id=$1",[order.id]);
+  const renewalIso=cycle?.ra_cancellation_renewal_date?isoDate(cycle.ra_cancellation_renewal_date):null;
+  const late=!!renewalIso && easternDateIso(new Date(requestedAt)) > new Date(new Date(renewalIso+'T12:00:00Z').getTime()-30*86400000).toISOString().slice(0,10);
+  const confirmation = raCancellationEmail(client.name, renewalIso ? fmtDate(renewalIso) : null, order.llc_name, late);
   sendMail({ to: client.email, ...confirmation }).catch((e) =>
     console.error("ra-cancel confirmation email failed", e),
   );

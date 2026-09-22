@@ -8,7 +8,7 @@ import {
 import { RA_RENEWAL_FEE_CENTS } from "./pricing";
 import { disableCard, saveCardFromPayment, type CardSimulation } from "./square";
 import { agentCheckoutLink, payAgentTarget } from "./ra-checkout";
-import { RA_NOTICE_DAYS, RA_CANCEL_DAYS, RA_CHARGE_DAYS, RA_RESIGNATION_CENTS } from "../src/lib/agentBilling";
+import { RA_NOTICE_DAYS, RA_MIN_NOTICE_DAYS, RA_CANCEL_DAYS, RA_CHARGE_DAYS, RA_RESIGNATION_CENTS } from "../src/lib/agentBilling";
 import { easternDateIso } from "./datetime";
 
 /** How the money is written everywhere the client reads it. */
@@ -113,19 +113,19 @@ interface RenewalOrder {id:string;contact_name:string;contact_email:string;llc_n
 interface RenewalRow {id:string;order_id:string;renewal_date:unknown;amount_cents:number;status:string;purpose:string;charge_due:unknown;retry_after:unknown;retries:number;notice_sent_at:unknown;billing_hold:boolean;lock_until:unknown;link_url:string|null}
 export async function runRenewals(today:string):Promise<{notices:number;charged:number;declined:number;cancelled:number;retried:number}> {
  const db=await getDb(),out={notices:0,charged:0,declined:0,cancelled:0,retried:0};
- const orders=await db.query<RenewalOrder>("SELECT * FROM orders WHERE status='formed' AND ra_renewal_date IS NOT NULL AND payload->'registeredAgent'->>'choice'='SERVICE' AND ra_ended_date IS NULL AND ra_replaced_at IS NULL");
+ const orders=await db.query<RenewalOrder>("SELECT * FROM orders WHERE status='formed' AND ra_renewal_date IS NOT NULL AND payload->'registeredAgent'->>'choice'='SERVICE' AND ra_ended_date IS NULL AND ra_replaced_at IS NULL AND ra_resignation_submitted IS NULL");
  for(const o of orders) {
   const date=isoOf(o.ra_renewal_date)!;const cancel=o.ra_cancellation_requested_at?easternDateIso(new Date(String(o.ra_cancellation_requested_at))):null;
   const timely=!!cancel && cancel<=addDays(date,-RA_CANCEL_DAYS);
-  let [row]=await db.query<RenewalRow>('SELECT * FROM ra_renewals WHERE order_id=$1 AND renewal_date=$2',[o.id,date]);
+  let [row]=await db.query<RenewalRow>('SELECT * FROM ra_renewals WHERE order_id=$1 AND renewal_date=$2 ORDER BY purpose ASC LIMIT 1',[o.id,date]);
   if(timely) {
    if(today<date){if(row&&!['charged','paid_by_link','cancelled'].includes(row.status)){await db.query("UPDATE ra_renewals SET status='cancelled',retry_after=NULL WHERE id=$1",[row.id]);out.cancelled++;}continue;}
    if(o.ra_proof_received_at)continue;
    await db.query('UPDATE orders SET ra_resignation_due=COALESCE(ra_resignation_due,$2) WHERE id=$1',[o.id,date]);
-   if(!row) { [row]=await db.query<RenewalRow>("INSERT INTO ra_renewals(order_id,renewal_date,amount_cents,status,purpose,charge_due) VALUES($1,$2,$3,'notice_pending','resignation',$2) ON CONFLICT(order_id,renewal_date) DO UPDATE SET order_id=EXCLUDED.order_id RETURNING *",[o.id,date,RA_RESIGNATION_CENTS]); }
+   if(!row) { [row]=await db.query<RenewalRow>("INSERT INTO ra_renewals(order_id,renewal_date,amount_cents,status,purpose,charge_due) VALUES($1,$2,$3,'notice_pending','resignation',$2) ON CONFLICT(order_id,renewal_date,purpose) DO UPDATE SET order_id=EXCLUDED.order_id RETURNING *",[o.id,date,RA_RESIGNATION_CENTS]); }
    else if(row.purpose!=='resignation'&&!['charged','paid_by_link'].includes(row.status)){[row]=await db.query<RenewalRow>("UPDATE ra_renewals SET purpose='resignation',status='notice_pending',amount_cents=$2,charge_due=renewal_date,notice_sent_at=NULL,billing_hold=false,retry_after=NULL,retries=0 WHERE id=$1 RETURNING *",[row.id,RA_RESIGNATION_CENTS]);}
   } else if(!row&&today>=addDays(date,-RA_NOTICE_DAYS)) {
-   [row]=await db.query<RenewalRow>("INSERT INTO ra_renewals(order_id,renewal_date,amount_cents,status,charge_due) VALUES($1,$2,$3,'notice_pending',$4) ON CONFLICT(order_id,renewal_date) DO UPDATE SET order_id=EXCLUDED.order_id RETURNING *",[o.id,date,RA_RENEWAL_FEE_CENTS,addDays(date,-RA_CHARGE_DAYS)]);
+   [row]=await db.query<RenewalRow>("INSERT INTO ra_renewals(order_id,renewal_date,amount_cents,status,charge_due) VALUES($1,$2,$3,'notice_pending',$4) ON CONFLICT(order_id,renewal_date,purpose) DO UPDATE SET order_id=EXCLUDED.order_id RETURNING *",[o.id,date,RA_RENEWAL_FEE_CENTS,addDays(date,-RA_CHARGE_DAYS)]);
   }
   if(!row||['charged','paid_by_link','cancelled'].includes(row.status))continue;
   const [locked]=await db.query<RenewalRow>("UPDATE ra_renewals SET lock_until=now()+interval '2 minutes' WHERE id=$1 AND (lock_until IS NULL OR lock_until<now()) RETURNING *",[row.id]);
@@ -134,7 +134,7 @@ export async function runRenewals(today:string):Promise<{notices:number;charged:
    const hasCard=o.card_status==='on_file'&&!!o.square_card_id&&!!o.square_customer_id&&gaveConsent(o.payload);
    if(row.status==='notice_pending') {
     const link=await agentCheckoutLink('renewal',row.id);
-    const late=row.purpose==='renewal'&&today>addDays(date,-RA_NOTICE_DAYS);
+    const late=row.purpose==='renewal'&&today>addDays(date,-RA_MIN_NOTICE_DAYS);
     const mail=row.purpose==='resignation'?{subject:`Registered-agent resignation due — ${o.llc_name}`,html:`<p>Your timely cancellation has reached its renewal date without replacement proof. A $99 charge for state filing fees and processing is due. This does not purchase another service year. The office must submit the resignation; this notice does not confirm filing.</p><p><a href="${link}">Pay now</a></p>`}:raRenewalNoticeEmail({name:o.contact_name,llcName:o.llc_name,renewalDate:longDate(date),amount:raRenewalFeeWords(),last4:hasCard?o.card_last4:null,chargeDate:longDate(addDays(date,-RA_CHARGE_DAYS)),cancelBy:longDate(addDays(date,-RA_CANCEL_DAYS)),linkUrl:link,giftCard:false,billingHold:late});
     try {
      await sendMail({to:await currentAgentNoticeEmail(db,o.id),...mail});

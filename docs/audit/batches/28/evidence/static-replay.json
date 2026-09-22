@@ -1,0 +1,7 @@
+{
+  "errors": [],
+  "trackedItems": 375,
+  "proposedRevision": 2,
+  "proposedFixes": 15,
+  "note": "In-memory replay only; no ledger status or owner decision changed"
+}

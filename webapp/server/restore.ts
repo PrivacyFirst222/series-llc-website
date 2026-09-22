@@ -1,8 +1,8 @@
 import type { Db } from './db';
 import { BACKUP_TABLES, type BackupDump } from './backup';
-import { deletionJournal } from './document-retention';
+import { readDeletionMirror } from './backup-deletions';
 import { readMirror, hashBytes } from './dropbox';
-import { replaceStoredFile } from './storage';
+import { replaceStoredFile, putObject, deletionPath } from './storage';
 import { isEncrypted, unseal } from './encryption';
 import { recoveryDetails, notifyTaxpayerNumbersRequired, type RecoverableElection } from './s-election-recovery';
 /** Actual recovery path, also exercised with an empty disposable database.
@@ -12,7 +12,8 @@ export async function restoreBackup(db:Db, dump:BackupDump):Promise<{tables:numb
  if(dump.version!==1||dump.fileManifestVersion!==1||!Array.isArray(dump.files))throw new Error('This restore requires a verified backup with a complete file manifest');
  for(const t of BACKUP_TABLES)if(!Array.isArray(dump.tables[t]))throw new Error(`Backup is missing table ${t}`);
  for(const table of BACKUP_TABLES){const [existing]=await db.query<{n:string}>(`SELECT count(*) AS n FROM ${table}`);if(Number(existing.n))throw new Error(`Restore target is not empty: ${table}`);}
- const tombstones=await deletionJournal();const deleted=new Set(tombstones.map(d=>d.storageKey));
+ const tombstones=await readDeletionMirror();const deleted=new Set(tombstones.map(d=>d.storageKey));
+ for(const key of [...(dump.deletionCheckpoint||[]),...dump.tables.document_deletions.map(d=>String(d.storage_key))])if(!deleted.has(key))throw new Error('Independent deletion journal is missing a recorded decision');
  const tables=structuredClone(dump.tables);
  const removedIds=new Set([...tombstones.map(d=>d.documentId),...tables.documents.filter(d=>deleted.has(String(d.storage_key))||d.deleted_at).map(d=>d.id)]);
  tables.documents=tables.documents.filter(d=>!removedIds.has(d.id));
@@ -35,6 +36,7 @@ export async function restoreBackup(db:Db, dump:BackupDump):Promise<{tables:numb
  for(const d of tables.documents){const raw=bytes.get(String(d.storage_key));if(!raw)throw new Error('Document missing from backup manifest');if((d.meta as {sensitive?:boolean}|null)?.sensitive&&!isEncrypted(raw))throw new Error('Sensitive backup document is not encrypted');}
  for(const d of tables.library_documents){if(!bytes.has(String(d.storage_key)))throw new Error('Library document missing from backup manifest');}
  for(const d of tables.orders){if(d.summary_storage_key&&!bytes.has(String(d.summary_storage_key)))throw new Error('Order summary missing from backup manifest');}
+ for(const d of tombstones)await putObject(deletionPath(d.storageKey),Buffer.from(JSON.stringify(d)),true);
  for(const [key,data] of bytes)await replaceStoredFile(key,data);
  for(const t of BACKUP_TABLES){
   for(const row of tables[t]){const cols=Object.keys(row);if(cols.some(k=>!/^\w+$/.test(k)))throw new Error('Invalid backup column');
