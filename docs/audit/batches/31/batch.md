@@ -161,3 +161,5 @@ Ignore it long enough and the company is administratively dissolved. Administrat
 
 
 Revision 2 corrects only two Markdown-source assertion strings to include the existing bold delimiters. Revision 1 remains recorded as rejected under Adam’s standing authorization for necessary revision advances.
+
+Revision 3 updates the existing API check’s obsolete “cause the Company to file” expectation to the approved entity-specific wording. It retains the label and required consent reference, Section 5.4(b). The r2 API run had this sole failure; its full log remains in package f15806fef98e. The interrupted r2 browser run is not claimed as passing.

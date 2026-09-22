@@ -2644,7 +2644,7 @@ if (mint.status === 200) {
     const md = res.status === 200 ? assembleOa(res.body?.data?.inputs as OaInputs).markdown : "";
     check("the sole owner's s. 5.4 has no borrowing clause and no dollar limit", md.includes("**5.4 Actions Requiring Member Approval.**") && !/indebtedness in excess of/.test(md) && !/\[THRESHOLD\]/.test(md), md.match(/\*\*5\.4[\s\S]{0,900}/)?.[0]);
     check("the sole owner's s. 5.4 reletters: (a) then (b) the statement of authority", /\(a\) sell, exchange, or otherwise dispose[^\n]*; or\n\n\(b\) file, amend, or cancel a statement of authority/.test(md), md.match(/\(a\) sell[\s\S]{0,400}/)?.[0]);
-    check("the sole owner's s. 5.8 points at the relettered consent, Section 5.4(b)", md.includes("With the consent of the Member required by Section 5.4(b), the Manager may cause the Company to file"), md.match(/With the consent of the Member required by Section 5\.4\([a-d]\)/)?.[0]);
+    check("the sole owner's s. 5.8 points at the relettered consent, Section 5.4(b)", md.includes("With the consent of the Member required by Section 5.4(b), the Manager may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series"), md.match(/With the consent of the Member required by Section 5\.4\([a-d]\)/)?.[0]);
   }
   const smAfter = await api("/api/portal/oa", { cookies: smPw.cookie });
   check(
