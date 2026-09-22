@@ -1597,15 +1597,15 @@ if (mint.status === 200) {
     const storedRes = await api(`/api/dev/oa-generation-inputs/${gen2.body?.data?.generationId}`);
     const stored = storedRes.body?.data?.inputs as OaInputs;
     const owner = stored?.members?.[0]?.name ?? "";
-    const blank = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "typed", text: "   " }) });
+    const blank = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "typed", text: "   " }) });
     check("amendment: typed changes left blank are refused", blank.status === 400 && blank.body?.error?.code === "INVALID_INPUT", blank.body);
-    const noAgreementDate = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ effectiveDate: "2026-09-12", mode: "attached" }) });
+    const noAgreementDate = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, effectiveDate: "2026-09-12", mode: "attached" }) });
     check("amendment: refused without the agreement's effective date", noAgreementDate.status === 400, noAgreementDate.body);
     const history = await api("/api/portal/oa", { cookies: setPw.cookie });
     check("the agreement list carries each agreement's effective date, printed and as a date box needs it", history.body?.data?.generations?.[0]?.effective_date === "August 5, 2026" && history.body?.data?.generations?.[0]?.effective_date_iso === "2026-08-05", history.body?.data?.generations?.[0]);
-    const badDate = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ agreementDate: "2026-08-05", effectiveDate: "next week", mode: "attached" }) });
+    const badDate = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, agreementDate: "2026-08-05", effectiveDate: "next week", mode: "attached" }) });
     check("amendment: a date that is not a date is refused", badDate.status === 400, badDate.body);
-    const typed = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "typed", text: "Section 3.2 is amended to read: \"The Company may designate up to four Protected Series.\"\nSection 9.4 is deleted." }) });
+    const typed = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "typed", text: "Section 3.2 is amended to read: \"The Company may designate up to four Protected Series.\"\nSection 9.4 is deleted." }) });
     check("amendment with typed changes generates", typed.status === 200, typed.body);
     check("the first amendment is No. 1, titled for the company", typed.body?.data?.number === 1 && typed.body?.data?.title === "Amendment No. 1 to Operating Agreement — E2E Coastal Holdings, LLC", typed.body?.data);
     const amPdf = await fetch(`${BASE}/api/portal/documents/${typed.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } });
@@ -1627,7 +1627,7 @@ if (mint.status === 200) {
       check("read off the PDF: the Member signs, and nobody else", owner !== "" && new RegExp(`MEMBER: ${owner.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} Date:`).test(flat) && !/ACKNOWLEDGED/.test(flat) && !/MEMBERS:/.test(flat), { owner, tail: flat.slice(-400) });
       check("read off the PDF: the effective date typed is the one printed", /effective as of September 12, 2026, by the undersigned sole member/.test(flat), flat.match(/effective as of [^,]*, by[^.]*/)?.[0]);
     }
-    const attached = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ agreementDate: "2025-03-03", effectiveDate: "2026-10-01", mode: "attached" }) });
+    const attached = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, agreementDate: "2025-03-03", effectiveDate: "2026-10-01", mode: "attached" }) });
     check("a second amendment, with the changes attached as Exhibit A, is No. 2", attached.status === 200 && attached.body?.data?.number === 2 && /^Amendment No\. 2 /.test(attached.body?.data?.title ?? ""), attached.body?.data);
     const atBytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${attached.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } })).arrayBuffer());
     const atText = pdfText(atBytes);
@@ -1639,25 +1639,25 @@ if (mint.status === 200) {
     const docsNow = await api("/api/portal/documents", { cookies: setPw.cookie });
     const amDocs = ((docsNow.body?.data ?? []) as { kind: string; title: string }[]).filter((d) => d.kind === "amendment").map((d) => d.title);
     check("both amendments are in the client's documents as amendments", amDocs.length === 2 && amDocs.some((x) => x.startsWith("Amendment No. 1 ")) && amDocs.some((x) => x.startsWith("Amendment No. 2 ")), amDocs);
-    const noSession = await api("/api/portal/oa/amend", { method: "POST", body: JSON.stringify({ agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "attached" }) });
+    const noSession = await api("/api/portal/oa/amend", { method: "POST", body: JSON.stringify({ generationId: gen2.body?.data?.generationId, agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "attached" }) });
     check("amendment requires a signed-in client", noSession.status === 401);
   }
 
   // --- consent + Series Exhibit for a series added after formation ---
   const badName = await api("/api/portal/series/consent", {
     method: "POST", cookies: setPw.cookie,
-    body: JSON.stringify({ seriesName: "Totally Different Co, PS 4", seriesNumber: "4", purpose: "", effectiveDate: "2026-09-01" }),
+    body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "Totally Different Co, PS 4", seriesNumber: "4", purpose: "", effectiveDate: "2026-09-01" }),
   });
   check("series name not beginning with the company name is refused (s. 605.2202)",
     badName.status === 400, badName.body);
   const noPS = await api("/api/portal/series/consent", {
     method: "POST", cookies: setPw.cookie,
-    body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC - Unit 4", seriesNumber: "4", purpose: "", effectiveDate: "2026-09-01" }),
+    body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "E2E Coastal Holdings, LLC - Unit 4", seriesNumber: "4", purpose: "", effectiveDate: "2026-09-01" }),
   });
   check('series name without "PS" is refused (s. 605.2202)', noPS.status === 400, noPS.body);
   const consent = await api("/api/portal/series/consent", {
     method: "POST", cookies: setPw.cookie,
-    body: JSON.stringify({
+    body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true,
       seriesName: "E2E Coastal Holdings, LLC, PS D",
       seriesNumber: "D",
       purpose: "to acquire, own, and lease the real property at 400 Bay Court",
@@ -1692,7 +1692,7 @@ if (mint.status === 200) {
   }
   {
     // Special terms and a contribution, as the agreement's exhibit takes them (15 Sep 2026).
-    const withTerms = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", purpose: "", effectiveDate: "2026-09-02", specialTerms: "The Member may not sell 500 Bay Street without a written appraisal.", contribution: "the real property at 500 Bay Street" }) });
+    const withTerms = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", purpose: "", effectiveDate: "2026-09-02", specialTerms: "The Member may not sell 500 Bay Street without a written appraisal.", contribution: "the real property at 500 Bay Street" }) });
     check("a consent with special terms and a contribution generates", withTerms.status === 200, withTerms.body);
     if (withTerms.status === 200 && hasPdftotext) {
       const bytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${withTerms.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } })).arrayBuffer());
@@ -1702,7 +1702,7 @@ if (mint.status === 200) {
   }
   const consentBlank = await api("/api/portal/series/consent", {
     method: "POST", cookies: setPw.cookie,
-    body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", purpose: "", effectiveDate: "2026-09-02" }),
+    body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", purpose: "", effectiveDate: "2026-09-02" }),
   });
   check("consent with no stated purpose generates", consentBlank.status === 200, consentBlank.body);
   {
@@ -1714,13 +1714,13 @@ if (mint.status === 200) {
   }
   {
     // Each refusal names the box (15 Sep 2026).
-    const longTerms = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "2026-09-02", specialTerms: "x".repeat(2001) }) });
+    const longTerms = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "2026-09-02", specialTerms: "x".repeat(2001) }) });
     check("consent: special terms over 2,000 characters are refused by name", longTerms.status === 400 && longTerms.body?.error?.message === "Special terms can be at most 2,000 characters.", longTerms.body);
-    const noName = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "", seriesNumber: "E", effectiveDate: "2026-09-02" }) });
+    const noName = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "", seriesNumber: "E", effectiveDate: "2026-09-02" }) });
     check("consent: a missing series name is refused by name", noName.status === 400 && noName.body?.error?.message === "Enter the protected series name.", noName.body);
-    const noDate = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "soon" }) });
+    const noDate = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "soon" }) });
     check("consent: a missing date is refused by name", noDate.status === 400 && noDate.body?.error?.message === "Enter the effective date.", noDate.body);
-    const longContribution = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "2026-09-02", contribution: "y".repeat(301) }) });
+    const longContribution = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "2026-09-02", contribution: "y".repeat(301) }) });
     check("consent: a contribution over 300 characters is refused by name", longContribution.status === 400 && longContribution.body?.error?.message === "The contribution can be at most 300 characters.", longContribution.body);
   }
   {
@@ -1907,7 +1907,8 @@ if (mint.status === 200) {
       const named = await api(`/api/portal/oa/answers?company=${secondId}`, { method: "PUT", cookies: setPw.cookie, body: JSON.stringify({ firstOrAmended: "first", effectiveDate: "2026-10-01", members: [{ name: "Sydney Secondowner", address: "9 Second Street, Tampa, FL 33602" }], series: [] }) });
       check("the second company's owner is saved", named.status === 200, named.body);
       const secondName = ((await api(`/api/admin/orders/${secondId}`, { cookies: (await adminSession()).cookie })).body?.data as { llcName?: string })?.llcName ?? "";
-      const consent2 = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ company: secondId, seriesName: `${secondName}, PS B`, seriesNumber: "B", purpose: "", effectiveDate: "2026-10-02" }) });
+      const selectedSecond = await api(`/api/portal/oa/generate?company=${secondId}`, {method:"POST",cookies:setPw.cookie,body:JSON.stringify({firstOrAmended:"first",effectiveDate:"2026-10-01",authorized:true,multiOwner:false,members:[{name:"Sydney Secondowner",address:"9 Second Street, Tampa, FL 33602"}],series:[],assets:[]})});
+      const consent2 = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId:selectedSecond.body?.data?.generationId, partiesConfirmed:true, company: secondId, seriesName: `${secondName}, PS B`, seriesNumber: "B", purpose: "", effectiveDate: "2026-10-02" }) });
       check("a consent for the second company generates", consent2.status === 200, consent2.body);
       if (consent2.status === 200 && hasPdftotext) {
         const bytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${consent2.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } })).arrayBuffer());
@@ -2685,8 +2686,8 @@ if (mint.status === 200) {
     const smSeed = (await api("/api/portal/oa", { cookies: smPw.cookie })).body?.data?.seed as { llcName: string } | undefined;
     const savedBefore = (await api("/api/portal/oa", { cookies: smPw.cookie })).body?.data?.answers as Record<string, unknown> | undefined;
     await api("/api/portal/oa/answers", { method: "PUT", cookies: smPw.cookie, body: JSON.stringify({ ...smAnswers, members: [{ ...trustOwner, signerName: "" }] }) });
-    const consentGap = await api("/api/portal/series/consent", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ seriesName: `${smSeed?.llcName}, PS Z`, seriesNumber: "Z", effectiveDate: "2026-10-01" }) });
-    check("consent: a company or trust owner with no signer is refused, naming the owner", consentGap.status === 400 && /Name the person who signs for Vale Family Trust/.test(consentGap.body?.error?.message ?? ""), consentGap.body);
+    const consentGap = await api("/api/portal/series/consent", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ generationId:entityGen.body?.data?.generationId, partiesConfirmed:true, seriesName: `${smSeed?.llcName}, PS Z`, seriesNumber: "Z", effectiveDate: "2026-10-01" }) });
+    check("consent: incomplete questionnaire edits do not replace selected agreement parties", consentGap.status === 200, consentGap.body);
     // A backup beneficiary with no first beneficiary is refused, naming the owner.
     const soloOwner = { name: "Sam Solo", address: "9 Harbor Road, Naples, FL 34102", isEntity: false, todBeneficiary: "", todBackup: "my children in equal shares" };
     const backupOnly = await api("/api/portal/oa/generate", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ ...smAnswers, members: [soloOwner] }) });
@@ -2710,7 +2711,7 @@ if (mint.status === 200) {
   // On a manager-managed form the amendment carries the Manager's
   // acknowledgment — s. 12.1(b) bars new obligations on the Manager without
   // the Manager's written consent — beneath the Member's signature.
-  const smAmend = await api("/api/portal/oa/amend", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ agreementDate: "2026-08-08", effectiveDate: "2026-09-12", mode: "attached" }) });
+  const smAmend = await api("/api/portal/oa/amend", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ generationId:entityGen.body?.data?.generationId, agreementDate: "2026-08-08", effectiveDate: "2026-09-12", mode: "attached" }) });
   check("manager-managed sole owner: amendment generates", smAmend.status === 200 && smAmend.body?.data?.number === 1, smAmend.body);
   const smAmText = pdfText(new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${smAmend.body?.data?.documentId}/download`, { headers: { Cookie: smPw.cookie } })).arrayBuffer()));
   if (smAmText !== null) {
@@ -4111,6 +4112,12 @@ batch16Checks((label, ok, detail) => batch16Results.set(label, {ok, detail}));
 { const r = batch16Results.get("batch16: professional eligibility is conditional and cumulative"); check("batch16: professional eligibility is conditional and cumulative", r?.ok === true, r?.detail); }
 { const r = batch16Results.get("batch16: bankruptcy paragraph is exactly owner approved"); check("batch16: bankruptcy paragraph is exactly owner approved", r?.ok === true, r?.detail); }
 
+const {batch30Checks}=await import("./batch30-check");
+const batch30Results=new Map<string,{ok:boolean;detail?:unknown}>();
+await batch30Checks((label,ok,detail)=>batch30Results.set(label,{ok,detail}));
+{const r=batch30Results.get("batch30 C01");check("batch30 C01",r?.ok===true,r?.detail);}
+{const r=batch30Results.get("batch30 C02");check("batch30 C02",r?.ok===true,r?.detail);}
+{const r=batch30Results.get("batch30 C03");check("batch30 C03",r?.ok===true,r?.detail);}
 const {batch29Checks}=await import("./batch29-check");
 const batch29Results=new Map<string,{ok:boolean;detail?:unknown}>();
 await batch29Checks((label,ok,detail)=>batch29Results.set(label,{ok,detail}));

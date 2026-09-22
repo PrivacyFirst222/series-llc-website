@@ -1,3 +1,5 @@
+import { AgreementSourcePicker } from "./AgreementSourcePicker";
+import type { AgreementSource } from "@/lib/agreementSource";
 import { AgreementLoadError } from "./AgreementLoadError";
 // Amendment to Operating Agreement (Adam, 12 Sep 2026): "a standard amendment
 // form with recitals that refer to the amendment provisions in the OA and then
@@ -36,6 +38,8 @@ export default function AmendAgreement() {
   // The agreement being amended, by its effective date: prefilled from the
   // current agreement on file, confirmed or corrected by the client, printed
   // in Recital A (Adam, 12 Sep 2026).
+  const [selection, setSelection] = useState<{company:string|null; source:AgreementSource}|null>(null);
+  const selected = selection?.company === company ? selection.source : null;
   const [agreementDate, setAgreementDate] = useState<string | null>(null);
   const [mode, setMode] = useState<"typed" | "attached">("typed");
   const [text, setText] = useState<string>("");
@@ -61,6 +65,7 @@ export default function AmendAgreement() {
     mutationFn: (payload: { agreementDate: string }) =>
       api.post<{ documentId: string; title: string; number: number }>(`/api/portal/oa/amend${cq}`, {
         agreementDate: payload.agreementDate,
+        generationId: selected?.id,
         effectiveDate: effectiveDate ?? oaQuery.data?.todayEastern ?? "",
         mode,
         text: mode === "typed" ? text : undefined,
@@ -102,9 +107,8 @@ export default function AmendAgreement() {
     );
   }
 
-  const current = data.generations[0];
-  const agreementDateValue = agreementDate ?? current?.effective_date_iso ?? "";
-  const canCreate = !amend.isPending && !!agreementDateValue && !!(effectiveDate ?? oaQuery.data?.todayEastern) && (mode === "attached" || text.trim() !== "");
+  const agreementDateValue = agreementDate ?? selected?.effectiveDateIso ?? "";
+  const canCreate = !!selected && !amend.isPending && !!agreementDateValue && !!(effectiveDate ?? oaQuery.data?.todayEastern) && (mode === "attached" || text.trim() !== "");
 
   return (
     <section className="container-wide section-y">
@@ -118,11 +122,10 @@ export default function AmendAgreement() {
         <h1 className="display mt-2 text-3xl">Amendment to Operating Agreement</h1>
         <p className="mt-2 text-sm text-muted-foreground">{data.seed.llcName}</p>
 
-        {!current ? (
+        {!data.generations.length ? (
           <div className="mt-6 rounded-2xl border border-border bg-card p-5">
             <p className="text-sm">
-              An amendment amends the operating agreement on file. Generate your operating agreement
-              first, then come back here.
+              No generated agreement is available for this company. This form cannot amend an outside agreement or an older copy not associated with this company.
             </p>
             <Button asChild className="mt-4 rounded-full">
               <Link to={`/portal/agreement${cq}`}>Go to the operating agreement</Link>
@@ -148,6 +151,8 @@ export default function AmendAgreement() {
             </div>
 
             <QuestionCard title="Which operating agreement is being amended?">
+              <p className="text-sm">Choose the operating agreement you are amending.</p>
+              <AgreementSourcePicker company={company} value={selected?.id ?? ""} onChange={source=>{setSelection(source ? {company,source} : null);setAgreementDate(null);setError("");}} />
               <label className="text-sm" htmlFor="agreement-date">Effective date of the operating agreement</label>
               <Input
                 id="agreement-date"
@@ -157,15 +162,10 @@ export default function AmendAgreement() {
                 onChange={(e) => setAgreementDate(e.target.value)}
                 className="max-w-xs"
               />
-              <p className="text-xs text-muted-foreground" data-testid="agreement-on-file">
-                Most recently generated agreement on file:{" "}
-                <strong className="text-foreground">
-                  {current.amended_restated ? "Amended & Restated" : "Operating Agreement"} (No. {current.generation_number})
-                </strong>
-                {current.effective_date ? `, effective ${current.effective_date}` : ""}. The amendment names the
-                agreement by the date above. It is signed by every member, as the agreement requires,
-                and acknowledged by the manager where the agreement names one.
-              </p>
+              {selected ? <p className="text-xs text-muted-foreground" data-testid="agreement-on-file">
+                Selected agreement: Operating Agreement (No. {selected.number}){selected.effectiveDate ? `, effective ${selected.effectiveDate}` : ""}.
+                Confirm the effective date above. The amendment uses this agreement’s members and managers.
+              </p> : null}
             </QuestionCard>
 
             <QuestionCard title="When does the amendment take effect?">

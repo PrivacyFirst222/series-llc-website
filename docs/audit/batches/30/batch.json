@@ -1,0 +1,193 @@
+{
+  "id": "30",
+  "revision": 2,
+  "title": "Explicit agreement selection and protected-series EIN explanation",
+  "model": "Codex",
+  "base": "835aff445f27531b0972f057514ce2b4cb37b993",
+  "items": [
+    {
+      "id": "AUD-claude-reconciled-batch30-reader-6-amendment-latest-generation",
+      "part": "all",
+      "scope": "Select the company-specific amendment agreement and show its stored parties and date; refuse missing, foreign, deleted or unassigned legacy selections.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch30 C01"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch30-runtime-A-consent-from-draft",
+      "part": "all",
+      "scope": "Select a stored agreement for consent parties; show and confirm current parties, retaining entity and joint signature structure. Never infer adoption from generation order or saved questionnaire edits.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch30 C02"
+        }
+      ]
+    },
+    {
+      "id": "N1.07",
+      "part": "all",
+      "scope": "Preserve office entity-scoping checks and correct the portal series helper to the approved disregarded-entity wording, independent of the parent S-election purchase.",
+      "replaces": {
+        "batch": "02",
+        "revision": 1,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "check",
+            "suite": "server",
+            "label": "batch02 N1.07: EIN tax instructions do not borrow another entity election"
+          }
+        ]
+      },
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch02 N1.07: EIN tax instructions do not borrow another entity election"
+        },
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch30 C03"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "docs/audit/intakes/claude-reconciled-batch30.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "docs/audit/rulings.md",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/server/agreement-source.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/server/new-series.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/src/lib/agreementSource.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/src/pages/portal/AgreementSourcePicker.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/src/pages/portal/AmendAgreement.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/server/batch30-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/scripts/batch30-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/server/batch02-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/scripts/batch14-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/scripts/batch10-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "control": true,
+      "why": "Approved Batch30 agreement selection, signatures, series tax explanation and corresponding real regression fixtures."
+    },
+    {
+      "path": "webapp/server/pdf-render.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Keep the new joint-owner heading and both human signature lines together as one measured block."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": [
+    "consent: a company or trust owner with no signer is refused, naming the owner"
+  ],
+  "testSupport": [
+    "webapp/server/batch30-check.ts",
+    "webapp/scripts/batch30-walk.ts"
+  ]
+}

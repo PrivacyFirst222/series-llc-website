@@ -1,3 +1,5 @@
+import { AgreementSourcePicker } from "./AgreementSourcePicker";
+import type { AgreementSource } from "@/lib/agreementSource";
 // Orders the client has paid for and we have not yet delivered — placed
 // near the top of the portal, beneath the documents, so nothing waiting on
 // the client is far down the page (Adam, 6 Sep 2026: "Where they are
@@ -144,6 +146,9 @@ export function OrdersInProgress({
   // This is the only document that does, and it carries the Series Exhibit
   // Section 3.1 requires adopted at or before the filing.
   const [consentFor, setConsentFor] = useState<ServiceOrder | null>(null);
+  const [consentSource, setConsentSource] = useState<AgreementSource|null>(null);
+  const [partiesConfirmed, setPartiesConfirmed] = useState(false);
+  useEffect(()=>{setConsentSource(null);setPartiesConfirmed(false);},[consentFor,company]);
   const formOpen = detailsFor !== null || consentFor !== null || formedGateFor !== null;
   useEffect(() => {
     onFormOpenChange?.(formOpen);
@@ -152,7 +157,7 @@ export function OrdersInProgress({
   }, [formOpen]);
   const makeConsent = useMutation({
     mutationFn: (body: { seriesName: string; seriesNumber: string; purpose: string; effectiveDate: string; specialTerms: string; contribution: string }) =>
-      api.post<{ documentId: string; title: string }>("/api/portal/series/consent", { ...body, company: company ?? undefined }),
+      api.post<{ documentId: string; title: string }>("/api/portal/series/consent", { ...body, company: company ?? undefined, generationId: consentSource?.id, partiesConfirmed }),
     onSuccess: (res) => {
       setConsentFor(null);
       // The document card reads a separate query; without this the client
@@ -331,6 +336,7 @@ export function OrdersInProgress({
             className="space-y-3"
             onSubmit={(e) => {
               e.preventDefault();
+              if (!consentSource || !partiesConfirmed) return;
               const fd = new FormData(e.currentTarget);
               makeConsent.mutate({
                 seriesName: String(fd.get("seriesName") ?? ""),
@@ -342,6 +348,8 @@ export function OrdersInProgress({
               });
             }}
           >
+            <AgreementSourcePicker company={company} value={consentSource?.id ?? ""} onChange={source=>{setConsentSource(source);setPartiesConfirmed(false);}} />
+            {consentSource ? <label className="flex items-start gap-2 text-sm"><input type="checkbox" checked={partiesConfirmed} onChange={e=>setPartiesConfirmed(e.target.checked)} />I confirm that the members and managers shown above are the company’s current members and managers.</label> : null}
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Protected series name</label>
               <Input name="seriesName" defaultValue={consentFor?.details.seriesName ?? ""} required />
@@ -387,7 +395,7 @@ export function OrdersInProgress({
               <label className="text-sm font-medium">Special terms for this series (optional)</label>
               <Textarea name="specialTerms" rows={3} maxLength={2000} placeholder="Rules for this series alone, if any" />
               <p className="text-xs text-muted-foreground">
-                Up to 2,000 characters. As on the agreement's Series Exhibit. {data.oaSElection
+                Up to 2,000 characters. As on the agreement's Series Exhibit. {consentSource?.sElection
                   ? "Special terms may not override Article 8 (records), Article 9 (the tax rules protecting the S election), or statutory provisions that cannot be changed."
                   : "Special terms may not override Article 8 (records) or statutory provisions that cannot be changed."}
               </p>
@@ -397,7 +405,7 @@ export function OrdersInProgress({
               <p className="text-xs text-muted-foreground sm:mr-auto">
                 Every member signs it; keep it with your company records.
               </p>
-              <Button type="submit" disabled={makeConsent.isPending} className="rounded-full">
+              <Button type="submit" disabled={makeConsent.isPending || !consentSource || !partiesConfirmed} className="rounded-full">
                 {makeConsent.isPending ? "Preparing…" : "Prepare the consent"}
               </Button>
             </DialogFooter>
@@ -552,7 +560,7 @@ export function OrdersInProgress({
                 <label className="text-sm font-medium">Number of members</label>
                 <Input name="memberCount" inputMode="numeric" autoComplete="off" aria-label="Number of members" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount ?? String(einMemberCountDefault)} />
                 <p className="text-xs text-muted-foreground">
-                  {(Number((detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount) || einMemberCountDefault) > 1
+                  {detailsFor?.details.target === "series" ? "We will apply for this protected series’ EIN as a disregarded entity." : (Number((detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount) || einMemberCountDefault) > 1
                     ? (data.sElection.reason === "already_ordered" ? "We will report it as an S corporation, since the Form 2553 package is on the order." : "We will report it as a partnership, the IRS's default for several members.")
                     : (data.sElection.reason === "already_ordered" ? "We will report it as an S corporation, since the Form 2553 package is on the order." : "We will report it as a disregarded entity, the IRS's default for one member.")}
                 </p>

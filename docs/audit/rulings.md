@@ -121,3 +121,7 @@ Adam. A new ruling is added the day it is given.
 - Ruling N2.27: "Batch 16 item 14: Use this exact paragraph and update the manual and instructions: The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. § 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member’s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate’s interest in a Member’s transferable (economic) interest to the extent permitted by applicable law."
 
 - Ruling 90: "Keep the conservative inactive-name block; describe a recently inactive record without claiming the record proves dissolution. Apply consistently to the client and server explanations."
+
+- Ruling AUD-claude-reconciled-batch30-reader-6-amendment-latest-generation: "Approved Batch30 proposal: explicitly select the company agreement, show its parties and confirm its effective date; stop if the required agreement is unavailable. Go. Approve all."
+
+- Ruling AUD-claude-reconciled-batch30-runtime-A-consent-from-draft: "Approved Batch30 proposal: select an agreement supplying current members/managers, display and confirm them, preserve entity and joint signatures. Go. Approve all."

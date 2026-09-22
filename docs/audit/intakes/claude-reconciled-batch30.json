@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "run": "claude-reconciled-batch30",
+  "commit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+  "completedAt": "2026-09-22T06:49:31.365021+00:00",
+  "manifestSha": "1e5f8d3028a2b37e072c0998e01ac8c3c3ef8d48c549b4b18eb43b0eedb3f6b9",
+  "auditSha": "8663757091854fb28da02e37708e83edbb1f243d818b32dd7d7469b1f7260823",
+  "findings": [
+    {
+      "key": "reader-6-amendment-latest-generation",
+      "where": "Client portal, Amend your operating agreement \u2014 which agreement the amendment's parties and recitals come from",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 1733,
+      "reads": "  const current = await db.query<{ inputs: unknown }>(\n    `SELECT inputs FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1`,\n    [session.clientId, seed.orderId],\n  );",
+      "claims": "The company's current agreement is the most recently generated one, so the amendment's parties, Manager and company name are taken from it.",
+      "truth": "Ruling N3.10: 'generation order does not determine legal effect. No inferred adoption tracker.' Ruling 137 requires the restatement to name a company-specific predecessor chosen by the client (:1238-1246 does so). The amendment route offers no such choice: it always takes the newest oa_generations row's inputs (parties, Manager) while asking the client only to confirm an agreementDate (:1711), which may belong to an earlier generation whose owners differ. AmendAgreement.tsx:105 `const current = data.generations[0]` and :161 label it 'Most recently generated agreement on file'. A client who adopted Agreement No. 2 and later generated No. 3 with different owners gets an amendment signed by No. 3's parties reciting No. 2's date.",
+      "replacement": "Add `generationId: z.string().uuid()` to amendSchema; load `SELECT inputs FROM oa_generations WHERE id = $1 AND client_id = $2 AND order_id = $3` with [a.generationId, session.clientId, seed.orderId] and refuse with \"Choose the agreement you are amending.\" when absent; the form offers the same generation list the restatement uses, defaulting the confirmed date from the chosen generation. (Design follows Rulings 137/N3.10; the exact wording needs Adam's ruling.)",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "reader-6-f-amend-latest",
+        "reader-6-rulings"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude independent evidence",
+        "evidence": "Reopened at 835aff4; original evidence retained in batches/30/evidence/reconciled-source.json. Ask which company-specific agreement supplies the amendment parties and confirm the effective date for that selection. Do not infer adoption from recency. Reject another company\u2019s selection and explicitly handle outside/legacy predecessors.",
+        "priorCompared": true,
+        "replacement": "needs owner ruling"
+      },
+      "bucket": 6,
+      "reader": "reader-6",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "runtime-A-consent-from-draft",
+      "where": "Client portal \u2192 Orders in progress / Your documents \u2192 Consent & Series Exhibit (the series consent's members and signature blocks), and the S-election form's owner dropdown \u2014 versus Amendment to Operating Agreement (its MEMBERS blocks)",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 1594,
+      "reads": "  const savedForSeries = await savedOaAnswers(session.clientId, consentCompanyId);\n  const seriesOwners = effectiveOwners(seed.members, savedForSeries);\n  const managers = agreementManagers(seed, savedForSeries);",
+      "claims": "The comment at lines 1592-1593 says these are \"Same owners the operating agreement uses \u2014 a client who added or removed an owner must not get a series document that names the intake list\"; the comment over effectiveOwners (lines 319-320) says \"Every document that names the owners resolves them HERE \u2014 otherwise two documents generated the same afternoon disagree about who owns the company.\"",
+      "truth": "The consent resolves its members from the questionnaire DRAFT (oa_profiles.answers), which autosaves on every keystroke and may never be regenerated, while the amendment (lines 1733-1741) resolves its parties from the stored inputs of the most recently GENERATED agreement. Runtime (asset-owner-removal.md, checks \"the consent follows the DRAFT (sole member form, Riley absent) although the most recent generated agreement still lists Riley\" and \"the amendment follows the GENERATED agreement\"; both texts in consent-vs-amendment.md): with the third owner removed in the draft only, the PS 4 consent was the WRITTEN CONSENT OF THE SOLE MEMBER naming Casey Member alone, and Amendment No. 1 made the same minute carried MEMBERS blocks for Casey Member and Riley Partner. facts.md (Batch 14) records that a generated PDF does not establish adoption \u2014 a draft establishes even less \u2014 yet the consent, a signed instrument reciting that the signers are \"all of the members\", is built from it. The services route (lines 1857-1859) builds the S-election owner list from the same draft.",
+      "replacement": "In app.post(\"/portal/series/consent\") derive the owners and Managers the way the amendment does: read the most recent oa_generations row for the company (`SELECT inputs FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1`) and take `memberNames` from `inputs.members` (each member's `signatories ?? [name]`, with `entitySigner` for entity owners) and `managerNames`/`managerEntitySigners` from the inputs; fall back to `savedOaAnswers` only when no agreement has been generated, and say so in the dialog (OrdersInProgress.tsx, the Consent & Series Exhibit description) \u2014 or, if Adam prefers the draft, make the dialog state that the consent names the owners as currently answered in the questionnaire and that the agreement on file must be regenerated to match. Ruling needed: which record is the source of the members for a signed consent.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "runtime-A-asset-owner-removal",
+        "runtime-A-consent-vs-amendment",
+        "runtime-A-findings-sources"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude independent evidence",
+        "evidence": "Reopened at 835aff4; original evidence retained in batches/30/evidence/reconciled-source.json. Show the members/managers the consent will name and require the user to confirm the current authorized parties, using an explicitly selected source. Preserve entity/joint signers. Do not tell users regeneration alone changes legal ownership or fixes adoption.",
+        "priorCompared": true,
+        "replacement": "needs owner ruling"
+      },
+      "bucket": 6,
+      "reader": "reader-6",
+      "link": null,
+      "presentedAs": "new"
+    }
+  ]
+}

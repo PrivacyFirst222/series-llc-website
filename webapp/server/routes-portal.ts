@@ -1,3 +1,4 @@
+import { agreementSources, AGREEMENT_UNAVAILABLE } from "./agreement-source";
 import { storeElectionPackage } from './s-election-package-storage';
 import { registerRenewalCard } from './renewal-card';
 import { MAX_OA_OWNERS } from "../src/lib/oaLimits";
@@ -1043,6 +1044,15 @@ app.get("/portal/documents/:id/download", async (c) => {
   });
 });
 
+app.get("/portal/oa/sources", async (c) => {
+  const session = await getSession(c);
+  if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  const companyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+  if (!companyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
+  const rows = await agreementSources(session.clientId, companyId);
+  return c.json({data: rows.map(({source}) => ({...source, effectiveDateIso:isoFromPrinted(source.effectiveDate)}))});
+});
+
 app.get("/portal/oa", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -1544,6 +1554,8 @@ app.post("/portal/series/consent", async (c) => {
       // The company the series joins (Adam, 31 Aug 2026: one account, several
       // companies); the consent document is filed under it.
       company: z.string().uuid().optional(),
+      generationId: z.string().uuid().optional(),
+      partiesConfirmed: z.boolean().optional(),
     })
     .safeParse(await c.req.json().catch(() => null));
   if (!body.success) {
@@ -1552,6 +1564,8 @@ app.post("/portal/series/consent", async (c) => {
     const first = body.error.issues[0];
     const field = String(first?.path?.[0] ?? "");
     if (field === "company") return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
+    if (field === "generationId") return c.json(err(AGREEMENT_UNAVAILABLE, "INVALID_INPUT"), 400);
+    if (field === "partiesConfirmed") return c.json(err("Confirm that the displayed members and managers are current.", "INVALID_INPUT"), 400);
     const tooBig = first?.code === "too_big";
     const msg =
       field === "seriesName" ? (tooBig ? "The series name can be at most 300 characters." : "Enter the protected series name.")
@@ -1584,35 +1598,15 @@ app.post("/portal/series/consent", async (c) => {
     );
   }
 
-  const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
-  // Same owners the operating agreement uses — a client who added or removed an
-  // owner must not get a series document that names the intake list.
-  const savedForSeries = await savedOaAnswers(session.clientId, consentCompanyId);
-  const seriesOwners = effectiveOwners(seed.members, savedForSeries);
-  const managers = agreementManagers(seed, savedForSeries);
-  const invalidManager = memberManaged ? null : managerProblem(managers);
-  if (invalidManager) return c.json(err(invalidManager, "INVALID_INPUT"), 400);
-  // Entity owners and Managers sign through the people the questionnaire
-  // named (Adam, 13 Sep 2026).
-  const entitySigners: { entity: string; name: string; title: string }[] = [];
-  (savedForSeries?.members ?? []).forEach((m, i) => {
-    const owner = seriesOwners[i];
-    if (owner && (m.isEntity ?? seed.members[i]?.isEntity) && (m.signerName ?? "").trim()) {
-      entitySigners.push({ entity: owner.name, name: (m.signerName ?? "").trim(), title: (m.signerTitle ?? "").trim() });
-    }
-  });
-  managers.filter(m => m.isEntity).forEach(m => entitySigners.push({ entity: m.name!.trim(), name: m.signerName!.trim(), title: m.signerTitle!.trim() }));
-  // A company or trust signs through a person, here as in the agreement
-  // (15 Sep 2026: the consent printed the company on a person's line).
-  for (let i = 0; i < seriesOwners.length; i += 1) {
-    const m = savedForSeries?.members?.[i];
-    const isEntity = m?.isEntity ?? seed.members[i]?.isEntity ?? false;
-    if (!isEntity) continue;
-    const sg = entitySigners.find((x) => x.entity === seriesOwners[i].name);
-    if (!sg || !hasFirstAndLast(sg.name) || !sg.title) {
-      return c.json(err(`Name the person who signs for ${seriesOwners[i].name || `owner ${i + 1}`} — first and last name — and their title.`, "INVALID_INPUT"), 400);
-    }
-  }
+  const selected = (await agreementSources(session.clientId, seed.orderId)).find(x => x.source.id === body.data.generationId);
+  if (!selected) return c.json(err(AGREEMENT_UNAVAILABLE, "INVALID_INPUT"), 400);
+  if (body.data.partiesConfirmed !== true) return c.json(err("Confirm that the displayed members and managers are current.", "INVALID_INPUT"), 400);
+  const oa = selected.inputs;
+  const memberManaged = oa.version.startsWith("member");
+  const entitySigners = [
+    ...oa.members.flatMap(m => m.entitySigner ? [{entity:m.name, ...m.entitySigner}] : []),
+    ...(oa.managerEntitySigners ?? []).map(m => ({entity:m.manager, name:m.name, title:m.title})),
+  ];
   const generatedOn = new Date();
   let pdf: Uint8Array;
   let title: string;
@@ -1623,8 +1617,9 @@ app.post("/portal/series/consent", async (c) => {
       seriesNumber: body.data.seriesNumber.trim(),
       purpose: body.data.purpose,
       effectiveDate: fmtDate(body.data.effectiveDate),
-      memberNames: seriesOwners.map((m) => m.name),
-      managerNames: managers.map(m => m.name!.trim()),
+      memberNames: oa.members.map(m => m.name),
+      memberSignatories: oa.members.map(m => ({member:m.name, signatories:m.signatories, jointHolding:m.jointHolding})),
+      managerNames: oa.managerNames,
       memberManaged,
       specialTerms: body.data.specialTerms,
       contribution: body.data.contribution,
@@ -1698,7 +1693,7 @@ app.delete("/portal/oa/generations/:id", async (c) => {
 });
 
 /** Amendment to Operating Agreement (Adam, 12 Sep 2026). Filled from the
- *  STORED inputs of the company's current agreement, so the parties who sign
+ *  STORED inputs of the agreement explicitly selected by the client, so the parties who sign
  *  the amendment are the parties who signed the agreement, and numbered per
  *  company from 1. The PDF lands in Your documents beside the agreement. */
 const amendSchema = z.object({
@@ -1708,6 +1703,7 @@ const amendSchema = z.object({
   effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   mode: z.enum(["typed", "attached"]),
   text: z.string().max(20000).optional(),
+  generationId: z.string().uuid().optional(),
 });
 app.post("/portal/oa/amend", async (c) => {
   const session = await getSession(c);
@@ -1715,6 +1711,7 @@ app.post("/portal/oa/amend", async (c) => {
   const body = amendSchema.safeParse(await c.req.json().catch(() => null));
   if (!body.success) {
     const field = String(body.error.issues[0]?.path?.[0] ?? "");
+    if (field === "generationId") return c.json(err(AGREEMENT_UNAVAILABLE, "INVALID_INPUT"), 400);
     const named = field === "agreementDate" ? "the effective date of the operating agreement" : field === "effectiveDate" ? "the amendment's effective date" : field === "mode" ? "how the changes are stated" : field === "text" ? "the typed changes" : "the amendment";
     return c.json(err(`Please check ${named}.`, "INVALID_INPUT"), 400);
   }
@@ -1727,15 +1724,11 @@ app.post("/portal/oa/amend", async (c) => {
   const seed = await oaSeed(session.clientId, amendCompanyId);
   if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
   const db = await getDb();
-  const current = await db.query<{ inputs: unknown }>(
-    `SELECT inputs FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1`,
-    [session.clientId, seed.orderId],
-  );
-  if (current.length === 0) {
-    return c.json(err("Generate an operating agreement first. An amendment amends the agreement on file.", "NO_AGREEMENT"), 400);
-  }
-  const rawInputs = current[0].inputs;
-  const oa = (typeof rawInputs === "string" ? JSON.parse(rawInputs) : rawInputs) as OaInputs;
+  const available = await agreementSources(session.clientId, seed.orderId);
+  if (!available.length) return c.json(err(AGREEMENT_UNAVAILABLE, "NO_AGREEMENT"), 400);
+  const selected = available.find(x => x.source.id === a.generationId);
+  if (!selected) return c.json(err(AGREEMENT_UNAVAILABLE, "INVALID_INPUT"), 400);
+  const oa = selected.inputs;
   // The next number after the highest on file for this company. A number is
   // printed on the PDF, so it is never reused while a later one exists.
   const prior = await db.query<{ title: string }>(

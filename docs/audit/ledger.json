@@ -19336,12 +19336,92 @@
               "batch": "02",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-22T06:50:15.749Z",
+              "event": "superseded by approved replacement",
+              "batch": "30",
+              "revision": 1,
+              "note": "prior fix 02 r1 at ; approved work order a9d1dd44e9885c7273f956a1cccf4347d3626dc42e7ea293a0918418ffc28ab8"
+            },
+            {
+              "at": "2026-09-22T06:50:15.749Z",
+              "event": "assigned",
+              "batch": "30",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T07:04:10.928Z",
+              "event": "rejected r1",
+              "batch": "30",
+              "revision": 1,
+              "note": "Automatic revision under Adam’s standing authorization: declare the consent assertion replacement and joint-signature pagination support."
+            },
+            {
+              "at": "2026-09-22T07:04:24.632Z",
+              "event": "superseded by approved replacement",
+              "batch": "30",
+              "revision": 2,
+              "note": "prior fix 02 r1 at ; approved work order 9f116dbefaf4537acb16be86448bf0e8e85c7d9423092946490e28d823598f43"
+            },
+            {
+              "at": "2026-09-22T07:04:24.632Z",
+              "event": "assigned",
+              "batch": "30",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T07:06:40.698Z",
+              "event": "implemented",
+              "batch": "30",
+              "revision": 2,
+              "note": "by Codex"
             }
           ],
-          "batch": "02",
+          "batch": "30",
+          "supersessions": [
+            {
+              "prior": {
+                "batch": "02",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "server",
+                    "label": "batch02 N1.07: EIN tax instructions do not borrow another entity election"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "30",
+              "revision": 1,
+              "hash": "a9d1dd44e9885c7273f956a1cccf4347d3626dc42e7ea293a0918418ffc28ab8"
+            },
+            {
+              "prior": {
+                "batch": "02",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "server",
+                    "label": "batch02 N1.07: EIN tax instructions do not borrow another entity election"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "30",
+              "revision": 2,
+              "hash": "9f116dbefaf4537acb16be86448bf0e8e85c7d9423092946490e28d823598f43"
+            }
+          ],
           "fix": {
-            "batch": "02",
-            "revision": 1,
+            "batch": "30",
+            "revision": 2,
             "commit": "",
             "doneBy": "Codex",
             "assertions": [
@@ -19349,6 +19429,11 @@
                 "kind": "check",
                 "suite": "server",
                 "label": "batch02 N1.07: EIN tax instructions do not borrow another entity election"
+              },
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch30 C03"
               }
             ]
           }
@@ -26835,6 +26920,140 @@
           }
         }
       ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch30-reader-6-amendment-latest-generation",
+      "tag": "substantive",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch30.json finding reader-6-amendment-latest-generation",
+      "text": "Client portal, Amend your operating agreement — which agreement the amendment's parties and recitals come from — `webapp/server/routes-portal.ts:1733`\nReads:   const current = await db.query<{ inputs: unknown }>(\n    `SELECT inputs FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1`,\n    [session.clientId, seed.orderId],\n  );\nClaims: The company's current agreement is the most recently generated one, so the amendment's parties, Manager and company name are taken from it.\nTrue: Ruling N3.10: 'generation order does not determine legal effect. No inferred adoption tracker.' Ruling 137 requires the restatement to name a company-specific predecessor chosen by the client (:1238-1246 does so). The amendment route offers no such choice: it always takes the newest oa_generations row's inputs (parties, Manager) while asking the client only to confirm an agreementDate (:1711), which may belong to an earlier generation whose owners differ. AmendAgreement.tsx:105 `const current = data.generations[0]` and :161 label it 'Most recently generated agreement on file'. A client who adopted Agreement No. 2 and later generated No. 3 with different owners gets an amendment signed by No. 3's parties reciting No. 2's date.\nProposed replacement (not approved): Add `generationId: z.string().uuid()` to amendSchema; load `SELECT inputs FROM oa_generations WHERE id = $1 AND client_id = $2 AND order_id = $3` with [a.generationId, session.clientId, seed.orderId] and refuse with \"Choose the agreement you are amending.\" when absent; the form offers the same generation list the restatement uses, defaulting the confirmed date from the chosen generation. (Design follows Rulings 137/N3.10; the exact wording needs Adam's ruling.)\nRechecked by Codex reconciliation of Claude independent evidence: Reopened at 835aff4; original evidence retained in batches/30/evidence/reconciled-source.json. Ask which company-specific agreement supplies the amendment parties and confirm the effective date for that selection. Do not infer adoption from recency. Reject another company’s selection and explicitly handle outside/legacy predecessors.",
+      "verdict": "open",
+      "waitsOn": [
+        "ruling:AUD-claude-reconciled-batch30-reader-6-amendment-latest-generation"
+      ],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T06:49:31.365021+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch30 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit 8663757091854fb28da02e37708e83edbb1f243d818b32dd7d7469b1f7260823"
+            },
+            {
+              "at": "2026-09-22T06:50:15.748Z",
+              "event": "assigned",
+              "batch": "30",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T07:04:10.928Z",
+              "event": "rejected r1",
+              "batch": "30",
+              "revision": 1,
+              "note": "Automatic revision under Adam’s standing authorization: declare the consent assertion replacement and joint-signature pagination support."
+            },
+            {
+              "at": "2026-09-22T07:04:24.632Z",
+              "event": "assigned",
+              "batch": "30",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T07:06:40.698Z",
+              "event": "implemented",
+              "batch": "30",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "30",
+          "fix": {
+            "batch": "30",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch30 C01"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch30-runtime-A-consent-from-draft",
+      "tag": "substantive",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-reconciled-batch30.json finding runtime-A-consent-from-draft",
+      "text": "Client portal → Orders in progress / Your documents → Consent & Series Exhibit (the series consent's members and signature blocks), and the S-election form's owner dropdown — versus Amendment to Operating Agreement (its MEMBERS blocks) — `webapp/server/routes-portal.ts:1594`\nReads:   const savedForSeries = await savedOaAnswers(session.clientId, consentCompanyId);\n  const seriesOwners = effectiveOwners(seed.members, savedForSeries);\n  const managers = agreementManagers(seed, savedForSeries);\nClaims: The comment at lines 1592-1593 says these are \"Same owners the operating agreement uses — a client who added or removed an owner must not get a series document that names the intake list\"; the comment over effectiveOwners (lines 319-320) says \"Every document that names the owners resolves them HERE — otherwise two documents generated the same afternoon disagree about who owns the company.\"\nTrue: The consent resolves its members from the questionnaire DRAFT (oa_profiles.answers), which autosaves on every keystroke and may never be regenerated, while the amendment (lines 1733-1741) resolves its parties from the stored inputs of the most recently GENERATED agreement. Runtime (asset-owner-removal.md, checks \"the consent follows the DRAFT (sole member form, Riley absent) although the most recent generated agreement still lists Riley\" and \"the amendment follows the GENERATED agreement\"; both texts in consent-vs-amendment.md): with the third owner removed in the draft only, the PS 4 consent was the WRITTEN CONSENT OF THE SOLE MEMBER naming Casey Member alone, and Amendment No. 1 made the same minute carried MEMBERS blocks for Casey Member and Riley Partner. facts.md (Batch 14) records that a generated PDF does not establish adoption — a draft establishes even less — yet the consent, a signed instrument reciting that the signers are \"all of the members\", is built from it. The services route (lines 1857-1859) builds the S-election owner list from the same draft.\nProposed replacement (not approved): In app.post(\"/portal/series/consent\") derive the owners and Managers the way the amendment does: read the most recent oa_generations row for the company (`SELECT inputs FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1`) and take `memberNames` from `inputs.members` (each member's `signatories ?? [name]`, with `entitySigner` for entity owners) and `managerNames`/`managerEntitySigners` from the inputs; fall back to `savedOaAnswers` only when no agreement has been generated, and say so in the dialog (OrdersInProgress.tsx, the Consent & Series Exhibit description) — or, if Adam prefers the draft, make the dialog state that the consent names the owners as currently answered in the questionnaire and that the agreement on file must be regenerated to match. Ruling needed: which record is the source of the members for a signed consent.\nRechecked by Codex reconciliation of Claude independent evidence: Reopened at 835aff4; original evidence retained in batches/30/evidence/reconciled-source.json. Show the members/managers the consent will name and require the user to confirm the current authorized parties, using an explicitly selected source. Preserve entity/joint signers. Do not tell users regeneration alone changes legal ownership or fixes adoption.",
+      "verdict": "open",
+      "waitsOn": [
+        "ruling:AUD-claude-reconciled-batch30-runtime-A-consent-from-draft"
+      ],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-22T06:49:31.365021+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-reconciled-batch30 at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; audit 8663757091854fb28da02e37708e83edbb1f243d818b32dd7d7469b1f7260823"
+            },
+            {
+              "at": "2026-09-22T06:50:15.749Z",
+              "event": "assigned",
+              "batch": "30",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-22T07:04:10.928Z",
+              "event": "rejected r1",
+              "batch": "30",
+              "revision": 1,
+              "note": "Automatic revision under Adam’s standing authorization: declare the consent assertion replacement and joint-signature pagination support."
+            },
+            {
+              "at": "2026-09-22T07:04:24.632Z",
+              "event": "assigned",
+              "batch": "30",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-22T07:06:40.698Z",
+              "event": "implemented",
+              "batch": "30",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "30",
+          "fix": {
+            "batch": "30",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch30 C02"
+              }
+            ]
+          }
+        }
+      ]
     }
   ],
   "rulings": [
@@ -27159,6 +27378,18 @@
       "kind": "ruling",
       "item": "90",
       "text": "Keep the conservative inactive-name block; describe a recently inactive record without claiming the record proves dissolution. Apply consistently to the client and server explanations."
+    },
+    {
+      "date": "2026-09-22",
+      "kind": "ruling",
+      "item": "AUD-claude-reconciled-batch30-reader-6-amendment-latest-generation",
+      "text": "Approved Batch30 proposal: explicitly select the company agreement, show its parties and confirm its effective date; stop if the required agreement is unavailable. Go. Approve all."
+    },
+    {
+      "date": "2026-09-22",
+      "kind": "ruling",
+      "item": "AUD-claude-reconciled-batch30-runtime-A-consent-from-draft",
+      "text": "Approved Batch30 proposal: select an agreement supplying current members/managers, display and confirm them, preserve entity and joint signatures. Go. Approve all."
     }
   ],
   "batches": [
@@ -28113,6 +28344,45 @@
           "event": "implemented"
         }
       ]
+    },
+    {
+      "id": "30",
+      "revision": 1,
+      "frozenHash": "a9d1dd44e9885c7273f956a1cccf4347d3626dc42e7ea293a0918418ffc28ab8",
+      "status": "rejected",
+      "model": "Codex",
+      "base": "835aff445f27531b0972f057514ce2b4cb37b993",
+      "history": [
+        {
+          "at": "2026-09-22T06:50:15.749Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-22T07:04:10.928Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-22T07:04 (terminal): Automatic revision under Adam’s standing authorization: declare the consent assertion replacement and joint-signature pagination support."
+        }
+      ]
+    },
+    {
+      "id": "30",
+      "revision": 2,
+      "frozenHash": "9f116dbefaf4537acb16be86448bf0e8e85c7d9423092946490e28d823598f43",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "835aff445f27531b0972f057514ce2b4cb37b993",
+      "history": [
+        {
+          "at": "2026-09-22T07:04:24.633Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-22T07:06:40.698Z",
+          "event": "implemented"
+        }
+      ]
     }
   ],
   "auditImports": [
@@ -28127,6 +28397,10 @@
     {
       "path": "docs/audit/intakes/claude-reconciled-batch29.json",
       "sha": "1801aa5c28a547c09ee49de2a9f79955dd031450176b39d267c61c7939d5a75e"
+    },
+    {
+      "path": "docs/audit/intakes/claude-reconciled-batch30.json",
+      "sha": "624127007eb33321ec8adccdb8a860b63073f0d0d3dfe1be1329cc14ed088b4c"
     }
   ]
 }

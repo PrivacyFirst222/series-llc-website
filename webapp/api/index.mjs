@@ -93820,6 +93820,14 @@ async function renderMarkdownPdf(opts) {
   };
   for (let bi2 = 0; bi2 < blocks.length; bi2++) {
     const block = blocks[bi2];
+    if (block.kind === "para" && block.sourceText.trim() === "[[signature-group]]") {
+      let end = bi2 + 1;
+      while (end < blocks.length && paraTextAt(end) !== "[[/signature-group]]") end++;
+      if (end === blocks.length) throw new Error("Unclosed signature group");
+      drawSignature(bi2 + 1, end);
+      bi2 = end;
+      continue;
+    }
     const signatureTo = block.kind === "para" ? signatureEnd(bi2) : null;
     if (signatureTo !== null) {
       drawSignature(bi2, signatureTo);
@@ -101409,6 +101417,49 @@ async function unavailableNames(names) {
   }
 }
 
+// server/agreement-source.ts
+init_db();
+var AGREEMENT_UNAVAILABLE = "Choose an available operating agreement for this company. An outside agreement or an older copy not associated with this company cannot be used by this form.";
+var person = external_exports.string().trim().min(1);
+var signer = external_exports.object({ name: person, title: person });
+var parties = external_exports.object({
+  companyName: person,
+  version: external_exports.enum(["single", "single-s", "multi", "s", "member", "member-s", "member-single", "member-single-s"]),
+  members: external_exports.array(external_exports.object({ name: person, signatories: external_exports.array(person).min(1).optional(), jointHolding: person.optional(), entitySigner: signer.optional() }).passthrough()).min(1),
+  managerNames: external_exports.array(person),
+  managerEntitySigners: external_exports.array(external_exports.object({ manager: person, name: person, title: person })).optional()
+}).passthrough().refine((x2) => x2.version.startsWith("member") || x2.managerNames.length > 0);
+async function agreementSources(client, company) {
+  const db = await getDb();
+  const rows = await db.query(
+    "SELECT id, inputs, generation_number FROM oa_generations WHERE client_id=$1 AND order_id=$2 ORDER BY created_at DESC",
+    [client, company]
+  );
+  return rows.flatMap((row) => {
+    let raw2;
+    try {
+      raw2 = typeof row.inputs === "string" ? JSON.parse(row.inputs) : row.inputs;
+    } catch {
+      return [];
+    }
+    if (!parties.safeParse(raw2).success) return [];
+    const inputs = raw2;
+    const source = {
+      id: row.id,
+      company,
+      sElection: inputs.version === "s" || inputs.version.endsWith("-s"),
+      number: Number(row.generation_number ?? inputs.generationNumber ?? 0),
+      effectiveDate: inputs.effectiveDate ?? "",
+      members: inputs.members.map((m2) => ({ name: m2.name, signatories: m2.signatories, jointHolding: m2.jointHolding, entitySigner: m2.entitySigner })),
+      managers: inputs.version.startsWith("member") ? [] : inputs.managerNames.map((name) => {
+        const s = inputs.managerEntitySigners?.find((x2) => x2.manager === name);
+        return { name, ...s ? { signer: { name: s.name, title: s.title } } : {} };
+      })
+    };
+    return [{ source, inputs }];
+  });
+}
+
 // server/s-election-package-storage.ts
 init_db();
 init_env();
@@ -107011,8 +107062,19 @@ By: _____________________________
 [[indent]]${sg.title}` : `_____________________________
 ${n}${suffix}`) + (dated ? "\nDate: _____________________________" : "");
   };
-  const psSignature = input.memberManaged ? input.memberNames.map((n) => block(n, ", Member", false)).join("\n\n") : managers.map((n) => block(n, ", Protected Series Manager", false)).join("\n\n");
-  const blocks = input.memberNames.map((n) => block(n, "")).join("\n\n");
+  const memberBlock = (name, suffix, dated = true) => {
+    const m2 = input.memberSignatories?.find((m3) => m3.member === name);
+    if (!m2?.signatories || m2.signatories.length < 2 || signerOf(name)) return block(name, suffix, dated);
+    return `[[signature-group]]
+
+${name}${m2.jointHolding ? ` \u2014 ${m2.jointHolding}` : ""}${suffix}
+
+${m2.signatories.map((n) => block(n, "", dated)).join("\n\n")}
+
+[[/signature-group]]`;
+  };
+  const psSignature = input.memberManaged ? input.memberNames.map((n) => memberBlock(n, ", Member", false)).join("\n\n") : managers.map((n) => block(n, ", Protected Series Manager", false)).join("\n\n");
+  const blocks = input.memberNames.map((n) => memberBlock(n, "")).join("\n\n");
   must2(s, "[COMPANY NAME], LLC", "company name");
   s = s.split("[COMPANY NAME], LLC").join(input.companyName);
   s = s.split("[COMPANY NAME]").join(input.companyName);
@@ -107036,7 +107098,7 @@ ${n}${suffix}`) + (dated ? "\nDate: _____________________________" : "");
   must2(s, "[MEMBER SIGNATURE BLOCKS]", "member signature blocks");
   s = s.split("[MEMBER SIGNATURE BLOCKS]").join(blocks);
   s = s.replace(/\n{3,}/g, "\n\n");
-  assertTemplateComplete(s);
+  assertTemplateComplete(s.replace(/\[\[\/?signature-group\]\]/g, ""));
   return { markdown: s, encodedClientText: true, title: `Consent & Series Exhibit \u2014 ${decodeDocumentText(input.seriesName)}` };
 }
 
@@ -108244,6 +108306,14 @@ function registerPortalRoutes(app2) {
       }
     });
   });
+  app2.get("/portal/oa/sources", async (c) => {
+    const session = await getSession(c);
+    if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const companyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
+    if (!companyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
+    const rows = await agreementSources(session.clientId, companyId);
+    return c.json({ data: rows.map(({ source }) => ({ ...source, effectiveDateIso: isoFromPrinted(source.effectiveDate) })) });
+  });
   app2.get("/portal/oa", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -108643,12 +108713,16 @@ function registerPortalRoutes(app2) {
       effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/),
       // The company the series joins (Adam, 31 Aug 2026: one account, several
       // companies); the consent document is filed under it.
-      company: external_exports.string().uuid().optional()
+      company: external_exports.string().uuid().optional(),
+      generationId: external_exports.string().uuid().optional(),
+      partiesConfirmed: external_exports.boolean().optional()
     }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) {
       const first = body.error.issues[0];
       const field = String(first?.path?.[0] ?? "");
       if (field === "company") return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
+      if (field === "generationId") return c.json(err(AGREEMENT_UNAVAILABLE, "INVALID_INPUT"), 400);
+      if (field === "partiesConfirmed") return c.json(err("Confirm that the displayed members and managers are current.", "INVALID_INPUT"), 400);
       const tooBig = first?.code === "too_big";
       const msg = field === "seriesName" ? tooBig ? "The series name can be at most 300 characters." : "Enter the protected series name." : field === "seriesNumber" ? tooBig ? "The exhibit identifier can be at most 40 characters." : "Enter the exhibit identifier." : field === "effectiveDate" ? "Enter the effective date." : field === "specialTerms" ? "Special terms can be at most 2,000 characters." : field === "contribution" ? "The contribution can be at most 300 characters." : field === "purpose" ? "The purpose can be at most 600 characters." : "Series name, identifier, and date are required.";
       return c.json(err(msg, "INVALID_INPUT"), 400);
@@ -108669,29 +108743,15 @@ function registerPortalRoutes(app2) {
         400
       );
     }
-    const memberManaged = seed.managementStructure === "MEMBER_MANAGED";
-    const savedForSeries = await savedOaAnswers(session.clientId, consentCompanyId);
-    const seriesOwners = effectiveOwners(seed.members, savedForSeries);
-    const managers = agreementManagers(seed, savedForSeries);
-    const invalidManager = memberManaged ? null : managerProblem(managers);
-    if (invalidManager) return c.json(err(invalidManager, "INVALID_INPUT"), 400);
-    const entitySigners = [];
-    (savedForSeries?.members ?? []).forEach((m2, i) => {
-      const owner = seriesOwners[i];
-      if (owner && (m2.isEntity ?? seed.members[i]?.isEntity) && (m2.signerName ?? "").trim()) {
-        entitySigners.push({ entity: owner.name, name: (m2.signerName ?? "").trim(), title: (m2.signerTitle ?? "").trim() });
-      }
-    });
-    managers.filter((m2) => m2.isEntity).forEach((m2) => entitySigners.push({ entity: m2.name.trim(), name: m2.signerName.trim(), title: m2.signerTitle.trim() }));
-    for (let i = 0; i < seriesOwners.length; i += 1) {
-      const m2 = savedForSeries?.members?.[i];
-      const isEntity = m2?.isEntity ?? seed.members[i]?.isEntity ?? false;
-      if (!isEntity) continue;
-      const sg = entitySigners.find((x2) => x2.entity === seriesOwners[i].name);
-      if (!sg || !hasFirstAndLast(sg.name) || !sg.title) {
-        return c.json(err(`Name the person who signs for ${seriesOwners[i].name || `owner ${i + 1}`} \u2014 first and last name \u2014 and their title.`, "INVALID_INPUT"), 400);
-      }
-    }
+    const selected = (await agreementSources(session.clientId, seed.orderId)).find((x2) => x2.source.id === body.data.generationId);
+    if (!selected) return c.json(err(AGREEMENT_UNAVAILABLE, "INVALID_INPUT"), 400);
+    if (body.data.partiesConfirmed !== true) return c.json(err("Confirm that the displayed members and managers are current.", "INVALID_INPUT"), 400);
+    const oa = selected.inputs;
+    const memberManaged = oa.version.startsWith("member");
+    const entitySigners = [
+      ...oa.members.flatMap((m2) => m2.entitySigner ? [{ entity: m2.name, ...m2.entitySigner }] : []),
+      ...(oa.managerEntitySigners ?? []).map((m2) => ({ entity: m2.manager, name: m2.name, title: m2.title }))
+    ];
     const generatedOn = /* @__PURE__ */ new Date();
     let pdf;
     let title;
@@ -108702,8 +108762,9 @@ function registerPortalRoutes(app2) {
         seriesNumber: body.data.seriesNumber.trim(),
         purpose: body.data.purpose,
         effectiveDate: fmtDate3(body.data.effectiveDate),
-        memberNames: seriesOwners.map((m2) => m2.name),
-        managerNames: managers.map((m2) => m2.name.trim()),
+        memberNames: oa.members.map((m2) => m2.name),
+        memberSignatories: oa.members.map((m2) => ({ member: m2.name, signatories: m2.signatories, jointHolding: m2.jointHolding })),
+        managerNames: oa.managerNames,
         memberManaged,
         specialTerms: body.data.specialTerms,
         contribution: body.data.contribution,
@@ -108776,7 +108837,8 @@ function registerPortalRoutes(app2) {
     agreementDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     effectiveDate: external_exports.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     mode: external_exports.enum(["typed", "attached"]),
-    text: external_exports.string().max(2e4).optional()
+    text: external_exports.string().max(2e4).optional(),
+    generationId: external_exports.string().uuid().optional()
   });
   app2.post("/portal/oa/amend", async (c) => {
     const session = await getSession(c);
@@ -108784,6 +108846,7 @@ function registerPortalRoutes(app2) {
     const body = amendSchema.safeParse(await c.req.json().catch(() => null));
     if (!body.success) {
       const field = String(body.error.issues[0]?.path?.[0] ?? "");
+      if (field === "generationId") return c.json(err(AGREEMENT_UNAVAILABLE, "INVALID_INPUT"), 400);
       const named = field === "agreementDate" ? "the effective date of the operating agreement" : field === "effectiveDate" ? "the amendment's effective date" : field === "mode" ? "how the changes are stated" : field === "text" ? "the typed changes" : "the amendment";
       return c.json(err(`Please check ${named}.`, "INVALID_INPUT"), 400);
     }
@@ -108796,15 +108859,11 @@ function registerPortalRoutes(app2) {
     const seed = await oaSeed(session.clientId, amendCompanyId);
     if (!seed) return c.json(err("We couldn't find a paid order for this company.", "NO_LLC"), 400);
     const db = await getDb();
-    const current = await db.query(
-      `SELECT inputs FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1`,
-      [session.clientId, seed.orderId]
-    );
-    if (current.length === 0) {
-      return c.json(err("Generate an operating agreement first. An amendment amends the agreement on file.", "NO_AGREEMENT"), 400);
-    }
-    const rawInputs = current[0].inputs;
-    const oa = typeof rawInputs === "string" ? JSON.parse(rawInputs) : rawInputs;
+    const available = await agreementSources(session.clientId, seed.orderId);
+    if (!available.length) return c.json(err(AGREEMENT_UNAVAILABLE, "NO_AGREEMENT"), 400);
+    const selected = available.find((x2) => x2.source.id === a2.generationId);
+    if (!selected) return c.json(err(AGREEMENT_UNAVAILABLE, "INVALID_INPUT"), 400);
+    const oa = selected.inputs;
     const prior = await db.query(
       "SELECT title FROM documents WHERE client_id = $1 AND kind = 'amendment' AND (order_id = $2 OR order_id IS NULL)",
       [session.clientId, seed.orderId]

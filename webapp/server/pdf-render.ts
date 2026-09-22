@@ -376,6 +376,16 @@ export async function renderMarkdownPdf(opts: {
 
   for (let bi = 0; bi < blocks.length; bi++) {
     const block = blocks[bi];
+    // A joint ownership unit has a heading and separate human signatures.
+    // Reserve the complete group so the heading cannot be stranded.
+    if (block.kind === "para" && block.sourceText.trim() === "[[signature-group]]") {
+      let end = bi + 1;
+      while (end < blocks.length && paraTextAt(end) !== "[[/signature-group]]") end++;
+      if (end === blocks.length) throw new Error("Unclosed signature group");
+      drawSignature(bi + 1, end);
+      bi = end;
+      continue;
+    }
     const signatureTo = block.kind === "para" ? signatureEnd(bi) : null;
     if (signatureTo !== null) { drawSignature(bi, signatureTo); bi = signatureTo - 1; continue; }
     if (block.kind === "para" && !tailPulled) {

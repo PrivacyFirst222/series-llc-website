@@ -33,8 +33,10 @@ async function routes() {
  const invalidDate=await generate({...answers,firstOrAmended:'amended',priorAgreement:'external',priorAgreementDate:'2026-02-30'});
  const empty=await generate({...answers,managers:[]}), incomplete=await generate({...answers,managers:[{name:'Management LLC',isEntity:true}]}), duplicate=await generate({...answers,managers:[{name:'Same Person'},{name:'Same Person'}]});
  const removed=await generate({...answers,managers:answers.managers.slice(1)});
- const consent=await req('/portal/series/consent',{company:co,seriesName:'Fourteen, LLC Protected Series 4',seriesNumber:'4',purpose:'',effectiveDate:'2026-09-20'});
+ const consentAgreement=crypto.randomUUID();await db.query("INSERT INTO oa_generations(id,client_id,order_id,template_version,amended_restated,inputs,generation_number) VALUES($1,$2,$3,'test',false,$4,9)",[consentAgreement,client,co,JSON.stringify(removed.inputs)]);
+ const consent=await req('/portal/series/consent' ,{generationId:consentAgreement,partiesConfirmed:true,company:co,seriesName:'Fourteen, LLC Protected Series 4',seriesNumber:'4',purpose:'',effectiveDate:'2026-09-20'});
  let consentText='';if(consent.body.data?.documentId){const pdf=await app.request('/api/portal/documents/'+consent.body.data.documentId+'/download',{headers:{Cookie:`fpsllc_session=${token.token}`}});const bytes=new Uint8Array(await pdf.arrayBuffer());evidence('saved-managers-consent.pdf',bytes);const text=Bun.spawnSync(['pdftotext','-layout','-','-'],{stdin:bytes});if(text.exitCode)throw Error('pdftotext failed');consentText=text.stdout.toString();}
+ await db.query('DELETE FROM oa_generations WHERE id=$1',[consentAgreement]);
  const servicesS=await req('/portal/services?company='+co);
  await db.query("UPDATE oa_generations SET inputs=jsonb_set(inputs,'{version}','\"single\"') WHERE id=$1",[prior]);
  const servicesOrdinary=await req('/portal/services?company='+co);

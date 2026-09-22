@@ -118,7 +118,8 @@ async function child() {
   const professionalSeed=await oaSeed(clientId,b);
   report('batch09 existing-company seed retains professional type and principal address',professionalSeed?.formationType==='PLLC'&&professionalSeed.principalAddress.includes('111 Alpha Avenue'),professionalSeed&&{formationType:professionalSeed.formationType,principalAddress:professionalSeed.principalAddress});
   await db.query('UPDATE orders SET payload=$1 WHERE id=$2',[JSON.stringify(conversion),b]);
-  const consent=await json('/portal/series/consent',{company:b,seriesName:'Actual Existing, LLC, PS New',seriesNumber:'New',purpose:'',effectiveDate:date});
+  const consentAgreement=await json('/portal/oa/generate?company='+b,{firstOrAmended:'first',effectiveDate:date,authorized:true,multiOwner:false,members:[{name:'Alice Example',address:'111 Alpha Avenue'}],assets:[],series:[]});
+  const consent=await json('/portal/series/consent' ,{generationId:consentAgreement.data?.generationId,partiesConfirmed:true,company:b,seriesName:'Actual Existing, LLC, PS New',seriesNumber:'New',purpose:'',effectiveDate:date});
   const consentText=consent.data?.documentId?await pdf(await req(`/portal/documents/${consent.data.documentId}/download`)):JSON.stringify(consent);
   report('batch02 existing-company consent names the recorded company',!!consent.data?.documentId&&consentText.includes('Actual Existing')&&!consentText.includes('Abandoned Candidate'),consent);
   const dirty=structuredClone(pa);dirty.members.memberList=[{...dirty.members.memberList[0],memberType:'ENTITY',firstName:'Obsolete',lastName:'Human',entityName:'Current Entity'}];await db.query('UPDATE orders SET payload=$1 WHERE id=$2',[JSON.stringify(dirty),a]);
