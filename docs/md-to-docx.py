@@ -427,6 +427,7 @@ def body_xml(md, P):
             headings.append((len(h.group(1)), h.group(2).strip()))
 
     out, i = [], 0
+    signature_choice_start = None
     if tp:
         out.append(title_page(tp, P))
     seen_rule = False
@@ -443,6 +444,15 @@ def body_xml(md, P):
 
         line = lines[i].rstrip()
         if line.startswith(DRAFT_START) and line.endswith(DRAFT_END):
+            signature_labels = ("If individual signer", "If entity signer", "If individual member", "If entity member")
+            if any(line == DRAFT_START + "[" + label + ":]" + DRAFT_END for label in signature_labels):
+                signature_choice_start = len(out)
+            if any(line == DRAFT_START + "[End " + label.lower() + ".]" + DRAFT_END for label in signature_labels):
+                if signature_choice_start is not None:
+                    for pi in range(signature_choice_start, len(out)):
+                        if out[pi].startswith("<w:p") and "<w:keepNext/>" not in out[pi]:
+                            out[pi] = out[pi].replace("<w:pPr>", "<w:pPr><w:keepNext/>", 1)
+                signature_choice_start = None
             if "[End " in line and out and out[-1].startswith("<w:p"):
                 # A closing label belongs to the preceding paragraph, never
                 # alone on a new page. Preserve that paragraph's other rules.
