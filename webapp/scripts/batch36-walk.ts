@@ -77,7 +77,7 @@ try{
  await page.getByRole('tab',{name:'Completed Orders',exact:true}).click();await page.getByText('Page 1 of 5',{exact:true}).waitFor();await page.getByRole('button',{name:'Next',exact:true}).click();await page.getByText('Page 2 of 5',{exact:true}).waitFor();check('completed tab has working pagination',true);
  const search=page.getByRole('searchbox');await search.fill('Finished Fixture');await page.getByRole('button',{name:/Finished Fixture LLC/}).waitFor();
  check('search reaches older completed orders',await page.getByRole('button',{name:'Next',exact:true}).count()===0);
- await page.getByRole('button',{name:/Finished Fixture LLC/}).click();await page.getByRole('button',{name:'Close',exact:true}).waitFor();check('completed order retains detail access',await page.getByText('Formation documents',{exact:true}).count()===1);await page.getByRole('button',{name:'Close',exact:true}).click();
+ await page.getByRole('button',{name:/Finished Fixture LLC/}).click();await page.getByText('Formation documents',{exact:true}).waitFor();check('completed order retains detail access',await page.getByText('Formation documents',{exact:true}).count()===1);await page.getByRole('button',{name:'Close',exact:true}).click();
  await search.fill('');await page.getByText('Page 1 of 5',{exact:true}).waitFor();await shot('completed-desktop');
  await page.setViewportSize({width:1024,height:768});await shot('completed-tablet');
  await page.setViewportSize({width:390,height:844});await shot('completed-mobile');

@@ -112860,7 +112860,7 @@ function registerAdminRoutes(app2) {
     ]);
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     if (rows[0].status !== "filed") {
-      return c.json(err("Only a filing awaiting the State\u2019s decision can be moved back. A formed company with work still owed appears in Post-Filing Items or New Orders.", "BAD_STATE"), 400);
+      return c.json(err("Only a filing awaiting the State\u2019s decision can be moved back. A formed company appears in Post-Filing Items or New Orders while other work is owed.", "BAD_STATE"), 400);
     }
     await db.query("UPDATE orders SET status = 'paid', filed_at = NULL, series_filed_at = NULL, rejected_at = now(), copied_fields = '{}'::jsonb WHERE id = $1", [
       c.req.param("id")

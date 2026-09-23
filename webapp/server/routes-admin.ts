@@ -240,7 +240,7 @@ app.post("/admin/orders/:id/unfiled", async (c) => {
   ]);
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   if (rows[0].status !== "filed") {
-    return c.json(err("Only a filing awaiting the State’s decision can be moved back. A formed company with work still owed appears in Post-Filing Items or New Orders.", "BAD_STATE"), 400);
+    return c.json(err("Only a filing awaiting the State’s decision can be moved back. A formed company appears in Post-Filing Items or New Orders while other work is owed.", "BAD_STATE"), 400);
   }
   // A Division rejection means refiling, usually under the alternate name:
   // every copied-field tick is cleared so the re-copy starts honest, and the
