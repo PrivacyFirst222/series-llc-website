@@ -30047,6 +30047,110 @@
           }
         }
       ]
+    },
+    {
+      "id": "AUD-codex-release-review-2026-09-22-RR-01",
+      "tag": "substantive",
+      "area": "Emails and jobs",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/codex-release-review-2026-09-22.json finding RR-01",
+      "text": "Release review: RR-01 — `webapp/server/backup.ts:23`\nReads: export const BACKUP_TABLES = [\nClaims: A complete backup preserves durable recovery workflows.\nTrue: The table list omits staged_documents and renewal_card_attempts; the offline backup/empty-database restore probe loses both rows and leaves the cleanup object. See sealed recovery-backup.log and recovery-restore.log.\nProposed replacement (not approved): Include both workflow tables in the consistent snapshot; validate recoverable card requests before restoration; preserve cleanup paths and retry identity; reject incomplete older dumps and restart incomplete old jobs from a fresh consistent snapshot.\nRechecked by Codex release reviewer: Reopened at frozen c91b101 and reproduced offline in the sealed release review; not an independent second model review.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-23T01:20:44.194773+00:00",
+              "event": "recorded from verified audit",
+              "note": "codex-release-review-2026-09-22 at c91b101b9652a14906270d1422f8cc771f71e706; audit eb45aea77ec3c627ae5d28bc2b5b421ffdd8adc7b45556fe4426605f097ae069"
+            },
+            {
+              "at": "2026-09-23T01:20:44.300Z",
+              "event": "assigned",
+              "batch": "35",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T01:27:05.506Z",
+              "event": "implemented",
+              "batch": "35",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "35",
+          "fix": {
+            "batch": "35",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch35 RR-01"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-codex-release-review-2026-09-22-RR-02",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/codex-release-review-2026-09-22.json finding RR-02",
+      "text": "Release review: RR-02 — `docs/audit/ledger-lib.ts:480`\nReads: let cursor = bp.fix;\nClaims: Replacement replay can validate the complete unpublished history.\nTrue: The real ba8b8a6..c91b101 range refuses eight legitimate replacements because initial assignment and implementation are not replayed. See sealed publication-range-guard.log and local-transition-probe.log.\nProposed replacement (not approved): Replay the initial ordinary lifecycle from retained work orders and ordered events before replacements, preserving exact prior assertions, approvals, rejection and ownership checks.\nRechecked by Codex release reviewer: Reopened at frozen c91b101 and reproduced offline in the sealed release review; not an independent second model review.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-23T01:20:44.194773+00:00",
+              "event": "recorded from verified audit",
+              "note": "codex-release-review-2026-09-22 at c91b101b9652a14906270d1422f8cc771f71e706; audit eb45aea77ec3c627ae5d28bc2b5b421ffdd8adc7b45556fe4426605f097ae069"
+            },
+            {
+              "at": "2026-09-23T01:20:44.300Z",
+              "event": "assigned",
+              "batch": "35",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T01:27:05.506Z",
+              "event": "implemented",
+              "batch": "35",
+              "revision": 1,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "35",
+          "fix": {
+            "batch": "35",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch35 RR-02"
+              }
+            ]
+          }
+        }
+      ]
     }
   ],
   "rulings": [
@@ -31608,6 +31712,25 @@
           "event": "implemented"
         }
       ]
+    },
+    {
+      "id": "35",
+      "revision": 1,
+      "frozenHash": "aa8396900f16d7cbeb6dd1dd419dc1ad10a1ca6e3cd7bef93c197c10c7e01299",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "c91b101b9652a14906270d1422f8cc771f71e706",
+      "history": [
+        {
+          "at": "2026-09-23T01:20:44.300Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-23T01:27:05.506Z",
+          "event": "implemented"
+        }
+      ]
     }
   ],
   "auditImports": [
@@ -31642,6 +31765,10 @@
     {
       "path": "docs/audit/intakes/claude-optional-batch34.json",
       "sha": "ccf1ccf2b36c98f2a27310b499e9931ce0d61d029ebe43e7f3cb31f76292ff54"
+    },
+    {
+      "path": "docs/audit/intakes/codex-release-review-2026-09-22.json",
+      "sha": "04a2284e8653c388f56f8b7f2957dc6caa92b8e94b3cd3a189defb093ba971bc"
     }
   ]
 }

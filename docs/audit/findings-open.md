@@ -2,7 +2,7 @@
 
 GENERATED from docs/audit/ledger.json by `bun run docs/audit/ledger-print.ts list`. Do not edit: the commit step refuses a copy that differs from the ledger. The auditors' original files are unchanged under docs/audit/sources/ and docs/audit/runs/.
 
-417 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 83 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 405.
+419 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 85 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 407.
 
 A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.
 For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-session.ts. The historical coverage-check.ts alone does not establish complete prior-item reconciliation. Audit completion does not approve repairs or publication.
@@ -2090,7 +2090,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
   - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).
 
-## Emails and jobs — 41 open of 42
+## Emails and jobs — 42 open of 43
 
 - **194. [A3]** — **implemented** — related: 212
   - Renewal notice timing (mine). renewals.ts NOTICE_DAYS = 45. Terms 9(d): notice 30–60 days before the cancellation deadline; deadline is renewal − 30 (9(g)); so notice must be 60–90 days before the date. Replace: 60.
@@ -2434,8 +2434,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Drop the parameter: in email.ts:108 remove `giftCard: boolean;`, at :113 print `No eligible card is on file,` and in renewals.ts:126 remove `giftCard:false,`.
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
   - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).
+- **AUD-codex-release-review-2026-09-22-RR-01. [substantive]** — **implemented**
+  - Release review: RR-01 — `webapp/server/backup.ts:23`
+  - Reads: export const BACKUP_TABLES = [
+  - Claims: A complete backup preserves durable recovery workflows.
+  - True: The table list omits staged_documents and renewal_card_attempts; the offline backup/empty-database restore probe loses both rows and leaves the cleanup object. See sealed recovery-backup.log and recovery-restore.log.
+  - Proposed replacement (not approved): Include both workflow tables in the consistent snapshot; validate recoverable card requests before restoration; preserve cleanup paths and retry identity; reject incomplete older dumps and restart incomplete old jobs from a fresh consistent snapshot.
+  - Rechecked by Codex release reviewer: Reopened at frozen c91b101 and reproduced offline in the sealed release review; not an independent second model review.
+  - Fixed: batch 35 revision 1, commit , by Codex; protected by 1 assertion(s).
 
-## Agreements and guidance — 104 open of 107
+## Agreements and guidance — 105 open of 108
 
 - **229. [A80]** — **implemented**
   - Manager-managed forms (4), Indemnification: "an act exceeding the authority conferred by Section 5.4"; 5.4 is the approval list, 5.3 the authority. Replace: "an act taken without the approval Section 5.4 requires" (both places).
@@ -3385,3 +3393,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Only pull the tail forward when it will NOT fit on the current page AND the pull leaves the new page more than a third full; otherwise let the tail finish on the current page (it fits by definition when `y - tail >= MARGIN`) — i.e. change the condition at line 301 to `if (tail !== null && tail > 0 && y - tail < MARGIN && tail > TEXT_H / 3)`; a two-line tail then stays under the table, which always has room for two lines or the table row itself would have broken.
   - Rechecked by Codex at 455be76607d5f351dd9a0a80701f74af23683d1f: Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place.
   - Fixed: batch 34 revision 1, commit , by Codex; protected by 2 assertion(s).
+- **AUD-codex-release-review-2026-09-22-RR-02. [housekeeping]** — **implemented** — housekeeping
+  - Release review: RR-02 — `docs/audit/ledger-lib.ts:480`
+  - Reads: let cursor = bp.fix;
+  - Claims: Replacement replay can validate the complete unpublished history.
+  - True: The real ba8b8a6..c91b101 range refuses eight legitimate replacements because initial assignment and implementation are not replayed. See sealed publication-range-guard.log and local-transition-probe.log.
+  - Proposed replacement (not approved): Replay the initial ordinary lifecycle from retained work orders and ordered events before replacements, preserving exact prior assertions, approvals, rejection and ownership checks.
+  - Rechecked by Codex release reviewer: Reopened at frozen c91b101 and reproduced offline in the sealed release review; not an independent second model review.
+  - Fixed: batch 35 revision 1, commit , by Codex; protected by 1 assertion(s).

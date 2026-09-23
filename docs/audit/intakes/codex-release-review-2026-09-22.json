@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "run": "codex-release-review-2026-09-22",
+  "commit": "c91b101b9652a14906270d1422f8cc771f71e706",
+  "completedAt": "2026-09-23T01:20:44.194773+00:00",
+  "manifestSha": "b2303d95db3dc300f0286cbe221235a9509f70fb0230f54a57f611cc019b6696",
+  "auditSha": "eb45aea77ec3c627ae5d28bc2b5b421ffdd8adc7b45556fe4426605f097ae069",
+  "findings": [
+    {
+      "key": "RR-01",
+      "relation": "new",
+      "where": "Release review: RR-01",
+      "file": "webapp/server/backup.ts",
+      "line": 23,
+      "reads": "export const BACKUP_TABLES = [",
+      "claims": "A complete backup preserves durable recovery workflows.",
+      "truth": "The table list omits staged_documents and renewal_card_attempts; the offline backup/empty-database restore probe loses both rows and leaves the cleanup object. See sealed recovery-backup.log and recovery-restore.log.",
+      "replacement": "Include both workflow tables in the consistent snapshot; validate recoverable card requests before restoration; preserve cleanup paths and retry identity; reject incomplete older dumps and restart incomplete old jobs from a fresh consistent snapshot.",
+      "severity": "substantive",
+      "review": {
+        "reviewer": "Codex release reviewer",
+        "evidence": "Reopened at frozen c91b101 and reproduced offline in the sealed release review; not an independent second model review.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "RR-02",
+      "relation": "new",
+      "where": "Release review: RR-02",
+      "file": "docs/audit/ledger-lib.ts",
+      "line": 480,
+      "reads": "let cursor = bp.fix;",
+      "claims": "Replacement replay can validate the complete unpublished history.",
+      "truth": "The real ba8b8a6..c91b101 range refuses eight legitimate replacements because initial assignment and implementation are not replayed. See sealed publication-range-guard.log and local-transition-probe.log.",
+      "replacement": "Replay the initial ordinary lifecycle from retained work orders and ordered events before replacements, preserving exact prior assertions, approvals, rejection and ownership checks.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex release reviewer",
+        "evidence": "Reopened at frozen c91b101 and reproduced offline in the sealed release review; not an independent second model review.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    }
+  ]
+}

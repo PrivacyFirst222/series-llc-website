@@ -35,6 +35,8 @@ export const BACKUP_TABLES = [
   "ra_renewals",
   "ra_payment_attempts",
   "document_deletions",
+  "staged_documents",
+  "renewal_card_attempts",
 ] as const;
 
 const PREFIX = "backups/";
@@ -122,7 +124,11 @@ export async function runDbBackup(options:{resumeOnly?:boolean;budgetMs?:number}
  try{
   await ensureDeletionMirror(await deletionJournal());
   const saved=await readObject(JOB);let job:BackupJob|null=saved?JSON.parse(saved.toString()):null;
-  if(!job&&options.resumeOnly)return {key:'',sizeBytes:0,rowCounts:{},complete:(await backupProgress()).complete,pending:0};
+  const obsoleteJob=!!job&&BACKUP_TABLES.some(t=>!Array.isArray(job!.dump.tables[t]));
+  // A pre-upgrade checkpoint cannot acquire missing tables from a later moment.
+  // Replace only unfinished work with a new, internally consistent snapshot.
+  if(obsoleteJob)job=null;
+  if(!job&&!obsoleteJob&&options.resumeOnly)return {key:'',sizeBytes:0,rowCounts:{},complete:(await backupProgress()).complete,pending:0};
   if(!job){
    // One statement captures a consistent database snapshot. Never include
    // transient encrypted taxpayer numbers in a retained backup.

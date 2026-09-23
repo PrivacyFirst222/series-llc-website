@@ -1,0 +1,104 @@
+{
+  "id": "35",
+  "revision": 1,
+  "title": "Complete recovery workflows and publication-range replay",
+  "model": "Codex",
+  "base": "c91b101b9652a14906270d1422f8cc771f71e706",
+  "items": [
+    {
+      "id": "AUD-codex-release-review-2026-09-22-RR-01",
+      "part": "all",
+      "scope": "Include both workflow tables in the consistent snapshot; validate recoverable card requests before restoration; preserve cleanup paths and retry identity; reject incomplete older dumps and restart incomplete old jobs from a fresh consistent snapshot.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch35 RR-01"
+        }
+      ]
+    },
+    {
+      "id": "AUD-codex-release-review-2026-09-22-RR-02",
+      "part": "all",
+      "scope": "Replay the initial ordinary lifecycle from retained work orders and ordered events before replacements, preserving exact prior assertions, approvals, rejection and ownership checks.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch35 RR-02"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/server/backup.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved release blocker repair, regression coverage and checked intake."
+    },
+    {
+      "path": "webapp/server/restore.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved release blocker repair, regression coverage and checked intake."
+    },
+    {
+      "path": "docs/db-restore.md",
+      "mode": "code",
+      "control": true,
+      "why": "Approved release blocker repair, regression coverage and checked intake."
+    },
+    {
+      "path": "docs/audit/ledger-lib.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved release blocker repair, regression coverage and checked intake."
+    },
+    {
+      "path": "docs/audit/batch35-controls.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved release blocker repair, regression coverage and checked intake."
+    },
+    {
+      "path": "webapp/server/batch35-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved release blocker repair, regression coverage and checked intake."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved release blocker repair, regression coverage and checked intake."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved release blocker repair, regression coverage and checked intake."
+    },
+    {
+      "path": "docs/audit/intakes/codex-release-review-2026-09-22.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved release blocker repair, regression coverage and checked intake."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "why": "Normal generated output."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Normal generated output."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "docs/audit/batch35-controls.ts",
+    "webapp/server/batch35-check.ts"
+  ]
+}

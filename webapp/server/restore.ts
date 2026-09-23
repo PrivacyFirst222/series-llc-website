@@ -1,4 +1,5 @@
 import type { Db } from './db';
+import { decryptSecret } from './crypto';
 import { BACKUP_TABLES, type BackupDump } from './backup';
 import { readDeletionMirror } from './backup-deletions';
 import { readMirror, hashBytes } from './dropbox';
@@ -25,6 +26,17 @@ export async function restoreBackup(db:Db, dump:BackupDump):Promise<{tables:numb
   else if(row.type==='ein'&&row.status==='in_progress')row.status='awaiting_info';
   const needed = recoveryDetails(row as unknown as RecoverableElection, true);
   if(needed){row.status='awaiting_info';row.details=needed;recovery.push(row as unknown as RecoverableElection);}
+ }
+ // Pending card requests are durable, encrypted provider retry identities. A
+ // vanished worker's lease must not block the recovered client's retry. Verify
+ // the required key and identity before writing any restored file or row.
+ for(const row of tables.renewal_card_attempts){
+  if(row.status!=='pending')continue;
+  try{
+   const input=JSON.parse(decryptSecret(String(row.source_token)));
+   if(input.attemptId!==row.id||input.referenceId!==row.order_id||typeof input.source!=='string'||!input.source)throw new Error('identity');
+  }catch{throw new Error('Pending card update cannot be recovered: request key or identity unavailable');}
+  row.lock_until=null;
  }
  // Verify every required file and encryption key before writing database rows.
  const bytes=new Map<string,Buffer>();

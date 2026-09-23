@@ -3,7 +3,8 @@
 At 08:15 UTC the scheduled backup captures a consistent database snapshot.
 It includes clients, orders, service orders, document metadata, operating-agreement
 profiles and generations, library metadata, webhook history, Sunbiz sync state,
-contact messages, email history, renewal history and document-deletion records.
+contact messages, email history, renewal history, document-deletion records,
+staged-document cleanup intents and pending card-update attempts.
 The corresponding retained files (client documents, library files and order
 summaries) are copied to Dropbox and read back for verification. Only after all
 required files are accounted for is the completed snapshot published to private
@@ -65,8 +66,22 @@ independent Dropbox `/recovery/deletion-journal-v1.json` journal: it is authorit
 database. Expired questionnaire numbers remain absent. Client-deleted tax
 files stay unavailable even if older snapshots refer to them.
 
-The current tool requires the new complete file-manifest format. Older test
-dumps are left alone and are not silently certified as complete backups.
+The current tool requires the complete file-manifest format and all required
+workflow tables, including `staged_documents` and `renewal_card_attempts`. Older
+dumps missing either table are refused before any restoration writes: their
+missing workflow history cannot be reconstructed from that snapshot. Existing
+backups are left alone. An unfinished pre-upgrade backup job missing a required
+table restarts from one fresh consistent snapshot rather than mixing rows from
+different dates.
+
+Pending card-update requests remain encrypted and retain their original attempt
+ID and provider request. Keep the encryption keys (including the legacy session
+key if still used by a saved request). Restore verifies pending requests can be
+decrypted and match their attempt and company before writing files or rows. It
+clears the vanished worker's lease; reopening the portal card-update dialog
+continues the same attempt instead of silently creating a new one. Restoration
+does not call Square or charge a card. Document-cleanup intents resume through
+the existing cleanup job, including abandoned uploads and superseded packages.
 
 ## Deletion and provider recovery copies
 

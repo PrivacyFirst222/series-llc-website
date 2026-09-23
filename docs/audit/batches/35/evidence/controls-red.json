@@ -1,0 +1,105 @@
+[
+  {
+    "name": "initial open to implemented to replacement",
+    "ok": false,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix"
+    ]
+  },
+  {
+    "name": "initial assigned to implemented to replacement",
+    "ok": false,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix"
+    ]
+  },
+  {
+    "name": "missing assigned",
+    "ok": true,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix"
+    ]
+  },
+  {
+    "name": "missing implemented",
+    "ok": true,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix"
+    ]
+  },
+  {
+    "name": "missing superseded by approved replacement",
+    "ok": true,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix"
+    ]
+  },
+  {
+    "name": "forged assigned",
+    "ok": true,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix"
+    ]
+  },
+  {
+    "name": "forged implemented",
+    "ok": true,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix"
+    ]
+  },
+  {
+    "name": "implementation before assignment",
+    "ok": true,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix"
+    ]
+  },
+  {
+    "name": "forged archived assertions",
+    "ok": true,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix",
+      "item fixture35 part all: replacement: archived prior fix is not its frozen implemented work order",
+      "item fixture35 part all: replacement: exact prior fix and new work order are not bound by the retained snapshot",
+      "item fixture35 part all: replacement has no retained prior fix"
+    ]
+  },
+  {
+    "name": "missing predecessor snapshot",
+    "ok": true,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix",
+      "item fixture35 part all: replacement: archived prior fix is not its frozen implemented work order"
+    ]
+  },
+  {
+    "name": "altered predecessor snapshot",
+    "ok": true,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix",
+      "item fixture35 part all: replacement: archived prior fix is not its frozen implemented work order"
+    ]
+  },
+  {
+    "name": "replacement is not records-only",
+    "ok": true,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix"
+    ]
+  },
+  {
+    "name": "cancelled initial assignment then first fix and replacement",
+    "ok": false,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix"
+    ]
+  },
+  {
+    "name": "missing cancellation event",
+    "ok": true,
+    "problems": [
+      "item fixture35 part all: invalid replacement transition or archived prior fix"
+    ]
+  }
+]

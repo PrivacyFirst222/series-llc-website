@@ -474,44 +474,56 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
       const priorAttempts = bp.supersessions ?? [], attempts = ap.supersessions ?? [];
       if (!isPrefix(priorAttempts, attempts)) out.push(`${name}: supersession archive was rewritten`);
       const appendedAttempts = isPrefix(priorAttempts, attempts) ? attempts.slice(priorAttempts.length) : [];
-      // Replay replacements in part-history order. A predecessor can be
-      // replaced and restored while implemented, then released later in the
-      // same compared range. Its final batch state is not its earlier state.
+      // Replay every lifecycle event, including a first fix made after the
+      // comparison baseline. Never infer that fix from the replacement archive:
+      // its assignment, implementation and frozen work order must establish it.
       const events = ap.history.slice(bp.history.length);
-      let eventOffset = 0;
       let cursor = bp.fix;
       let cursorBatch = bp.batch, cursorStatus: PartStatus = bp.status;
-      const advanceRelease = (until: number) => {
-        if (cursorStatus !== "implemented" || !cursor) return;
-        const current = after.batches.find(x => x.id === cursor!.batch && x.revision === cursor!.revision);
-        if (current?.status === "released" && current.release && events.slice(eventOffset, until).some(h => h.event === "released" && h.batch === current.id && h.revision === current.revision)) {
-          cursor = { ...cursor, commit: current.release.git.commit };
-          cursorStatus = "released";
-        }
-      };
-      let replaced = appendedAttempts.length > 0 && ["implemented", "released"].includes(cursorStatus) && !!cursor;
-      for (const attempt of appendedAttempts) {
-        const target = after.batches.find(x => x.id === attempt.batch && x.revision === attempt.revision);
-        const assignedAt = events.findIndex((h, i) => i >= eventOffset && h.event === "superseded by approved replacement" && h.batch === attempt.batch && h.revision === attempt.revision);
-        if (assignedAt >= 0) advanceRelease(assignedAt);
-        if (!target || assignedAt < 0 || !["implemented", "released"].includes(cursorStatus) || (attempt.priorStatus ?? "released") !== cursorStatus || !same(attempt.prior, cursor)
-          || before.batches.some(x => x.id === target.id && x.revision === target.revision)
-          || supersessionProblems(after, b.id, bp.key, attempt, read, external).length) { replaced = false; break; }
-        eventOffset = assignedAt + 1;
-        if (target.status === "rejected") {
-          const rejectedAt = events.findIndex((h, i) => i >= eventOffset && h.event === `rejected r${target.revision}` && h.batch === target.id && h.revision === target.revision);
-          if (rejectedAt < 0) { replaced = false; break; }
-          eventOffset = rejectedAt + 1;
-          continue;
-        }
-        cursorBatch = target.id;
-        cursorStatus = target.status === "authorized" ? "assigned" : "implemented";
-        const work = JSON.parse(read(`docs/audit/batches/${target.id}/revisions/r${target.revision}.json`)!) as BatchFile;
-        const entry = work.items.find(x => x.id === b.id && x.part === bp.key)!;
-        cursor = target.status === "authorized" ? undefined : { batch: target.id, revision: target.revision, commit: "", doneBy: target.model, assertions: entry.assertions };
+      let cursorRevision = bp.fix?.revision ?? owner?.revision;
+      let replacementPending: Supersession | undefined;
+      let attemptIndex = 0;
+      let replaced = appendedAttempts.length > 0;
+      for (const h of replaced ? events : []) {
+        const target = after.batches.find(x => x.id === h.batch && x.revision === h.revision);
+        let work: BatchFile | undefined;
+        try { const text = target && read(`docs/audit/batches/${target.id}/revisions/r${target.revision}.json`); work = text ? JSON.parse(text) : undefined; } catch { /* refused below */ }
+        const entry = work?.items.find(x => x.id === b.id && x.part === bp.key);
+        if (!target || !work || !entry || work.id !== target.id || work.revision !== target.revision || frozenHashOf(work) !== target.frozenHash) { replaced = false; break; }
+        const owns = cursorBatch === target.id && cursorRevision === target.revision;
+        if (h.event === "superseded by approved replacement") {
+          const attempt = appendedAttempts[attemptIndex++];
+          if (replacementPending || !attempt || attempt.batch !== target.id || attempt.revision !== target.revision
+            || !["implemented", "released"].includes(cursorStatus) || !cursor
+            || (attempt.priorStatus ?? "released") !== cursorStatus || !same(attempt.prior, cursor)
+            || before.batches.some(x => x.id === target.id && x.revision === target.revision)
+            || supersessionProblems(after, b.id, bp.key, attempt, read, external).length) { replaced = false; break; }
+          replacementPending = attempt;
+        } else if (h.event === "assigned") {
+          if (replacementPending) {
+            if (replacementPending.batch !== target.id || replacementPending.revision !== target.revision || !same(entry.replaces, cursor)) { replaced = false; break; }
+          } else if (cursorStatus !== "open" || cursor || entry.replaces) { replaced = false; break; }
+          replacementPending = undefined;
+          cursor = undefined; cursorStatus = "assigned"; cursorBatch = target.id; cursorRevision = target.revision;
+        } else if (h.event === "implemented") {
+          if (replacementPending || !owns || cursorStatus !== "assigned" || !target.history.some(e => e.event === EVENT.implemented)) { replaced = false; break; }
+          cursor = { batch: target.id, revision: target.revision, commit: "", doneBy: target.model, assertions: entry.assertions };
+          cursorStatus = "implemented";
+        } else if (h.event === `rejected r${target.revision}`) {
+          if (replacementPending || !owns || !["assigned", "implemented"].includes(cursorStatus) || target.status !== "rejected") { replaced = false; break; }
+          const restore = attempts.find(s => s.batch === target.id && s.revision === target.revision);
+          cursor = restore ? structuredClone(restore.prior) : undefined;
+          cursorStatus = restore ? (restore.priorStatus ?? "released") : "open";
+          cursorBatch = cursor?.batch; cursorRevision = cursor?.revision;
+        } else if (h.event === "accepted by Adam" || h.event === "released") {
+          if (replacementPending || !owns || !cursor || target.status !== "released" || !target.release
+            || (h.event === "accepted by Adam" ? cursorStatus !== "implemented" : !["implemented", "accepted"].includes(cursorStatus))) { replaced = false; break; }
+          cursorStatus = h.event === "released" ? "released" : "accepted";
+          if (cursorStatus === "released") cursor = { ...cursor, commit: target.release.git.commit };
+        } else { replaced = false; break; }
       }
-      advanceRelease(events.length);
-      replaced = replaced && cursorStatus === ap.status && cursorBatch === ap.batch && same(cursor, ap.fix);
+      replaced = replaced && !replacementPending && attemptIndex === appendedAttempts.length
+        && cursorStatus === ap.status && cursorBatch === ap.batch && same(cursor, ap.fix);
       if (appendedAttempts.length && !replaced) out.push(`${name}: invalid replacement transition or archived prior fix`);
       if (replaced && opts.strict && (bp.status !== ap.status || bp.batch !== ap.batch || !same(bp.fix, ap.fix))) out.push(`${name}: replacement needs acceptance; never records-only publication`);
       const restore = bp.supersessions?.at(-1);

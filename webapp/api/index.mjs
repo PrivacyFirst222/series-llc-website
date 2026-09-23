@@ -94672,7 +94672,9 @@ async function runDbBackup(options = {}) {
     await ensureDeletionMirror(await deletionJournal());
     const saved = await readObject(JOB);
     let job = saved ? JSON.parse(saved.toString()) : null;
-    if (!job && options.resumeOnly) return { key: "", sizeBytes: 0, rowCounts: {}, complete: (await backupProgress()).complete, pending: 0 };
+    const obsoleteJob = !!job && BACKUP_TABLES.some((t) => !Array.isArray(job.dump.tables[t]));
+    if (obsoleteJob) job = null;
+    if (!job && !obsoleteJob && options.resumeOnly) return { key: "", sizeBytes: 0, rowCounts: {}, complete: (await backupProgress()).complete, pending: 0 };
     if (!job) {
       const selects = BACKUP_TABLES.map((t) => `'${t}',(SELECT coalesce(json_agg(x),'[]'::json) FROM ${t} x)`).join(",");
       const [snap] = await db.query(`SELECT json_build_object(${selects}) AS dump`);
@@ -94761,7 +94763,9 @@ var init_backup = __esm({
       "email_log",
       "ra_renewals",
       "ra_payment_attempts",
-      "document_deletions"
+      "document_deletions",
+      "staged_documents",
+      "renewal_card_attempts"
     ];
     PREFIX = "backups/";
     JOB = "backup-jobs/current.json";
