@@ -227,3 +227,7 @@ Under Adam's standing authorization for necessary revisions, revision 1 is rejec
 ## Revision 3
 
 The full revision-2 browser command passed all 1,312 browser checks, then failed its subsequent Word-preservation gate because the approved Manual sentence had no exact replacement assertion. Revision 3 adds that assertion to item 6 and uses replace mode for the Manual. The approved text and all product bytes are unchanged. The existing preservation check remains intact.
+
+## Revision 4
+
+The remaining bundled checks exposed one stale selector in Batch28: Legal-mail notices was renamed Document notices by the approved notification expansion. Revision 4 declares that test file and updates only the selector. The existing resend assertion is unchanged; its focused run passes 23/23. All other remaining bundled checks passed before the full rerun.

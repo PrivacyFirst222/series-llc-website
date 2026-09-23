@@ -1845,43 +1845,47 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): /** Online cancellation of registered agent service — required by s. 501.165 because the service is accepted online. Recording the request is the Terms 9(g) notice; the agency ends when replacement proof arrives or, if none by the renewal date, when our resignation takes effect (Terms 9(g), 10(e); renewals.ts). */
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
   - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **AUD-claude-release-group-a-2026-09-23-item-1. [substantive]** — **open**
+- **AUD-claude-release-group-a-2026-09-23-item-1. [substantive]** — **implemented**
   - Client portal: show a submitted registered-agent resignation — `webapp/src/pages/portal/PortalDashboard.tsx:382`
   - Reads:                 {company.raEndedDate ? `Our registered-agent appointment ends on ${formatDate(company.raEndedDate)}.` : company.raAppointmentDate ? `Your registered agent service is active${company.raRenewalDate ? ` and renews on ${new Date(`${company.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : ""}.` : "Your appointment date has not yet been recorded. Your first service year begins when our appointment takes effect."} You may give cancellation notice here at any time. Give notice at least 30 days before renewal and provide replacement proof by renewal to avoid a resignation charge.
   - Claims: After the office submits a resignation for nonpayment, bad contact information, or misuse of the address, the client can still see an ordinary active-service/renewal message and no resignation notice.
   - True: Batch 28 already approved recording all four grounds; the office display already distinguishes submission. This completes that behavior, without changing billing or legal end dates. Source reconciliation: RR-AGENT-1
   - Proposed replacement (not approved): Show the submitted date for every resignation ground. Replace the ordinary renewal and avoid-a-charge invitation with the resignation state. Distinguish submission, recorded state filing, and the appointment ending; do not imply submission immediately ends the appointment. Keep outstanding payment information accurate. Exact wording: Resignation submitted [date]. We will display the appointment end date when it is recorded.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
-- **AUD-claude-release-group-a-2026-09-23-item-3. [wording]** — **open**
+- **AUD-claude-release-group-a-2026-09-23-item-3. [wording]** — **implemented**
   - S-election questionnaire: explain both deletion deadlines — `webapp/src/pages/portal/OrdersInProgress.tsx:287`
   - Reads:               We use this to complete IRS Form 2553 for {detailsFor?.llc_name}. You sign the
   - Claims: The dialog where clients enter taxpayer numbers mentions only the fourteen-day editing window. An undelivered package instead loses those questionnaire numbers after 90 days without an update.
   - True: Batch 28 approved 90-day expiry before delivery; Batch 03 approved keeping encrypted completed documents until the client deletes them. Source reconciliation: RR-DATA-02
   - Proposed replacement (not approved): Make this dialog match the already-approved Privacy Policy. Preserve the existing retention periods, encrypted completed documents, and secure re-entry process. This does not add a new email. Exact wording: Social Security numbers are encrypted. Our scheduled cleanup removes them from the questionnaire after the fourteen-day editing window following delivery. If your package has not been delivered, our scheduled cleanup removes them after 90 days without an update to this questionnaire. Your other answers remain available, but you must re-enter the numbers securely before we can complete the package. Your completed document stays encrypted in Your documents until you choose to delete it.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
-- **AUD-claude-release-group-a-2026-09-23-item-12. [substantive]** — **open**
+- **AUD-claude-release-group-a-2026-09-23-item-12. [substantive]** — **implemented**
   - Operating-agreement amendment page: handle an empty usable-agreement list — `webapp/src/pages/portal/AmendAgreement.tsx:125`
   - Reads:         {!data.generations.length ? (
   - Claims: Stored agreement history can exist while none of those agreements is usable by the amendment picker. The page then shows a form with no selectable agreement.
   - True: Batch 30 already requires rejection of unavailable, foreign and incomplete sources. Source reconciliation: RR-PORTAL-03
   - Proposed replacement (not approved): Base the empty-state message on the successfully loaded usable source list, not the separate history count. Keep loading and failed requests distinct. Do not alter sample records or weaken source validation. Exact wording: No usable operating agreement is available for this company. Go to the operating agreement questionnaire to create one before using this amendment form.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
-- **AUD-claude-release-group-a-2026-09-23-item-13. [wording]** — **open**
+- **AUD-claude-release-group-a-2026-09-23-item-13. [wording]** — **implemented**
   - Operating-agreement questionnaire: name the 100-owner limit in server errors — `webapp/server/routes-portal.ts:1111`
   - Reads: function answersProblem(error: z.ZodError): string {
   - Claims: The screen blocks owner 101 correctly, but a direct request receives only Please check your answers.
   - True: Adam already approved a maximum of 100 and an explanation before unsupported entry. Source reconciliation: RR-PORTAL-05
   - Proposed replacement (not approved): Return the specific owner-limit message when that validation fails. Preserve the general fallback for unrelated malformed requests. Exact wording: The operating agreement supports up to 100 owners. Remove an owner before saving.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -2140,33 +2144,36 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 rejected r1: Declare the fact-ledger update required by Adam's approved Completed Orders tab and Post-Filing Items column.
   - 2026-09-23 rejected r2: Declare updates to Batch05 and Batch10 browser fixtures for the approved queue API and Completed Orders navigation; preserve their substantive assertions.
   - 2026-09-23 rejected r3: Include the third nonempty Office board fixture (Batch02) in the same queue-response update; no product behavior or prior assertion changed.
-- **AUD-claude-release-group-a-2026-09-23-item-10. [substantive]** — **open**
+- **AUD-claude-release-group-a-2026-09-23-item-10. [substantive]** — **implemented**
   - Office S-election order: distinguish missing answers from a failed load — `webapp/src/pages/admin/ServiceOrdersSection.tsx:216`
   - Reads:             ) : viewing.type === "s-election" ? (
   - Claims: When the secure details request fails, the office sees EIN and officer information as not yet provided, even when the client supplied it.
   - True: The existing EIN-details repair already establishes this error-handling rule. Source reconciliation: RR-PORTAL-01
   - Proposed replacement (not approved): Use loading, failed-with-Retry, and successful-response states for the S-election branch, as the EIN branch already does. Only a successful response can establish missing answers. Exact wording: We couldn’t load the S-election details. Please try again.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
-- **AUD-claude-release-group-a-2026-09-23-item-11. [wording]** — **open**
+- **AUD-claude-release-group-a-2026-09-23-item-11. [wording]** — **implemented**
   - Office protected-series EIN instructions: match your chosen classification — `webapp/src/pages/admin/ServiceOrdersSection.tsx:340`
   - Reads:                         ["Tax classification", viewing.details.target === "series" ? "Confirm this series’ intended tax treatment before applying." : detailQuery.data?.sElectionPaid ? "S corporation (Form 2553 package for this company)" : Number(d.memberCount) > 1 ? "Partnership" : "Disregarded entity"],
   - Claims: The client is promised a disregarded-entity application, while the office list still asks staff to confirm the classification.
   - True: Adam’s later explicit instruction governs: “The only tax classification for a series we permit is disregarded entity.” An older auditor’s caution is not a contrary owner ruling. Source reconciliation: RR-PORTAL-02
   - Proposed replacement (not approved): Show Disregarded entity for a protected-series target. Keep parent-company scoping and parent tax choices separate. This describes the service you permit, not universal tax advice about all possible series. Exact wording: Disregarded entity
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
-- **AUD-claude-release-group-a-2026-09-23-item-14. [substantive]** — **open**
+- **AUD-claude-release-group-a-2026-09-23-item-14. [substantive]** — **implemented**
   - Office Clients tab: do not draw an empty cancellation badge — `webapp/src/pages/admin/AdminDashboard.tsx:576`
   - Reads:                   {variant !== "ra" && cl.ra_cancellation_requested_at ? (
   - Claims: A cancellation flag can be present while the separately filtered company text is empty, producing an empty colored badge. The source supports this possibility; no real-user reproduction is claimed.
   - True: Batch 28 approved identifying the affected company in the cancellation summary. Source reconciliation: RR-PORTAL-06
   - Proposed replacement (not approved): Render the badge only when there is company-specific cancellation text to display. Keep the existing company eligibility and end-date rules.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -3482,73 +3489,80 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Replay the initial ordinary lifecycle from retained work orders and ordered events before replacements, preserving exact prior assertions, approvals, rejection and ownership checks.
   - Rechecked by Codex release reviewer: Reopened at frozen c91b101 and reproduced offline in the sealed release review; not an independent second model review.
   - Fixed: batch 35 revision 1, commit , by Codex; protected by 1 assertion(s).
-- **AUD-claude-release-group-a-2026-09-23-item-2. [substantive]** — **open**
+- **AUD-claude-release-group-a-2026-09-23-item-2. [substantive]** — **implemented**
   - Office order summary: quote the consent the client actually gave — `webapp/server/order-summary.ts:35`
   - Reads:   { field: "registeredAgentSeriesAgreementAcknowledgment", text: AGENT_SERIES_AGREEMENT },
   - Claims: The new-company self-agent form uses a personal acceptance, but the office summary quotes the different confirmation used when adding series to an existing company.
   - True: Adam already chose self-agent or our service for new formations, and Batch 29 approved preserving the personal acceptance. No new consent language is needed. Source reconciliation: RR-AGENT-2
   - Proposed replacement (not approved): Select the same existing consent constant using the same form path and agent choice as the screen. Preserve the version distinction for older records; do not rewrite historical attestations by guessing what an old client saw. Exact wording: I agree to serve as registered agent for the company and each of its protected series, including every protected series in this order.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
-- **AUD-claude-release-group-a-2026-09-23-item-4. [substantive]** — **open**
+- **AUD-claude-release-group-a-2026-09-23-item-4. [substantive]** — **implemented**
   - Office document uploads: retry failed emails without uploading twice — `webapp/server/office-notifications.ts:8`
   - Reads: export async function notifyLegalMail(id:string):Promise<boolean> {
   - Claims: Legal-mail notices have a retry record, but other document notices can fail without a usable resend path. Re-uploading creates another document instead of retrying the email.
   - True: Preserves the existing Email the client choice and legal-mail behavior. It does not authorize new marketing or automatic reminders. Source reconciliation: RR-DATA-03
   - Proposed replacement (not approved): Record requested notices and their outcomes for ordinary uploads and the formation-package notification. Give the office a retry for the existing document or package, with the appropriate email template. Keep unchecked optional notifications unsent. This is more than widening the legal-mail query: formation notices also need an explicit, nonduplicating identity.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
-- **AUD-claude-release-group-a-2026-09-23-item-5. [housekeeping]** — **open** — housekeeping
+- **AUD-claude-release-group-a-2026-09-23-item-5. [housekeeping]** — **implemented** — housekeeping
   - Backup log: label unfinished backup counts accurately — `webapp/server/routes-ops.ts:319`
   - Reads:   console.log(`[backup] ${result.key}: ${result.sizeBytes} bytes`, result.rowCounts);
   - Claims: An unfinished backup logs empty final row counts even though provisional counts are available.
   - True: Preserves complete, resumable backups and the existing distinction between provisional and final totals. Source reconciliation: RR-DATA-04
   - Proposed replacement (not approved): Log the provisional counts with an explicit unfinished label; log final counts only for a completed backup. Do not put provisional numbers into a field downstream readers treat as final.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
-- **AUD-claude-release-group-a-2026-09-23-item-6. [wording]** — **open**
+- **AUD-claude-release-group-a-2026-09-23-item-6. [wording]** — **implemented**
   - Owner’s Manual: include fractional ownership in the article map — `docs/owners-manual.md:126`
   - Reads: | **Article 4** | The owners: membership interests as simple percentages, the rule that no owner holds any series directly, voting (multi-owner), the transfer-on-death designation (Section 23), and — in the multi-owner forms — the member duties that power the bankruptcy protections |
   - Claims: The Article 4 summary says simple percentages, although the agreement and the next section of the Manual permit exact fractions.
   - True: Batch 31 already approved percentages or fractions in the masters; Manual line 142 already explains the same choice. Source reconciliation: RR-DOCS-02
   - Proposed replacement (not approved): Replace only the map’s description of membership interests; carry the change through generated outputs. Exact wording: membership interests as percentages or fractions of the whole
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 2 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
-- **AUD-claude-release-group-a-2026-09-23-item-7. [housekeeping]** — **open** — housekeeping
+- **AUD-claude-release-group-a-2026-09-23-item-7. [housekeeping]** — **implemented** — housekeeping
   - Editable Word documents: define the drafting-label style — `docs/md-to-docx.py:126`
   - Reads:                 output.append(label_runs.replace("<w:rPr>", '<w:rPr><w:rStyle w:val="DraftingChoice"/>'))
   - Claims: Drafting labels refer to a Word character style that is not defined in the document. Direct formatting currently makes the labels look correct.
   - True: Batch 32 approved italic, bracketed drafting annotations. This supplies their missing style definition. Source reconciliation: RR-DOCS-04
   - Proposed replacement (not approved): Define the existing DraftingChoice character style with the intended italic appearance, keeping every legal word and current direct formatting. Verify the actual XML and rendered appearance; do not claim Microsoft Word behavior from LibreOffice alone.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
-- **AUD-claude-release-group-a-2026-09-23-item-8. [wording]** — **open**
+- **AUD-claude-release-group-a-2026-09-23-item-8. [wording]** — **implemented**
   - Editable Word documents: fix annotation capitalization and spacing — `docs/md-to-docx.py:389`
   - Reads:                 label = "If " + labels[subject].lower()
   - Claims: One label lowercases Exhibit A; some labels have doubled spaces, and an optional clause has awkward punctuation inside its label.
   - True: Batch 32’s drafting choices and legal text stay intact. These are editable-master annotations, not new legal terms. Source reconciliation: RR-DOCS-05
   - Proposed replacement (not approved): Preserve Exhibit A capitalization and normalize boundaries around drafting annotations without deleting punctuation belonging to an optional clause. Preserve all alternatives and their removal behavior. Do not blindly adopt the suggested suppress-space rule if it glues labels to words.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
-- **AUD-claude-release-group-a-2026-09-23-item-9. [substantive]** — **open**
+- **AUD-claude-release-group-a-2026-09-23-item-9. [substantive]** — **implemented**
   - Generated PDFs: wrap unusually long words instead of overflowing — `webapp/server/pdf-render.ts:144`
   - Reads: export function wrapSegs(f: Fonts, segs: Seg[], width: number, size: number): Seg[][] {
   - Claims: A long unbroken name or other token can run beyond the page margin. Claude reproduced it on both the old and current renderer; it is not a new regression.
   - True: No new intake restriction or foreign-character policy is introduced. Source reconciliation: RR-DOCS-07
   - Proposed replacement (not approved): Split an over-wide token across lines only when it cannot fit as a whole, preserving all characters and formatting. Keep existing accepted name-length limits.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
+  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
