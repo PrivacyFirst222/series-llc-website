@@ -110,3 +110,8 @@ Expects: no made-up historical acceptance and no earlier batch falsely said to
 have been published before the combined release.
 
 Historical render compatibility was retained: old ledgers without tracking metadata still produce their archived report bytes. The audit-mechanism suite passes 69/69 after this correction.
+
+
+## Approval provenance supplied September 23, 2026
+
+Approval provenance supplied by Adam in the September 23, 2026 website handoff: after “Load group c”, Adam said “Go. Approve all”. This authorized the presented implementation scope; it was not acceptance of an exact release package. The quotations were supplied in that handoff; the original conversation was not independently recovered.

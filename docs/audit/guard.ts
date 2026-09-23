@@ -40,9 +40,9 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import {
   ROOT, BATCHES, git, gitOk, loadLedger, loadBatch, frozenHashOf, productFiles, ledgerRegressions, frozenFileProblems, linkProblems, replayStatic,
-  isRecordPath, isControlPath, count, defectGroup, familyClaim, unmetWaits, checkLabels, readAt, type Ledger, type BatchFile,
+  isRecordPath, isControlPath, count, defectGroup, familyClaim, unmetWaits, checkLabels, readAt, rulingCompletenessProblems, type Ledger, type BatchFile,
 } from "./ledger-lib";
-import { renderList } from "./ledger-print";
+import { renderList, listRenderVersion } from "./ledger-print";
 
 const staged = process.argv.includes("--staged");
 const againstArg = process.argv.includes("--against") ? process.argv[process.argv.indexOf("--against") + 1] ?? "" : null;
@@ -69,8 +69,8 @@ if (againstArg !== null) {
     refusals.push(...frozenFileProblems(after, readA));
     const files = git(["ls-tree", "-r", "--name-only", afterRev]).split("\n").filter((f) => /^(webapp\/(src|server|index\.html|vercel\.json)|docs\/)/.test(f) && /\.(tsx?|md|json|html)$/.test(f) && !/\.test\.tsx?$|^webapp\/server\/e2e\.ts$|^docs\/(audit|source|word)\//.test(f) && !(/^docs\//.test(f) && !/\.md$/.test(f)));
     refusals.push(...replayStatic(after, readA, files));
-    if (readA("docs/audit/findings-open.md") !== renderList(after)) refusals.push("docs/audit/findings-open.md differs from the ledger at that commit");
-    notes.push(`compared the ledger at ${afterRev.slice(0, 7)} with the ledger at ${beforeRev.slice(0, 7)}${beforeText ? "" : " (none there: every record is new)"}; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here`);
+    if (readA("docs/audit/findings-open.md") !== renderList(after, listRenderVersion(readA("docs/audit/ledger-print.ts")))) refusals.push("docs/audit/findings-open.md differs from the ledger at that commit");
+    notes.push(`compared the ledger at ${afterRev.slice(0, 7)} with the ledger at ${beforeRev.slice(0, 7)}${beforeText ? "" : " (none there: every record is new)"}; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here; completeness against his external ruling records was not checked`);
   } else notes.push(`no ledger at ${afterRev.slice(0, 7)}`);
   done();
   console.log("guard: ok");
@@ -95,6 +95,7 @@ if (ledgerText === null) {
   process.exit(0);
 }
 const ledger: Ledger = loadLedger(ledgerText);
+refusals.push(...rulingCompletenessProblems(ledger, read));
 
 /* 1 — against the last committed ledger; Adam's records are read here */
 const headText = git(["show", "HEAD:docs/audit/ledger.json"], { allowFail: true });

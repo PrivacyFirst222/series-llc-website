@@ -1,0 +1,464 @@
+{
+  "id": "41",
+  "revision": 1,
+  "title": "Approved focused release repairs excluding unpaid-checkout pagination (A2)",
+  "model": "Codex",
+  "base": "761af015e05507c19ec5a458af0cf839637ce8da",
+  "items": [
+    {
+      "id": "AUD-codex-focused-release-40-2026-09-23-a1",
+      "part": "all",
+      "scope": "### A1. Separate renewal sales from debts after resignation \u2014 release blocker\n\n**Where:** client portal Registered agent service card; payment links and checkout; receipts; office Registered Agent Clients.\n\n**What is wrong:** after the office records resignation, the client can still pay an ordinary renewal. In fresh tests, that payment advanced the anniversary by a year and generated a receipt promising service through that new date. The same wrong receipt/year advancement happens when the client pays legitimately overdue fees after a nonpayment resignation. Once the office records state filing, that overdue-fee link instead refuses payment immediately, even though the legal end date is still in the future.\n\nGoverning sources: Batch 37 item 1 says, \u201cReplace the ordinary renewal and avoid-a-charge invitation with the resignation state\u201d and \u201cKeep outstanding payment information accurate.\u201d Terms 10(f) says, \u201cIf we resign for nonpayment, that resignation charge and any unpaid service fees are due immediately.\u201d These already establish the necessary distinction.\n\n**Proposed repair:** stop selling/fulfilling a new service year after resignation submission and reject stale new-year links at the server. Keep legitimate unpaid service fees and the separate resignation charge collectible. A debt payment must settle the balance without advancing the anniversary, reversing resignation or promising renewed service. Apply this distinction to checkout details, payment submission, portal history, office balances and receipts, including after state filing/end. Preserve existing payment safeguards and reconcile any in-flight payment before changing its obligation. Do not cancel every unpaid row indiscriminately.\n\nClaude's suggested portal/checkout/cancellation changes are incomplete without the debt path and checkout consent/receipt changes. The current checkout still solicits automatic future renewals for these payments.\n\n**Exact proposed wording:**\n\n- Debt action: **\u201cPay outstanding service fees\u201d**.\n- Debt checkout: **\u201cThis payment settles outstanding registered-agent service fees. It does not renew service or change the recorded resignation or appointment end date.\u201d**\n- Debt consent: **\u201cI authorize payment of $[amount] toward the outstanding registered-agent service fees shown above.\u201d** Existing applicable card/provider requirements must still be satisfied.\n- Debt receipt: **\u201cWe received $[amount] toward the outstanding registered-agent service fees for [company]. This payment does not renew service or change the recorded resignation or appointment end date.\u201d**\n- Payment history: **\u201cOutstanding service fees paid on [date]: $[amount].\u201d**\n- Unavailable new-year checkout: **\u201cThis service renewal is unavailable because our resignation has been submitted. Your portal shows any outstanding service fees and resignation charge separately.\u201d**\n\n**Required safeguard repair:** the Batch 37 negative searches for capitalized \u201cRenews on.\u201d I deliberately added the false lowercase \u201cactive and renews on\u201d sentence alongside the proper resignation message; the existing walk still passed 22/22. A case-insensitive negative detected all three affected resignation cases. Claude's broader branch-reversion mutation did fail, but that does not prove this narrower wrong message is protected. Add active-service controls and resigned/declined/debt fixtures, stale-link refusal, debt settlement without renewal, and separate resignation-fee payment. Test resignation/payment races during implementation; no race defect is claimed from this review.\n\n**New decision:** none; exact repair wording needs your requested approval.\n\nSources: [portal](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/src/pages/portal/PortalDashboard.tsx:362>), [payment eligibility](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/ra-checkout.ts:37>), [office event handling](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/ra-office.ts:42>), [fulfillment/receipt](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/renewals.ts:175>), [checkout consent](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/src/pages/AgentCheckout.tsx:19>), [test](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/scripts/batch37-walk.ts:72>). Evidence: [fresh billing observations](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/focused/log.json>), [captured email](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/focused/mail.jsonl>), [original check missing the mutation](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/mutation/defect-reintroduced/results.json>), [corrected negative detecting it](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/mutation/corrected-negative/results.json>).",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch41 agent obligations and payment recovery"
+        }
+      ]
+    },
+    {
+      "id": "AUD-codex-focused-release-40-2026-09-23-a3",
+      "part": "all",
+      "scope": "### A3. Make payment notices truthful and usable when email fails \u2014 smaller correction\n\n**Where:** renewal/reminder/decline emails; client portal payment link; failed receipt handling.\n\n**What is wrong:** a reminder delivered after a declined charge says \u201cThere is nothing you need to do\u201d; it can also give an already-passed cancellation deadline as a current instruction. The portal can direct the client to an email payment link while showing no usable link itself. Failed decline emails are not retried. A newly reproduced related omission: if the charge succeeds during the email outage, advancing the anniversary makes the job stop revisiting the failed reminder, while the failed receipt is only logged.\n\nThis does not necessarily require 55 days of email failure, as Claude suggested. A fresh test first ran the renewal job on the charge date: one failed-mail run and next-day recovery reproduced the false reassurance. That proves a possible trigger, not its production frequency.\n\n**Proposed repair:** store the payment link with the obligation before attempting email, independent of delivery success and subject to A1's debt/renewal distinction. Track and retry failed financial correspondence separately from charging. Compose retries from actual payment status, renewal date and any still-scheduled retry. Never reset a paid/declined state or start another payment simply to resend mail. Preserve the 70-day reminder schedule and all approved billing rules.\n\n**Exact proposed wording, used conditionally:**\n\n- Declined: **\u201cYour $99 registered-agent renewal charge was declined. You may pay now using the same or a different eligible card.\u201d** Action: **\u201cPay renewal now\u201d**.\n- Before the anniversary: **\u201cPlease pay by [renewal date] to avoid delinquency.\u201d** After it: **\u201cThe renewal fee remains unpaid and is now overdue.\u201d**\n- Passed deadline: **\u201cThe cancellation deadline for this renewal was [date] and has passed. You may still give cancellation notice in your client portal or by emailing support@myfloridaseriesllc.com. A late reminder does not extend the cancellation or replacement deadlines.\u201d**\n- Portal decline: **\u201cRenewal charge declined for [date]. Pay now below using the same or a different eligible card.\u201d** If the action cannot load: **\u201cWe could not load the payment link. Please try again or contact support@myfloridaseriesllc.com.\u201d**\n- Recovered paid notice: **\u201cWe received your $99 renewal payment. Your registered-agent service is paid through [date]. No further payment is due for this renewal.\u201d** Preserve applicable reminder/deadline information without suggesting another charge is pending. Resigned debt payments use A1's wording.\n\n**New decision:** none; wording approval only. Sources: [job](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/renewals.ts:118>), [templates](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/email.ts:103>), [portal](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/src/pages/portal/PortalDashboard.tsx:431>). Evidence: [billing observations](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/focused/log.json>), [late first run](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/late-first/log.json>), [missing link screenshot](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/focused/shots/decline-before-mail-recovery.png>). The two duplicate document-review email sightings are included here.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch41 financial correspondence recovery"
+        }
+      ]
+    },
+    {
+      "id": "AUD-codex-focused-release-40-2026-09-23-a4",
+      "part": "all",
+      "scope": "### A4. Show completed replacement and separate resignation balances accurately \u2014 smaller correction\n\n**Where:** portal Registered agent service card; Office \u2192 Registered Agent Clients.\n\n**What is wrong:** after the office verifies the replacement agent, the portal still asks the client to appoint a successor/send proof and offers a renewal-card update. A resigning client's office row still says \u201crenews.\u201d Its payment summary chooses the newest charge, so labeling that charge correctly alone would still hide earlier unpaid service fees.\n\n**Proposed repair:** show the completed replacement/end state before the pending-cancellation instructions. Remove future-renewal controls where inappropriate, while retaining legitimate balances. In the office, show appointment status separately from both service-fee and resignation-fee balances. Submission must not be labeled an already-ended appointment.\n\n**Exact proposed wording:** **\u201cReplacement registered agent verified. Our registered-agent appointment ended on [date].\u201d** For a future end use **\u201cOur registered-agent appointment ends on [date].\u201d** Office example: **\u201cResignation submitted September 20, 2026\u201d**, **\u201cOutstanding service fees: $99 \u2014 payment declined\u201d**, **\u201cResignation charge: $99 \u2014 unpaid; payment link available.\u201d** Each balance independently changes to **\u201cPaid [date]\u201d** when paid.\n\n**New decision:** none. Sources: [portal condition](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/src/pages/portal/PortalDashboard.tsx:368>), [office labels](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/src/pages/admin/AdminDashboard.tsx:47>), [office query](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/routes-admin.ts:862>). Evidence: [replacement screenshot](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/focused/shots/replacement-portal.png>), [office debt screenshot](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/focused/shots/arrears-office-before.png>).",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch41 agent balances and checkout states"
+        }
+      ]
+    },
+    {
+      "id": "AUD-codex-focused-release-40-2026-09-23-a5",
+      "part": "all",
+      "scope": "### A5. Search using the client's current email too \u2014 smaller correction\n\n**Where:** Office active and Completed Orders search.\n\n**What is wrong:** changing the account email does not change the historical order email, and the board searches only the latter. Fresh API/browser tests found the completed order using the old address and no result using the current address.\n\n**Proposed repair:** search the associated account's current name/email as well as the original order name/email. Keep historical order details intact and apply the search consistently to counts/pages. No wording change or new decision.\n\nSources: [board search](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/admin-board.ts:35>), [email change](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/routes-admin.ts:991>). Evidence: [results](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/office/results.json>), [current address misses](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/office/current-email-search-empty.png>), [old address matches](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/office/historical-email-search-found.png>). The fixture sets the exact resulting account state directly; it does not claim a fresh end-to-end email-verification walk.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch41 office identity search and certificate refresh"
+        }
+      ]
+    },
+    {
+      "id": "AUD-codex-focused-release-40-2026-09-23-a6",
+      "part": "all",
+      "scope": "### A6. Refresh the work queues after deleting the last certificate \u2014 smaller correction, additional finding\n\n**Where:** Office \u2192 Completed Orders \u2192 order details \u2192 Delete certificate copy.\n\n**What is wrong:** I deleted the last purchased Certificate of Status through the real screen. The detail correctly said the certificate was owed; the API moved the order to Post-Filing Items. After closing the detail, the board still displayed the order under Completed Orders until reload. Claude's office notes mentioned this as a source-level possibility; it was outside the 23 consolidated entries. It is now independently reproduced.\n\n**Proposed repair:** after successful certificate deletion, refresh the order detail and both board scopes, their counts and page bounds. Keep an order complete if another qualifying copy still exists. No new wording or policy.\n\nSource: [delete callback](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/src/pages/admin/OrderDetail.tsx:97>). Evidence: [actual UI/API assertions](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/office-delete/results.json>), [stale Completed card](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/office-delete/stale-completed-after-delete.png>), [correct after reload](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/office-delete/reload-post-filing.png>).",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch41 office identity search and certificate refresh"
+        }
+      ]
+    },
+    {
+      "id": "AUD-codex-focused-release-40-2026-09-23-b1",
+      "part": "all",
+      "scope": "### B1. Preserve prior filing-document versions needed by completed backups \u2014 release blocker\n\n**Where:** Office Replace action for Articles/designations; document mirror; database restore tool and runbook.\n\n**What is wrong:** replacing a PDF keeps its document identity/title, so the mirror overwrites the path older backup manifests reference. A previously successful backup then fails its content-hash check before inserting any rows. A new backup can restore the replacement, but it does not repair older affected backups. The precise scope is every snapshot referencing those overwritten bytes, not literally every backup ever created.\n\n**Proposed repair:** give each non-sensitive filing-document revision an immutable backup identity and retain the verified older copies needed by completed snapshots. Use those identities consistently in the mirror, manifest and restore. Preserve or restart any unfinished snapshot whose required bytes would otherwise be destroyed. Keep old manifest paths readable. Do not apply a global filename change to encrypted tax files without accounting for every copy in their deletion mechanism.\n\nA runbook note alone is insufficient for release: a routine correction can disable the latest completed recovery point before another exists. Failing safely on a bad hash is correct, but it does not make the backup recoverable. Provider version history is a possible recovery source only if the exact prior bytes actually exist and match; I did not verify that service.\n\n**Exact proposed interim runbook wording:**\n\n> Replacing an Articles or Protected Series Designation PDF can invalidate an earlier snapshot that references the overwritten Dropbox bytes. The restore stops with \u201cBackup file missing or changed\u201d before inserting database rows. A later completed backup can restore the replacement but does not repair earlier snapshots. Use an affected snapshot only after obtaining the exact prior bytes and verifying its manifest hash. If those bytes are unavailable, this tool cannot restore that snapshot. Do not bypass the hash check or assume provider version history is available.\n\nAfter repair, replace the interim warning with the tested revision-recovery procedure and keep its legacy limitation. Do not rewrite or clean historical sample backups.\n\n**New decision:** none. Sources: [Replace](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/routes-admin.ts:1415>), [mirror identity/overwrite](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/dropbox.ts:75>), [restore hash check](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/restore.ts:43>). Evidence: [decisive fresh results](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/recovery/coordinator-decisive-evidence.json>), [full observations](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/recovery/structured-observations.json>). Original snapshot control recovered 16 tables/9 files; after replacement, affected restores stopped with all 16 tables empty; a later snapshot restored successfully.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch41 B1 filing revision recovery"
+        }
+      ]
+    },
+    {
+      "id": "AUD-codex-focused-release-40-2026-09-23-b2",
+      "part": "all",
+      "scope": "### B2. Recover the latest retained S-election package without losing deletion control \u2014 release blocker\n\n**Where:** S-election replacement; independent recovery journal; restore; client documents and S-election service state.\n\n**What is wrong:** restore a snapshot taken before a completed replacement, and the system can hide both packages, leave the order fulfilled, and reject editing with \u201cYou deleted this document.\u201d The client did not delete it. In two fresh variants, two encrypted primary objects and two mirror copies survived without restored document/staging/deletion references, even after cleanup and a subsequent backup. The portal offered neither package nor a recovery action.\n\nN1.01/N1.02 already require completed encrypted forms to remain until client deletion, while excluding transient questionnaire numbers and preserving deletion decisions. Therefore I reject Claude's classification as a required new choice between retaining the replacement and deleting it. **Retaining the latest completed package follows the existing decision.** The reproduced loss of access/deletion tracking makes this a release blocker, even though it requires recovery to expose it.\n\n**Proposed repair:** durably record the committed replacement relationship, owner/company/service associations, immutable encrypted recovery identity and verified file hash independently of the restorable database, before retiring the predecessor. Ensure the successor has a verified recoverable encrypted copy first. Recovery must reinstate the latest committed, not-client-deleted successor and reconcile staged work so cleanup cannot delete it. An actual later client deletion must defeat all earlier snapshots and replacement records and reach all controlled encrypted copies. Cover repeated replacements, lost responses, concurrent operations, primary-storage loss, restore-then-delete and repeated recovery.\n\nKeep full questionnaire numbers out of snapshots/journals and recovered questionnaire fields. A retained encrypted completed PDF remains permitted by the existing ruling. If required recovery evidence is unavailable, stop with a truthful actionable failure; do not silently label the service fulfilled/client-deleted or leave files untracked. Legacy tombstones lack reliable replacement history: preserve their deletion effect rather than guessing or resurrecting documents. Introduce the new protocol forward; no sample-data cleanup is needed.\n\n**Exact proposed recovery failure wording:** **\u201cRecovery could not verify the current S-election package for [company]. Do not switch production to this restored database until the package and its document records are reconciled. No client deletion has been inferred.\u201d**\n\n**Exact proposed runbook wording:**\n\n> Before switching production to a restored database, verify that every recorded S-election replacement resolves to its latest retained encrypted package or a later actual client-deletion decision. A successful restore command alone does not prove this. Preserve all controlled-copy deletion records and exclude full questionnaire numbers. Missing historical replacement metadata cannot be recreated by guessing; stop and reconcile the affected package before using the restored database.\n\n**New decision:** none for this retention-preserving repair. Sources: [replacement storage](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/s-election-package-storage.ts:10>), [retirement](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/document-retention.ts:16>), [restore treatment](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/restore.ts:19>), [recovery exclusion](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/s-election-recovery.ts:18>), [edit denial](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/routes-portal.ts:2269>). Evidence: [fresh results](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/recovery/coordinator-decisive-evidence.json>), [recovered portal](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/recovery/ui-live.png>), [portal readback](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/recovery/ui-live.txt>).",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch41 B2 retained package recovery"
+        }
+      ]
+    },
+    {
+      "id": "AUD-codex-focused-release-40-2026-09-23-c1",
+      "part": "all",
+      "scope": "### C1. Correct the Manual's company-filing table \u2014 smaller substantive correction\n\n**Where:** Owner's Manual Section 11, Step 4; generated Word and client PDF.\n\nThe new paragraph correctly distinguishes company-owned from series-owned property, but the table below still says to record the company's statement where \u201cthe company or a series\u201d owns property. **That was a missed dependent edit in the earlier Codex work.** The source and both fresh renders confirm it; passing tests did not establish consistency.\n\nGoverning approved words: \u201cA statement concerning property held by the company identifies the company; a statement concerning property held by a protected series identifies that protected series.\u201d The company instructions are expressly qualified against use for a series filing. Official [s. 605.0302](https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/Sections/0605.0302.html) and [s. 605.2108](https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/Sections/0605.2108.html) were directly read; they support the entity distinction without establishing the Division's practical series-filing procedure.\n\n**Exact proposed Step 4 cell:**\n\n> In the official records of **every county where the company owns real property.** The clerk charges a separate recording fee.\n\nDelete only \u201cor a series.\u201d Preserve the entire approved paragraph, optional filing, qualifications and agreement masters. Update the Markdown source, regenerate outputs, inspect the table/downstream pages and add a targeted consistency safeguard. This implements the existing policy; it is not a new legal/business choice.\n\nSource: [Manual](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/owners-manual.md:194>). Evidence: [fresh PDF table](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/documents/manual-16.png>), [fresh Word page](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/documents/word/page-19.png>), [artifact identity](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/documents/identity.json>).",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "In the official records of **every county where the company or a series owns real property.** The clerk charges a separate recording fee.",
+          "after": "In the official records of **every county where the company owns real property.** The clerk charges a separate recording fee.",
+          "count": 1
+        },
+        {
+          "kind": "document",
+          "master": "docs/owners-manual.md",
+          "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+          "masterPresent": [
+            "In the official records of **every county where the company owns real property.** The clerk charges a separate recording fee."
+          ],
+          "wordPresent": [
+            "every county where the company owns real property."
+          ],
+          "wordAbsent": [
+            "company or a series owns real property"
+          ]
+        },
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch41 Manual company filing and signature grouping"
+        }
+      ]
+    },
+    {
+      "id": "AUD-codex-focused-release-40-2026-09-23-c2",
+      "part": "all",
+      "scope": "### C2. Keep the Word sample signature block together \u2014 smaller formatting correction\n\n**Where:** Manual Section 13 in Word. Fresh bundled-LibreOffice rendering puts \u201cName: Maria Santos\u201d on page 20 and \u201cTitle: Manager\u201d on page 21. The client PDF keeps the block together.\n\n**Proposed repair:** make the generator keep this contiguous sample block together through its explanatory note, leaving the final paragraph free to end the group. Preserve every word; do not chain all quoted prose throughout all documents. Regenerate and inspect adjacent pages after C1. Microsoft Word pagination was not tested. No new decision or wording.\n\nSources: [sample](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/owners-manual.md:216>), [generator](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/md-to-docx.py:564>). Evidence: [Word page 20](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/documents/word/page-20.png>), [page 21](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/documents/word/page-21.png>), [paragraph properties](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/documents/signature-ooxml.json>).",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch41 Manual company filing and signature grouping"
+        }
+      ]
+    },
+    {
+      "id": "AUD-codex-focused-release-40-2026-09-23-c3",
+      "part": "all",
+      "scope": "### C3. Display settled owner choices as settled \u2014 smaller tracking correction\n\n**Where:** generated audit list. Items **8, 15, 22, 34, 38, 139, N2.14, 232, 236 and N2.02** have their authentic rulings, but no owner-retained disposition; they still read as open work. The generator also prints \u201cwaits on Adam's ruling\u201d for 51 item-level waits whose named ruling exists.\n\n**Proposed repair:** record the ten dispositions through the existing checked mechanism and regenerate the list. Render only genuinely unmet ruling waits, including the already-supported item/part semantics; do not delete immutable wait/history fields. Keep technical implementation/release status separate from the owner's retained wording. Existing rulings and assertions remain untouched. This is a reviewed tracking change, not permission to mark everything released.\n\n**Exact display wording:** reuse **\u201cOwner retained the wording.\u201d** with its existing technical-lifecycle explanation. Omit satisfied \u201cwaits on Adam's ruling\u201d labels. Suppressing all 51 misleading labels is explicitly included here, rather than silently expanding a ten-item bookkeeping fix.\n\n**New decision:** none. Sources: [renderer](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/audit/ledger-print.ts:40>), [retain mechanism](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/audit/tracking.ts:14>). Evidence: [all ten dispositions and 51 named waits](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/release/controls.json>).",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch41 ruling completeness and settled display"
+        }
+      ]
+    },
+    {
+      "id": "AUD-codex-focused-release-40-2026-09-23-c4",
+      "part": "all",
+      "scope": "### C4. Detect authentic rulings that never reach repository records \u2014 smaller safeguard correction\n\n**Where:** local commit/release checks. Today's 73 rulings are present; current release records are not missing one. But the checks reject removal/forgery of repository rulings without checking completeness against the external authenticated records. A fresh in-memory probe of the historical ledger, which lacks eleven records, produces no refusal when compared with itself.\n\n**Proposed repair:** local gates with access to owner records must require each relevant authenticated ruling's exact item/part/text in both the ledger and canonical ruling line, naming omissions. Preserve historical verification modes without silently allowing incomplete current release records. CI should explicitly report that it cannot inspect the local owner-record source; it must not claim to have performed that check. Add clean, omitted, altered and forged-record probes. No new policy or customer wording.\n\nSource: [current validation](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/audit/ledger-lib.ts:426>). Evidence: [control and mutation results](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/release/controls.json>). Existing removal/forgery protections did reject their intended mutations.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch41 ruling completeness and settled display"
+        }
+      ]
+    },
+    {
+      "id": "AUD-codex-focused-release-40-2026-09-23-c5",
+      "part": "all",
+      "scope": "### C5. Preserve exact approval provenance supplied in this handoff \u2014 smaller records correction\n\n**Where:** Batch 38 and 39 readable records. They summarize approval rather than quote it. Your handoff supplies both exact exchanges: after **\u201cLoad group b\u201d**, **\u201cGo. Approve all\u201d**; after **\u201cLoad group c\u201d**, **\u201cGo. Approve all\u201d**.\n\n**Proposed append-only note for each relevant record:**\n\n> Approval provenance supplied by Adam in the September 23, 2026 website handoff: after \u201c[Load group b / Load group c]\u201d, Adam said \u201cGo. Approve all\u201d. This authorized the presented implementation scope; it was not acceptance of an exact release package.\n\nUse the applicable group in each note. Preserve the exact Group D exchange from the supplied handoff in its provenance note if completing that record at the same time. Label these as quotations supplied by you in this handoff; do not pretend the original session was independently recovered or fabricate an authenticated acceptance. No new decision is needed, and this review does not write those records.\n\nSources: [Batch 38](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/audit/batches/38/batch.md:3>), [Batch 39](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/audit/batches/39/batch.md:3>), [your supplied handoff](</Users/adam/.codex/attachments/2d1431b2-b172-4c55-b6b3-b62d0d4439fc/Pasted text.txt>).",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch41 ruling completeness and settled display"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/server/ra-checkout.ts",
+      "mode": "code",
+      "control": false,
+      "why": "A1/A3/A4: obligation/payment distinction, durable correspondence, truthful status and separate balances; append migration17 only."
+    },
+    {
+      "path": "webapp/server/ra-office.ts",
+      "mode": "code",
+      "control": false,
+      "why": "A1/A3/A4: obligation/payment distinction, durable correspondence, truthful status and separate balances; append migration17 only."
+    },
+    {
+      "path": "webapp/server/renewals.ts",
+      "mode": "code",
+      "control": false,
+      "why": "A1/A3/A4: obligation/payment distinction, durable correspondence, truthful status and separate balances; append migration17 only."
+    },
+    {
+      "path": "webapp/server/email.ts",
+      "mode": "code",
+      "control": false,
+      "why": "A1/A3/A4: obligation/payment distinction, durable correspondence, truthful status and separate balances; append migration17 only."
+    },
+    {
+      "path": "webapp/server/renewal-card.ts",
+      "mode": "code",
+      "control": false,
+      "why": "A1/A3/A4: obligation/payment distinction, durable correspondence, truthful status and separate balances; append migration17 only."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "control": false,
+      "why": "A1/A3/A4: obligation/payment distinction, durable correspondence, truthful status and separate balances; append migration17 only."
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "A1/A3/A4: obligation/payment distinction, durable correspondence, truthful status and separate balances; append migration17 only."
+    },
+    {
+      "path": "webapp/src/pages/AgentCheckout.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "A1/A3/A4: obligation/payment distinction, durable correspondence, truthful status and separate balances; append migration17 only."
+    },
+    {
+      "path": "webapp/src/pages/admin/AdminDashboard.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "A1/A3/A4: obligation/payment distinction, durable correspondence, truthful status and separate balances; append migration17 only."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "control": false,
+      "why": "A1/A3/A4: obligation/payment distinction, durable correspondence, truthful status and separate balances; append migration17 only."
+    },
+    {
+      "path": "webapp/server/db.ts",
+      "mode": "code",
+      "control": false,
+      "why": "A1/A3/A4: obligation/payment distinction, durable correspondence, truthful status and separate balances; append migration17 only."
+    },
+    {
+      "path": "webapp/server/agent-obligations.ts",
+      "mode": "new",
+      "control": false,
+      "why": "A1/A3 shared obligation/payment and correspondence safeguards."
+    },
+    {
+      "path": "webapp/server/agent-correspondence.ts",
+      "mode": "new",
+      "control": false,
+      "why": "A1/A3 shared obligation/payment and correspondence safeguards."
+    },
+    {
+      "path": "webapp/server/admin-board.ts",
+      "mode": "code",
+      "control": false,
+      "why": "A5 search current identity; A6 invalidate detail and board scopes after certificate deletion. A2 pagination explicitly excluded."
+    },
+    {
+      "path": "webapp/src/pages/admin/OrderDetail.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "A5 search current identity; A6 invalidate detail and board scopes after certificate deletion. A2 pagination explicitly excluded."
+    },
+    {
+      "path": "webapp/server/dropbox.ts",
+      "mode": "code",
+      "control": false,
+      "why": "B1/B2 immutable filing revisions and durable retained-package recovery/deletion protocol; runbook truth."
+    },
+    {
+      "path": "webapp/server/backup.ts",
+      "mode": "code",
+      "control": false,
+      "why": "B1/B2 immutable filing revisions and durable retained-package recovery/deletion protocol; runbook truth."
+    },
+    {
+      "path": "webapp/server/restore.ts",
+      "mode": "code",
+      "control": false,
+      "why": "B1/B2 immutable filing revisions and durable retained-package recovery/deletion protocol; runbook truth."
+    },
+    {
+      "path": "webapp/server/backup-deletions.ts",
+      "mode": "code",
+      "control": false,
+      "why": "B1/B2 immutable filing revisions and durable retained-package recovery/deletion protocol; runbook truth."
+    },
+    {
+      "path": "webapp/server/document-retention.ts",
+      "mode": "code",
+      "control": false,
+      "why": "B1/B2 immutable filing revisions and durable retained-package recovery/deletion protocol; runbook truth."
+    },
+    {
+      "path": "webapp/server/s-election-package-storage.ts",
+      "mode": "code",
+      "control": false,
+      "why": "B1/B2 immutable filing revisions and durable retained-package recovery/deletion protocol; runbook truth."
+    },
+    {
+      "path": "docs/db-restore.md",
+      "mode": "code",
+      "control": false,
+      "why": "B1/B2 immutable filing revisions and durable retained-package recovery/deletion protocol; runbook truth."
+    },
+    {
+      "path": "webapp/server/package-recovery.ts",
+      "mode": "new",
+      "control": false,
+      "why": "B1/B2 approved durable replacement and recovery protocol."
+    },
+    {
+      "path": "webapp/server/filing-document-replacement.ts",
+      "mode": "new",
+      "control": false,
+      "why": "B1/B2 approved durable replacement and recovery protocol."
+    },
+    {
+      "path": "docs/md-to-docx.py",
+      "mode": "code",
+      "control": true,
+      "why": "C2 scope keepNext to the existing Manual signature sample group only."
+    },
+    {
+      "path": "docs/owners-manual.md",
+      "mode": "replace",
+      "why": "C1 delete only or a series from company-owned-property Step4 table."
+    },
+    {
+      "path": "docs/word/Series LLC Owners Manual - REVISED DRAFT.docx",
+      "mode": "generated",
+      "why": "Approved C1/C2 source and generator output; no external publication."
+    },
+    {
+      "path": "docs/audit/ledger-lib.ts",
+      "mode": "code",
+      "control": true,
+      "why": "C3 settled waits display with historical compatibility; C4 exact authenticated ruling completeness in current local gates, historical/CI limitations explicit."
+    },
+    {
+      "path": "docs/audit/ledger-print.ts",
+      "mode": "code",
+      "control": true,
+      "why": "C3 settled waits display with historical compatibility; C4 exact authenticated ruling completeness in current local gates, historical/CI limitations explicit."
+    },
+    {
+      "path": "docs/audit/guard.ts",
+      "mode": "code",
+      "control": true,
+      "why": "C3 settled waits display with historical compatibility; C4 exact authenticated ruling completeness in current local gates, historical/CI limitations explicit."
+    },
+    {
+      "path": "docs/audit/release-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "C3 settled waits display with historical compatibility; C4 exact authenticated ruling completeness in current local gates, historical/CI limitations explicit."
+    },
+    {
+      "path": "docs/audit/batches/38/batch.md",
+      "mode": "code",
+      "control": false,
+      "why": "C5 append exact approval provenance supplied in user handoff; no frozen work-order or acceptance change."
+    },
+    {
+      "path": "docs/audit/batches/39/batch.md",
+      "mode": "code",
+      "control": false,
+      "why": "C5 append exact approval provenance supplied in user handoff; no frozen work-order or acceptance change."
+    },
+    {
+      "path": "docs/audit/batches/40/batch.md",
+      "mode": "code",
+      "control": false,
+      "why": "C5 append exact approval provenance supplied in user handoff; no frozen work-order or acceptance change."
+    },
+    {
+      "path": "docs/audit/intakes/codex-focused-release-40-2026-09-23.json",
+      "mode": "new",
+      "control": true,
+      "why": "Checked intake of twelve approved grouped repairs with retained independent evidence. All existing item identities preserved."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Integrate declared new API/UI regressions and strengthen existing resignation negative. No old check labels removed."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Integrate declared new API/UI regressions and strengthen existing resignation negative. No old check labels removed."
+    },
+    {
+      "path": "webapp/scripts/batch37-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Integrate declared new API/UI regressions and strengthen existing resignation negative. No old check labels removed."
+    },
+    {
+      "path": "webapp/server/batch41-billing-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Focused regression checks and deliberate negative controls for the approved repairs, isolated storage and providers."
+    },
+    {
+      "path": "webapp/scripts/batch41-billing-walk.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Focused regression checks and deliberate negative controls for the approved repairs, isolated storage and providers."
+    },
+    {
+      "path": "webapp/server/batch41-recovery-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Focused regression checks and deliberate negative controls for the approved repairs, isolated storage and providers."
+    },
+    {
+      "path": "webapp/server/batch41-recovery.test.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Focused regression checks and deliberate negative controls for the approved repairs, isolated storage and providers."
+    },
+    {
+      "path": "webapp/server/batch41-controls-check.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Focused regression checks and deliberate negative controls for the approved repairs, isolated storage and providers."
+    },
+    {
+      "path": "docs/audit/batch41-controls.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Focused regression checks and deliberate negative controls for the approved repairs, isolated storage and providers."
+    },
+    {
+      "path": "docs/batch41-word-check.py",
+      "mode": "new",
+      "control": true,
+      "why": "Focused regression checks and deliberate negative controls for the approved repairs, isolated storage and providers."
+    },
+    {
+      "path": "webapp/scripts/batch41-office-walk.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Focused regression checks and deliberate negative controls for the approved repairs, isolated storage and providers."
+    }
+  ],
+  "requiredChecks": [
+    "source-evidence",
+    "combined-release"
+  ],
+  "testSupport": [
+    "webapp/server/batch41-billing-check.ts",
+    "webapp/scripts/batch41-billing-walk.ts",
+    "webapp/server/batch41-recovery-check.ts",
+    "webapp/server/batch41-controls-check.ts",
+    "docs/audit/batch41-controls.ts",
+    "docs/batch41-word-check.py",
+    "webapp/scripts/batch41-office-walk.ts"
+  ],
+  "removedChecks": []
+}

@@ -542,6 +542,11 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
     `CREATE UNIQUE INDEX IF NOT EXISTS ra_renewal_date_purpose ON ra_renewals(order_id,renewal_date,purpose)`,
     `CREATE UNIQUE INDEX IF NOT EXISTS ra_one_resignation ON ra_renewals(order_id) WHERE purpose='resignation'`,
   ]},
+  { id: 17, name: "agent-obligations-and-durable-correspondence", statements: [
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_payment_target uuid`,
+    `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS correspondence jsonb NOT NULL DEFAULT '{}'::jsonb`,
+    `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS correspondence_lock_until timestamptz`,
+  ]},
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

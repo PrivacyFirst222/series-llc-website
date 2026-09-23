@@ -2937,6 +2937,21 @@ for(const [label,r]of batch05Results)expect(r.ok,label,r.detail);
     expect(correct, "batch19 65: progress matches reachable screens and resumes at certification", observations);
   }
 
+  // Batch41 owns separate offline apps/data; no parent test fixtures are shared.
+  for (const [script,prefix,label] of [
+    ["batch41-office-walk.ts","B41OFFICE:","batch41 office identity search and certificate refresh"],
+    ["batch41-billing-walk.ts","B41BILLING:","batch41 agent balances and checkout states"],
+  ]) {
+    const child = Bun.spawn([process.execPath, decodeURIComponent(new URL(script, import.meta.url).pathname)], {stdout:"pipe",stderr:"pipe"});
+    const [out,error,code] = await Promise.all([new Response(child.stdout).text(),new Response(child.stderr).text(),child.exited]);
+    const lines=out.split("\n").filter(line=>line.startsWith(prefix));
+    let result:{rows?:{ok:boolean}[]}|null=null;
+    try {if(lines.length===1)result=JSON.parse(lines[0].slice(prefix.length));}catch{
+      // Malformed child results fail the check below.
+    }
+    expect(code===0&&!!result?.rows?.length&&result.rows.every(r=>r.ok),label,{code,result,error:code?error:undefined});
+  }
+
   } finally {
     try { await browser.close(); } finally { stack.stop(); }
   }

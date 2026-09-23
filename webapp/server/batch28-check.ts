@@ -144,7 +144,7 @@ async function restore(){
  const omitted=parsed.records.find((r:{documentId:string})=>r.documentId===want.goneId);
  if(!omitted)throw Error('Incomplete-journal fixture lacks the known deletion');
  const incomplete={...parsed,records:parsed.records.filter((r:{storageKey:string})=>r.storageKey!==omitted.storageKey)};
- incomplete.sha=createHash('sha256').update(JSON.stringify(incomplete.records)).digest('hex');
+ incomplete.sha=createHash('sha256').update(JSON.stringify(incomplete.version===2?{version:2,records:incomplete.records,packages:incomplete.packages}:incomplete.records)).digest('hex');
  const partialDump=structuredClone(dump);partialDump.deletionCheckpoint=[...(dump.deletionCheckpoint||[]),omitted.storageKey];
  const files=()=>readdirSync(process.env.DEV_STORAGE_DIR!,{recursive:true}).sort();
  const beforeFiles=JSON.stringify(files());let writes=0,refusal='';const realQuery=db.query.bind(db);

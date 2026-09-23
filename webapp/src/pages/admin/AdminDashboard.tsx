@@ -23,6 +23,7 @@ import { api, ApiError } from "@/lib/api";
 import OrderBoard from "./OrderBoard";
 import { LibrarySection } from "./LibrarySection";
 
+interface AgentBalance {id:string;purpose:string;status:string;amount_cents:number;date:string;charged_at:string|null;link_url:string|null;notice_error?:string|null}
 interface AdminClient {
   id: string;
   email: string;
@@ -36,7 +37,7 @@ interface AdminClient {
   document_count: number;
   ra_llcs: string[];
   /** Per agent company: the card kept for the renewal and the latest renewal (16 Sep 2026). */
-  ra_cards?: { billing_hold?:boolean;notice_error?:string|null;purpose?:string;order_id?:string; consent?:boolean; resignation_due?:string|null; resignation_submitted?:string|null; llc_name: string; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note: string | null; last_status: string | null; last_date: string | null }[];
+  ra_cards?: { balances?:AgentBalance[]; replaced_at?:string|null;ended_date?:string|null; billing_hold?:boolean;notice_error?:string|null;purpose?:string;order_id?:string; consent?:boolean; resignation_due?:string|null; resignation_submitted?:string|null; llc_name: string; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note: string | null; last_status: string | null; last_date: string | null }[];
   companies: { id: string; llc_name: string; contact_name?: string; has_summary?: boolean }[];
 }
 
@@ -52,10 +53,16 @@ const renewalStatusWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): st
   : c.last_status === "link_sent" ? `link sent for ${c.last_date ?? ""}`
   : c.last_status === "cancelled" ? `cancelled ${c.last_date ?? ""}`
   : c.last_status;
+const balanceWords = (b:AgentBalance):string => {
+ const label=b.purpose==='resignation'?'Resignation charge':b.purpose==='service_fee'?'Outstanding service fees':'Renewal';
+ const amount=`$${(b.amount_cents/100).toFixed(b.amount_cents%100?2:0)}`;
+ const state=['charged','paid_by_link'].includes(b.status)?`Paid ${b.charged_at?new Date(b.charged_at).toLocaleDateString('en-US',{timeZone:'America/New_York'}):b.date}`:b.status==='declined'?'payment declined':`unpaid${b.link_url?'; payment link available':''}`;
+ return `${label}: ${amount} — ${state}${b.notice_error?' — notice failed':''}`;
+};
 const renewalWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
-  renewalStatusWords(c) + (c.notice_error ? " — notice failed" : "");
+  c.balances?.length ? c.balances.filter(b=>b.status!=="cancelled"&&b.purpose!=="unavailable").map(balanceWords).join("\n") : renewalStatusWords(c) + (c.notice_error ? " — notice failed" : "");
 /** A row that needs a hand: a notice failure, decline, or missing card. */
-const raNeedsHand = (cl: AdminClient): boolean => (cl.ra_cards ?? []).some((c) => c.notice_error || c.last_status === "declined" || c.last_status === "notice_pending" || c.card_status !== "on_file" || Boolean(c.resignation_due && !c.resignation_submitted));
+const raNeedsHand = (cl: AdminClient): boolean => (cl.ra_cards ?? []).some((c) => c.balances?.some(b=>b.notice_error||(!["charged","paid_by_link","cancelled"].includes(b.status)&&b.purpose!=="unavailable")) || Boolean(c.resignation_submitted&&!c.ended_date) || c.notice_error || c.last_status === "declined" || c.last_status === "notice_pending" || c.card_status !== "on_file" || Boolean(c.resignation_due && !c.resignation_submitted));
 
 interface EmailRow {
   id: string;
@@ -585,12 +592,12 @@ function ClientsTable({
                 ) : null}
                 {variant === "ra" ? (
                   <td className="px-3 py-3 text-xs" data-testid="ra-card-cell">
-                    {(cl.ra_cards ?? []).length === 0 ? "—" : (cl.ra_cards ?? []).map((c) => <div key={c.llc_name}>{(cl.ra_cards ?? []).length > 1 ? `${c.llc_name}: ` : ""}{cardWords(c)}<div>Renewal permission: {c.consent === true ? "Agreed" : c.consent === false ? "Not agreed" : "Not recorded"}</div>{c.resignation_due && !c.resignation_submitted ? <strong>Resignation due {c.resignation_due.slice(0,10)}</strong> : null}{c.order_id ? <details><summary className="cursor-pointer underline">Manage appointment</summary><AgentServicePanel orderId={c.order_id}/></details> : null}</div>)}
+                    {(cl.ra_cards ?? []).length === 0 ? "—" : (cl.ra_cards ?? []).map((c) => <div key={c.llc_name}>{(cl.ra_cards ?? []).length > 1 ? `${c.llc_name}: ` : ""}{cardWords(c)}<div>Renewal permission: {c.consent === true ? "Agreed" : c.consent === false ? "Not agreed" : "Not recorded"}</div>{c.resignation_submitted ? <strong>Resignation submitted {c.resignation_submitted.slice(0,10)}</strong> : null}{c.resignation_due && !c.resignation_submitted ? <strong>Resignation due {c.resignation_due.slice(0,10)}</strong> : null}{c.order_id ? <details><summary className="cursor-pointer underline">Manage appointment</summary><AgentServicePanel orderId={c.order_id}/></details> : null}</div>)}
                   </td>
                 ) : null}
                 {variant === "ra" ? (
                   <td className="px-3 py-3 text-xs" data-testid="ra-renewals-cell">
-                    {(cl.ra_cards ?? []).length === 0 ? "—" : (cl.ra_cards ?? []).map((c) => <div key={c.llc_name}>{(cl.ra_cards ?? []).length > 1 ? `${c.llc_name}: ` : ""}{renewalWords(c)}</div>)}
+                    {(cl.ra_cards ?? []).length === 0 ? "—" : (cl.ra_cards ?? []).map((c) => <div key={c.llc_name} className="whitespace-pre-line">{(cl.ra_cards ?? []).length > 1 ? `${c.llc_name}: ` : ""}{renewalWords(c)}</div>)}
                   </td>
                 ) : null}
                 {/* Every paid company under this account, with the name given

@@ -4113,6 +4113,20 @@ batch16Checks((label, ok, detail) => batch16Results.set(label, {ok, detail}));
 { const r = batch16Results.get("batch16: professional eligibility is conditional and cumulative"); check("batch16: professional eligibility is conditional and cumulative", r?.ok === true, r?.detail); }
 { const r = batch16Results.get("batch16: bankruptcy paragraph is exactly owner approved"); check("batch16: bankruptcy paragraph is exactly owner approved", r?.ok === true, r?.detail); }
 
+const batch41Results = new Map<string, {ok:boolean;detail?:unknown}>();
+const {batch41BillingChecks}=await import("./batch41-billing-check");
+await batch41BillingChecks((label,ok,detail)=>batch41Results.set(label,{ok,detail}));
+const {batch41RecoveryChecks}=await import("./batch41-recovery-check");
+await batch41RecoveryChecks((label,ok,detail)=>batch41Results.set(label,{ok,detail}));
+const {batch41ControlsChecks}=await import("./batch41-controls-check");
+await batch41ControlsChecks((label,ok,detail)=>batch41Results.set(label,{ok,detail}));
+{const r=batch41Results.get("batch41 agent obligations and payment recovery");check("batch41 agent obligations and payment recovery",r?.ok===true,r?.detail);}
+{const r=batch41Results.get("batch41 financial correspondence recovery");check("batch41 financial correspondence recovery",r?.ok===true,r?.detail);}
+{const r=batch41Results.get("batch41 B1 filing revision recovery");check("batch41 B1 filing revision recovery",r?.ok===true,r?.detail);}
+{const r=batch41Results.get("batch41 B2 retained package recovery");check("batch41 B2 retained package recovery",r?.ok===true,r?.detail);}
+{const r=batch41Results.get("batch41 ruling completeness and settled display");check("batch41 ruling completeness and settled display",r?.ok===true,r?.detail);}
+{const r=batch41Results.get("batch41 Manual company filing and signature grouping");check("batch41 Manual company filing and signature grouping",r?.ok===true,r?.detail);}
+
 const {batch40Checks}=await import("./batch40-check");
 await batch40Checks((_label,ok,detail)=>check("batch40 renewal reminders do not gate billing",ok,detail));
 const {batch38Checks}=await import("./batch38-check");

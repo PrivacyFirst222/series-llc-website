@@ -140,3 +140,8 @@ Expects: correct output passes, each deliberately broken protection fails for it
 
 ## Revision 2
 The broader mandatory suite exposed two fixture-copy lists missing the new evidence module and an isolation fixture that assumed dist could be reused. Add the dependency to both copy lists and give the isolation fixture a real local build (source HTML, package and existing dependency link). Preserve all original offline-proof and stranger-process refusal assertions. Revision 1 is retained as rejected under Adam's standing authorization for necessary revisions; no product decision changed.
+
+
+## Approval provenance supplied September 23, 2026
+
+Approval provenance supplied by Adam in the September 23, 2026 website handoff: after “Load group b”, Adam said “Go. Approve all”. This authorized the presented implementation scope; it was not acceptance of an exact release package. The quotations were supplied in that handoff; the original conversation was not independently recovered.

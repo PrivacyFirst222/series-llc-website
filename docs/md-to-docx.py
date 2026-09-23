@@ -429,6 +429,18 @@ def body_xml(md, P):
     lines = ["\x00" if "\x00" in line and not line.replace("\x00", "").strip()
              else line.replace("\x00", "") for line in commented.split("\n")]
 
+    # The Manual's Section 13 example is one signature, including its final
+    # explanatory note. Keep that specific contiguous quote group together;
+    # ordinary quoted prose elsewhere must remain free to span pages.
+    sample_signature_keep_next = set()
+    if P is PROFILES["manual"]:
+        for start, line in enumerate(lines):
+            if line.strip() == "The signature block that does it right:":
+                end = start + 1
+                while end < len(lines) and lines[end].strip().startswith("> "):
+                    end += 1
+                sample_signature_keep_next.update(range(start + 1, end - 1))
+
     # Headings, collected first so [[contents]] can be built from them.
     headings = []
     for ln in lines:
@@ -566,7 +578,7 @@ def body_xml(md, P):
             out.append(
                 para(body, P, sz=P["small_sz"], after=80, keep_lines=True,
                      ind_left=P["quote_ind"], ind_right=P["quote_ind"],
-                     keep_next=introduces(body))
+                     keep_next=i in sample_signature_keep_next or introduces(body))
             )
             i += 1
             continue

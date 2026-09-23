@@ -1,4 +1,5 @@
-import { agentCheckoutLink } from './ra-checkout';
+import { normalizeAgentObligations, PAYMENT_RECONCILE } from './agent-obligations';
+import { ensureAgentPaymentLink, deliverAgentCorrespondence } from './agent-correspondence';
 import type { Hono } from 'hono';
 import { z } from 'zod';
 import { getDb } from './db';
@@ -40,8 +41,9 @@ export function registerAgentOffice(app:Hono) {
    await db.query("UPDATE orders SET ra_cancellation_requested_at=LEAST(COALESCE(ra_cancellation_requested_at,$2::timestamptz),$2::timestamptz) WHERE id=$1",[id,b.date+'T12:00:00Z']);
    await db.query("UPDATE orders SET ra_cancellation_note=$2, ra_cancellation_renewal_date=LEAST(ra_renewal_date,(SELECT min(renewal_date) FROM ra_renewals WHERE order_id=$1 AND purpose='renewal' AND renewal_date >= (orders.ra_cancellation_requested_at AT TIME ZONE 'America/New_York')::date)) WHERE id=$1",[id,b.note]);
   }else if(b.action==='replacement') {
-   await db.query('UPDATE orders SET ra_replaced_at=$2,ra_ended_date=$2,ra_proof_received_at=now(),ra_proof_note=$3 WHERE id=$1',[id,b.date,b.note]);
-   await db.query("UPDATE ra_renewals SET status='cancelled',retry_after=NULL WHERE order_id=$1 AND purpose='renewal' AND status IN ('notice_pending','notice_sent','link_sent','declined')",[id]);
+   const changed=await db.query(`UPDATE orders SET ra_replaced_at=$2,ra_ended_date=$2,ra_proof_received_at=now(),ra_proof_note=$3 WHERE id=$1 AND ra_payment_target IS NULL AND NOT EXISTS (SELECT 1 FROM ra_payment_attempts a JOIN ra_renewals r ON r.id=a.target_id WHERE r.order_id=orders.id AND a.status IN ('pending','approved','completed') AND r.status NOT IN ('charged','paid_by_link','cancelled')) RETURNING id`,[id,b.date,b.note]);
+   if(!changed.length)return c.json(err(PAYMENT_RECONCILE,'PROCESSING'),409);
+   await normalizeAgentObligations(db,id);
   }else if(b.action==='submitted') {
    const reason=b.reason || 'timely-cancellation';
    if(reason==='timely-cancellation' && (!o.ra_resignation_due||b.date<isoOf(o.ra_resignation_due)!))return c.json(err('The cancellation resignation is not due yet.','NOT_DUE'),400);
@@ -52,15 +54,14 @@ export function registerAgentOffice(app:Hono) {
    const [fee]=await db.query<{id:string;notice_sent_at:unknown}>(`WITH recorded AS (
      UPDATE orders SET ra_resignation_submitted=COALESCE(ra_resignation_submitted,$2::date),
        ra_resignation_reason=COALESCE(ra_resignation_reason,$3),ra_resignation_note=COALESCE(ra_resignation_note,$4)
-     WHERE id=$1 RETURNING id)
+     WHERE id=$1 AND ra_payment_target IS NULL AND NOT EXISTS (SELECT 1 FROM ra_payment_attempts a JOIN ra_renewals r ON r.id=a.target_id WHERE r.order_id=orders.id AND a.status IN ('pending','approved','completed') AND r.status NOT IN ('charged','paid_by_link','cancelled')) RETURNING id)
      INSERT INTO ra_renewals(order_id,renewal_date,amount_cents,status,purpose,charge_due)
      SELECT id,$2::date,9900,'notice_pending','resignation',$2::date FROM recorded
      ON CONFLICT(order_id) WHERE purpose='resignation' DO UPDATE SET order_id=EXCLUDED.order_id RETURNING id,notice_sent_at`,[id,b.date,reason,b.note||'Timely cancellation without replacement proof']);
-   if(!fee.notice_sent_at)try {
-     const link=await agentCheckoutLink('renewal',fee.id);
-     await sendMail({to:await currentAgentNoticeEmail(db,id),subject:'Registered-agent resignation charge',html:`<p>We submitted our registered-agent resignation. The $99 charge represents state fees and processing fees. It does not purchase another year of service. Any unpaid service fees remain due separately.</p><p><a href="${link}">Pay the resignation charge</a></p>`});
-     await db.query("UPDATE ra_renewals SET notice_sent_at=now(),status=CASE WHEN status='notice_pending' THEN 'link_sent' ELSE status END,notice_error=NULL,link_url=$2 WHERE id=$1",[fee.id,link]);
-   }catch(e){await db.query('UPDATE ra_renewals SET notice_error=$2 WHERE id=$1',[fee.id,String(e).slice(0,300)]);}
+   if(!fee)return c.json(err(PAYMENT_RECONCILE,'PROCESSING'),409);
+   await normalizeAgentObligations(db,id);
+   await ensureAgentPaymentLink(db,fee.id);
+   if(!fee.notice_sent_at)await deliverAgentCorrespondence(fee.id,today);
   }else if(b.action==='filed') {
    if(!o.ra_resignation_submitted||b.date<isoOf(o.ra_resignation_submitted)!)return c.json(err('Record submission first, then the actual state filing date.','BAD_STATE'),400);
    await db.query('UPDATE orders SET ra_resignation_filed=$2,ra_ended_date=CASE WHEN ra_replaced_at IS NOT NULL THEN LEAST(ra_replaced_at,$3::date) ELSE $3::date END WHERE id=$1',[id,b.date,addDays(b.date,31)]);

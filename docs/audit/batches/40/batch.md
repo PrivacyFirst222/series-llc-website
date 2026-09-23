@@ -33,3 +33,22 @@ Expects: no implication that a statement naming the parent covers series-owned p
 
 ## Verification
 Before/after isolated renewal fixtures: on-time, 60-day boundary, late, failed email, legacy hold, no consent/card, timely cancellation, voluntary payment, concurrent jobs and duplicate replay. Read all Manual and Terms text; compare statement clauses in all eight masters; render Word/PDF guidance. Full review required. Prior fixes archived through the existing replacement mechanism.
+
+
+## Approval provenance supplied September 23, 2026
+
+The following exact Group D exchange was supplied by Adam in the September 23, 2026 website handoff; the original conversation was not independently recovered.
+
+For Group D item 2, Adam said:
+
+> We should not be blocked from billing the card if we don’t timely send the 60 day notice. We technically don’t even have to send it be cause it doesn’t affect the client’s obligation to give us 30 days notice. Never block my ability to charge for the renewal fee for any reason. That’s my choice.
+
+He then said:
+
+> Go
+
+Then:
+
+> Item 1 is also approved
+
+This authorized the presented implementation scope. It was not acceptance of an exact release package. The approved interpretation preserves the 70-day reminder schedule and existing charge timing, authorization, cancellation, duplicate-payment and provider requirements; missing or late reminders do not block otherwise authorized annual charges.

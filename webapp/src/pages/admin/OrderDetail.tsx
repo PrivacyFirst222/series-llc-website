@@ -94,7 +94,14 @@ function DeleteCopyButton({ docId, orderId, onError }: { docId: string; orderId:
       const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
       if (!res.ok) throw new Error(body?.error?.message ?? "The copy could not be deleted. Try again.");
     },
-    onSuccess: () => { onError(null); setConfirming(false); queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] }); },
+    onSuccess: async () => {
+      onError(null);
+      setConfirming(false);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] }),
+        queryClient.invalidateQueries({ queryKey: ["admin", "orders"] }),
+      ]);
+    },
     onError: (e: Error) => onError(e.message),
   });
   if (confirming) {

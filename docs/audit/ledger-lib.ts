@@ -812,6 +812,36 @@ export function hasRulingRecord(r: Ruling): boolean {
   return rulingRecords().some((x) => x.kind === "ruling" && x.item === r.item && (x.part ?? "") === (r.part ?? "") && (x.text ?? "").trim() === r.text.trim());
 }
 
+/** Current local commit/release gates check completeness, not just additions.
+ * Historical comparisons and CI deliberately do not call this function: they
+ * cannot pretend today's external decisions existed in an earlier snapshot. */
+export function rulingCompletenessProblems(
+  ledger: Ledger,
+  read: (path: string) => string | null = readTree,
+  records?: RulingRecord[],
+): string[] {
+  if (records === undefined && !existsSync(RULINGS_FILE)) {
+    return ledger.rulings.some(r => rulingKind(r) === "ruling")
+      ? ["authenticated owner ruling records unavailable; current local completeness was not checked"] : [];
+  }
+  const out: string[] = [];
+  const lines = new Set((read("docs/audit/rulings.md") ?? "").split("\n"));
+  for (const record of records ?? rulingRecords()) {
+    if (record.kind !== "ruling") continue;
+    const name = `ruling on item ${record.item}${record.part ? ` (${record.part})` : ""}`;
+    const item = ledger.items.find(i => i.id === record.item);
+    if (!item || (record.part && ![...item.parts, ...(item.retiredParts ?? [])].some(p => p.key === record.part))) {
+      out.push(`${name}: authenticated ruling has no matching retained item/part`);
+    }
+    if (!ledger.rulings.some(r => rulingKind(r) === "ruling" && r.item === record.item
+      && (r.part ?? "") === (record.part ?? "") && r.text === record.text)) {
+      out.push(`${name}: authenticated exact text is missing from the current ledger`);
+    }
+    if (!lines.has(rulingLine(record))) out.push(`${name}: authenticated canonical line is missing from docs/audit/rulings.md`);
+  }
+  return out;
+}
+
 /** Adam's standing acceptance of exactly this FULL commit — or why there is
  *  none. A later rejection of the same batch and revision cancels it. An
  *  acceptance names one review package; one without a package identity

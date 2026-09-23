@@ -61,7 +61,10 @@ job a completed snapshot.
    a required file, or a key is unavailable. Verify client access and documents
    before changing the production database configuration.
 
-A restore cannot recover records created after the snapshot. Do not remove the
+A restore cannot generally recover records created after the snapshot. The forward
+S-election replacement protocol described below can recover a later completed
+package for a service and owner already present in the snapshot. It does not
+invent a missing client, company, or service order. Do not remove the
 independent Dropbox `/recovery/deletion-journal-v1.json` journal: it is authoritative even when restoring an older
 database. Expired questionnaire numbers remain absent. Client-deleted tax
 files stay unavailable even if older snapshots refer to them.
@@ -97,3 +100,69 @@ physical erasure of every provider-held recovery copy.
 The live source initializes the independent journal from its existing primary deletion records before a new backup or deletion. Restoration never initializes an empty journal. A missing, corrupt or inaccessible journal aborts before restoring any file or row. Each completed backup records its deletion checkpoint, and recovery refuses a journal missing any checkpoint or snapshot deletion. Concurrent journal writers use Dropbox revision matching, so one cannot overwrite another decision. Primary storage loss therefore does not lose the journal; simultaneous loss of the independent journal still requires recovery of that journal before restoration.
 
 Completed row counts are calculated after deleted-document filtering. Counts for an unfinished job, when returned, are explicitly provisional. Staged S-election replacement files have durable cleanup intents before upload; an abandoned or failed replacement is retried by the cleanup job without removing the prior usable package.
+
+
+## Filing-document revisions and legacy snapshots
+
+New Articles and Protected Series Designation revisions have immutable recovery
+paths derived from the complete document and storage identity. Office Replace
+verifies the old revision's recovery copy and the new revision's copy before
+changing the document row. Earlier verified recovery copies remain. New snapshots
+name the appropriate revision; old snapshots still read their original paths. An
+unfinished snapshot using an obsolete path or a filing revision replaced during
+its run restarts from a fresh consistent snapshot.
+
+This forward repair does not repair historically overwritten bytes. Replacing an
+Articles or Protected Series Designation PDF under the earlier protocol could
+invalidate a snapshot that references the overwritten Dropbox bytes. Such a
+restore stops with “Backup file missing or changed” before inserting database
+rows. A later completed backup can restore the replacement but does not repair
+earlier snapshots. Use an affected snapshot only after obtaining the exact prior
+bytes and verifying its manifest hash. If those bytes are unavailable, this tool
+cannot restore that snapshot. Do not bypass the hash check or assume provider
+version history is available. No historical sample backup is rewritten or deleted.
+
+## Completed S-election replacement recovery
+
+The independent journal at the existing `/recovery/deletion-journal-v1.json` path
+accepts the legacy deletion-only format and a forward version 2 envelope containing
+package recovery records. Its revision-matched writes serialize replacement and
+client-deletion decisions together. Older restore tools must not be used with the
+new envelope. The original deletion records remain authoritative.
+
+Each new package records its intended primary and mirror identity before upload,
+verifies an encrypted mirror, and records the committed successor relationship
+before retiring its predecessor or acknowledging successful completion. The
+record includes owner/company/service associations, a plaintext content hash,
+and an explicit projection of non-secret metadata. Full questionnaire numbers
+and their encrypted questionnaire values are excluded. Completed PDF contents
+remain encrypted, including in the mirror.
+
+Restore verifies this independent history before writes and reinstates the latest
+committed retained package for an existing authorized service, even when that
+package was completed after the snapshot. It reconciles old staging rows so their
+cleanup cannot delete the recovered successor. A later actual client deletion
+defeats the old snapshot and all known replacement versions; their controlled
+primary/mirror copies remain eligible for cleanup, including delayed uploads.
+An unfinished intent whose commit outcome cannot be established stops recovery
+instead of guessing. A source-side retry/cleanup can finalize a database-committed
+package; an aborted upload retains its independent cleanup identity.
+
+Before switching production to a restored database, verify that every recorded
+S-election replacement resolves to its latest retained encrypted package or a
+later actual client-deletion decision. A successful restore command alone does
+not prove this. Preserve all controlled-copy deletion records and exclude full
+questionnaire numbers. Missing historical replacement metadata cannot be recreated
+by guessing; stop and reconcile the affected package before using the restored
+database. Legacy tombstones do not identify a successor and retain their deletion
+effect. No historical test-copy cleanup is performed.
+
+If current package evidence or recoverable bytes are unavailable, the restore
+reports: “Recovery could not verify the current S-election package for [company].
+Do not switch production to this restored database until the package and its
+document records are reconciled. No client deletion has been inferred.” Restore
+to a fresh empty target after correcting the evidence; do not merge partial data.
+
+Correspondence worker leases are cleared after restore. Unresolved payment
+reservations and pending provider request identities remain; restoration itself
+does not submit a payment or decide that an ambiguous provider request failed.

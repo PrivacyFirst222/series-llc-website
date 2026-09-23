@@ -320,6 +320,7 @@ interface CompanyInfo {
   raResignationSubmitted?:string|null;
   raResignationFiled?:string|null;
   raEndedDate?:string|null;
+  raReplacedAt?:string|null;
   cardNote?:string|null;
   raCancellationRequestedAt: string | null;
   raCancellationLate?: boolean;
@@ -327,7 +328,7 @@ interface CompanyInfo {
   cardStatus?: "on_file" | "none" | "gift_card" | null;
   cardLast4?: string | null;
   cardBrand?: string | null;
-  renewals?: { linkUrl?:string|null;purpose?:string; date: string | null; amountCents: number; status: string; chargedAt: string | null }[];
+  renewals?: { reconcilingPayment?:boolean; linkUrl?:string|null;purpose?:string; date: string | null; amountCents: number; status: string; chargedAt: string | null }[];
 }
 
 const brandWord = (b: string | null | undefined): string => {
@@ -359,12 +360,16 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
         <span className="ml-auto text-xs text-muted-foreground" data-testid="ra-card-company">{company.llcName}</span>
       </div>
       <div className="px-5 py-4">
-        {company.raResignationSubmitted ? (
+        {company.raReplacedAt ? (
+          <p role="status" className="text-sm">Replacement registered agent verified. Our registered-agent appointment {company.raReplacedAt <= new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'}) ? 'ended' : 'ends'} on {formatDate(company.raReplacedAt)}.</p>
+        ) : company.raResignationSubmitted ? (
           <p role="status" className="text-sm">
             Resignation submitted {formatDate(company.raResignationSubmitted)}. {company.raResignationFiled ? `Filed by the state ${formatDate(company.raResignationFiled)}. ` : "State filing has not yet been recorded. "}{company.raEndedDate
               ? `Appointment end date: ${formatDate(company.raEndedDate)}.`
               : "We will display the appointment end date when it is recorded."}
           </p>
+        ) : company.raEndedDate ? (
+          <p role="status" className="text-sm">Our registered-agent appointment {company.raEndedDate <= new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'}) ? 'ended' : 'ends'} on {formatDate(company.raEndedDate)}.</p>
         ) : requestedAt ? (
           <div className="flex gap-2.5 rounded-lg border border-amber-300/60 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">
             <Clock className="mt-0.5 h-4 w-4 shrink-0" />
@@ -427,14 +432,14 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
 
               {(company.renewals ?? []).filter((r) => r.status === "charged" || r.status === "paid_by_link" || r.status === "declined").map((r) => (
                 <p key={`${r.date}-${r.status}`} className="mt-1" data-testid="renewal-line">
-                  {r.status === "declined"
-                    ? `${r.purpose === "resignation" ? "Resignation" : "Renewal"} charge declined for ${r.date ? new Date(`${r.date}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""} — pay with the link in your email.`
-                    : `${r.purpose === "resignation" ? "Resignation payment received on" : "Renewed on"} ${r.chargedAt ? new Date(r.chargedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""} for $${(r.amountCents / 100).toFixed(0)}.`}
+                  {r.reconcilingPayment ? "A payment is being checked. Use Check payment result below; this will not start a second charge." : r.status === "declined"
+                    ? `${r.purpose === "service_fee" ? "Outstanding service fees" : r.purpose === "resignation" ? "Resignation" : "Renewal"} charge declined for ${r.date ? new Date(`${r.date}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""}. ${r.linkUrl ? "Pay now below using the same or a different eligible card." : "We could not load the payment link. Please try again or contact support@myfloridaseriesllc.com."}`
+                    : `${r.purpose === "service_fee" ? "Outstanding service fees paid on" : r.purpose === "resignation" ? "Resignation payment received on" : "Renewed on"} ${r.chargedAt ? new Date(r.chargedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""}${r.purpose === "service_fee" ? ":" : " for"} $${(r.amountCents / 100).toFixed(0)}.`}
                 </p>
               ))}
-<UpdateRenewalCard key={company.orderId} company={company.orderId}/></div>
+{!company.raResignationSubmitted && !company.raEndedDate && !company.raReplacedAt ? <UpdateRenewalCard key={company.orderId} company={company.orderId}/> : null}</div>
         {!company.raResignationSubmitted && company.raResignationDue ? <p className="mt-3">{`Resignation due ${formatDate(company.raResignationDue)}; submission has not yet been recorded.`} {company.raEndedDate ? `Appointment ends ${formatDate(company.raEndedDate)}.` : ""}</p> : null}
-        {(company.renewals ?? []).filter(r=>r.linkUrl && !["charged","paid_by_link","cancelled"].includes(r.status)).map(r=><p key={r.date} className="mt-3"><a className="underline text-trust" href={r.linkUrl!}>Pay {r.purpose === "resignation" ? "resignation charge" : "renewal"} now / use another card</a></p>)}
+        {(company.renewals ?? []).filter(r=>r.linkUrl && !["charged","paid_by_link","cancelled"].includes(r.status)).map(r=><p key={r.date} className="mt-3"><a className="underline text-trust" href={r.linkUrl!}>{r.reconcilingPayment ? "Check payment result" : r.purpose === "service_fee" ? "Pay outstanding service fees" : `Pay ${r.purpose === "resignation" ? "resignation charge" : "renewal"} now / use another card`}</a></p>)}
         {cancelMutation.isError ? (
           <p className="mt-2 text-xs text-destructive">
             Something went wrong recording your request. Please try again or email

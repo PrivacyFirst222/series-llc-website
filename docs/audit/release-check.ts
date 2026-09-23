@@ -50,9 +50,9 @@
 import { readFileSync } from "node:fs";
 import {
   MANDATORY_CHECKS, git, gitBytes, sha256, loadLedger, ledgerRegressions, frozenFileProblems, linkProblems, isRecordPath, readAt,
-  combinedProblems, standingAcceptance, resolvePackage, packageProblems, rulingRecords, rulingLine, type BatchFile,
+  combinedProblems, standingAcceptance, resolvePackage, packageProblems, rulingRecords, rulingLine, rulingCompletenessProblems, type BatchFile,
 } from "./ledger-lib";
-import { renderList } from "./ledger-print";
+import { renderList, listRenderVersion } from "./ledger-print";
 
 const ZERO = /^0+$/;
 
@@ -66,12 +66,13 @@ function recordProblems(live: string, pushing: string, strict: boolean, files: s
   if (before && after === null) why.push("docs/audit/ledger.json is missing from what is being pushed — the ledger existed and is gone");
   if (after !== null) {
     const afterLedger = loadLedger(after);
+    why.push(...rulingCompletenessProblems(afterLedger, readP));
     if (before) why.push(...ledgerRegressions(loadLedger(before), afterLedger, { strict, read: readP, external: "required" }));
     else why.push(...linkProblems(afterLedger));
     why.push(...frozenFileProblems(afterLedger, readP));
     /* R2 */
     if (files.includes("docs/audit/findings-open.md") || files.includes("docs/audit/ledger.json")) {
-      if (readP("docs/audit/findings-open.md") !== renderList(afterLedger)) why.push("docs/audit/findings-open.md is not what the ledger being pushed renders to — it is generated, never edited");
+      if (readP("docs/audit/findings-open.md") !== renderList(afterLedger, listRenderVersion(readP("docs/audit/ledger-print.ts")))) why.push("docs/audit/findings-open.md is not what the ledger being pushed renders to — it is generated, never edited");
     }
   }
   if (!strict) return why;

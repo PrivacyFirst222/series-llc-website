@@ -1,0 +1,23 @@
+{
+  "candidate": "761af015e05507c19ec5a458af0cf839637ce8da",
+  "scope": "Focused review, not whole-product audit",
+  "approved": [
+    "A1",
+    "A3",
+    "A4",
+    "A5",
+    "A6",
+    "B1",
+    "B2",
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "C5"
+  ],
+  "excluded": [
+    "A2"
+  ],
+  "reportSha": "7945cf9bb9c5181fe416fae623495bb6065c32e41a8cc09e7985ddd145c1144a",
+  "evidenceManifestSha": "277dbfc68fc603aff3b5fc2473f045ac8229ab27b7b976061a28b20886616d22"
+}

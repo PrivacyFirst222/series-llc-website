@@ -1,5 +1,6 @@
 import type { Db } from './db';
 import { decryptSecret } from './crypto';
+import {recoverPackages} from './package-recovery';
 import { BACKUP_TABLES, type BackupDump } from './backup';
 import { readDeletionMirror } from './backup-deletions';
 import { readMirror, hashBytes } from './dropbox';
@@ -16,6 +17,8 @@ export async function restoreBackup(db:Db, dump:BackupDump):Promise<{tables:numb
  const tombstones=await readDeletionMirror();const deleted=new Set(tombstones.map(d=>d.storageKey));
  for(const key of [...(dump.deletionCheckpoint||[]),...dump.tables.document_deletions.map(d=>String(d.storage_key))])if(!deleted.has(key))throw new Error('Independent deletion journal is missing a recorded decision');
  const tables=structuredClone(dump.tables);
+ const packageRecovery=await recoverPackages(tables,dump.packageCheckpoint);
+ const restoreFiles=[...new Map([...dump.files,...packageRecovery.files].map(f=>[f.storageKey,f])).values()];
  const removedIds=new Set([...tombstones.map(d=>d.documentId),...tables.documents.filter(d=>deleted.has(String(d.storage_key))||d.deleted_at).map(d=>d.id)]);
  tables.documents=tables.documents.filter(d=>!removedIds.has(d.id));
  tables.oa_generations=tables.oa_generations.map(d=>removedIds.has(d.document_id)?{...d,document_id:null}:d);
@@ -27,6 +30,9 @@ export async function restoreBackup(db:Db, dump:BackupDump):Promise<{tables:numb
   const needed = recoveryDetails(row as unknown as RecoverableElection, true);
   if(needed){row.status='awaiting_info';row.details=needed;recovery.push(row as unknown as RecoverableElection);}
  }
+ // A vanished correspondence worker may not retain a lease after recovery.
+ // Unresolved payment reservations/provider identities are deliberately kept.
+ for(const row of tables.ra_renewals)if('correspondence_lock_until' in row)row.correspondence_lock_until=null;
  // Pending card requests are durable, encrypted provider retry identities. A
  // vanished worker's lease must not block the recovered client's retry. Verify
  // the required key and identity before writing any restored file or row.
@@ -40,7 +46,7 @@ export async function restoreBackup(db:Db, dump:BackupDump):Promise<{tables:numb
  }
  // Verify every required file and encryption key before writing database rows.
  const bytes=new Map<string,Buffer>();
- for(const f of dump.files){if(deleted.has(f.storageKey))continue;
+ for(const f of restoreFiles){if(deleted.has(f.storageKey))continue;
   const data=await readMirror(f.path);
   if(!data||!f.sha||hashBytes(isEncrypted(data)?unseal(data):data)!==f.sha)throw new Error(`Backup file missing or changed: ${f.path}`);
   if(isEncrypted(data))unseal(data);bytes.set(f.storageKey,data);

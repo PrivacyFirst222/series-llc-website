@@ -105,24 +105,23 @@ export function welcomeEmail(name: string, setPasswordUrl: string, isConversion 
  *  cancellation deadline, and how to cancel — scheduled 70 days before the date; delivery does not gate renewal billing. */
 export function raRenewalNoticeEmail(opts: {
   name: string; llcName: string; renewalDate: string; amount: string; last4: string | null;
-  chargeDate: string; cancelBy: string; linkUrl: string | null; chargeDue?: boolean;
+  chargeDate: string; cancelBy: string; linkUrl: string | null; chargeDue?: boolean; deadlinePassed?: boolean; overdue?: boolean;
 }): { subject: string; html: string } {
   const how = opts.last4
     ? `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong> and will be charged to your card ending
       <strong>${escapeHtml(opts.last4)}</strong> ${opts.chargeDue ? 'now that the scheduled billing date has arrived' : `on <strong>${escapeHtml(opts.chargeDate)}</strong>`}. There is nothing you need to do.</p>`
     : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. No eligible card is on file,
-      so please pay it by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below. Paying with a credit or debit
+      ${opts.overdue ? 'and the renewal fee remains unpaid and is now overdue. Please pay using the button below.' : `so please pay it by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below.`} Paying with a credit or debit
       card keeps that card for the following years, so the renewal is automatic from then on.</p>
       <p><a href="${opts.linkUrl ?? "#"}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the renewal</a></p>`;
   return {
-    subject: `Your registered agent service renews on ${opts.renewalDate}`,
+    subject: opts.overdue ? `Registered-agent renewal fee overdue — ${opts.llcName}` : `Your registered agent service renews on ${opts.renewalDate}`,
     html: wrap(`
       <p>Hi ${escapeHtml(opts.name || "there")},</p>
-      <p>Your registered agent service for <strong>${escapeHtml(opts.llcName)}</strong> renews on
+      <p>Your registered agent service for <strong>${escapeHtml(opts.llcName)}</strong> ${opts.overdue ? 'had its renewal date on' : 'renews on'}
       <strong>${escapeHtml(opts.renewalDate)}</strong>.</p>
       ${how}
-      <p><strong>To cancel</strong>, give notice by <strong>${escapeHtml(opts.cancelBy)}</strong> — in your client portal
-      (the Registered agent service card) or by email to support@myfloridaseriesllc.com. Florida law requires your LLC
+      <p>${opts.deadlinePassed ? `The cancellation deadline for this renewal was ${escapeHtml(opts.cancelBy)} and has passed. You may still give cancellation notice in your client portal or by emailing support@myfloridaseriesllc.com. A late reminder does not extend the cancellation or replacement deadlines.` : `<strong>To cancel</strong>, give notice by <strong>${escapeHtml(opts.cancelBy)}</strong> — in your client portal (the Registered agent service card) or by email to support@myfloridaseriesllc.com.`} Florida law requires your LLC
       to have a registered agent at all times, so you must also designate a successor agent with the Division of
       Corporations and send us proof; the Terms of Service explain both steps.</p>
       <p>Questions? Just reply to this email.</p>
@@ -131,30 +130,29 @@ export function raRenewalNoticeEmail(opts: {
 }
 
 /** The receipt after the renewal is charged or paid through its link. */
-export function raRenewalReceiptEmail(opts: { name: string; llcName: string; amount: string; last4: string; throughDate: string }): { subject: string; html: string } {
+export function raRenewalReceiptEmail(opts: { name: string; llcName: string; amount: string; last4: string; throughDate: string; recovered?: boolean; deadlinesHtml?: string }): { subject: string; html: string } {
   return {
     subject: `Registered agent service renewed — ${opts.llcName}`,
     html: wrap(`
       <p>Hi ${escapeHtml(opts.name || "there")},</p>
-      <p>We received <strong>${escapeHtml(opts.amount)}</strong>
-      for registered agent service for <strong>${escapeHtml(opts.llcName)}</strong> through
-      <strong>${escapeHtml(opts.throughDate)}</strong>.</p>
+      ${opts.recovered ? `<p>We received your ${escapeHtml(opts.amount)} renewal payment. Your registered-agent service is paid through ${escapeHtml(opts.throughDate)}. No further payment is due for this renewal.</p>` : `<p>We received <strong>${escapeHtml(opts.amount)}</strong> for registered agent service for <strong>${escapeHtml(opts.llcName)}</strong> through <strong>${escapeHtml(opts.throughDate)}</strong>.</p>`}
       <p>Your renewal date is shown on the Registered agent service card in your client portal.</p>
+      ${opts.deadlinesHtml ?? ""}
     `),
   };
 }
 
 /** The charge was declined (Terms 9(e)): pay by the renewal date or the
  *  service is delinquent. */
-export function raRenewalDeclinedEmail(opts: { name: string; llcName: string; last4: string; renewalDate: string; linkUrl: string; willRetry: boolean; retryDate: string | null; resignation?: boolean }): { subject: string; html: string } {
+export function raRenewalDeclinedEmail(opts: { name: string; llcName: string; last4: string; renewalDate: string; linkUrl: string; willRetry: boolean; retryDate: string | null; resignation?: boolean; amount?: string; overdue?: boolean; deadlinesHtml?: string }): { subject: string; html: string } {
   return {
     subject: `Action needed: your registered agent ${opts.resignation ? "resignation" : "renewal"} charge was declined`,
     html: wrap(`
       <p>Hi ${escapeHtml(opts.name || "there")},</p>
-      <p>The ${opts.resignation ? "resignation" : "renewal"} charge to your card ending <strong>${escapeHtml(opts.last4)}</strong> for registered agent
-      service for <strong>${escapeHtml(opts.llcName)}</strong> was declined.${opts.willRetry && opts.retryDate ? ` We will try the card once more on ${escapeHtml(opts.retryDate)}.` : ""}</p>
-      <p>You may pay now using the same or a different eligible card; there is no two-day waiting period. ${opts.resignation ? "This payment is for state filing fees and processing, not another service year." : `Pay by ${escapeHtml(opts.renewalDate)} to avoid delinquency. The card you use is saved for future annual renewals.`}</p>
-      <p><a href="${opts.linkUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the ${opts.resignation ? "resignation charge" : "renewal"}</a></p>
+      <p>${opts.resignation ? `The resignation charge to your card ending ${escapeHtml(opts.last4)} for ${escapeHtml(opts.llcName)} was declined.` : `Your ${escapeHtml(opts.amount??'$99')} registered-agent renewal charge was declined. You may pay now using the same or a different eligible card.`}${opts.willRetry && opts.retryDate ? ` We will try the card once more on ${escapeHtml(opts.retryDate)}.` : ""}</p>
+      <p>You may pay now using the same or a different eligible card; there is no two-day waiting period. ${opts.resignation ? "This payment is for state filing fees and processing, not another service year." : `${opts.overdue ? "The renewal fee remains unpaid and is now overdue." : `Please pay by ${escapeHtml(opts.renewalDate)} to avoid delinquency.`} The card you use is saved for future annual renewals.`}</p>
+      <p><a href="${opts.linkUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">${opts.resignation ? "Pay the resignation charge" : "Pay renewal now"}</a></p>
+      ${opts.deadlinesHtml ?? ""}
       <p>If the reason for the decline is not clear to you, your card issuer can tell you.</p>
     `),
   };

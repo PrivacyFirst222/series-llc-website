@@ -8,6 +8,7 @@ export const SERVICE_COMPANY_SQL = `COALESCE(so.formation_order_id,
 
 const BOARD_SQL = `WITH facts AS (
  SELECT o.id, o.client_id, o.contact_name, o.contact_email, o.package, o.llc_name,
+        current_client.name AS current_contact_name, current_client.email AS current_contact_email,
         o.status, o.service_fee_cents, o.state_fees_cents, o.created_at, o.formed_at,
         COALESCE(jsonb_array_length(o.payload->'series'), 0) AS series_count,
         COALESCE((o.payload->'optionalDocuments'->>'certificateOfStatus')::boolean, false) AS cert_status_purchased,
@@ -17,7 +18,7 @@ const BOARD_SQL = `WITH facts AS (
         (o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
         EXISTS (SELECT 1 FROM service_orders so WHERE ${SERVICE_COMPANY_SQL} = o.id AND so.status IN ('awaiting_info', 'in_progress')) AS services_owed,
         EXISTS (SELECT 1 FROM service_orders so WHERE ${SERVICE_COMPANY_SQL} = o.id AND so.status IN ('awaiting_info', 'in_progress') AND so.created_at > o.formed_at) AS new_work
- FROM orders o
+ FROM orders o LEFT JOIN clients current_client ON current_client.id = o.client_id
 ), board AS (
  SELECT *, CASE
    WHEN status = 'pending_payment' THEN 'pending'
@@ -32,7 +33,7 @@ const BOARD_SQL = `WITH facts AS (
 export async function readOrderBoard(db: Db, q: string, view: "all" | "active" | "completed", requestedPage: number) {
   const pageSize = view === "all" ? 200 : 50;
   const scope = view === "completed" ? "work_stage = 'completed'" : view === "active" ? "work_stage IN ('pending', 'new', 'state', 'post-filing')" : "true";
-  const where = `${scope} AND ($1 = '' OR llc_name ILIKE $2 OR contact_name ILIKE $2 OR contact_email ILIKE $2)`;
+  const where = `${scope} AND ($1 = '' OR llc_name ILIKE $2 OR contact_name ILIKE $2 OR contact_email ILIKE $2 OR current_contact_name ILIKE $2 OR current_contact_email ILIKE $2)`;
   // Count and page share one database snapshot. Clamp after the last card on
   // a page is completed, so the office is not left on a nonexistent page.
   const [result] = await db.query<{ orders: Record<string, unknown>[]; total: number; page: number }>(`${BOARD_SQL},

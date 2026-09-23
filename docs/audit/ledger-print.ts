@@ -18,7 +18,13 @@ const statusOf = (it: Item): string => {
   return it.verdict === "optional" ? `optional — ${one}` : one;
 };
 
-export function renderList(l: Ledger): string {
+export const LIST_RENDER_VERSION = 2;
+/** Archived commits retain the renderer version recorded in their source. */
+export function listRenderVersion(source: string | null): 1 | 2 {
+  return /^export const LIST_RENDER_VERSION = 2;$/m.test(source ?? "") ? 2 : 1;
+}
+
+export function renderList(l: Ledger, version: 1 | 2 = LIST_RENDER_VERSION): string {
   const out: string[] = [];
   const tracked = l.dispositions !== undefined || l.implementations !== undefined || l.combinedReleases !== undefined || l.auditAdjudications !== undefined;
   const live = l.items.filter((i) => i.verdict !== "dropped");
@@ -44,17 +50,18 @@ export function renderList(l: Ledger): string {
         it.housekeeping ? "housekeeping" : "",
         it.parts.length === 1 ? link(it.parts[0]) : "",
         it.related?.length ? `related: ${it.related.join(", ")}` : "",
-        ...it.waitsOn.map((w) => (w.startsWith("ruling:") ? (w.slice(7) === it.id ? "waits on Adam's ruling" : `waits on Adam's ruling on item ${w.slice(7)}`) : `waits on ${w}`)),
+        ...it.waitsOn.filter(w => version === 1 || !tracked || it.parts.some(p => unmetWaits(l, it, p).includes(w))).map((w) => (w.startsWith("ruling:") ? (w.slice(7) === it.id ? "waits on Adam's ruling" : `waits on Adam's ruling on item ${w.slice(7)}`) : `waits on ${w}`)),
       ].filter(Boolean).join("; ");
       out.push(`- **${it.id}. [${it.tag}]** — **${statusOf(it)}**${flags ? ` — ${flags}` : ""}`);
-      for (const line of it.text.split("\n")) out.push(`  - ${line}`);
+      for (const line of it.text.split("\n")) out.push(version === 2 && !line ? "" : `  - ${line}`);
       if (it.codex && it.codex.status !== "confirmed") out.push(`  - Codex (${it.codex.status}): ${it.codex.evidence}`);
       if (it.codex?.replacementOk === false) out.push(`  - **Codex rejected the proposed replacement:** ${it.codex.replacementNote || "(no note given)"}`);
       if (it.verdictReason) out.push(`  - Outcome: ${it.verdictReason}`);
       if (it.correctedReplacement) out.push(`  - Corrected after Codex's review: ${it.correctedReplacement}`);
       for (const r of l.rulings.filter((x) => (x.kind ?? "ruling") === "ruling" && x.item === it.id)) out.push(`  - Ruling, ${r.date}${r.part ? ` (${r.part})` : ""}: ${r.text}`);
       for (const p of it.parts) {
-        if (it.parts.length > 1) out.push(`  - Part "${p.key}" — ${p.status}: ${p.scope}${p.waitsOn.length ? ` (waits on ${p.waitsOn.join(", ")})` : ""}${link(p) ? ` — ${link(p)}` : ""}`);
+        const displayedWaits = p.waitsOn.filter(w => version === 1 || !tracked || unmetWaits(l, it, p).includes(w));
+        if (it.parts.length > 1) out.push(`  - Part "${p.key}" — ${p.status}: ${p.scope}${displayedWaits.length ? ` (waits on ${displayedWaits.join(", ")})` : ""}${link(p) ? ` — ${link(p)}` : ""}`);
         for (const s of p.supersessions ?? []) out.push(`  - Previous fix${it.parts.length > 1 ? ` (${p.key})` : ""}: ${s.prior.batch} r${s.prior.revision}, ${tracked ? `release commit ${s.prior.commit || "not recorded"}` : `commit ${s.prior.commit}`}; ${s.prior.assertions.length} assertion(s) retained. Replacement attempt: ${s.batch} r${s.revision}, work order ${s.hash}.`);
         if (p.fix && !tracked) out.push(`  - Fixed${it.parts.length > 1 ? ` (${p.key})` : ""}: batch ${p.fix.batch} revision ${p.fix.revision}, commit ${p.fix.commit.slice(0, 7)}, by ${p.fix.doneBy}; protected by ${p.fix.assertions.length} assertion(s).`);
         if (p.fix && tracked) out.push(`  - Implemented protections${it.parts.length > 1 ? ` (${p.key})` : ""}: batch ${p.fix.batch} revision ${p.fix.revision}, release commit ${p.fix.commit ? p.fix.commit.slice(0, 7) : "not recorded"}, by ${p.fix.doneBy}; protected by ${p.fix.assertions.length} assertion(s).`);

@@ -7,7 +7,7 @@ import { ROOT, git, ledgerRegressions, type Ledger } from "./ledger-lib";
 import { CHECKS, hash, validateAudit, type AuditData, type Finding } from "./audit-session-lib";
 import { intakeItems, type Intake } from "./audit-import-lib";
 import { manifestFor } from "./audit-session";
-import { renderList } from "./ledger-print";
+import { renderList, listRenderVersion } from "./ledger-print";
 const rows:{name:string;ok:boolean}[]=[];
 function check(name:string,ok:boolean){rows.push({name,ok});console.log(`${ok?"PASS":"FAIL"} ${name}`);}
 const ledger:Ledger={version:2,builtFrom:[],rulings:[],batches:[],items:[{id:"1",tag:"fixture",area:"Office",housekeeping:false,source:"fixture",text:"fixture source",verdict:"open",waitsOn:[],parts:[{key:"all",scope:"fixture",status:"open",waitsOn:[],history:[{at:"2026-01-01T00:00:00Z",event:"recorded"}]}]}]};
@@ -85,7 +85,7 @@ try{
  m.files.pop();writeFileSync(join(dir,"manifest.json"),JSON.stringify(m));const tampered=run("check",dir);check("real gate rejects altered manifest denominator",tampered.status!==0&&tampered.stderr.includes("manifest differs"));
  check("existing run never overwritten",run("init",dir,"real-command-fixture","HEAD","2").status!==0);
  const factory=manifestFor("factory",git(["rev-parse","HEAD"]).trim(),2);check("source inventory includes server and browser expectation checks",factory.files.some(f=>f.path==="webapp/server/e2e.ts")&&factory.files.some(f=>f.path==="webapp/scripts/behavioral.ts"));
-  for (const rev of ["e630541", "fffd6567"]) check(`historical generated report remains identical at ${rev}`, renderList(JSON.parse(git(["show", `${rev}:docs/audit/ledger.json`]))) === git(["show", `${rev}:docs/audit/findings-open.md`]));
+  for (const rev of ["e630541", "fffd6567"]) check(`historical generated report remains identical at ${rev}`, renderList(JSON.parse(git(["show", `${rev}:docs/audit/ledger.json`])), listRenderVersion(git(["show", `${rev}:docs/audit/ledger-print.ts`]))) === git(["show", `${rev}:docs/audit/findings-open.md`]));
   // Real intake and guard commands in a tiny synthetic Git repository. The
   // fixture evidence below is deliberately simulated, never a product audit.
   const fixture=join(temp,"intake-repo");mkdirSync(join(fixture,"docs/audit"),{recursive:true});mkdirSync(join(fixture,"webapp/server"),{recursive:true});mkdirSync(join(fixture,"webapp/src"),{recursive:true});

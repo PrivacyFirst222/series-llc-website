@@ -25,6 +25,9 @@ const commit=()=>{g('add','-A');g('-c','core.hooksPath=/dev/null','commit','-qm'
 const at='2026-09-23T10:00:00.000Z';
 const seedItem:any={id:'x',tag:'wording',area:'Client portal',source:'fixture',text:'fixture',verdict:'open',waitsOn:[],parts:[{key:'all',scope:'fixture',status:'open',waitsOn:[],history:[{at,event:'seed'}]}]};
 const ruling={date:'2026-09-23',kind:'ruling',item:'x',text:'Leave as is.'};
+// This disposable owner source and canonical line authenticate only the simulated ruling.
+put(join(L.HOME,'rulings.jsonl'),JSON.stringify({kind:'ruling',item:ruling.item,text:ruling.text,at,source:'SIMULATED fixture'})+'\n');
+put('docs/audit/rulings.md',L.rulingLine(ruling)+'\n');
 const empty:any={version:2,builtFrom:[],dispositions:[],implementations:[],combinedReleases:[],auditAdjudications:[],items:[seedItem],rulings:[ruling],batches:[]};put('docs/audit/ledger.json',empty);put('docs/audit/findings-open.md',renderList(empty));put('fixture.txt','before');put('docs/word/Test.docx','synthetic document bytes');
 const base=commit();
 const assertion={kind:'present',file:'fixture.txt',text:'protected'};

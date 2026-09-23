@@ -1,4 +1,4 @@
-import { ensureDeletionMirror, readDeletionMirror } from './backup-deletions';
+import { ensureDeletionMirror, readDeletionMirror, readRecoveryJournal } from './backup-deletions';
 import { deletionJournal } from './document-retention';
 import { isEncrypted, unseal } from "./encryption";
 import { gzipSync } from "node:zlib";
@@ -98,7 +98,7 @@ export async function listBackups(): Promise<BackupInfo[]> {
  *  you needed. The admin panel shows the newest dump's date so a stall is
  *  visible. */
 
-export interface BackupDump {version:1; dumpedAt:string; tables:Record<string,Record<string,unknown>[]>; files:BackupFile[]; fileManifestVersion:1; deletionCheckpoint?:string[]}
+export interface BackupDump {version:1; dumpedAt:string; tables:Record<string,Record<string,unknown>[]>; files:BackupFile[]; fileManifestVersion:1; deletionCheckpoint?:string[]; packageCheckpoint?:string[]}
 interface BackupJob {key:string; dump:BackupDump; done:Record<string,string>; errors:Record<string,string>}
 const JOB='backup-jobs/current.json';
 const backupKey=(iso:string)=>`db-${iso.slice(0,10)}-${iso.slice(11, 19).replace(/:/g, "")}.json.gz`;
@@ -107,7 +107,7 @@ export function backupFiles(tables:BackupDump['tables']):BackupFile[]{
  const orders=new Map((tables.orders||[]).map(o=>[o.id,o]));const clients=new Map((tables.clients||[]).map(c=>[c.id,c]));
  const files:BackupFile[]=[];
  for(const d of tables.documents||[]){if(d.deleted_at)continue;const o=orders.get(d.order_id),c=clients.get(d.client_id);
-   files.push({storageKey:String(d.storage_key),path:documentMirrorPath({id:String(d.id),title:String(d.title),kind:String(d.kind),storage_key:String(d.storage_key),llc_name:o && o.client_id===d.client_id?String(o.llc_name):null,email:c?String(c.email):null})});}
+   files.push({storageKey:String(d.storage_key),path:documentMirrorPath({id:String(d.id),title:String(d.title),kind:String(d.kind),storage_key:String(d.storage_key),mirror_path:typeof d.mirror_path==='string'?d.mirror_path:null,llc_name:o && o.client_id===d.client_id?String(o.llc_name):null,email:c?String(c.email):null})});}
  for(const d of tables.library_documents||[])files.push({storageKey:String(d.storage_key),path:`/reference/${encodeURIComponent(String(d.key))}-${encodeURIComponent(String(d.storage_key).split('/').pop()!)}.backup`});
  for(const o of tables.orders||[])if(o.summary_storage_key)files.push({storageKey:String(o.summary_storage_key),path:`/summaries/${o.id}-${encodeURIComponent(String(o.summary_storage_key).split('/').pop()!)}.backup`});
  return [...new Map(files.map(f=>[f.storageKey,f])).values()];
@@ -124,7 +124,14 @@ export async function runDbBackup(options:{resumeOnly?:boolean;budgetMs?:number}
  try{
   await ensureDeletionMirror(await deletionJournal());
   const saved=await readObject(JOB);let job:BackupJob|null=saved?JSON.parse(saved.toString()):null;
-  const obsoleteJob=!!job&&BACKUP_TABLES.some(t=>!Array.isArray(job!.dump.tables[t]));
+  let obsoleteJob=!!job&&BACKUP_TABLES.some(t=>!Array.isArray(job!.dump.tables[t]));
+  if(job&&!obsoleteJob){
+   // Old unfinished manifests must not write a reused legacy filename. An
+   // unfinished snapshot whose filing revision was replaced starts afresh.
+   const expected=backupFiles(job.dump.tables);
+   obsoleteJob=job.dump.files.some(f=>expected.find(x=>x.storageKey===f.storageKey)?.path!==f.path);
+   if(!obsoleteJob){const current=await db.query<{id:string;storage_key:string}>("SELECT id,storage_key FROM documents WHERE kind IN ('articles','psd')");obsoleteJob=job.dump.tables.documents.some(d=>['articles','psd'].includes(String(d.kind))&&current.some(c=>c.id===d.id&&c.storage_key!==d.storage_key));}
+  }
   // A pre-upgrade checkpoint cannot acquire missing tables from a later moment.
   // Replace only unfinished work with a new, internally consistent snapshot.
   if(obsoleteJob)job=null;
@@ -165,6 +172,7 @@ export async function runDbBackup(options:{resumeOnly?:boolean;budgetMs?:number}
   job.dump.files=job.dump.files.filter(f=>!deleted.has(f.storageKey));
   job.dump.tables.documents=job.dump.tables.documents.filter(d=>!d.deleted_at&&!deleted.has(String(d.storage_key)));
   job.dump.deletionCheckpoint=(await readDeletionMirror()).map(r=>r.storageKey);
+  job.dump.packageCheckpoint=(await readRecoveryJournal()).packages.map(r=>r.id);
   rowCounts=Object.fromEntries(BACKUP_TABLES.map(t=>[t,job!.dump.tables[t].length]));
   const data=gzipSync(Buffer.from(JSON.stringify(job.dump)));
   const existing=await readObject(PREFIX+job.key);

@@ -1,3 +1,5 @@
+import { obligationPurpose } from "./agent-obligations";
+import { replaceFilingDocument } from "./filing-document-replacement";
 import { readOrderBoard, SERVICE_COMPANY_SQL } from "./admin-board";
 import { notifyContact, notifyDocument } from './office-notifications';
 import { addYears, isoOf as agentIso } from "./renewals";
@@ -857,15 +859,17 @@ app.get("/admin/clients", async (c) => {
             (SELECT o.payload->'client'->>'lastName' FROM orders o WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL ORDER BY o.paid_at ASC LIMIT 1) AS last_name,
             (SELECT o.payload->'client'->>'suffix' FROM orders o WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL ORDER BY o.paid_at ASC LIMIT 1) AS suffix,
             COUNT(d.id)::int AS document_count,
-            -- Each company with its renewal date once formed (15 Sep 2026:
-            -- the client saw the date; no office screen did).
-            (SELECT COALESCE(jsonb_agg(DISTINCT (o.llc_name || CASE WHEN o.ra_renewal_date IS NULL AND o.ra_cancellation_requested_at IS NULL THEN '' ELSE ' (' || concat_ws(' — ', 'renews ' || to_char(o.ra_renewal_date, 'FMMon FMDD, YYYY'), 'cancellation requested ' || to_char(o.ra_cancellation_requested_at, 'FMMon FMDD, YYYY')) || ')' END)), '[]'::jsonb)
-               FROM orders o
-              WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
-                AND o.payload->'registeredAgent'->>'choice' = 'SERVICE' AND (o.ra_ended_date IS NULL OR o.ra_ended_date > (now() AT TIME ZONE 'America/New_York')::date)) AS ra_llcs,
             -- The card kept for each agent company and its latest renewal (16 Sep 2026).
             (SELECT COALESCE(jsonb_agg(jsonb_build_object(
                 'order_id', o.id, 'consent', o.payload->'registeredAgent'->'renewalCardConsent', 'resignation_due', o.ra_resignation_due, 'resignation_submitted', o.ra_resignation_submitted, 'llc_name', o.llc_name, 'card_status', o.card_status, 'card_last4', o.card_last4, 'card_brand', o.card_brand, 'card_note', o.card_note,
+                'replaced_at', o.ra_replaced_at, 'ended_date', o.ra_ended_date,
+                'renewal_date', o.ra_renewal_date, 'cancellation_requested_at', o.ra_cancellation_requested_at,
+                'balances', (SELECT COALESCE(jsonb_agg(jsonb_build_object(
+                  'id',r.id,'purpose',r.purpose,
+                  'status',r.status,'amount_cents',r.amount_cents,'date',r.renewal_date,'charged_at',r.charged_at,'link_url',r.link_url,
+                  'reconcilingPayment',EXISTS(SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed')),
+                  'notice_error',COALESCE(r.correspondence->>'error',r.notice_error)
+                ) ORDER BY r.renewal_date DESC),'[]'::jsonb) FROM ra_renewals r WHERE r.order_id=o.id),
                 'billing_hold', (SELECT r.billing_hold FROM ra_renewals r WHERE r.order_id=o.id ORDER BY r.renewal_date DESC LIMIT 1),
                 'notice_error', (SELECT r.notice_error FROM ra_renewals r WHERE r.order_id=o.id ORDER BY r.renewal_date DESC LIMIT 1),
                 'purpose', (SELECT r.purpose FROM ra_renewals r WHERE r.order_id=o.id ORDER BY r.renewal_date DESC LIMIT 1),
@@ -881,6 +885,31 @@ app.get("/admin/clients", async (c) => {
      FROM clients cl LEFT JOIN documents d ON d.client_id = cl.id
      GROUP BY cl.id ORDER BY cl.created_at DESC`,
   );
+  type Balance = { purpose: string; status: string; date: unknown; link_url: string | null; reconcilingPayment?: boolean; [key: string]: unknown };
+  type AgentCard = { llc_name: string; resignation_submitted: unknown; replaced_at: unknown; ended_date: unknown; renewal_date: unknown; cancellation_requested_at: unknown; balances: Balance[]; [key: string]: unknown };
+  const day = (value: unknown): string | null => value ? value instanceof Date ? value.toISOString().slice(0, 10) : String(value).slice(0, 10) : null;
+  const today = easternDateIso();
+  const dateWords = (value: unknown): string => new Date(day(value)! + 'T12:00:00Z').toLocaleDateString('en-US', {timeZone:'UTC',month:'long',day:'numeric',year:'numeric'});
+  for (const row of rows) {
+    const cards = ((row.ra_cards as AgentCard[] | null) ?? []).map(card => ({
+      ...card,
+      balances: card.balances.map(balance => {
+        const purpose = obligationPurpose({purpose:balance.purpose,status:balance.status,renewal_date:balance.date,
+          ra_resignation_submitted:card.resignation_submitted,ra_replaced_at:card.replaced_at,ra_ended_date:card.ended_date,
+          ra_cancellation_requested_at:card.cancellation_requested_at,reconcilingPayment:balance.reconcilingPayment});
+        return {...balance,purpose,link_url:purpose === 'unavailable' ? null : balance.link_url};
+      }),
+    })).filter(card => !card.ended_date || day(card.ended_date)! > today || card.balances.some(balance =>
+      ['service_fee','resignation'].includes(balance.purpose) && !['charged','paid_by_link','cancelled'].includes(balance.status)));
+    row.ra_cards = cards;
+    row.ra_llcs = cards.map(card => {
+      if (card.replaced_at) return `${card.llc_name} (Replacement registered agent verified. Our registered-agent appointment ${day(card.replaced_at)! <= today ? 'ended' : 'ends'} on ${dateWords(card.replaced_at)}.)`;
+      if (card.ended_date && day(card.ended_date)! <= today) return `${card.llc_name} (Our registered-agent appointment ended on ${dateWords(card.ended_date)}.)`;
+      if (card.resignation_submitted) return `${card.llc_name} (Resignation submitted ${dateWords(card.resignation_submitted)})`;
+      const facts = [card.renewal_date ? `renews ${dateWords(card.renewal_date)}` : '', card.cancellation_requested_at ? `cancellation requested ${dateWords(card.cancellation_requested_at)}` : ''].filter(Boolean);
+      return card.llc_name + (facts.length ? ` (${facts.join(' — ')})` : '');
+    });
+  }
   return c.json({ data: rows });
 });
 
@@ -1411,7 +1440,7 @@ app.delete("/admin/documents/:id", async (c) => {
 
 /** Replace a wrong Articles or designation PDF in place (15 Sep 2026): the
  *  document keeps its title, kind and coverage; the client's portal serves
- *  the new file; the old file is removed; the mirror copies it again. */
+ *  the new file; the previous revision remains recoverable for older backups. */
 app.post("/admin/documents/:id/replace", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -1427,12 +1456,14 @@ app.post("/admin/documents/:id/replace", async (c) => {
   if (!(file instanceof File) || file.size === 0) return c.json(err("Choose the replacement PDF.", "INVALID_INPUT"), 400);
   if (file.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
   if (!(await looksLikePdf(file))) return c.json(err(`${file.name} is not a readable PDF.`, "NOT_A_PDF"), 400);
-  const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
-  await db.query(
-    "UPDATE documents SET storage_key = $2, content_type = $3, size_bytes = $4, mirrored_at = NULL WHERE id = $1",
-    [rows[0].id, stored.storageKey, file.type || "application/pdf", stored.sizeBytes],
-  );
-  await deleteFile(rows[0].storage_key).catch(() => {});
+  const replaced = await replaceFilingDocument(db, {
+    id: rows[0].id,
+    expectedStorageKey: rows[0].storage_key,
+    filename: file.name,
+    bytes: Buffer.from(await file.arrayBuffer()),
+    contentType: file.type || "application/pdf",
+  });
+  if (!replaced) return c.json(err("This document changed while the replacement was being prepared. Reload it and try again.", "DOCUMENT_CHANGED"), 409);
   return c.json({ data: { ok: true } });
 });
 

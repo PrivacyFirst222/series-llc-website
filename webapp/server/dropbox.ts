@@ -2,6 +2,7 @@ import { env } from "./env";
 import { getDb } from "./db";
 import { readStoredFile, storageWasDeleted } from "./storage";
 import { createHash } from "node:crypto";
+import {isEncrypted,unseal} from "./encryption";
 
 /** Verified client-file backup. Sensitive files are copied as ciphertext.
  * Deletion requests propagate through the durable deletion journal. Each run
@@ -72,7 +73,9 @@ async function uploadDev(path: string, data: Buffer): Promise<void> {
 
 export const hashBytes = (data: Buffer) => createHash('sha256').update(data).digest('hex');
 export interface BackupFile { storageKey: string; path: string; sha?: string; }
-export function documentMirrorPath(doc: {id: string; title: string; kind: string; llc_name?: string | null; email?: string | null; storage_key: string}): string {
+export function documentMirrorPath(doc: {id: string; title: string; kind: string; llc_name?: string | null; email?: string | null; storage_key: string;mirror_path?:string|null}): string {
+  if(doc.kind==='articles'||doc.kind==='psd')return `/filing-revisions/${doc.id}-${hashBytes(Buffer.from(doc.storage_key))}.pdf`;
+  if(doc.storage_key.endsWith('.encrypted')&&doc.mirror_path)return doc.mirror_path;
   return `/${safePathPart(doc.llc_name || doc.email || "unassigned")}/${doc.id.slice(0,8)}-${safePathPart(doc.title || doc.kind)}.pdf${doc.storage_key.endsWith('.encrypted') ? '.encrypted' : ''}`;
 }
 const devMirror = async (path: string) => {
@@ -103,6 +106,11 @@ export async function mirrorFile(file: BackupFile): Promise<{sha:string;copied:b
   const bytes=await readStoredFile(file.storageKey), sha=hashBytes(bytes);
   const prior=await readMirror(file.path);
   let copied=false;
+  if(prior && hashBytes(prior)!==sha){
+    // A filename is a recovery identity. Only re-encryption of identical
+    // plaintext may replace its bytes; a new document needs a new identity.
+    if(!isEncrypted(prior)||!isEncrypted(bytes)||hashBytes(unseal(prior))!==hashBytes(unseal(bytes)))throw new Error('Refusing to overwrite different recovery file contents');
+  }
   if(!prior || hashBytes(prior)!==sha){
     if(configured())await uploadToDropbox(file.path,bytes);else await uploadDev(file.path,bytes);
     copied=true;
@@ -136,7 +144,7 @@ export async function runFileMirror(options: {budgetMs?:number} = {}): Promise<{
  try {
   let exhausted=false;
   while(Date.now()-started<budget){
-   const docs=await db.query<{id:string;title:string;kind:string;storage_key:string;llc_name:string|null;email:string|null}>(`SELECT d.id,d.title,d.kind,d.storage_key,o.llc_name,c.email FROM documents d LEFT JOIN orders o ON o.id=d.order_id AND o.client_id=d.client_id LEFT JOIN clients c ON c.id=d.client_id WHERE d.deleted_at IS NULL AND d.id::text>$1 ORDER BY d.id::text LIMIT 50`,[cursor]);
+   const docs=await db.query<{id:string;title:string;kind:string;storage_key:string;mirror_path:string|null;llc_name:string|null;email:string|null}>(`SELECT d.id,d.title,d.kind,d.storage_key,d.mirror_path,o.llc_name,c.email FROM documents d LEFT JOIN orders o ON o.id=d.order_id AND o.client_id=d.client_id LEFT JOIN clients c ON c.id=d.client_id WHERE d.deleted_at IS NULL AND d.id::text>$1 ORDER BY d.id::text LIMIT 50`,[cursor]);
    if(!docs.length){exhausted=true;break;}
    for(const doc of docs){
     if(Date.now()-started>=budget)break;
