@@ -30277,7 +30277,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30297,22 +30297,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30329,7 +30322,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30349,22 +30342,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30381,7 +30367,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30401,22 +30387,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30433,7 +30412,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30453,22 +30432,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30485,7 +30457,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30505,22 +30477,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30537,7 +30502,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30557,22 +30522,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30589,7 +30547,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30609,22 +30567,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30641,7 +30592,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30661,22 +30612,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30693,7 +30637,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30713,22 +30657,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30745,7 +30682,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30765,22 +30702,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30797,7 +30727,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30817,22 +30747,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30849,7 +30772,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30869,22 +30792,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30901,7 +30817,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30921,22 +30837,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30953,7 +30862,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30973,22 +30882,15 @@
               "batch": "37",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:15:15.414Z",
+              "event": "rejected r1",
+              "batch": "37",
+              "revision": 1,
+              "note": "Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     }
@@ -32667,7 +32569,7 @@
       "id": "37",
       "revision": 1,
       "frozenHash": "e847913c2bf1f791eb336fc1aeee025d4b4b6f72dbb864b3a3c4db1449dc023e",
-      "status": "implemented",
+      "status": "rejected",
       "model": "Codex",
       "base": "3ff5edd95c196550019e3bb7595eff70d843b41f",
       "history": [
@@ -32679,6 +32581,11 @@
         {
           "at": "2026-09-23T09:50:30.910Z",
           "event": "implemented"
+        },
+        {
+          "at": "2026-09-23T10:15:15.414Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-23T10:09 (Adam standing authorization for necessary revisions within approved work): Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions."
         }
       ]
     }
