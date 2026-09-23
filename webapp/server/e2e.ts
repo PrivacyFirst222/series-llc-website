@@ -3069,7 +3069,7 @@ if (mint.status === 200) {
     sun,
   );
   check(
-    "recently dissolved entity is HELD (s. 605.0715 window)",
+    "recently inactive entity is held under the service’s conservative name-availability rule",
     gator?.verdict === "held" && gator?.conflicts?.[0]?.status === "Inactive",
     gator,
   );
@@ -4113,6 +4113,10 @@ batch16Checks((label, ok, detail) => batch16Results.set(label, {ok, detail}));
 { const r = batch16Results.get("batch16: professional eligibility is conditional and cumulative"); check("batch16: professional eligibility is conditional and cumulative", r?.ok === true, r?.detail); }
 { const r = batch16Results.get("batch16: bankruptcy paragraph is exactly owner approved"); check("batch16: bankruptcy paragraph is exactly owner approved", r?.ok === true, r?.detail); }
 
+const {batch38Checks}=await import("./batch38-check");
+const batch38Results=new Map<string,{ok:boolean;detail?:unknown}>();
+await batch38Checks((label,ok,detail)=>batch38Results.set(label,{ok,detail}));
+{const r=batch38Results.get("batch38 verification controls");check("batch38 verification controls",r?.ok===true,r?.detail);}
 const {batch37Checks}=await import("./batch37-check");
 const batch37Results=new Map<string,{ok:boolean;detail?:unknown}>();
 await batch37Checks((label,ok,detail)=>batch37Results.set(label,{ok,detail}));

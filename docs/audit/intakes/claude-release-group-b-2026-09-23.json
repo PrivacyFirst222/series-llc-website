@@ -1,0 +1,190 @@
+{
+  "schema": 1,
+  "run": "claude-release-group-b-2026-09-23",
+  "commit": "404669b878756fdbc562aee89c61b6810057484a",
+  "completedAt": "2026-09-23T11:19:39.416765+00:00",
+  "manifestSha": "6628985cbb2c3420ad879a2f7fa94448c3e79a5261d56ec6ddc88262831a60cc",
+  "auditSha": "8924b339df858b8df8b5f4a4e0f60a3db6dbe912db8f14e1a4bf65e050383809",
+  "findings": [
+    {
+      "key": "item-15",
+      "relation": "new",
+      "where": "Word regression checks: detect words glued to drafting labels",
+      "file": "docs/batch32-word-check.py",
+      "line": 11,
+      "reads": " return ''.join(t.text or '' for r in root.iter(W+'r') if r.find(W+'rPr/'+W+'rStyle') is None or r.find(W+'rPr/'+W+'rStyle').get(W+'val')!=LABEL_STYLE for t in r.iter(W+'t'))",
+      "claims": "The test can pass the exact spacing defect it was intended to prevent because it deletes whitespace before comparing text.",
+      "truth": "Batch 32 approved separation of alternatives; this strengthens proof of that existing requirement. Sources: RR-DOCS-03",
+      "replacement": "Compare paragraph-aware text with whitespace collapsed, not erased, and add boundary assertions for drafting labels. Evaluate Claude\u2019s supplied checker rather than adopting it unchecked. Preserve both existing content checks and all legal alternatives.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group B",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-16",
+      "relation": "new",
+      "where": "Document provenance test: use the contribution wording clients receive",
+      "file": "webapp/server/provenance.ts",
+      "line": 106,
+      "reads": "      { description: S.asset1, value: \"$1,000\", by: single ? S.m1 : `${S.m1} and ${S.m2}, equally`, to: S.ser1 },",
+      "claims": "The test fixture still uses the retired equally wording rather than the current fractions and joint-owner wording.",
+      "truth": "Batch 32 already approved exact fractions and explicitly identified joint ownership. Sources: RR-DOCS-09",
+      "replacement": "Generate representative contributed-by cells through the real capital formatter, with tightly scoped normalization for those cells. Avoid a broad expression that could hide unrelated text changes.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group B",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-17",
+      "relation": "new",
+      "where": "Browser checks: test a fresh site build",
+      "file": "webapp/scripts/behavioral.ts",
+      "line": 781,
+      "reads": "  if (!existsSync(\"dist/index.html\")) await buildSite(process.cwd(), resolve(\"dist\"), false);",
+      "claims": "Running the browser script directly can use an old dist folder while testing a current server.",
+      "truth": "Tests must describe the candidate being reviewed; this introduces no customer behavior. Sources: RR-EV-02-behavioral-serves-stale-dist",
+      "replacement": "Build the site before the standalone walk. Any reuse optimization must validate a complete build identity, not file modification times. Preserve the review runner\u2019s exact build under test.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group B",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-18",
+      "relation": "new",
+      "where": "Restore tests: prove incomplete deletion records stop a restore",
+      "file": "webapp/server/restore.ts",
+      "line": 17,
+      "reads": " for(const key of [...(dump.deletionCheckpoint||[]),...dump.tables.document_deletions.map(d=>String(d.storage_key))])if(!deleted.has(key))throw new Error('Independent deletion journal is missing a recorded decision');",
+      "claims": "The restore refuses an independent deletion journal missing a decision in the backup, but Claude found that removing this refusal did not fail the old test.",
+      "truth": "Preserves Adam\u2019s rule that restoring a backup must not bring deleted documents back. Sources: RR-EV-03-restore-journal-completeness-guard-untested",
+      "replacement": "Add a case where the journal exists but omits one recorded deletion; assert refusal before restored files or database rows are written. The current Batch 28 and 35 sources were checked: the latter tests the newly backed-up workflow tables, not this incomplete-journal case.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group B",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-19",
+      "relation": "new",
+      "where": "Repair tests: fail if a required current module is missing",
+      "file": "webapp/server/batch28-check.ts",
+      "line": 90,
+      "reads": " const baseRows=await query('SELECT id FROM documents');let storageModule:typeof import('./s-election-package-storage')|null=null;try{storageModule=await import('./s-election-package-storage');}catch{/* Baseline predates the new atomic helper. */}",
+      "claims": "A failed import can silently switch a current-candidate check to a weaker old-code branch.",
+      "truth": "Old-code reproduction remains supported, but cannot silently reduce current checks. Sources: RR-EV-04-batch28-a09-capability-conditional-weak-branch",
+      "replacement": "Permit baseline compatibility only through an explicit baseline mode, bound to the intended baseline. Normal candidate runs must fail on missing modules or exports.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group B",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-20",
+      "relation": "new",
+      "where": "Portal renewal test: distinguish appointment date from formation date",
+      "file": "webapp/scripts/behavioral.ts",
+      "line": 1016,
+      "reads": "        expect(new RegExp(`renews on [A-Z][a-z]+ \\\\d{1,2}, ${nextYear}`).test(dash) && !/renews annually/.test(dash), \"renewal: the portal's agent card names the renewal date a year from the recorded appointment\", dash.match(/registered agent service is active[^.]*\\./)?.[0]);",
+      "claims": "The fixture uses coincident dates, and the assertion checks only next year. The wrong anniversary rule could still pass.",
+      "truth": "Adam already directed that the service year starts when the agent appointment takes effect. No policy decision is reopened. Sources: RR-EV-05-renewal-label-corrected-predicate-unchanged",
+      "replacement": "Use distinct recorded appointment and formation dates and assert the exact displayed renewal date, including a separate leap-day case.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group B",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-21",
+      "relation": "new",
+      "where": "Before-and-after evidence: retain the test source as well as its output",
+      "file": "webapp/scripts/batch34-check.ts",
+      "line": 24,
+      "reads": "  check(!!close&&close.includes('Transfer on Death designations')&&close.includes('Designating Member')&&close.includes(input.members.at(-1)!.name),`Exhibit A closing section stays together: ${key}`,close);",
+      "claims": "An early fixture correction was described but its original text was not retained, so the historical edit cannot now be independently reconstructed from that record.",
+      "truth": "This repairs future evidence handling, not the historical record. Sources: RR-EV-06-fixture-name-correction-has-no-artefact",
+      "replacement": "For future red/green evidence, retain and hash the exact check source and any changes to it. Keep the historical limitation explicitly stated; do not invent or relabel a missing old file.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group B",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-22",
+      "relation": "new",
+      "where": "Before-and-after logs: identify the code actually tested",
+      "file": "webapp/scripts/batch34-check.ts",
+      "line": 13,
+      "reads": "const check=(ok:boolean,label:string,detail?:unknown)=>{total++;if(!ok)failed++;console.log('CHECK_RESULT '+JSON.stringify({suite:'batch34',label,ok,commit:process.env.CHECK_COMMIT??'local',run:process.env.CHECK_RUN_ID??'local',...(!ok?{detail}:{})}));};",
+      "claims": "The retained exploratory pagination logs say local instead of identifying their source commit and run.",
+      "truth": "The normal packaged run already uses identities; this closes the separate reproduction evidence gap. Sources: RR-EV-07-red-green-runs-not-identity-bound",
+      "replacement": "Reproduce the targeted comparison with explicit baseline/candidate identities, distinct run IDs and check-source hashes. Preserve the original logs as historical artifacts.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group B",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-23",
+      "relation": "new",
+      "where": "Document checks: state and close the two formatting coverage gaps",
+      "file": "docs/format-check.py",
+      "line": 191,
+      "reads": "            # No baseline is not a reason to check nothing. Stranding and a",
+      "claims": "The Amendment and Statement forms have pagination checks but no original-source typography baseline.",
+      "truth": "This is a verification design choice, not a new legal drafting choice. Any new visual baseline will be labeled as an approved product baseline. Sources: RR-EV-09-two-word-forms-pagination-only",
+      "replacement": "Confirm which originals exist; document any absence. Add explicit typography/layout checks for these authored forms and submit representative renders with the package. Do not silently treat the current output as an independent original baseline.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group B",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-24",
+      "relation": "new",
+      "where": "Internal test label: use the already-approved inactive-name wording",
+      "file": "webapp/server/e2e.ts",
+      "line": 3072,
+      "reads": "    \"recently dissolved entity is HELD (s. 605.0715 window)\",",
+      "claims": "One test label still says recently dissolved and cites the old section; customer-facing wording has already been corrected.",
+      "truth": "Batches 29/33 already approved the conservative hold and accurate labels. Sources: RR-PORTAL-07",
+      "replacement": "Change the label to describe the conservative recently-inactive name hold, without making a broader statutory claim. Keep the predicate.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group B",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    }
+  ]
+}

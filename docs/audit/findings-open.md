@@ -2,7 +2,7 @@
 
 GENERATED from docs/audit/ledger.json by `bun run docs/audit/ledger-print.ts list`. Do not edit: the commit step refuses a copy that differs from the ledger. The auditors' original files are unchanged under docs/audit/sources/ and docs/audit/runs/.
 
-434 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 100 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 422.
+444 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 110 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 432.
 
 A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.
 For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-session.ts. The historical coverage-check.ts alone does not establish complete prior-item reconciliation. Audit completion does not approve repairs or publication.
@@ -2531,7 +2531,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Rechecked by Codex release reviewer: Reopened at frozen c91b101 and reproduced offline in the sealed release review; not an independent second model review.
   - Fixed: batch 35 revision 1, commit , by Codex; protected by 1 assertion(s).
 
-## Agreements and guidance — 112 open of 115
+## Agreements and guidance — 122 open of 125
 
 - **229. [A80]** — **implemented**
   - Manager-managed forms (4), Indemnification: "an act exceeding the authority conferred by Section 5.4"; 5.4 is the approval list, 5.3 the authority. Replace: "an act taken without the approval Section 5.4 requires" (both places).
@@ -3566,3 +3566,83 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
+- **AUD-claude-release-group-b-2026-09-23-item-15. [housekeeping]** — **implemented** — housekeeping
+  - Word regression checks: detect words glued to drafting labels — `docs/batch32-word-check.py:11`
+  - Reads:  return ''.join(t.text or '' for r in root.iter(W+'r') if r.find(W+'rPr/'+W+'rStyle') is None or r.find(W+'rPr/'+W+'rStyle').get(W+'val')!=LABEL_STYLE for t in r.iter(W+'t'))
+  - Claims: The test can pass the exact spacing defect it was intended to prevent because it deletes whitespace before comparing text.
+  - True: Batch 32 approved separation of alternatives; this strengthens proof of that existing requirement. Sources: RR-DOCS-03
+  - Proposed replacement (not approved): Compare paragraph-aware text with whitespace collapsed, not erased, and add boundary assertions for drafting labels. Evaluate Claude’s supplied checker rather than adopting it unchecked. Preserve both existing content checks and all legal alternatives.
+  - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Fixed: batch 38 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-release-group-b-2026-09-23-item-16. [housekeeping]** — **implemented** — housekeeping
+  - Document provenance test: use the contribution wording clients receive — `webapp/server/provenance.ts:106`
+  - Reads:       { description: S.asset1, value: "$1,000", by: single ? S.m1 : `${S.m1} and ${S.m2}, equally`, to: S.ser1 },
+  - Claims: The test fixture still uses the retired equally wording rather than the current fractions and joint-owner wording.
+  - True: Batch 32 already approved exact fractions and explicitly identified joint ownership. Sources: RR-DOCS-09
+  - Proposed replacement (not approved): Generate representative contributed-by cells through the real capital formatter, with tightly scoped normalization for those cells. Avoid a broad expression that could hide unrelated text changes.
+  - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Fixed: batch 38 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-release-group-b-2026-09-23-item-17. [housekeeping]** — **implemented** — housekeeping
+  - Browser checks: test a fresh site build — `webapp/scripts/behavioral.ts:781`
+  - Reads:   if (!existsSync("dist/index.html")) await buildSite(process.cwd(), resolve("dist"), false);
+  - Claims: Running the browser script directly can use an old dist folder while testing a current server.
+  - True: Tests must describe the candidate being reviewed; this introduces no customer behavior. Sources: RR-EV-02-behavioral-serves-stale-dist
+  - Proposed replacement (not approved): Build the site before the standalone walk. Any reuse optimization must validate a complete build identity, not file modification times. Preserve the review runner’s exact build under test.
+  - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Fixed: batch 38 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-release-group-b-2026-09-23-item-18. [housekeeping]** — **implemented** — housekeeping
+  - Restore tests: prove incomplete deletion records stop a restore — `webapp/server/restore.ts:17`
+  - Reads:  for(const key of [...(dump.deletionCheckpoint||[]),...dump.tables.document_deletions.map(d=>String(d.storage_key))])if(!deleted.has(key))throw new Error('Independent deletion journal is missing a recorded decision');
+  - Claims: The restore refuses an independent deletion journal missing a decision in the backup, but Claude found that removing this refusal did not fail the old test.
+  - True: Preserves Adam’s rule that restoring a backup must not bring deleted documents back. Sources: RR-EV-03-restore-journal-completeness-guard-untested
+  - Proposed replacement (not approved): Add a case where the journal exists but omits one recorded deletion; assert refusal before restored files or database rows are written. The current Batch 28 and 35 sources were checked: the latter tests the newly backed-up workflow tables, not this incomplete-journal case.
+  - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Fixed: batch 38 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-release-group-b-2026-09-23-item-19. [housekeeping]** — **implemented** — housekeeping
+  - Repair tests: fail if a required current module is missing — `webapp/server/batch28-check.ts:90`
+  - Reads:  const baseRows=await query('SELECT id FROM documents');let storageModule:typeof import('./s-election-package-storage')|null=null;try{storageModule=await import('./s-election-package-storage');}catch{/* Baseline predates the new atomic helper. */}
+  - Claims: A failed import can silently switch a current-candidate check to a weaker old-code branch.
+  - True: Old-code reproduction remains supported, but cannot silently reduce current checks. Sources: RR-EV-04-batch28-a09-capability-conditional-weak-branch
+  - Proposed replacement (not approved): Permit baseline compatibility only through an explicit baseline mode, bound to the intended baseline. Normal candidate runs must fail on missing modules or exports.
+  - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Fixed: batch 38 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-release-group-b-2026-09-23-item-20. [housekeeping]** — **implemented** — housekeeping
+  - Portal renewal test: distinguish appointment date from formation date — `webapp/scripts/behavioral.ts:1016`
+  - Reads:         expect(new RegExp(`renews on [A-Z][a-z]+ \\d{1,2}, ${nextYear}`).test(dash) && !/renews annually/.test(dash), "renewal: the portal's agent card names the renewal date a year from the recorded appointment", dash.match(/registered agent service is active[^.]*\./)?.[0]);
+  - Claims: The fixture uses coincident dates, and the assertion checks only next year. The wrong anniversary rule could still pass.
+  - True: Adam already directed that the service year starts when the agent appointment takes effect. No policy decision is reopened. Sources: RR-EV-05-renewal-label-corrected-predicate-unchanged
+  - Proposed replacement (not approved): Use distinct recorded appointment and formation dates and assert the exact displayed renewal date, including a separate leap-day case.
+  - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Fixed: batch 38 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-release-group-b-2026-09-23-item-21. [housekeeping]** — **implemented** — housekeeping
+  - Before-and-after evidence: retain the test source as well as its output — `webapp/scripts/batch34-check.ts:24`
+  - Reads:   check(!!close&&close.includes('Transfer on Death designations')&&close.includes('Designating Member')&&close.includes(input.members.at(-1)!.name),`Exhibit A closing section stays together: ${key}`,close);
+  - Claims: An early fixture correction was described but its original text was not retained, so the historical edit cannot now be independently reconstructed from that record.
+  - True: This repairs future evidence handling, not the historical record. Sources: RR-EV-06-fixture-name-correction-has-no-artefact
+  - Proposed replacement (not approved): For future red/green evidence, retain and hash the exact check source and any changes to it. Keep the historical limitation explicitly stated; do not invent or relabel a missing old file.
+  - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Fixed: batch 38 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-release-group-b-2026-09-23-item-22. [housekeeping]** — **implemented** — housekeeping
+  - Before-and-after logs: identify the code actually tested — `webapp/scripts/batch34-check.ts:13`
+  - Reads: const check=(ok:boolean,label:string,detail?:unknown)=>{total++;if(!ok)failed++;console.log('CHECK_RESULT '+JSON.stringify({suite:'batch34',label,ok,commit:process.env.CHECK_COMMIT??'local',run:process.env.CHECK_RUN_ID??'local',...(!ok?{detail}:{})}));};
+  - Claims: The retained exploratory pagination logs say local instead of identifying their source commit and run.
+  - True: The normal packaged run already uses identities; this closes the separate reproduction evidence gap. Sources: RR-EV-07-red-green-runs-not-identity-bound
+  - Proposed replacement (not approved): Reproduce the targeted comparison with explicit baseline/candidate identities, distinct run IDs and check-source hashes. Preserve the original logs as historical artifacts.
+  - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Fixed: batch 38 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-release-group-b-2026-09-23-item-23. [housekeeping]** — **implemented** — housekeeping
+  - Document checks: state and close the two formatting coverage gaps — `docs/format-check.py:191`
+  - Reads:             # No baseline is not a reason to check nothing. Stranding and a
+  - Claims: The Amendment and Statement forms have pagination checks but no original-source typography baseline.
+  - True: This is a verification design choice, not a new legal drafting choice. Any new visual baseline will be labeled as an approved product baseline. Sources: RR-EV-09-two-word-forms-pagination-only
+  - Proposed replacement (not approved): Confirm which originals exist; document any absence. Add explicit typography/layout checks for these authored forms and submit representative renders with the package. Do not silently treat the current output as an independent original baseline.
+  - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Fixed: batch 38 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-release-group-b-2026-09-23-item-24. [housekeeping]** — **implemented** — housekeeping
+  - Internal test label: use the already-approved inactive-name wording — `webapp/server/e2e.ts:3072`
+  - Reads:     "recently dissolved entity is HELD (s. 605.0715 window)",
+  - Claims: One test label still says recently dissolved and cites the old section; customer-facing wording has already been corrected.
+  - True: Batches 29/33 already approved the conservative hold and accurate labels. Sources: RR-PORTAL-07
+  - Proposed replacement (not approved): Change the label to describe the conservative recently-inactive name hold, without making a broader statutory claim. Keep the predicate.
+  - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Fixed: batch 38 revision 1, commit , by Codex; protected by 1 assertion(s).

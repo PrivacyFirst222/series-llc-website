@@ -1,6 +1,9 @@
+import {captureSource,verifySource} from "../../docs/audit/evidence";
+import {randomUUID} from "node:crypto";
+import {appendFileSync} from "node:fs";
 /** Optional Batch34: exact retained inputs, real assembler and PDF pagination. */
-import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync} from 'node:fs';
-import {join,resolve} from 'node:path';
+import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync,readdirSync} from 'node:fs';
+import {join,resolve,dirname} from 'node:path';
 import {tmpdir} from 'node:os';
 import type {OaInputs} from '../server/oa';
 import type {NewSeriesInput} from '../server/new-series';
@@ -9,9 +12,14 @@ import {execFileSync} from 'node:child_process';
 globalThis.fetch=async()=>{throw Error('Batch34 prohibits external access');};
 const source=process.env.BATCH34_SOURCE??resolve(import.meta.dir,'..');
 const {assembleOa}=await import(source+'/server/oa.ts'),{assembleNewSeries}=await import(source+'/server/new-series.ts'),{renderMarkdownPdf}=await import(source+'/server/pdf-render.ts');
-let failed=0,total=0;
-const check=(ok:boolean,label:string,detail?:unknown)=>{total++;if(!ok)failed++;console.log('CHECK_RESULT '+JSON.stringify({suite:'batch34',label,ok,commit:process.env.CHECK_COMMIT??'local',run:process.env.CHECK_RUN_ID??'local',...(!ok?{detail}:{})}));};
+const actualCommit=execFileSync('git',['rev-parse','HEAD'],{cwd:source,encoding:'utf8'}).trim();
+if(process.env.CHECK_COMMIT&&process.env.CHECK_COMMIT!==actualCommit)throw Error('Batch34 claimed commit differs from source');
+const run=process.env.CHECK_RUN_ID||'batch34-'+randomUUID();
 const owned=!process.env.BATCH34_EVIDENCE,dir=process.env.BATCH34_EVIDENCE?resolve(process.env.BATCH34_EVIDENCE):mkdtempSync(join(tmpdir(),'batch34-'));mkdirSync(dir,{recursive:true});
+const sourceDir=join(dir,'source'),sourceSha=captureSource(dirname(source),sourceDir,run,actualCommit,[import.meta.filename,...readdirSync(join(import.meta.dir,'fixtures/batch34')).filter(n=>n.endsWith('.json')).sort().map(n=>join(import.meta.dir,'fixtures/batch34',n))]);
+writeFileSync(join(dir,'identity.json'),JSON.stringify({commit:actualCommit,run,sourceSha},null,2));
+let failed=0,total=0;
+const check=(ok:boolean,label:string,detail?:unknown)=>{total++;if(!ok)failed++;const row={suite:'batch34',label,ok,commit:actualCommit,run,sourceSha,...(!ok?{detail}:{})};console.log('CHECK_RESULT '+JSON.stringify(row));appendFileSync(join(dir,'results.jsonl'),JSON.stringify(row)+'\n');};
 async function pdf(key:string,a:{markdown:string;title:string;encodedClientText?:boolean}){
  const path=join(dir,key+'.pdf');writeFileSync(path,await renderMarkdownPdf({...a,watermark:null}));writeFileSync(join(dir,key+'.md'),a.markdown);
  const raw=execFileSync('pdftotext',['-layout',path,'-'],{encoding:'utf8'});writeFileSync(join(dir,key+'.txt'),raw);
@@ -34,5 +42,6 @@ try{
  const long=JSON.parse(readFileSync(new URL('./fixtures/batch34/pdf-1-ordinary.json',import.meta.url),'utf8'))as OaInputs;
  long.members=Array.from({length:40},(_,i)=>({...long.members[0],name:`Owner Number ${i}`,percentage:2.5,todBeneficiary:`Beneficiary Number ${i}`}));
  const lp=await pdf('long-exhibit',assembleOa(long));check(lp.join(' ').includes('Owner Number 39')&&lp.join(' ').includes('Beneficiary Number 39'),'oversized Exhibit A retains final owner and beneficiary');
+ check(verifySource(sourceDir,sourceSha).length===0,'retained check source matches its manifest');
 }finally{if(owned)rmSync(dir,{recursive:true,force:true});}
 console.log(`${total-failed}/${total} Batch34 checks passed`);if(failed)process.exit(1);

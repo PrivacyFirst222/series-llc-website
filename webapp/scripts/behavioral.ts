@@ -1,3 +1,4 @@
+import { freshSite } from "./fresh-site";
 import { batch14Walk } from "./batch14-walk";
 import { batch13Walk } from "./batch13-walk";
 import { batch12Walk } from "./batch12-walk";
@@ -36,7 +37,7 @@ import { buildPayload } from "../src/components/forms/florida-llc/buildPayload";
 import { memberRowIsBlank } from "../src/components/forms/florida-llc/validation";
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
-import { startIsolatedStack, buildSite } from "./isolated-stack";
+import { startIsolatedStack } from "./isolated-stack";
 import { existsSync, writeFileSync, appendFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { tmpdir } from "node:os";
@@ -778,8 +779,7 @@ function jsonDiff(expected: unknown, actual: unknown, path = ""): string[] {
 async function main(): Promise<void> {
   // Reuse the review runner's owned-process proof and throwaway database.
   // HTTP 200 alone cannot establish that this run started the answering API.
-  if (!existsSync("dist/index.html")) await buildSite(process.cwd(), resolve("dist"), false);
-  else console.log("(using existing dist/ — run `bun run behavioral` to rebuild first)");
+  await freshSite(process.cwd());
   const stack = await startIsolatedStack({ serveDir: resolve("dist") });
   API = stack.api;
   WEB_PORT = Number(new URL(stack.web).port);
@@ -976,7 +976,7 @@ async function main(): Promise<void> {
       fd.set("articles", pdf("articles"));
       fd.append("psd", pdf("psd"));
       fd.append("psdSeries", JSON.stringify(seriesNames));
-      await fetch(`${API}/api/admin/orders/${dOrderId}/agent`,{method:"POST",headers:{Cookie:adminCookie,"Content-Type":"application/json"},body:JSON.stringify({action:"appointment",date:new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"})})});
+      await fetch(`${API}/api/admin/orders/${dOrderId}/agent`,{method:"POST",headers:{Cookie:adminCookie,"Content-Type":"application/json"},body:JSON.stringify({action:"appointment",date:"2026-03-20"})});
       const formed = await fetch(`${API}/api/admin/orders/${dOrderId}/formation-documents`, { method: "POST", headers: { Cookie: adminCookie }, body: fd });
       expect(formed.status === 200, "actions: run D's company is formed through the admin API", await formed.text().catch(() => ""));
 
@@ -1012,8 +1012,7 @@ async function main(): Promise<void> {
         // A formed company on our agent service shows its renewal date
         // (Adam, 14 Sep 2026: "stored and shown in the portal").
         const dash = await page.locator("main").innerText();
-        const nextYear = String(new Date().getFullYear() + 1);
-        expect(new RegExp(`renews on [A-Z][a-z]+ \\d{1,2}, ${nextYear}`).test(dash) && !/renews annually/.test(dash), "renewal: the portal's agent card names the renewal date a year from the recorded appointment", dash.match(/registered agent service is active[^.]*\./)?.[0]);
+        expect(dash.includes("renews on March 20, 2027") && !/renews annually/.test(dash), "renewal: the portal's agent card names the renewal date a year from the recorded appointment", dash.match(/registered agent service is active[^.]*\./)?.[0]);
       }
       // The S election is not the client's to act on until the office has
       // entered the formation date (Form 2553 timing gate, 6 Sep 2026): the

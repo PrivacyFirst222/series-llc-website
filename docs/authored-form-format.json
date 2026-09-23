@@ -1,0 +1,496 @@
+{
+  "kind": "approved-product-layout",
+  "authority": "Adam approved Group B item 23; current layout preserved, not represented as an independent original.",
+  "sourceCommit": "404669b878756fdbc562aee89c61b6810057484a",
+  "originals": "No Amendment or Statement original exists in docs/source; the original-source baseline remains unchanged.",
+  "forms": {
+    "FPSLLC Statement of Authorized Representative - FORM.docx": {
+      "sourceSha256": "42e7a6393dfe5989ffed141490081fab9e867b80058c958f960eb690a5f388e1",
+      "layout": {
+        "defaults": "<ns0:docDefaults xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rPrDefault><ns0:rPr><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" ns0:cs=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr></ns0:rPrDefault><ns0:pPrDefault><ns0:pPr><ns0:widowControl /><ns0:spacing ns0:after=\"200\" ns0:line=\"276\" ns0:lineRule=\"auto\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr></ns0:pPrDefault></ns0:docDefaults>",
+        "sections": [
+          "<ns0:sectPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:pgSz ns0:w=\"12240\" ns0:h=\"15840\" /><ns0:pgMar ns0:top=\"1440\" ns0:right=\"1440\" ns0:bottom=\"1440\" ns0:left=\"1440\" ns0:header=\"720\" ns0:footer=\"720\" ns0:gutter=\"0\" /></ns0:sectPr>"
+        ],
+        "paragraphs": [
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:before=\"240\" ns0:after=\"200\" /><ns0:jc ns0:val=\"center\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"28\" /><ns0:szCs ns0:val=\"28\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:before=\"240\" ns0:after=\"200\" /><ns0:jc ns0:val=\"center\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"26\" /><ns0:szCs ns0:val=\"26\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepLines /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:ind ns0:left=\"407\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepLines /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:ind ns0:left=\"407\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          }
+        ]
+      }
+    },
+    "FPSLLC Amendment to Operating Agreement - FORM.docx": {
+      "sourceSha256": "d4de9baa5475c6538ee0d101dedb38de31a72f67d9257857b902cd5d0805e117",
+      "layout": {
+        "defaults": "<ns0:docDefaults xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rPrDefault><ns0:rPr><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" ns0:cs=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr></ns0:rPrDefault><ns0:pPrDefault><ns0:pPr><ns0:widowControl /><ns0:spacing ns0:after=\"200\" ns0:line=\"276\" ns0:lineRule=\"auto\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr></ns0:pPrDefault></ns0:docDefaults>",
+        "sections": [
+          "<ns0:sectPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:pgSz ns0:w=\"12240\" ns0:h=\"15840\" /><ns0:pgMar ns0:top=\"1440\" ns0:right=\"1440\" ns0:bottom=\"1440\" ns0:left=\"1440\" ns0:header=\"720\" ns0:footer=\"720\" ns0:gutter=\"0\" /></ns0:sectPr>"
+        ],
+        "paragraphs": [
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:before=\"240\" ns0:after=\"200\" /><ns0:jc ns0:val=\"center\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"28\" /><ns0:szCs ns0:val=\"28\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:before=\"240\" ns0:after=\"200\" /><ns0:jc ns0:val=\"center\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"28\" /><ns0:szCs ns0:val=\"28\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:before=\"240\" ns0:after=\"200\" /><ns0:jc ns0:val=\"center\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"26\" /><ns0:szCs ns0:val=\"26\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:before=\"240\" ns0:after=\"200\" /><ns0:jc ns0:val=\"center\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"26\" /><ns0:szCs ns0:val=\"26\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:before=\"240\" ns0:after=\"200\" /><ns0:jc ns0:val=\"center\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:before=\"240\" ns0:after=\"200\" /><ns0:jc ns0:val=\"center\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:before=\"240\" ns0:after=\"200\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"26\" /><ns0:szCs ns0:val=\"26\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:pageBreakBefore /><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:before=\"240\" ns0:after=\"200\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"26\" /><ns0:szCs ns0:val=\"26\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:keepLines /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:ind ns0:left=\"407\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:keepLines /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:ind ns0:left=\"407\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:b /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>",
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:keepLines /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:ind ns0:left=\"407\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:keepLines /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:ind ns0:left=\"407\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:keepNext /><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"80\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rStyle ns0:val=\"DraftingChoice\" /><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          },
+          {
+            "paragraph": "<ns0:pPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:widowControl /><ns0:spacing ns0:after=\"160\" /><ns0:jc ns0:val=\"both\" /></ns0:pPr>",
+            "runs": [
+              "<ns0:rPr xmlns:ns0=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><ns0:rFonts ns0:ascii=\"Times New Roman\" ns0:hAnsi=\"Times New Roman\" /><ns0:i /><ns0:sz ns0:val=\"24\" /><ns0:szCs ns0:val=\"24\" /></ns0:rPr>"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

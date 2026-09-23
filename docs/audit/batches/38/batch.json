@@ -1,0 +1,283 @@
+{
+  "id": "38",
+  "revision": 1,
+  "title": "Release review Group B: verification and evidence",
+  "model": "Codex",
+  "base": "404669b878756fdbc562aee89c61b6810057484a",
+  "items": [
+    {
+      "id": "AUD-claude-release-group-b-2026-09-23-item-15",
+      "part": "all",
+      "scope": "Compare paragraph-aware text with whitespace collapsed, not erased, and add boundary assertions for drafting labels. Evaluate Claude\u2019s supplied checker rather than adopting it unchecked. Preserve both existing content checks and all legal alternatives.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch38 verification controls"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-b-2026-09-23-item-16",
+      "part": "all",
+      "scope": "Generate representative contributed-by cells through the real capital formatter, with tightly scoped normalization for those cells. Avoid a broad expression that could hide unrelated text changes.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch38 verification controls"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-b-2026-09-23-item-17",
+      "part": "all",
+      "scope": "Build the site before the standalone walk. Any reuse optimization must validate a complete build identity, not file modification times. Preserve the review runner\u2019s exact build under test.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch38 verification controls"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-b-2026-09-23-item-18",
+      "part": "all",
+      "scope": "Add a case where the journal exists but omits one recorded deletion; assert refusal before restored files or database rows are written. The current Batch 28 and 35 sources were checked: the latter tests the newly backed-up workflow tables, not this incomplete-journal case.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch38 verification controls"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-b-2026-09-23-item-19",
+      "part": "all",
+      "scope": "Permit baseline compatibility only through an explicit baseline mode, bound to the intended baseline. Normal candidate runs must fail on missing modules or exports.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch38 verification controls"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-b-2026-09-23-item-20",
+      "part": "all",
+      "scope": "Use distinct recorded appointment and formation dates and assert the exact displayed renewal date, including a separate leap-day case.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch38 verification controls"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-b-2026-09-23-item-21",
+      "part": "all",
+      "scope": "For future red/green evidence, retain and hash the exact check source and any changes to it. Keep the historical limitation explicitly stated; do not invent or relabel a missing old file.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch38 verification controls"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-b-2026-09-23-item-22",
+      "part": "all",
+      "scope": "Reproduce the targeted comparison with explicit baseline/candidate identities, distinct run IDs and check-source hashes. Preserve the original logs as historical artifacts.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch38 verification controls"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-b-2026-09-23-item-23",
+      "part": "all",
+      "scope": "Confirm which originals exist; document any absence. Add explicit typography/layout checks for these authored forms and submit representative renders with the package. Do not silently treat the current output as an independent original baseline.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch38 verification controls"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-b-2026-09-23-item-24",
+      "part": "all",
+      "scope": "Change the label to describe the conservative recently-inactive name hold, without making a broader statutory claim. Keep the predicate.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch38 verification controls"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/batch25-word-check.py",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/batch32-word-check.py",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/word-text-check.py",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/format-check.py",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/authored-form-format.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/batch38-word-check.py",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/evidence.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/ledger-lib.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/README.md",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "webapp/server/provenance.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "webapp/server/batch28-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "webapp/server/batch38-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "webapp/server/batch38.test.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "webapp/scripts/batch34-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "webapp/scripts/audit-review.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "webapp/scripts/batch38-renewal-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "webapp/scripts/fresh-site.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "webapp/package.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/intakes/claude-release-group-b-2026-09-23.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group B verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "why": "Existing generation hook"
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Existing generation hook"
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/server/batch38-check.ts",
+    "webapp/server/batch38.test.ts",
+    "docs/batch38-word-check.py",
+    "webapp/scripts/batch38-renewal-check.ts"
+  ],
+  "removedChecks": [
+    "recently dissolved entity is HELD (s. 605.0715 window)"
+  ]
+}

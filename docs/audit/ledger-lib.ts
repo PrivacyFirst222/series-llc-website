@@ -1,3 +1,4 @@
+import {packageSourceProblems,type SourceEvidence} from "./evidence";
 /**
  * The fix ledger's shared parts (17 Sep 2026, FAILURES.md P88–P92; reviewed by
  * Codex before each revision was built).
@@ -818,6 +819,7 @@ export function standingAcceptance(commitFull: string, batch?: string, revision?
 
 export interface SiteFile { path: string; sha: string }
 export interface ReviewPackage {
+  sourceEvidence?: SourceEvidence[];
   batch: string; revision: number; base: string; commit: string; packageId: string; diffSha: string; createdAt: string; runId: string;
   /** null for a full run; the names of the checks a partial run was limited to. */
   partial: string[] | null;
@@ -860,6 +862,7 @@ export function resolvePackage(q: { acceptance?: Acceptance; batch?: string; rev
  *  manifest — nothing added, missing or changed since the review. */
 export function packageProblems(x: { dir: string; pkg: ReviewPackage }): string[] {
   const out: string[] = [];
+  if(x.pkg.required.includes("source-evidence"))out.push(...packageSourceProblems(x.dir,x.pkg.sourceEvidence ?? []));
   if (x.pkg.partial !== null) out.push(`package ${x.pkg.packageId} is PARTIAL or has no explicit full-run marker — partial must be null`);
   if (!Array.isArray(x.pkg.site) || x.pkg.site.length === 0) { out.push(`package ${x.pkg.packageId} has no nonempty site manifest`); return out; }
   const seen = new Set<string>();

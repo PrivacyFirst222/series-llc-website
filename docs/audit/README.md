@@ -345,3 +345,17 @@ same disclosed administrator-access and hook-bypass limits.
   provisions; its description now says so.
 - `batch21-controls.ts` runs these regression suites from the existing mandatory
   `ledger-controls` check. Repairs remain subject to normal owner acceptance.
+
+## Batch 38: verification evidence and regression checks
+
+Group B (items 15–24) changes verification, not client wording or service rules.
+- Word checks collapse whitespace within paragraphs instead of deleting it, and test label boundaries. They retain alternatives and legal text. The supplied external checker was evaluated: it also flags intentional paragraph splits, so it is not adopted unchanged.
+- Provenance fixtures obtain contribution text from `computeCapital`; only exact expected contributed-by cells are normalized.
+- Running `behavioral.ts` directly always builds the site first. An old `dist` directory is not build evidence.
+- `batch28-check.ts` requires current storage modules/exports. Historical compatibility requires `BATCH28_BASELINE_COMMIT=00663979fc6559eda50d3de9317f42a52de46953` and HEAD equal to that exact pre-repair commit; any other requested identity refuses. An incomplete, correctly hashed deletion journal must be rejected before writes.
+- Renewal fixtures use distinct formation and appointment dates and exact displayed anniversaries, including the existing February 28 anniversary for a February 29 appointment in a non-leap year.
+- Review packages retain candidate and before-fix source snapshots and SHA-256 manifests under `source/`. Before-fix snapshots include the actual overlaid tests, with a distinct run identity. `source-evidence` verifies every retained file, its hash and the exact file set; release/package validation repeats it when required. Old packages are not retroactively described as containing sources they did not retain.
+- Standalone Batch 34 pagination evidence records the actual source HEAD, whether the tree is modified, exact check and fixture sources, run identity and manifest hash. The original exploratory logs remain historical artifacts; the missing early version of the fixture was not recovered or invented.
+- The Amendment and Statement have no independent original in `docs/source/`. `authored-form-format.json` is explicitly the owner-approved **product layout** at 404669b, not an original-source baseline. It checks paragraph/run typography, spacing and page layout alongside pagination. Deliberately changed fonts, sizes and spacing must fail.
+
+`batch38-check.ts` is part of the server suite. Its Word, source-retention, fresh-build, contribution, required-module and real portal appointment checks run in temporary isolated fixtures. The Batch 38 review evidence additionally retains the incomplete-journal and wrong-anniversary mutation runs, historical pagination comparison, and rendered authored forms.

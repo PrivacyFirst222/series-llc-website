@@ -2,7 +2,20 @@
 import {mkdtempSync,rmSync,readFileSync,writeFileSync,mkdirSync,renameSync,existsSync} from 'node:fs';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {readdirSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
+const oldBaseline='00663979fc6559eda50d3de9317f42a52de46953';
+function baselineMode(): boolean {
+ const requested=process.env.BATCH28_BASELINE_COMMIT;
+ if(!requested)return false;
+ const actual=execFileSync('git',['rev-parse','HEAD'],{cwd:import.meta.dir,encoding:'utf8'}).trim();
+ if(requested!==oldBaseline||actual!==requested)throw Error('Batch28 baseline mode requires its exact pre-repair commit');
+ console.log('Explicit Batch28 baseline compatibility: '+actual);
+ return true;
+}
+const historicalBaseline=baselineMode();
 const prefix='B28:';
 const results:{label:string;ok:boolean;detail:unknown}[]=[];
 const check=(label:string,ok:boolean,detail:unknown={})=>{results.push({label,ok,detail});console.log(prefix+JSON.stringify({label,ok,detail}));};
@@ -87,7 +100,8 @@ async function child(){
  const {putFile,readFileStream,readObject,deletionPath}=await import('./storage');
  const old=await putFile('old.pdf',bytes.buffer as ArrayBuffer,'application/pdf',true);const priorId=crypto.randomUUID();await query("INSERT INTO documents(id,client_id,order_id,kind,title,storage_key,content_type,size_bytes,meta) VALUES($1,$2,$3,'package','Prior S package',$4,'application/pdf',$5,'{\"sensitive\":true}')",[priorId,cid,cardCo,old.storageKey,bytes.length]);
  await query("UPDATE service_orders SET details=details||jsonb_build_object('documentId',$2::text) WHERE id=$1",[fresh,priorId]);
- const baseRows=await query('SELECT id FROM documents');let storageModule:typeof import('./s-election-package-storage')|null=null;try{storageModule=await import('./s-election-package-storage');}catch{/* Baseline predates the new atomic helper. */}
+ const baseRows=await query('SELECT id FROM documents');let storageModule:typeof import('./s-election-package-storage')|null=null;try{storageModule=await import('./s-election-package-storage');}catch(error){if(!historicalBaseline)throw new Error('Required current package-storage module could not load', {cause:error});}
+ if(storageModule && (typeof storageModule.storeElectionPackage!=='function'||typeof storageModule.cleanupStagedDocuments!=='function'))throw Error('Required current package-storage exports are missing');
  let replacementOk=!!storageModule;const observations:unknown[]=[];
  if(storageModule){
   const args={serviceId:fresh,clientId:cid,companyId:cardCo,title:'Replacement',pdf:Buffer.from(bytes),details:{phone:'4075550100'},ssns:['123456789'],priorDocumentId:priorId};
@@ -115,7 +129,7 @@ async function child(){
  const deletedBefore=await requestDocumentDeletion(goneId,cid);const next=await runDbBackup();const nextDump=JSON.parse(gunzipSync((await readObject('backups/'+next.key))!).toString());
  check('A08',next.complete&&next.rowCounts.documents===nextDump.tables.documents.length&&nextDump.tables.documents.every((d:{id:string})=>d.id!==goneId),{counts:next.rowCounts,documents:nextDump.tables.documents.length});
  // A still-present old file must not be revived when primary storage is gone.
- const mirror=await import('./dropbox');const decision=(await(await import('./document-retention')).deletionJournal()).find(d=>d.documentId===goneId)!;if('compareWriteMirror' in mirror)await mirror.compareWriteMirror(decision.mirrorPath,Buffer.from(await readObject(kept.storageKey)||''),null);else {const path=join(process.env.DEV_MIRROR_DIR!,decision.mirrorPath.replace(/^\//,''));mkdirSync(join(path,'..'),{recursive:true});writeFileSync(path,Buffer.from(await readObject(kept.storageKey)||''));}
+ const mirror=await import('./dropbox');const decision=(await(await import('./document-retention')).deletionJournal()).find(d=>d.documentId===goneId)!;if('compareWriteMirror' in mirror)await mirror.compareWriteMirror(decision.mirrorPath,Buffer.from(await readObject(kept.storageKey)||''),null);else {if(!historicalBaseline)throw Error('Current mirror API is missing');const path=join(process.env.DEV_MIRROR_DIR!,decision.mirrorPath.replace(/^\//,''));mkdirSync(join(path,'..'),{recursive:true});writeFileSync(path,Buffer.from(await readObject(kept.storageKey)||''));}
 
  // Empty target uses the exact migrated schema via a second child below.
  writeFileSync(join(process.env.BATCH28_DIR!,'dump.json'),JSON.stringify(dump));writeFileSync(join(process.env.BATCH28_DIR!,'want.json'),JSON.stringify({goneId,kept:kept.storageKey}));
@@ -125,6 +139,20 @@ async function child(){
 async function restore(){
  const {getDb}=await import('./db'),{restoreBackup}=await import('./restore');const db=await getDb();const dump=JSON.parse(readFileSync(join(process.env.BATCH28_DIR!,'dump.json'),'utf8'));const want=JSON.parse(readFileSync(join(process.env.BATCH28_DIR!,'want.json'),'utf8'));
  const journal=join(process.env.DEV_MIRROR_DIR!,'recovery/deletion-journal-v1.json');if(!existsSync(journal)){try{await restoreBackup(db,dump);}catch(e){throw Error('Actual restore after primary loss: '+String(e));}const revived=await db.query('SELECT id FROM documents WHERE id=$1',[want.goneId]);throw Error('Restore after primary loss revived '+revived.length+' deleted document(s); no independent deletion journal consulted');}renameSync(journal,journal+'.hold');let missing=false;try{await restoreBackup(db,dump);}catch{missing=true;}renameSync(journal+'.hold',journal);if(!missing)throw Error('Missing journal accepted');
+ // A syntactically valid journal can still omit a decision the snapshot knows.
+ const original=readFileSync(journal);const parsed=JSON.parse(original.toString());
+ const omitted=parsed.records.find((r:{documentId:string})=>r.documentId===want.goneId);
+ if(!omitted)throw Error('Incomplete-journal fixture lacks the known deletion');
+ const incomplete={...parsed,records:parsed.records.filter((r:{storageKey:string})=>r.storageKey!==omitted.storageKey)};
+ incomplete.sha=createHash('sha256').update(JSON.stringify(incomplete.records)).digest('hex');
+ const partialDump=structuredClone(dump);partialDump.deletionCheckpoint=[...(dump.deletionCheckpoint||[]),omitted.storageKey];
+ const files=()=>readdirSync(process.env.DEV_STORAGE_DIR!,{recursive:true}).sort();
+ const beforeFiles=JSON.stringify(files());let writes=0,refusal='';const realQuery=db.query.bind(db);
+ db.query=(async(text:string,params?:unknown[])=>{if(/^\s*(INSERT|UPDATE|DELETE)/i.test(text))writes++;return realQuery(text,params);}) as typeof db.query;
+ writeFileSync(journal,JSON.stringify(incomplete));
+ try{await restoreBackup(db,partialDump);}catch(e){refusal=String(e);}finally{db.query=realQuery;writeFileSync(journal,original);}
+ if(!refusal.includes('Independent deletion journal is missing a recorded decision')||writes!==0||JSON.stringify(files())!==beforeFiles)throw Error('Incomplete journal did not stop restore before writes: '+JSON.stringify({refusal,writes}));
+ console.log('INCOMPLETE_JOURNAL_REFUSED_BEFORE_WRITES');
  await restoreBackup(db,dump);if((await db.query('SELECT id FROM documents WHERE id=$1',[want.goneId])).length)throw Error('Deleted document revived');const {readFileStream}=await import('./storage');if(!(await readFileStream(want.kept)).length)throw Error('Retained document missing');console.log('RESTORE_OK');
 }
 export async function batch28Checks(report:(label:string,ok:boolean,detail?:unknown)=>void){
