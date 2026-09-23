@@ -145,3 +145,25 @@ Adam. A new ruling is added the day it is given.
 - Ruling AUD-claude-reconciled-batch31-render-oa-4-1-percentages-vs-fractions: "Batch 31 review item 8: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
 
 - Ruling AUD-claude-reconciled-batch31-statutes-0302-series-property: "Batch 31 review item 9: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling 8: "Batch 11 review item 5: Adam directs that the existing wording remain unchanged: \"5.  There is a $25 state fee to appoint a resident agent.  Leave as is\". No fix is authorized for this finding."
+
+- Ruling 242: "Batch 11 review item 17: \"17.  Just state our fee.  Add a $50 series.  No need to mention state fees\". Use \"add a $50 series per property\" and state Maria's first three are included in the service package; do not add a state-fee breakdown to those examples."
+
+- Ruling 15: "Batch 12 review item 1: Adam rejected the proposed one-EIN wording change and directed that the existing wording stay unchanged."
+
+- Ruling 22: "Batch 12 review item 2: Adam rejected the proposed tax-return comparison change and directed that the existing wording stay unchanged."
+
+- Ruling 34: "Batch 12 review item 4: Adam rejected the proposed shareholder-residency acknowledgment change and directed that the existing wording stay unchanged."
+
+- Ruling 38: "Batch 12 review item 5: Adam rejected the proposed diagram tax-filing wording change and directed that the existing wording stay unchanged."
+
+- Ruling 139: "Batch 12 review item 8: Adam rejected the proposed operating-agreement questionnaire help change and directed that the existing wording stay unchanged."
+
+- Ruling N2.14: "Batch 12 review item 12: Adam rejected the proposed uneven-distributions explanation and heading changes and directed that the existing wording stay unchanged."
+
+- Ruling 232: "Batch 16 item 4: Reject. Keep as is."
+
+- Ruling 236: "Batch 16 item 5: Reject. Keep as is."
+
+- Ruling N2.02: "Batch 16 item 9: Rejected. Leave as is."

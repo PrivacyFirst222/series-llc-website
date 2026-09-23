@@ -1,0 +1,179 @@
+{
+  "id": "39",
+  "revision": 2,
+  "title": "Release review Group C: verification and evidence",
+  "model": "Codex",
+  "base": "fd77a1c19e47e25245db4992050d353514432c86",
+  "items": [
+    {
+      "id": "AUD-claude-release-group-c-2026-09-23-item-25",
+      "part": "all",
+      "scope": "Copy the exact authenticated records through the existing ruling mechanism; regenerate the list. Identify the ten retained decisions and the approved example wording without altering those choices or inventing new acceptance events.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/audit/README.md",
+          "text": "Group C tracking records"
+        },
+        {
+          "kind": "present",
+          "file": "docs/audit/repair-check.ts",
+          "text": "Group C: append-only tracking and combined release controls"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-c-2026-09-23-item-26",
+      "part": "all",
+      "scope": "Show an explicit owner-retained disposition alongside the existing technical lifecycle status. Preserve the assertions. Prefer a reviewed disposition annotation over adding a new lifecycle state throughout every gate.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/audit/README.md",
+          "text": "Group C tracking records"
+        },
+        {
+          "kind": "present",
+          "file": "docs/audit/repair-check.ts",
+          "text": "Group C: append-only tracking and combined release controls"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-c-2026-09-23-item-27",
+      "part": "all",
+      "scope": "Add append-only implementation receipts referencing the already-created commit, work-order hash and package. Display that separately from release. Verify ancestry and scope; do not try to store a commit\u2019s own hash inside itself or rewrite old protected fix objects.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/audit/README.md",
+          "text": "Group C tracking records"
+        },
+        {
+          "kind": "present",
+          "file": "docs/audit/repair-check.ts",
+          "text": "Group C: append-only tracking and combined release controls"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-c-2026-09-23-item-28",
+      "part": "all",
+      "scope": "Import an informational adjudication with the original source ID and the existing reason the blanket removal was unsafe. Leave the fallback code intact. Use the checked intake/migration path, not a manual edit of the generated list.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/audit/README.md",
+          "text": "Group C tracking records"
+        },
+        {
+          "kind": "present",
+          "file": "docs/audit/repair-check.ts",
+          "text": "Group C: append-only tracking and combined release controls"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-c-2026-09-23-item-29",
+      "part": "all",
+      "scope": "Add a reviewed combined-release receipt that links the final accepted commit/package to the exact included batch revisions and active parts. Verify work-order hashes, preserved/superseded fixes and each batch\u2019s required checks before inclusion; verify remote/deployment/document evidence after publication. Keep individual acceptance history truthful. Do not fabricate separate historical acceptances or require thirty sequential releases.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/audit/README.md",
+          "text": "Group C tracking records"
+        },
+        {
+          "kind": "present",
+          "file": "docs/audit/repair-check.ts",
+          "text": "Group C: append-only tracking and combined release controls"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/audit/ledger-lib.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group C verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/ledger-print.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group C verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/audit-import-lib.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group C verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/tracking.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group C verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/tracking-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group C verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/README.md",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group C verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/release-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group C verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "webapp/scripts/audit-review.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group C verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group C verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/rulings.md",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group C verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/intakes/claude-release-group-c-2026-09-23.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group C verification repair, explicit evidence binding, or focused regression coverage."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "why": "Existing generation hook"
+    },
+    {
+      "path": "docs/audit/repair-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Reset real tracking metadata when replacing all items in disposable synthetic fixtures; include tracking probes in every mandatory control run."
+    }
+  ],
+  "requiredChecks": [
+    "tracking",
+    "combined-release"
+  ],
+  "testSupport": [],
+  "removedChecks": []
+}

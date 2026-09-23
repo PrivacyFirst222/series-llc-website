@@ -109,6 +109,10 @@ try {
   // This clears references only in the disposable synthetic fixture; the
   // source ledger and its immutable intake protections remain unchanged.
   fixture.auditImports = [];
+  fixture.auditAdjudications = [];
+  fixture.dispositions = [];
+  fixture.implementations = [];
+  fixture.combinedReleases = [];
   ledger(fixture); baseline = commit();
   console.log(`Synthetic fixture baseline: ${baseline}; real source ledger not used.`);
   // 1: use the actual authorize/implemented commands, then erase a recorded fix.
@@ -226,6 +230,8 @@ try {
       assert("Batch 28: exact unpublished-fix replacement lifecycle", unpublished.code === 0, unpublished);
       const audit = sh(["bun", "run", join(ROOT, "docs/audit/audit-session-check.ts")]);
       assert("audit: exact coverage, reconciliation, evidence and immutable intake", audit.code === 0, audit);
+      const tracking = sh(["bun", "run", join(ROOT, "docs/audit/tracking-check.ts")]);
+      assert("Group C: append-only tracking and combined release controls", tracking.code === 0, tracking);
       const batch21 = sh(["bun", "run", join(ROOT, "docs/audit/batch21-controls.ts")]);
       assert("Batch 21: scoped rulings, complete inventory, isolation and document sequence", batch21.code === 0, batch21);
     }

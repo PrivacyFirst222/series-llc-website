@@ -359,3 +359,57 @@ Group B (items 15–24) changes verification, not client wording or service rule
 - The Amendment and Statement have no independent original in `docs/source/`. `authored-form-format.json` is explicitly the owner-approved **product layout** at 404669b, not an original-source baseline. It checks paragraph/run typography, spacing and page layout alongside pagination. Deliberately changed fonts, sizes and spacing must fail.
 
 `batch38-check.ts` is part of the server suite. Its Word, source-retention, fresh-build, contribution, required-module and real portal appointment checks run in temporary isolated fixtures. The Batch 38 review evidence additionally retains the incomplete-journal and wrong-anniversary mutation runs, historical pagination comparison, and rendered authored forms.
+
+## Group C tracking records
+
+Group C preserves earlier decisions and separates three facts: implementation,
+owner retention of wording, and publication. It changes no client-facing text.
+
+- Eleven previously external rulings are copied verbatim by `batch.ts ruling`.
+  Ten retain wording; item 242 approves the already-recorded example wording.
+  They are not new decisions or acceptance events. The three Batch 31 retained
+  items carry reviewed `dispositions` referencing their exact recorded rulings.
+  Their implemented assertions remain active; no lifecycle state is invented.
+- `tracking.ts implementation <packageId>` appends an implementation receipt
+  only for an existing ancestral commit, exact frozen work order, declared
+  scope, and full passing package. The package manifest's hash is retained.
+  Earlier Fix objects, histories and release commits are untouched. An absent
+  receipt is printed as absent, never as a blank commit or implied publication.
+  Later bookkeeping can attach this batch's package after it exists; a commit
+  never purports to contain its own hash.
+- Checked audit intakes can carry informational `adjudications`, separate from
+  actionable findings. The original `reader-6-oa-legacy-null-branches` source ID
+  and cross-review reason are preserved once. It is disputed, its proposed
+  blanket cleanup is unsafe, and no code removal or owner ruling is inferred.
+  The same source ID cannot also be imported as an open repair.
+- A final combined work order requires `combined-release`. The review runner
+  derives its manifest from the actual remote-to-candidate ledger range,
+  including exact revisions, frozen work orders and every preserved or
+  superseded part. The package must pass the union of those work orders'
+  required checks; unknown checks fail as missing. Active assertions are replayed
+  by the normal static, rendered-document and behavior checks. Historical red
+  probes remain evidence of their original repairs, not reruns claimed here.
+  Acceptance and the push/Dropbox gate rederive the manifest and validate it.
+- After the accepted package is pushed, deployed and its documents copied,
+  `tracking.ts combined <packageId> --deployment dpl_ID` asks origin for main,
+  reads the Vercel deployment API using `VERCEL_TOKEN` and `VERCEL_PROJECT_ID`
+  (and `VERCEL_TEAM_ID` if
+  needed), requires READY production with aliases assigned in that project for
+  the accepted commit, and compares all
+  published Word bytes. It records the observation under
+  `~/.fpsllc/publications.jsonl` and appends the matching ledger receipt. A missing
+  credential, deployment, acceptance, package, check or document refuses. It
+  never deploys, copies a document or writes an acceptance itself.
+- The generated list identifies each part's combined publication separately;
+  it does not forge earlier individual acceptances or rewrite the old lifecycle.
+  A release dependency is satisfied only for the exact preserved fix in the
+  combined receipt; a later replacement does not inherit that publication.
+  Receipt additions are checked; old receipts are immutable. CI checks their
+  committed structure and ancestry; authenticated owner and publication records
+  remain local. An external observation records what was verified then, not a
+  promise that a deployment or Dropbox file can never change afterwards.
+
+The safeguards remain procedural under the existing administrator-access and
+hook-bypass limits. `tracking-check.ts`, included in the mandatory ledger-control suite, uses a disposable synthetic repository
+and simulated package/owner inputs. Its results test the controls; they are
+not real acceptances, live publication tests or product behavior evidence.

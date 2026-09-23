@@ -32558,6 +32558,391 @@
           }
         }
       ]
+    },
+    {
+      "id": "AUD-claude-release-group-c-2026-09-23-item-25",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-release-group-c-2026-09-23.json finding item-25",
+      "text": "Decision records: preserve the eleven existing rulings in the repository — `docs/audit/batches/27/batch.md:1`\nReads: # Batch 27 — recover approved Batches 11, 12 and 16\nClaims: Eleven decisions are in the external ruling file but absent from the repository’s ruling entries. A future auditor can reopen matters you already settled.\nTrue: All eleven external records were reopened. Items: 8, 15, 22, 34, 38, 139, N2.14, 232, 236, N2.02 and 242. No repeat ruling is requested. Sources: RR-RECON-01-rulings-only-outside-the-repo\nProposed replacement (not approved): Copy the exact authenticated records through the existing ruling mechanism; regenerate the list. Identify the ten retained decisions and the approved example wording without altering those choices or inventing new acceptance events.\nRechecked by Codex reconciliation, owner approved Group C: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-23T12:26:49.695682+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-release-group-c-2026-09-23 at fd77a1c19e47e25245db4992050d353514432c86; audit 80e078d9d145f3bea59111a17562a9bc9d2a88c87dc906372e55d7d7c912d59a"
+            },
+            {
+              "at": "2026-09-23T12:26:49.825Z",
+              "event": "assigned",
+              "batch": "39",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T12:35:42.201Z",
+              "event": "implemented",
+              "batch": "39",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T12:40:25.389Z",
+              "event": "rejected r1",
+              "batch": "39",
+              "revision": 1,
+              "note": "Standing authorization for necessary revisions: extend declared test scope to reset new tracking metadata in synthetic control fixtures and run tracking tests in the mandatory control suite."
+            },
+            {
+              "at": "2026-09-23T12:40:25.449Z",
+              "event": "assigned",
+              "batch": "39",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-23T12:40:25.500Z",
+              "event": "implemented",
+              "batch": "39",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "39",
+          "fix": {
+            "batch": "39",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/audit/README.md",
+                "text": "Group C tracking records"
+              },
+              {
+                "kind": "present",
+                "file": "docs/audit/repair-check.ts",
+                "text": "Group C: append-only tracking and combined release controls"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-c-2026-09-23-item-26",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-release-group-c-2026-09-23.json finding item-26",
+      "text": "Tracking display: distinguish protected retained wording from a repair — `docs/audit/ledger-print.ts:33`\nReads:   out.push(\"A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.\");\nClaims: Three items you rejected appear simply implemented because the work implemented assertions that protect the unchanged wording.\nTrue: Batch 31 rulings on deed wording, effective-date wording and the FAQ filing description remain binding. Sources: RR-RECON-02-ledger-says-implemented-for-what-adam-rejected\nProposed replacement (not approved): Show an explicit owner-retained disposition alongside the existing technical lifecycle status. Preserve the assertions. Prefer a reviewed disposition annotation over adding a new lifecycle state throughout every gate.\nRechecked by Codex reconciliation, owner approved Group C: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-23T12:26:49.695682+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-release-group-c-2026-09-23 at fd77a1c19e47e25245db4992050d353514432c86; audit 80e078d9d145f3bea59111a17562a9bc9d2a88c87dc906372e55d7d7c912d59a"
+            },
+            {
+              "at": "2026-09-23T12:26:49.825Z",
+              "event": "assigned",
+              "batch": "39",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T12:35:42.201Z",
+              "event": "implemented",
+              "batch": "39",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T12:40:25.389Z",
+              "event": "rejected r1",
+              "batch": "39",
+              "revision": 1,
+              "note": "Standing authorization for necessary revisions: extend declared test scope to reset new tracking metadata in synthetic control fixtures and run tracking tests in the mandatory control suite."
+            },
+            {
+              "at": "2026-09-23T12:40:25.449Z",
+              "event": "assigned",
+              "batch": "39",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-23T12:40:25.500Z",
+              "event": "implemented",
+              "batch": "39",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "39",
+          "fix": {
+            "batch": "39",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/audit/README.md",
+                "text": "Group C tracking records"
+              },
+              {
+                "kind": "present",
+                "file": "docs/audit/repair-check.ts",
+                "text": "Group C: append-only tracking and combined release controls"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-c-2026-09-23-item-27",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-release-group-c-2026-09-23.json finding item-27",
+      "text": "Tracking history: attach verifiable implementation commits — `docs/audit/batch.ts:108`\nReads:     part.status = \"implemented\";\nClaims: The generated list prints an empty commit for implemented fixes. The command intentionally fills that field only at release, so this is more than a forgotten value.\nTrue: Preserves the distinction between implemented, accepted and released. Sources: RR-RECON-03-ledger-records-no-implementing-commit\nProposed replacement (not approved): Add append-only implementation receipts referencing the already-created commit, work-order hash and package. Display that separately from release. Verify ancestry and scope; do not try to store a commit’s own hash inside itself or rewrite old protected fix objects.\nRechecked by Codex reconciliation, owner approved Group C: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-23T12:26:49.695682+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-release-group-c-2026-09-23 at fd77a1c19e47e25245db4992050d353514432c86; audit 80e078d9d145f3bea59111a17562a9bc9d2a88c87dc906372e55d7d7c912d59a"
+            },
+            {
+              "at": "2026-09-23T12:26:49.825Z",
+              "event": "assigned",
+              "batch": "39",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T12:35:42.201Z",
+              "event": "implemented",
+              "batch": "39",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T12:40:25.389Z",
+              "event": "rejected r1",
+              "batch": "39",
+              "revision": 1,
+              "note": "Standing authorization for necessary revisions: extend declared test scope to reset new tracking metadata in synthetic control fixtures and run tracking tests in the mandatory control suite."
+            },
+            {
+              "at": "2026-09-23T12:40:25.449Z",
+              "event": "assigned",
+              "batch": "39",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-23T12:40:25.500Z",
+              "event": "implemented",
+              "batch": "39",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "39",
+          "fix": {
+            "batch": "39",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/audit/README.md",
+                "text": "Group C tracking records"
+              },
+              {
+                "kind": "present",
+                "file": "docs/audit/repair-check.ts",
+                "text": "Group C: append-only tracking and combined release controls"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-c-2026-09-23-item-28",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-release-group-c-2026-09-23.json finding item-28",
+      "text": "Audit history: retain the reason a proposed cleanup was rejected — `docs/audit/ledger.json:1`\nReads: {\nClaims: One Claude finding about legacy fallback code was adjudicated outside the repository and never received an internal record.\nTrue: This records the cross-review’s decision; it does not approve the rejected cleanup or pretend Adam made a new ruling. Sources: RR-RECON-05-one-claude-record-has-no-record-in-the-candidate\nProposed replacement (not approved): Import an informational adjudication with the original source ID and the existing reason the blanket removal was unsafe. Leave the fallback code intact. Use the checked intake/migration path, not a manual edit of the generated list.\nRechecked by Codex reconciliation, owner approved Group C: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-23T12:26:49.695682+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-release-group-c-2026-09-23 at fd77a1c19e47e25245db4992050d353514432c86; audit 80e078d9d145f3bea59111a17562a9bc9d2a88c87dc906372e55d7d7c912d59a"
+            },
+            {
+              "at": "2026-09-23T12:26:49.825Z",
+              "event": "assigned",
+              "batch": "39",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T12:35:42.201Z",
+              "event": "implemented",
+              "batch": "39",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T12:40:25.389Z",
+              "event": "rejected r1",
+              "batch": "39",
+              "revision": 1,
+              "note": "Standing authorization for necessary revisions: extend declared test scope to reset new tracking metadata in synthetic control fixtures and run tracking tests in the mandatory control suite."
+            },
+            {
+              "at": "2026-09-23T12:40:25.449Z",
+              "event": "assigned",
+              "batch": "39",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-23T12:40:25.500Z",
+              "event": "implemented",
+              "batch": "39",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "39",
+          "fix": {
+            "batch": "39",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/audit/README.md",
+                "text": "Group C tracking records"
+              },
+              {
+                "kind": "present",
+                "file": "docs/audit/repair-check.ts",
+                "text": "Group C: append-only tracking and combined release controls"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-c-2026-09-23-item-29",
+      "tag": "housekeeping",
+      "area": "Agreements and guidance",
+      "housekeeping": true,
+      "source": "docs/audit/intakes/claude-release-group-c-2026-09-23.json finding item-29",
+      "text": "Combined-release tracking: record which earlier batches shipped together — `docs/audit/batch.ts:118`\nReads:   const { acc, why } = standingAcceptance(commit, b.id, b.revision);\nClaims: The current released command requires acceptance for a particular batch. A single combined release would otherwise leave earlier included batches looking unshipped.\nTrue: Adam chose publication together at the end. This is a control change requiring review, not permission to weaken the release gate. Sources: RR-REL-05\nProposed replacement (not approved): Add a reviewed combined-release receipt that links the final accepted commit/package to the exact included batch revisions and active parts. Verify work-order hashes, preserved/superseded fixes and each batch’s required checks before inclusion; verify remote/deployment/document evidence after publication. Keep individual acceptance history truthful. Do not fabricate separate historical acceptances or require thirty sequential releases.\nRechecked by Codex reconciliation, owner approved Group C: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-23T12:26:49.695682+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-release-group-c-2026-09-23 at fd77a1c19e47e25245db4992050d353514432c86; audit 80e078d9d145f3bea59111a17562a9bc9d2a88c87dc906372e55d7d7c912d59a"
+            },
+            {
+              "at": "2026-09-23T12:26:49.825Z",
+              "event": "assigned",
+              "batch": "39",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T12:35:42.201Z",
+              "event": "implemented",
+              "batch": "39",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T12:40:25.389Z",
+              "event": "rejected r1",
+              "batch": "39",
+              "revision": 1,
+              "note": "Standing authorization for necessary revisions: extend declared test scope to reset new tracking metadata in synthetic control fixtures and run tracking tests in the mandatory control suite."
+            },
+            {
+              "at": "2026-09-23T12:40:25.449Z",
+              "event": "assigned",
+              "batch": "39",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-23T12:40:25.500Z",
+              "event": "implemented",
+              "batch": "39",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "39",
+          "fix": {
+            "batch": "39",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/audit/README.md",
+                "text": "Group C tracking records"
+              },
+              {
+                "kind": "present",
+                "file": "docs/audit/repair-check.ts",
+                "text": "Group C: append-only tracking and combined release controls"
+              }
+            ]
+          }
+        }
+      ]
     }
   ],
   "rulings": [
@@ -32954,6 +33339,72 @@
       "kind": "ruling",
       "item": "AUD-claude-reconciled-batch31-statutes-0302-series-property",
       "text": "Batch 31 review item 9: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "8",
+      "text": "Batch 11 review item 5: Adam directs that the existing wording remain unchanged: \"5.  There is a $25 state fee to appoint a resident agent.  Leave as is\". No fix is authorized for this finding."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "242",
+      "text": "Batch 11 review item 17: \"17.  Just state our fee.  Add a $50 series.  No need to mention state fees\". Use \"add a $50 series per property\" and state Maria's first three are included in the service package; do not add a state-fee breakdown to those examples."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "15",
+      "text": "Batch 12 review item 1: Adam rejected the proposed one-EIN wording change and directed that the existing wording stay unchanged."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "22",
+      "text": "Batch 12 review item 2: Adam rejected the proposed tax-return comparison change and directed that the existing wording stay unchanged."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "34",
+      "text": "Batch 12 review item 4: Adam rejected the proposed shareholder-residency acknowledgment change and directed that the existing wording stay unchanged."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "38",
+      "text": "Batch 12 review item 5: Adam rejected the proposed diagram tax-filing wording change and directed that the existing wording stay unchanged."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "139",
+      "text": "Batch 12 review item 8: Adam rejected the proposed operating-agreement questionnaire help change and directed that the existing wording stay unchanged."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.14",
+      "text": "Batch 12 review item 12: Adam rejected the proposed uneven-distributions explanation and heading changes and directed that the existing wording stay unchanged."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "232",
+      "text": "Batch 16 item 4: Reject. Keep as is."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "236",
+      "text": "Batch 16 item 5: Reject. Keep as is."
+    },
+    {
+      "date": "2026-09-20",
+      "kind": "ruling",
+      "item": "N2.02",
+      "text": "Batch 16 item 9: Rejected. Leave as is."
     }
   ],
   "batches": [
@@ -34363,6 +34814,49 @@
           "event": "implemented"
         }
       ]
+    },
+    {
+      "id": "39",
+      "revision": 1,
+      "frozenHash": "6c2e1bbdf18c126bc8fd7033f793de5c75ece9784f8bfb7e711f08b2a2de5c03",
+      "status": "rejected",
+      "model": "Codex",
+      "base": "fd77a1c19e47e25245db4992050d353514432c86",
+      "history": [
+        {
+          "at": "2026-09-23T12:26:49.826Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-23T12:35:42.201Z",
+          "event": "implemented"
+        },
+        {
+          "at": "2026-09-23T12:40:25.389Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-23T12:40 (Adam standing authorization in this thread for necessary later revisions within approved work): Standing authorization for necessary revisions: extend declared test scope to reset new tracking metadata in synthetic control fixtures and run tracking tests in the mandatory control suite."
+        }
+      ]
+    },
+    {
+      "id": "39",
+      "revision": 2,
+      "frozenHash": "c49895d99204515ccc1f81995cc916490f93880646900288f5c47c72b505ee81",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "fd77a1c19e47e25245db4992050d353514432c86",
+      "history": [
+        {
+          "at": "2026-09-23T12:40:25.449Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-23T12:40:25.500Z",
+          "event": "implemented"
+        }
+      ]
     }
   ],
   "auditImports": [
@@ -34413,6 +34907,408 @@
     {
       "path": "docs/audit/intakes/claude-release-group-b-2026-09-23.json",
       "sha": "202fe3e1cb158c4eb13d098f9faf5feb7e700d6454dd76231b807ce4de66c8fe"
+    },
+    {
+      "path": "docs/audit/intakes/claude-release-group-c-2026-09-23.json",
+      "sha": "8411e23dd63f27ee86cceef8ca826e0805f067b46908b1093bf9982b31ce3eb5"
+    }
+  ],
+  "auditAdjudications": [
+    {
+      "sourceId": "reader-6-oa-legacy-null-branches",
+      "verdict": "disputed",
+      "reason": "Two clauses query oa_generations, but the third at1757 queries documents.kind=amendment. Migration4 backfills oa_generations once and has no NOT NULL guarantee. Its scalar lookup leaves null when no paid order exists. Migration5 only backfills package documents, so it cannot establish that legacy NULL amendment rows are impossible. Source therefore does not support the claim that all three alternatives are dead.",
+      "replacementVerdict": "unsafe as a blanket cleanup",
+      "source": "Cross-review at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; original Claude run claude-post-batches-2026-09-20; RECONCILED.json finding 77",
+      "codeRemovalApproved": false
+    }
+  ],
+  "dispositions": [
+    {
+      "item": "AUD-claude-reconciled-batch31-reader-1-benefits-deed-unconditional",
+      "part": "all",
+      "disposition": "owner-retained",
+      "ruling": {
+        "date": "2026-09-22",
+        "kind": "ruling",
+        "item": "AUD-claude-reconciled-batch31-reader-1-benefits-deed-unconditional",
+        "text": "Batch 31 review item 1: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md."
+      }
+    },
+    {
+      "item": "AUD-claude-reconciled-batch31-reader-2-series-established-on-effect-not-filing",
+      "part": "all",
+      "disposition": "owner-retained",
+      "ruling": {
+        "date": "2026-09-22",
+        "kind": "ruling",
+        "item": "AUD-claude-reconciled-batch31-reader-2-series-established-on-effect-not-filing",
+        "text": "Batch 31 review item 2: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md."
+      }
+    },
+    {
+      "item": "AUD-claude-reconciled-batch31-reader-1-faq-0905-generalized",
+      "part": "all",
+      "disposition": "owner-retained",
+      "ruling": {
+        "date": "2026-09-22",
+        "kind": "ruling",
+        "item": "AUD-claude-reconciled-batch31-reader-1-faq-0905-generalized",
+        "text": "Batch 31 review item 4: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md."
+      }
+    }
+  ],
+  "implementations": [
+    {
+      "batch": "0-final",
+      "revision": 1,
+      "commit": "ca80d088cc70250a99a35e94f9fd5f4ef75b38e3",
+      "workOrderSha": "6ec66e83a8ce7d8944dc7ffb0e4af179eb7f856a3cb42167be54ddff8ccc844d",
+      "packageId": "4b5ff6472ebb",
+      "packageSha": "aaca71b044da92482202fd269ea871c0d54db3fa44ab7b8f0cbca4fe5b3e93ae",
+      "at": "2026-09-23T12:32:48.913Z"
+    },
+    {
+      "batch": "01",
+      "revision": 1,
+      "commit": "3465320475ab690615f08cc3291f7cf186ebf814",
+      "workOrderSha": "1a51f85ea695969c4c1b247cd7dd2b08242231001e2d95a17bc763a51ceba66c",
+      "packageId": "2647aabafe93",
+      "packageSha": "9a3d35a94f4f7c89bd775cce48dfc31a5cecb6115a384b32a9a550836023877f",
+      "at": "2026-09-23T12:32:49.077Z"
+    },
+    {
+      "batch": "02",
+      "revision": 1,
+      "commit": "f902a8e41b973f62a96ca6c39067c33ae0fb61a2",
+      "workOrderSha": "6d0b2214493c73c38e2c82522a425b997aa216001ba039c5686663916d93d045",
+      "packageId": "57ca7c2f44aa",
+      "packageSha": "caeaa443f8f7978edddc6539a5be6bf058e3f2d3cdfcf0230110d60a9c861ac2",
+      "at": "2026-09-23T12:32:49.228Z"
+    },
+    {
+      "batch": "03",
+      "revision": 1,
+      "commit": "fae579f41b46e94b55a78ff08dd69d053488ddb8",
+      "workOrderSha": "a189ea16a3d5ae33f026097f719ebb2ca170657b3c40094dace42a9441b28618",
+      "packageId": "6ee881943907",
+      "packageSha": "f0ea9bc1457eaf489fdf3978cfa933eaa3e8bd89e9ad1563b2f54e6f7a8121f8",
+      "at": "2026-09-23T12:32:49.377Z"
+    },
+    {
+      "batch": "04",
+      "revision": 1,
+      "commit": "80d4c558ce2c5295ae7610f323e4a30cc12a514a",
+      "workOrderSha": "512fc73fbe725c3ee857603e571d5f41207f130d8e4634fe478c6976ec5e3a06",
+      "packageId": "47ac74aca838",
+      "packageSha": "af15bfbb859e3830dd6574dae2fdcdcff8aa33366f0a649bd75f0257d1668d1b",
+      "at": "2026-09-23T12:32:49.518Z"
+    },
+    {
+      "batch": "04-followup",
+      "revision": 1,
+      "commit": "ef1f5d75620891ec94004a96a24732924546160b",
+      "workOrderSha": "8d5c2ddc64bc45827ade4311b92cc4d8c33e48665937069cecc0c341a39cd269",
+      "packageId": "89099bd24abd",
+      "packageSha": "2a9de15cd049a1d3bb5ee393858f86bfb773f8a945763ecbdc15dc7104274645",
+      "at": "2026-09-23T12:32:49.660Z"
+    },
+    {
+      "batch": "06",
+      "revision": 1,
+      "commit": "00628225d59793891b00ab4aebe23468b104cdbd",
+      "workOrderSha": "6c6938381f21c81890c1138f20c23d3bcefe568879590ee95d880372c69687a5",
+      "packageId": "6427938798ff",
+      "packageSha": "4a3e96b2564767880b6899ab20dc83dcc26b6701ae6eb2e24e795aab2558ca56",
+      "at": "2026-09-23T12:32:49.965Z"
+    },
+    {
+      "batch": "07",
+      "revision": 1,
+      "commit": "32eb7738d86ac9fc2eb26f82eadefd3533dabac4",
+      "workOrderSha": "9a19d9417bf162071e3d565710a646bb0034cc118549486781c0511f067c6293",
+      "packageId": "703e4f04fd88",
+      "packageSha": "79ceef3d3f0033814f224b07a17710da542f9a59de274a06724d182b7441a13c",
+      "at": "2026-09-23T12:32:50.120Z"
+    },
+    {
+      "batch": "08",
+      "revision": 2,
+      "commit": "c22d47592edf06826e0bfbad69f42e349dda44f7",
+      "workOrderSha": "9ddf1c5d1610cd8709d6466d932df5ce5c94ebeff6a225765b239f9f72ef3033",
+      "packageId": "60ae581a29df",
+      "packageSha": "1f08d34c52f459fba05f7b9cc405f461abe6d2143693994469dd7fa94d255c00",
+      "at": "2026-09-23T12:32:50.262Z"
+    },
+    {
+      "batch": "09",
+      "revision": 2,
+      "commit": "880d1b2389eb19b9854fb3dd8467a619d69beefc",
+      "workOrderSha": "38715986c17315975c859ca60776e50d9a36d2cfea41f49500cb9b14405b2535",
+      "packageId": "af2885ae7206",
+      "packageSha": "6f355e6c180710f5f42dd22b6d2305c3e35c0052cbda198474e3f9ea5d40f9d0",
+      "at": "2026-09-23T12:32:50.412Z"
+    },
+    {
+      "batch": "10",
+      "revision": 1,
+      "commit": "80277f5dffd5c765a8ca8c81b6c93679a8252a83",
+      "workOrderSha": "a8244f67bc27fc4cd163b7c904757bbe9eb2d7ccc84f069b345716b51dec7a45",
+      "packageId": "1263a2004e2c",
+      "packageSha": "bf3f975e9149b9e2a3464630aaa1d7b962e3e2e4a7a0ea014054d33fbf6d3185",
+      "at": "2026-09-23T12:32:50.550Z"
+    },
+    {
+      "batch": "13",
+      "revision": 1,
+      "commit": "810ee613b34783965ca185dd6bd12d718bd1ca69",
+      "workOrderSha": "29b49fa2f0b5af28fd5226e4e3401af31abd1662a5d18a36b79cf717b0ed9c7e",
+      "packageId": "859e2bf35fed",
+      "packageSha": "56b79d873084347a5e971e9abaf960eb605c7e5073de90399fc74deff06511dc",
+      "at": "2026-09-23T12:32:50.718Z"
+    },
+    {
+      "batch": "14",
+      "revision": 1,
+      "commit": "47fc704e377fd73242e6ae0cbcdb9deb7db672b0",
+      "workOrderSha": "10ac4c9f3a7917d0d2c73b35967cf9edb127b8276a6abcfbb348bd40a18343c8",
+      "packageId": "d65741062e07",
+      "packageSha": "80023bfaa925281900af1d124e8787240759aeebb7aa1cc37a5cce3a643aaa90",
+      "at": "2026-09-23T12:32:50.859Z"
+    },
+    {
+      "batch": "15",
+      "revision": 2,
+      "commit": "2d36183d239a1e378026bcb7e2923af35912854f",
+      "workOrderSha": "4facefc23617dab8026ab91dd11179c3550ca5269c024147ab603cc5a75abbf4",
+      "packageId": "a35edb38068b",
+      "packageSha": "67578862d1c0aa49dd914826922f675f84b5d9c92f31827c26668d7e3c0f354a",
+      "at": "2026-09-23T12:32:51.003Z"
+    },
+    {
+      "batch": "17",
+      "revision": 2,
+      "commit": "a500e3c5f4e85e89e7b5b8664004cae01f619c53",
+      "workOrderSha": "990ffa106396d23cc0527ddb091c72149bf5617c9cb62d626244eb84b8f425de",
+      "packageId": "fdc0aedbc619",
+      "packageSha": "9492db862c29dd4cf169df9d5c01a0e71a1a12524085f2a884d7af32a22ae20a",
+      "at": "2026-09-23T12:32:51.151Z"
+    },
+    {
+      "batch": "18",
+      "revision": 2,
+      "commit": "8ec01904bfff8d6028fba5e85c818808517daef7",
+      "workOrderSha": "b57a3dc15c68e86449fff5c4946f8600fff5e79366fcca67d3f022f14bf28ba6",
+      "packageId": "a14f77d8a0f6",
+      "packageSha": "dade420ab64d5beb01e0300173204eed5338ba7f20b3e3c046d2a06a8912417d",
+      "at": "2026-09-23T12:32:51.301Z"
+    },
+    {
+      "batch": "19",
+      "revision": 2,
+      "commit": "29d7b470bcedcd03abe4842f171fb624f3e497ff",
+      "workOrderSha": "94da6d6b118cba75fc16f34c55323a645e3dddb8fafbc1f8ba8a30a8dc2cfd35",
+      "packageId": "c47e7180b81b",
+      "packageSha": "fb94f8b06f5b87b0a803e42cb168481fe5dfe4801f21a70d7ebc5ac04cdbe79f",
+      "at": "2026-09-23T12:32:51.446Z"
+    },
+    {
+      "batch": "20",
+      "revision": 1,
+      "commit": "e63054181dd0b341f639d56ff5c4a6ac6329f253",
+      "workOrderSha": "6a48da0db305795a7b40bb3ae31530f3576d4a53fc4bf9377cd0456a2555a193",
+      "packageId": "7ec76c4ae8c1",
+      "packageSha": "bd2e4b2d30df90b8af105b82c7f2c5542e53c7527bae9ca8026f4969b1688165",
+      "at": "2026-09-23T12:32:51.585Z"
+    },
+    {
+      "batch": "audit-mechanism",
+      "revision": 1,
+      "commit": "4a344e22e0d0239481f3182d6528bf84d960ed0d",
+      "workOrderSha": "8cbeffad0cb220a2a69273d475ed88e2bfe3b9f9684dcc70199115d78af1f960",
+      "packageId": "353b3da9de4a",
+      "packageSha": "da596cd12fa74a8a834b8278c2c8e6cdef1066b70663200be1d95884d49189ba",
+      "at": "2026-09-23T12:32:51.733Z"
+    },
+    {
+      "batch": "21",
+      "revision": 1,
+      "commit": "53327cf5220b8c2c07208c13d90f46cc76534993",
+      "workOrderSha": "00b96362c08a47d7d3418c86fc757a05317aa4dd03fa5f9a4476fd897cad94e5",
+      "packageId": "865dcfb12d40",
+      "packageSha": "861603572b6e579dffd922c1eaed8ae1fc021c0d3030660e6aebbdc8bc13797c",
+      "at": "2026-09-23T12:32:51.885Z"
+    },
+    {
+      "batch": "22",
+      "revision": 1,
+      "commit": "3577d25d6c452215171683deb3f5ffc5e0c9636b",
+      "workOrderSha": "028fb2a322801568772eb4655397200d5770b34c33cffac9d435a149f8174927",
+      "packageId": "fe903fe17147",
+      "packageSha": "1bb17249358cbd7074fc37a900ac759a7365bdc1a3fba4b02f5aa3f8162d213f",
+      "at": "2026-09-23T12:32:52.028Z"
+    },
+    {
+      "batch": "23",
+      "revision": 1,
+      "commit": "81a7290cc77d13c42685a57d9d37f5103cf6d4c4",
+      "workOrderSha": "375932138ef4743c032d58e5f0ffdc605d202fee6683ccc8881837959fef9c72",
+      "packageId": "878d45c6f898",
+      "packageSha": "18e71cfc42498ab2156a0eb206a48112d6a1c7963b2293c6b6ad4312bc5c38f4",
+      "at": "2026-09-23T12:32:52.167Z"
+    },
+    {
+      "batch": "24",
+      "revision": 1,
+      "commit": "2559e18f5094b70c8eba1eb64e3c3519aa609f3e",
+      "workOrderSha": "1d78d4e027065defe1da3f5e3005561bb35ab66d38afa30076a7a7cb2a06828b",
+      "packageId": "926611ba9446",
+      "packageSha": "15dff8326d640be485ca73c23ed45fa0670a1dfc62f3af56ed6359b32866e814",
+      "at": "2026-09-23T12:32:52.309Z"
+    },
+    {
+      "batch": "25",
+      "revision": 1,
+      "commit": "b5eb58497f8e6f79aa847b224cc0b797bf7c8e29",
+      "workOrderSha": "2d77411999d0a5ac29db574c51a146a7ac5fa90f8a6811ef94f23a58da3665b6",
+      "packageId": "045c7e87717c",
+      "packageSha": "93d2c3418bf1a67569f416c7011e6d07124fd6b708811b86e67d59e9602c6cae",
+      "at": "2026-09-23T12:32:52.482Z"
+    },
+    {
+      "batch": "26",
+      "revision": 1,
+      "commit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "workOrderSha": "1fd0aa71151ff609a7387d7ce492263b0f79c631b7f43ad4bc5c1b0033c503a0",
+      "packageId": "56d24b97e90b",
+      "packageSha": "95e103e993c3d89f7a68b88401b9055a5d8607341cbe4403322456b1565e5950",
+      "at": "2026-09-23T12:32:52.635Z"
+    },
+    {
+      "batch": "27",
+      "revision": 3,
+      "commit": "e405da48435c3171430fe5021662017857fbc097",
+      "workOrderSha": "dea3f34c268d2b9aff1b90f32d3aca7c6d2c2cb5789817043cac364c86dbf304",
+      "packageId": "1b397eacf513",
+      "packageSha": "22c101a668853b53d5621f6d338bca7ab45592e813ea2b2b197a73beb8e7bf71",
+      "at": "2026-09-23T12:32:52.783Z"
+    },
+    {
+      "batch": "28-controls",
+      "revision": 1,
+      "commit": "00663979fc6559eda50d3de9317f42a52de46953",
+      "workOrderSha": "e80750104ee1dda88d234e29e1e8b38a788389213b71a5353876607ae4ffd5e2",
+      "packageId": "4de84e960ed1",
+      "packageSha": "fdbd25e44c24db18138e0ff4dce7e16b1d27c111fee1a20eeb551b879765e273",
+      "at": "2026-09-23T12:32:52.923Z"
+    },
+    {
+      "batch": "29",
+      "revision": 4,
+      "commit": "835aff445f27531b0972f057514ce2b4cb37b993",
+      "workOrderSha": "19de5ff95900bd8e2087199dd1349495473fa1d40dfe443c118ea5fddc06442f",
+      "packageId": "5a1b075c3b93",
+      "packageSha": "e702e4b6edb0b91a08afdc65ffc0569a71f67df4da42f1c7777fcdcee5ca7a24",
+      "at": "2026-09-23T12:32:53.208Z"
+    },
+    {
+      "batch": "31",
+      "revision": 3,
+      "commit": "4754c5116dcc2a0105acd4a0adede646d3c6f41a",
+      "workOrderSha": "8ffe5afded047ab6e35f54949b26b88352b5173ebc3f12f31f2305e2068fe853",
+      "packageId": "aaeabc755635",
+      "packageSha": "58076acc8d8fe07b7ec0e7c65602a114a840ef99b44222e373c7b4241eeede66",
+      "at": "2026-09-23T12:32:53.492Z"
+    },
+    {
+      "batch": "32",
+      "revision": 2,
+      "commit": "3a72f468f54a1ca96de23ddf5587f327fda09e32",
+      "workOrderSha": "8393059d974e924575150bbfdaf599c41249f46d957863ad715e010bc8c69d68",
+      "packageId": "1e540a10031a",
+      "packageSha": "bda17533606f964f2e96c4b075a1be4daed0ddda96f854c9f2f9a25533f64a23",
+      "at": "2026-09-23T12:32:53.633Z"
+    },
+    {
+      "batch": "33",
+      "revision": 1,
+      "commit": "455be76607d5f351dd9a0a80701f74af23683d1f",
+      "workOrderSha": "4b8659b8f3cfe85796aafcfc31deb292f7bd94118390f6e45749ddd4dbfa0fd1",
+      "packageId": "70883011e9fb",
+      "packageSha": "0292742ecedcd65a5094eee9ff8a0f2e3293c36d20c5c06b85375d5752a9f728",
+      "at": "2026-09-23T12:32:53.778Z"
+    },
+    {
+      "batch": "34",
+      "revision": 1,
+      "commit": "c91b101b9652a14906270d1422f8cc771f71e706",
+      "workOrderSha": "37ee730a48c64f58385e96780ecdd8f8ef9a7e1b9e85692578ff136f85cf27c6",
+      "packageId": "d58da0289ab7",
+      "packageSha": "1bf696ebb4673b8f6837410bbfbb13d8836bf6a9c12f8705f0053911ceb7140c",
+      "at": "2026-09-23T12:32:53.920Z"
+    },
+    {
+      "batch": "35",
+      "revision": 1,
+      "commit": "1aa316bf63254673db2ac5370a76573e518aeaec",
+      "workOrderSha": "aa8396900f16d7cbeb6dd1dd419dc1ad10a1ca6e3cd7bef93c197c10c7e01299",
+      "packageId": "2d75b55e1df6",
+      "packageSha": "0cef7902605fe1a0a839630124722ce47c2785c4084dfbdeb23f17501e880ca7",
+      "at": "2026-09-23T12:32:54.062Z"
+    },
+    {
+      "batch": "36",
+      "revision": 4,
+      "commit": "3ff5edd95c196550019e3bb7595eff70d843b41f",
+      "workOrderSha": "d371ead1834ecffabcd60d6c0c27b1802e9a9a4e453e4f963d79fd93a199f68a",
+      "packageId": "8cb044c94f11",
+      "packageSha": "62417288564efcc64a2e4d1e5d3ca6a0215b05ae65c0c67bea67b1403cec0fba",
+      "at": "2026-09-23T12:32:54.201Z"
+    },
+    {
+      "batch": "37",
+      "revision": 4,
+      "commit": "404669b878756fdbc562aee89c61b6810057484a",
+      "workOrderSha": "a9b0cd2cb61d94117658c5457098e6c970f63c795e770c9dfd9bb198772c98f9",
+      "packageId": "91b2fd1a24c8",
+      "packageSha": "d15765205c74061045b26120688b51d23d0ee05eb9ec9e281f60fbf6c7185062",
+      "at": "2026-09-23T12:32:54.339Z"
+    },
+    {
+      "batch": "38",
+      "revision": 2,
+      "commit": "fd77a1c19e47e25245db4992050d353514432c86",
+      "workOrderSha": "14d87384669c84f4364de91a12ee255cd27d2ade6b675a89db27948b78159879",
+      "packageId": "0990f2c76ec5",
+      "packageSha": "7d18883019ba68a8610e670988252809d4eccc2f89b9c30f31a4236281ab92f1",
+      "at": "2026-09-23T12:32:54.480Z"
+    },
+    {
+      "batch": "05",
+      "revision": 1,
+      "commit": "f2aa05568a2f057808066fdba3ac6055a7578ef2",
+      "workOrderSha": "43a4aa477e5e5beece6d99925a0390f9407d806c459ea1f5ed1831ec653c48b5",
+      "packageId": "2b176d47f80e",
+      "packageSha": "e84120a51c4ed24a53be4564a57ce76c2d1562adbede13ce37becba27ea9bc99",
+      "at": "2026-09-23T12:35:57.151Z"
+    },
+    {
+      "batch": "28",
+      "revision": 2,
+      "commit": "3f178aaad17e9440f1cf6001c66bb32635061fcb",
+      "workOrderSha": "262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b",
+      "packageId": "fca2c4ed466f",
+      "packageSha": "72bae1a8f33242d002a921b88d6d734c51aaaec20cf69f8a3ffe9213469868c8",
+      "at": "2026-09-23T12:35:57.292Z"
+    },
+    {
+      "batch": "30",
+      "revision": 3,
+      "commit": "9efcb29c4571efc3ddce69c8612f439569c455cf",
+      "workOrderSha": "89553dc2808b2de71117445c52058545007d2ae7a28662057be4aa7fca5d6272",
+      "packageId": "30180be42289",
+      "packageSha": "efb146490b478e306a9deca676ad94b17ae7bcb81c25249d1d7378996d5890aa",
+      "at": "2026-09-23T12:35:57.440Z"
     }
   ]
 }

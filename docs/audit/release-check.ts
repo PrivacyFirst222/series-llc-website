@@ -50,7 +50,7 @@
 import { readFileSync } from "node:fs";
 import {
   MANDATORY_CHECKS, git, gitBytes, sha256, loadLedger, ledgerRegressions, frozenFileProblems, linkProblems, isRecordPath, readAt,
-  standingAcceptance, resolvePackage, packageProblems, rulingRecords, rulingLine, type BatchFile,
+  combinedProblems, standingAcceptance, resolvePackage, packageProblems, rulingRecords, rulingLine, type BatchFile,
 } from "./ledger-lib";
 import { renderList } from "./ledger-print";
 
@@ -134,6 +134,7 @@ export function checkRange(live: string, pushing: string): { ok: boolean; why: s
   const batch = batchText ? (JSON.parse(batchText) as BatchFile) : null;
   const required = new Set<string>([...MANDATORY_CHECKS, ...(batch?.requiredChecks ?? [])]);
   if (batch?.items.some((i) => i.assertions.some((a) => a.kind === "check"))) required.add("red-before-fix");
+  if (required.has("combined-release") || pkg.combined) why.push(...combinedProblems(pkg));
   for (const name of required) {
     const c = pkg.checks.find((x) => x.name === name);
     if (!c) why.push(`required check "${name}" did not run for this commit — missing counts as failed`);

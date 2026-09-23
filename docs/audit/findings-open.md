@@ -2,8 +2,9 @@
 
 GENERATED from docs/audit/ledger.json by `bun run docs/audit/ledger-print.ts list`. Do not edit: the commit step refuses a copy that differs from the ledger. The auditors' original files are unchanged under docs/audit/sources/ and docs/audit/runs/.
 
-444 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 110 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 432.
+449 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 115 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Published (individual or combined receipt): 0 of 437.
 
+Combined publication is shown separately from individual lifecycle states. A combined receipt does not invent separate historical acceptances.
 A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.
 For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-session.ts. The historical coverage-check.ts alone does not establish complete prior-item reconciliation. Audit completion does not approve repairs or publication.
 
@@ -11,29 +12,34 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
 - **1. [A30]** — **implemented**
   - FAQ hero: "Drawn from real client questions about Florida's Protected Series LLC statute." No clients yet. Replace: "The questions people ask before forming a Florida Protected Series LLC, answered."
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **2. [A31]** — **implemented**
   - How It Works step 03: "…we send you the filed Articles … along with a form Operating Agreement completed from your questionnaire answers…". The agreement exists only after the portal questionnaire. Replace: posted documents and Manual; "A short questionnaire in the portal then completes your form Operating Agreement".
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **3. [A32]** — **implemented**
   - How It Works "Optional add-ons" calls the agent service an add-on; first year included. Replace: "Add-ons and choices".
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 4 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 4 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **4. [A33]** — **implemented**
   - Terms s. 1 assigns 9(c)–(g) and 11(e) to Filing Services; they are Agent Services matters. Replace: assign them to Agent Services.
   - **Codex rejected the proposed replacement:** Reassigning those clauses alone leaves the additional conflicts documented in linked item 29. Produce one complete section-allocation revision.
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **5. [A34]** — **implemented**
   - Terms "Last updated: August 13, 2026" and Privacy "Last updated: August 4, 2026" predate the last edits (Sep 15; Aug 9). Replace the dates.
   - **Codex rejected the proposed replacement:** Use the actual effective/publication dates of the revised policies. A commit date establishes an edit, not by itself the legally effective date.
-  - Previous fix: 27 r3, commit ; 2 assertion(s) retained. Replacement attempt: 28 r1, work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57.
-  - Previous fix: 27 r3, commit ; 2 assertion(s) retained. Replacement attempt: 28 r2, work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b.
-  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 2 assertion(s).
+  - Previous fix: 27 r3, release commit not recorded; 2 assertion(s) retained. Replacement attempt: 28 r1, work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57.
+  - Previous fix: 27 r3, release commit not recorded; 2 assertion(s) retained. Replacement attempt: 28 r2, work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b.
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 2 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
   - 2026-09-22 superseded by approved replacement: prior fix 27 r3 at ; approved work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57
@@ -46,46 +52,55 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Outcome: The Benefits 'Side by side' row is in rulings.md (15 Sep 2026); a ruled wording is not flagged.
 - **7. [A36]** — **implemented**
   - Benefits "Use multiple LLCs if… You only ever own 1 asset". Replace eyebrow: "Use a regular LLC if…".
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **8. [A37]** — **open**
   - Benefits footnote "State fees only" over a line including the $99 agent fee. Replace: "State fees and registered agent only".
+  - Ruling, 2026-09-20: Batch 11 review item 5: Adam directs that the existing wording remain unchanged: "5.  There is a $25 state fee to appoint a resident agent.  Leave as is". No fix is authorized for this finding.
 - **9. [A38]** — **implemented**
   - Benefits "Paid once" row "(3 of 10 covered by the fee)". Replace: "covered by our service fee".
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **10. [A39]** — **implemented**
   - Asset Protection: "vote his shares" (no shares in an LLC); "two entirely different directions … addresses all of them". Replace: "vote it"; "addresses both".
-  - Fixed: batch 17 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 17 revision 2, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **11. [A40]** — **implemented**
   - FAQ: "Florida Secretary of State" once (elsewhere Division of Corporations); "or (4) C corporation"; a comma splice; "only pay one annual fee" beside two yearly costs. Replace each; "file only one annual report".
   - **Codex rejected the proposed replacement:** Correct the grammar and distinguish one annual report from agent fees. Secretary of State is not inherently a false umbrella agency reference; consistency with Division of Corporations is editorial.
-  - Fixed: batch 17 revision 2, commit , by Codex; protected by 4 assertion(s).
+  - Implemented protections: batch 17 revision 2, release commit not recorded, by Codex; protected by 4 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **12. [A41]** — **implemented** — waits on Adam's ruling
   - Home hero and two sections: "Protected Series LLC Act" / "Protected Series Act"; the statute is the "Uniform Protected Series Provisions" (s. 605.2101). Ruling needed.
   - Ruling, 2026-09-20: Batch 17 review item 3 approved: use Florida's protected series statute on the public pages and Florida's Uniform Protected Series Provisions on the Manual cover. Preserve references to the model Uniform Protected Series Act.
-  - Fixed: batch 17 revision 2, commit , by Codex; protected by 4 assertion(s).
+  - Implemented protections: batch 17 revision 2, release commit not recorded, by Codex; protected by 4 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **13. [A42]** — **implemented**
   - Home Benefits grid: "One master OA + lightweight Series Designations." Replace: "One master operating agreement + a short Series Exhibit for every series."
   - **Codex rejected the proposed replacement:** Proposed wording is accurate for the private exhibit but should distinguish it from the filed designation. Location correction: Home.tsx renders only the first four cards, so this later card is on Benefits, not the home grid.
-  - Fixed: batch 17 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 17 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **14. [A43]** — **implemented**
   - The Statute page bullet 1 says the title does not make an asset a series' own; bullet 5 says a recorded deed is the record (s. 605.2301(2)(b)). Replace bullet 1 with a real-property carve-out.
   - **Codex rejected the proposed replacement:** The carve-out must retain the statutory conditions, including a recorded instrument in favor of a person giving value without knowledge of the signer’s lack of authority.
   - Ruling, 2026-09-20: Batch 17 review item 5: Adam approved the two displayed replacement paragraphs distinguishing the general asset-record rule from the recorded-real-property-instrument exception and preserving the giving-value and lack-of-knowledge conditions. Exact text is retained in Batch 17 revision 1.
-  - Fixed: batch 17 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 17 revision 2, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **15. [A44]** — **open** — waits on Adam's ruling
   - "one EIN-friendly tax structure" (What Is) and "1 EIN structure" (Benefits). Ruling needed: "one EIN".
   - Codex (disputed): WhatIs.tsx reads "one EIN-friendly tax structure" and Benefits.tsx reads "1 EIN structure". An unconditional replacement "one EIN" contradicts FAQ.tsx’s stated series EIN exceptions and the series-EIN purchase route at routes-portal.ts:2093-2181.
   - **Codex rejected the proposed replacement:** Do not turn imprecise shorthand into an absolute one-EIN promise. Explain that particular series may require separate EINs.
   - Corrected after Codex's review: 'One EIN' is wrong as an absolute: the site sells EINs for individual series. Reword to say the company has one EIN by default and a series may need its own. Ruling needed on the words.
+  - Ruling, 2026-09-20: Batch 12 review item 1: Adam rejected the proposed one-EIN wording change and directed that the existing wording stay unchanged.
 - **16. [A45]** — **dropped**
   - Recordkeeping App table grades "Provides operating agreement" typical: yes; home page says "generic LLC agreement, if any". Replace: "Provides an operating agreement written for protected series: typical no, ours yes".
   - Codex (disputed): RecordkeepingApp.tsx grades provision of an operating agreement, while WhyOnlyUs.tsx says "generic LLC agreement, if any". A generic operating agreement is still an operating agreement; the quotations do not establish a contradiction.
@@ -94,9 +109,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 - **17. [A46]** — **implemented**
   - Contact page "please contact us" on the contact page; Amend Agreement tab title reads "Page Not Found". Replace: "send them using the form below."; add the title.
   - Part "amend-title" — implemented: The Amendment page's browser title reads 'Page Not Found'; give it its proper title.
-  - Fixed (amend-title): batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (amend-title): batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
   - Part "contact-wording" — implemented: The Contact page says 'please contact us' on the contact page itself.
-  - Fixed (contact-wording): batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections (contact-wording): batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **18. [B1]** — **implemented**
@@ -105,7 +122,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: That the $125 state fee covers the first three protected series.
   - True: The $125 is $100 for the Articles plus $25 to designate the registered agent (docs/facts.md:39-40; s. 605.0213(2) and (7), opened). The three designations and their $25 state fees are covered by the $499 service fee (Pricing.tsx:90-91 'Covers up to 3 Protected Series Designations, including their state filing fees.'; FAQ.tsx:38). The StatBar ruling of 15 Sep covers the $125 stat bar, not this card.
   - Replace with: Pay the $125 Florida state filing fee once. Our $499 service fee covers your first three Protected Series Designations, state fees included; each one after that is $50 — $25 to prepare plus the $25 state filing fee.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **19. [B2]** — **implemented**
@@ -117,7 +135,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): BenefitsGrid.tsx:25 reads "One filing, one franchise relationship". Replacing it with "One state fee, one annual report" still wrongly collapses the Articles, agent-designation and series-designation state fees documented in facts.md.
   - **Codex rejected the proposed replacement:** Use a heading such as "One annual report for the company and its series". The original finding’s universal no-franchise-tax explanation is not established by section 605.0212.
   - Corrected after Codex's review: 'One state fee' is also wrong (Articles, agent designation and each series designation are separate state fees). Use 'One annual report for the company and its series'.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **20. [B3]** — **implemented**
@@ -126,7 +145,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: That registered agent service is included, without limit.
   - True: Only the first year is included; it renews at $99 (Pricing.tsx:11 'Florida registered agent service — first year included ($99/yr after)'; terms.md:46).
   - Replace with: Florida registered agent service — first year included
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **21. [B4]** — **dropped**
@@ -147,6 +167,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): Benefits.tsx:61 does display 10 returns versus 1 return, but the proposed note "A sole owner’s LLC files none either way" is false for a sole-owner LLC electing S-corporation taxation, an option this product supports.
   - **Codex rejected the proposed replacement:** Qualify the illustration by tax classification and income-tax-return type; a sole-owner disregarded entity differs from a sole-owner S corporation. Do not equate owner count with tax classification.
   - Corrected after Codex's review: 'A sole owner's LLC files none either way' is false for a sole-owner S corporation (Form 1120-S). Qualify the row by tax classification, not owner count.
+  - Ruling, 2026-09-20: Batch 12 review item 2: Adam rejected the proposed tax-return comparison change and directed that the existing wording stay unchanged.
 - **23. [B6]** — **implemented**
   - Benefits page, the footnote under 'The math' table — `webapp/src/pages/Benefits.tsx:182`
   - Reads: Registered agent pricing is held at $99/yr on both sides, so the comparison turns on the number of entities rather than on what any agent charges.
@@ -154,7 +175,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: In the first-year figure the ten LLCs are charged $990 of agent fees and the Protected Series LLC $0 (:52-53 '$990/yr' / '$99/yr' with the note :51 'Your first year is included in the service fee'; the ≈ $1,940 at :168 is 1,250 + 990 − (125 + 175)). The sides are held equal only from year two.
   - Replace with: Registered agent pricing is held at $99/yr on both sides after the first year; the first-year figure counts the year our service fee includes, so the comparison turns on the number of entities rather than on what any agent charges.
   - **Codex rejected the proposed replacement:** Explicitly distinguish equal renewal rates from the first-year inclusion. The conclusion that the entire comparison turns only on entity count remains too broad after the proposed edit.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **24. [B7]** — **implemented**
@@ -163,14 +185,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: That a message is optional (no asterisk; the pre-check at :35 tests only name and email: 'if (!form.name || !form.email)').
   - True: The server refuses a blank message: routes-payments.ts:638 'message: z.string().trim().min(1).max(5000)' and :647 returns 'Please provide your name, a valid email, and a message.' A visitor who leaves it blank is refused after Send with a message about three boxes.
   - Replace with: Label 'Message *'; pre-check 'if (!form.name || !form.email || !form.message.trim())' with the toast 'Please add your name, email, and a message so we can reply.'
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **25. [B8]** — **implemented**
   - Contact page, the small line beside the Send button — `webapp/src/pages/Contact.tsx:132`
   - Reads: Document preparation service only.
   - Claims: That the business is a document preparation service only.
   - True: The footer on the same screen (Footer.tsx:79-80) says 'MyFloridaSeriesLLC.com is a document preparation and registered agent service.' and Terms s. 4 sells registered agent service. Two wordings for one fact.
   - Replace with: Document preparation and registered agent service — not legal advice.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **26. [B9]** — **implemented**
@@ -182,7 +206,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): privacy.md:19 contains the quoted Square paragraph, but the replacement says "we keep only the card brand, its last four digits, and its expiration". renewals.ts stores Square customer/card identifiers as well and does not store expiration in that update.
   - **Codex rejected the proposed replacement:** Disclose card-on-file consent and Square storage, and accurately list retained identifiers, brand and last four; do not invent retained expiration or say only.
   - Corrected after Codex's review: Nothing stores the card's expiration, and Square's customer and card references are kept as well as brand and last four. Disclose the card on file and list what is actually kept; do not say 'only'.
-  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 03 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fae579f41b46e94b55a78ff08dd69d053488ddb8, batch 03 revision 1, package 6ee881943907. This records implementation, not acceptance or publication.
 - **27. [B10]** — **implemented**
   - Privacy Policy, section 2 'Information You Give Us', the Social Security paragraph — `webapp/src/content/privacy.md:15`
   - Reads: Our website forms do not request, and you should not enter into them, Social Security numbers, driver's license numbers, government identification numbers, biometric data, or bank account numbers. If you purchase our EIN service, we collect the responsible party's Social Security number or ITIN separately, through a secure channel we designate, solely to prepare and submit IRS Form SS-4, and we do not retain it after the EIN is issued.
@@ -193,9 +218,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - **Codex rejected the proposed replacement:** Correct the portal-collection/application description, and resolve the actual retention policy and backup behavior before promising deletion at issuance. The finding’s assertion that the deletion claim is right is unsupported.
   - Corrected after Codex's review: Split into two parts. The collection-channel wording can proceed. 'We delete it the moment the EIN is issued' is not true while nightly backups keep the ciphertext (N1.01), so the retention sentence waits on Adam's decision about backups.
   - Part "collection-channel" — implemented: Say that the Social Security number is collected through a secure form in the client portal, for the IRS's EIN application; the order form asks for none.
-  - Fixed (collection-channel): batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (collection-channel): batch 03 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fae579f41b46e94b55a78ff08dd69d053488ddb8, batch 03 revision 1, package 6ee881943907. This records implementation, not acceptance or publication.
   - Part "retention" — implemented: What the policy promises about keeping or deleting the number. (waits on ruling:N1.01)
-  - Fixed (retention): batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (retention): batch 03 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fae579f41b46e94b55a78ff08dd69d053488ddb8, batch 03 revision 1, package 6ee881943907. This records implementation, not acceptance or publication.
 - **28. [B11]** — **implemented** — waits on Adam's ruling
   - Terms of Service, section 9(g) 'How to cancel', last sentence — `webapp/src/content/terms.md:54`
   - Reads: If we have not received the proof described in (ii) by your renewal date, we remain registered agent of record and your account will continue to be billed at the then-current rate, prorated monthly, until we receive that proof or our resignation under Section 10(f) takes effect.
@@ -206,7 +233,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - **Codex rejected the proposed replacement:** Flag the missing documented monthly billing workflow for owner decision. Do not unilaterally substitute a new annual charge after timely cancellation.
   - Corrected after Codex's review: Nothing bills monthly, but replacing the sentence with an annual fee changes the bargain. Adam decides: build the monthly billing, or reword.
   - Ruling, 2026-09-19: Annual registered-agent billing only; no refund for changing agents midyear. Timely cancellation means at least 30 days before renewal. If replacement proof is missing by the renewal date, submit resignation on that date and charge $99 for state filing fees and processing, without a breakdown; this is not another service year. Email the resignation copy and mail the statutory notice. Appointment effective date starts the annual term. Both automatic-renewal consent and an eligible saved card are required. Show a prepaid warning only on an attempted prepaid purchase of our agent service. Allow immediate customer payment after decline. Approved by Adam in this conversation, culminating in “Go. Implement the changes”.
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **29. [B12]** — **implemented** — same defect as 4
   - Terms of Service, section 1, 'Which Company party you are contracting with' (the sentence A33 covers, beyond the 9(c)–(g) and 11(e) point) — `webapp/src/content/terms.md:6`
   - Reads: Sections 3 through 9 and 11 through 34 apply to Filing Services; Section 10 applies to Agent Services; and Sections 24 through 29 apply to both, each enforceable independently.
@@ -214,7 +242,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The Terms themselves apply other sections to Agent Services: 30 applies 10(d) to North Carolina residents (:162), 32 lists 10(e)–(g), 12 and 13 among the sections that survive termination (:168), 12 (chargebacks), 13 (portal), 14, 16, 20, 31, 33 and 34 are written for both parties, and 25(c) caps Agent Services' liability. On the sentence's own terms none of 12, 13, 14, 16, 20, 30–34 binds Agent Services.
   - Replace with: Sections 3 through 8, 9(a)–(b) and 11(a)–(d) and (f) apply to Filing Services; Sections 9(c)–(g), 10 and 11(e) apply to Agent Services; and every other Section applies to both, each enforceable independently.
   - **Codex rejected the proposed replacement:** Review all scopes together: the proposed exclusive Filing Services allocation still takes general sections such as eligibility/service descriptions away from Agent Services. Supply a complete, internally consistent allocation.
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **30. [B13]** — **optional — open**
   - Terms of Service, section 19 'Text Messages' — `webapp/src/content/terms.md:101`
   - Reads: If you provide a mobile number and opt in, we may send you service-related text messages. Message and data rates may apply. Reply STOP to opt out and HELP for help. We do not share mobile numbers with third parties for their marketing.
@@ -249,7 +278,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: That 'Single-Member' is how the single-member agreements are taxed (the comment at :38 says 'How the agreement is taxed, in the words a client would use').
   - True: 'Single-Member' names the number of owners, not a tax treatment; the FAQ (FAQ.tsx:56) calls it 'a disregarded entity'. The label is shown at PortalDashboard.tsx:506 and OAQuestionnaire.tsx:846. Same at :54 for 'member-single'.
   - Replace with: single: "Disregarded entity",  and  "member-single": "Disregarded entity",
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **34. [B17]** — **open**
@@ -258,6 +288,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: That only U.S. residents may hold S corporation stock.
   - True: The file's own source note (:105-107) states the IRS test as 'no nonresident alien shareholders'; a U.S. citizen living abroad is not a nonresident alien and is eligible, so 'only U.S. residents' excludes an eligible person. Adam's wording of 6 Sep 2026 — flagged for his decision.
   - Replace with: I understand that (I) a nonresident alien cannot be an S corporation shareholder, and an election that lists one will be rejected;
+  - Ruling, 2026-09-20: Batch 12 review item 4: Adam rejected the proposed shareholder-residency acknowledgment change and directed that the existing wording stay unchanged.
 - **35. [B23]** — **optional — implemented**
   - How It Works page, step 01 — `webapp/src/pages/HowItWorks.tsx:24`
   - Reads: It saves as you go, so you can stop and come back.
@@ -266,7 +297,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: It saves as you go in your browser, so you can stop and come back on the same device.
   - Codex (disputed): HowItWorks.tsx:24 reads "It saves as you go, so you can stop and come back." FloridaLLCFormationForm.tsx:181-197 does autosave and loadDraft restores it. The sentence makes no cross-device promise.
   - Outcome: The sentence makes no cross-device promise; 'in your browser' is a clarification.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **36. [B24]** — **implemented**
@@ -275,7 +307,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: That the app is available with formation today.
   - True: It is not released: Pricing.tsx:12 'Free iOS app (available end of year)'; RecordkeepingApp.tsx:129-130 'the recordkeeping app is currently in development'. The table row carries no such note.
   - Replace with: us: "Free with formation (iPhone app, coming end of year)",  and on :114  d: "Built around §605.2301 — free with formation, coming end of year"
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 4 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 4 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **37. [B25]** — **dropped**
@@ -296,6 +329,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): MothershipDiagram.tsx:98 says "... a single tax filing and operating agreement from your perspective." The proposed "one EIN" is not universal: the site and portal explicitly contemplate separate series EINs.
   - **Codex rejected the proposed replacement:** Qualify tax treatment rather than substituting a new unconditional EIN claim. Owner-level income reporting does not establish that the diagram promises a separate entity return.
   - Corrected after Codex's review: Same as 15: do not substitute an unconditional 'one EIN'. 'A single tax filing' is wrong for a sole-owner LLC that is disregarded, which files no return of its own; a sole-owner LLC taxed as an S corporation does file one (see item 22). Qualify by tax classification, not by owner count.
+  - Ruling, 2026-09-20: Batch 12 review item 5: Adam rejected the proposed diagram tax-filing wording change and directed that the existing wording stay unchanged.
 - **39. [B27]** — **implemented**
   - FAQ, 'What's the federal tax treatment?', the S election sentence — `webapp/src/pages/FAQ.tsx:56`
   - Reads: If you decide on an S corporation election, we offer a $95 package that prepares IRS Form 2553 for you to sign and file.
@@ -303,7 +337,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: It is sold only for new formations: Pricing.tsx:140 'Available for new LLCs we form, ordered within 65 days of paying for your formation.'; buildPayload.ts:133 'sElection: data.orderSElection && data.filingPath !== "CONVERT"'.
   - Replace with: If you decide on an S corporation election for an LLC we form, we offer a $95 package that prepares IRS Form 2553 for you to sign and file.
   - **Codex rejected the proposed replacement:** Add both restrictions: new LLCs we form, ordered within 65 days of formation payment. The proposed replacement omits the second.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **40. [B28]** — **dropped**
@@ -321,7 +356,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: That the portal, like the agent, is a first-year inclusion.
   - True: Only the agent service is a first-year inclusion (Pricing.tsx:11); the portal is the client's for as long as the account exists (terms.md:83).
   - Replace with: label: "Registered agent, with legal mail posted to your portal", us: "First year of agent service included",
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **42. [B30]** — **implemented** — housekeeping
@@ -330,7 +366,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: Links the reader to the 2025 statutes.
   - True: Online Sunshine now serves 'The 2026 Florida Statutes' (opened 16 Sep 2026); the same 2025 link is at WhatIs.tsx:138. The sections exist in both years, but the link pins last year's text.
   - Replace with: https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605ContentsIndex.html (no StatuteYear, so the current year is served), in both files.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **43. [B98]** — **implemented** — housekeeping
   - Server entry — code only — `webapp/server/app.ts:24`
@@ -340,7 +377,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: // server/e2e.ts imports personLegalName from "./app"; it lives in the portal module. — and drop effectiveOwners from the export, or import it somewhere.
   - Codex (housekeeping-only): app.ts:24–25 contains the quoted comment and re-exports both helpers. Removing an unused re-export changes no product text. The cited excluded e2e.ts was not read, so its import claim is not independently certified.
   - **Codex rejected the proposed replacement:** The proposed comment depends on an excluded test file. Do not add an otherwise unnecessary import merely to justify an export; first verify excluded consumers before removing an API export.
-  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 19 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **44. [B143]** — **implemented** — housekeeping
   - Server, the Sunbiz name check — the statute the hold is attributed to — `webapp/server/sunbiz.ts:160`
@@ -351,7 +389,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): sunbiz.ts:160 attributes both holds to 605.0715(5)–(6), but the 120-day voluntary-dissolution hold does exist in 2026 s.605.0717(2), opened on Online Sunshine. It ends earlier if a statement of termination is filed. The prior reader searched the wrong sections.
   - **Codex rejected the proposed replacement:** Retain the 120-day rule, cite 605.0717(2), and include its earlier-termination exception; cite 605.0715(5) for administrative dissolution.
   - Corrected after Codex's review: The 120-day hold exists: s. 605.0717(2), 'until 120 days after the effective date of dissolution or filing of a statement of termination, if earlier'. Cite s. 605.0715(5) for the one-year administrative hold and s. 605.0717(2) for the 120 days.
-  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
 - **N1.01. [substantive]** — **implemented** — waits on Adam's ruling
   - Privacy Policy, Social Security number retention; nightly database backups — `webapp/src/content/privacy.md:15`
   - Reads: At the end of that period we permanently delete every Social Security number you gave us and replace your copy of the completed form with a record copy showing only the last four digits.
@@ -359,7 +398,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: backup.ts:13–14 expressly includes taxpayer-number ciphertext; :124–142 snapshots every column of service_orders into immutable archives and :107–110 retains backups indefinitely. crypto.ts:52–53 derives the decrypting key from unchanged SESSION_SECRET. routes-portal.ts:623 clears only live rows. A backup made during the edit window remains decryptable afterwards. This is a separate retention defect from prior27's collection-channel wording; production execution is not asserted.
   - Replace with: At the end of that period we remove the Social Security numbers from the active service-order record and replace the portal form with a record copy showing only the last four digits. Encrypted copies remain in archived database backups. [To preserve the existing permanent-deletion promise instead, exclude live secrets from backups or expire their independent encryption keys, and remove already retained copies.]
   - Ruling, 2026-09-19: Approved revised Batch 03: retain completed S-election forms and EIN letters encrypted until the client deletes them; remove underlying EIN numbers when fulfillment is recorded and S-election questionnaire numbers after the 14-day editing window; exclude transient taxpayer numbers from backups, prevent restoration from resurrecting deleted documents, and do not clean up existing test backups.
-  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 03 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fae579f41b46e94b55a78ff08dd69d053488ddb8, batch 03 revision 1, package 6ee881943907. This records implementation, not acceptance or publication.
 - **N1.09. [substantive]** — **implemented** — waits on Adam's ruling
   - Terms of Service, section16, license to use purchased documents — `webapp/src/content/terms.md:92`
   - Reads: You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC formed through the Services, and no other rights.
@@ -367,7 +407,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Pricing.tsx:32–40 sells deliverables for an existing Florida LLC, and buildPayload.ts:21–29 supports CONVERT. Such a buyer's company was not formed through the Services, so the written license omits a product the site sells.
   - Replace with: You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC for which you purchased the Services, and no other rights.
   - Ruling, 2026-09-20: Adam approved Batch 11 item 19 with "I approve all other items", followed by "Go": "You receive a limited, personal, non-transferable license to use deliverables for the internal purposes of the LLC for which you purchased the Services, and no other rights."
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **N1.10. [substantive]** — **open** — waits on Adam's ruling
@@ -391,7 +432,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: routes-portal.ts:2396–2403 explicitly saves answers with an EIN pending, returns awaitingEin:true and documentId:null, and does not build the PDF. Batch13 authorizes this supported waiting state. FAQ.tsx:69 repeats the same immediate-delivery explanation. This differs from prior39, which concerns who can buy the package.
   - Proposed replacement (not approved): **(f) Add-on services.** Each add-on service is refundable until we begin work on it. The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.
   - Rechecked by codex-reader-5: Terms77/FAQ69 claim immediate PDF delivery. Actual routes-portal2396–2404 returns awaitingEin true and documentId null when no issued EIN. Replacement preserves the existing refund cutoff and corrects only false delivery rationale. Prior39 concerns purchase eligibility and differs.
-  - Fixed: batch 24 revision 1, commit , by Codex; protected by 4 assertion(s).
+  - Implemented protections: batch 24 revision 1, release commit not recorded, by Codex; protected by 4 assertion(s).
+  - Implementation evidence: commit 2559e18f5094b70c8eba1eb64e3c3519aa609f3e, batch 24 revision 1, package 926611ba9446. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B1-N02. [wording]** — **implemented**
   - Registered-agent payment page, browser tab title (/agent-checkout). — `webapp/src/components/layout/Layout.tsx:41`
   - Reads: document.title = PAGE_TITLES[pathname] ?? `Page Not Found \u2014 ${SITE}`;
@@ -399,7 +441,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: App.tsx:56 registers /agent-checkout under Layout; AgentCheckout.tsx:24 renders a payment heading. PAGE_TITLES:11–35 lacks that path, so every visit to this valid payment route receives the Page Not Found title. Prior17:amend-title concerns /portal/amend, which is already present; this new payment route is a separate missing entry.
   - Proposed replacement (not approved): Add the title-map entry: "/agent-checkout": `Registered Agent Payment — ${SITE}`,
   - Rechecked by codex-reader-5: Read Layout full and App44–63: valid /agent-checkout route has no title key; fallback is Page Not Found. Prior17 covers /portal/amend, already present. Specific proposed entry is accurate.
-  - Fixed: batch 22 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 22 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 3577d25d6c452215171683deb3f5ffc5e0c9636b, batch 22 revision 1, package fe903fe17147. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B1-N04. [substantive]** — **implemented**
   - Client portal, S-election questionnaire filing deadline and late-election warning; shared Form2553 deadline helper. — `webapp/src/lib/form2553Timing.ts:38`
   - Reads: return toISO(addDays(endOfTwoMonths, 15));
@@ -407,7 +450,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Actual helper returns2026-03-15(Sunday) for a company formed2026-01-01 and declares the election late onMonday03-16. IRS Publication509(2026), “Saturday, Sunday, or legal holiday”, generally moves the tax-act due date to the next nonweekend/nonlegal-holiday day; the root reader opened that rule and the Form2553 entry in the same publication. Preserve owner63’s formation-date starting point: this finding concerns only the ending-day adjustment. Primary source reading and quotation retained in evidence/primary-irs-deadline-read.md.
   - Proposed replacement (not approved): After computing the ordinary two-month-plus15day deadline, advance it past Saturdays, Sundays and applicable IRS/DC legal holidays. Use that adjusted date consistently for deadline display, the late decision and the preparation runway; keep the owner-approved formation-date starting point.
   - Rechecked by codex-reader-5: Independently imported real form2553Timing helper; Jan1 deadline is SundayMar15 and nextMondayMar16 is late. Read full relevant helper30–89 and root primary-irs-deadline-read.md. Root current IRS Publication509 evidence establishes weekend/holiday timely-nextday rule; rollover is independent of owner63 startdate decision and65-day purchase cutoff. Proposed adjustment correct, retaining5-day service runway separately.
-  - Fixed: batch 24 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 24 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit 2559e18f5094b70c8eba1eb64e3c3519aa609f3e, batch 24 revision 1, package 926611ba9446. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch31-reader-1-benefits-deed-unconditional. [substantive]** — **implemented** — waits on Adam's ruling
   - Home page and Benefits page, the benefits grid, card 04 "Real property in the series' name", second sentence — `webapp/src/components/home/BenefitsGrid.tsx:31`
   - Reads: body: "Real estate can be deeded to and held by a protected series in its own name. Under §605.2301, the recorded deed stands as the record that the property belongs to that series.",
@@ -416,7 +460,9 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): body: "Real estate can be deeded to and held by a protected series in its own name. Under §605.2301(2)(b), a recorded deed in favor of someone who gives value without knowing of any lack of authority is itself the record that the property is an associated asset of that series; your own asset records must show it in every other case.",
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 1: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md.
-  - Fixed: batch 31 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 31 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - **Owner retained the wording.** Technical lifecycle: implemented; protections do not mean the proposed wording change was made. Ruling: Batch 31 review item 1: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md.
+  - Implementation evidence: commit 4754c5116dcc2a0105acd4a0adede646d3c6f41a, batch 31 revision 3, package aaeabc755635. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 - **AUD-claude-reconciled-batch31-reader-1-faq-0905-generalized. [wording]** — **implemented** — waits on Adam's ruling
@@ -427,7 +473,9 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): There is also a registration question that runs in both directions: under §605.0905(3), owning income-producing real property or tangible personal property in Florida is itself transacting business here, which means a company formed elsewhere that owns Florida rental property has to qualify here — and a Florida company that buys rental property in another state should expect that state to apply its own version of the same rule.
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 4: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md.
-  - Fixed: batch 31 revision 3, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 31 revision 3, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - **Owner retained the wording.** Technical lifecycle: implemented; protections do not mean the proposed wording change was made. Ruling: Batch 31 review item 4: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md.
+  - Implementation evidence: commit 4754c5116dcc2a0105acd4a0adede646d3c6f41a, batch 31 revision 3, package aaeabc755635. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 - **AUD-claude-optional-batch34-reader-1-terms-third-parties-omit-dropbox. [wording]** — **implemented**
@@ -437,7 +485,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The Privacy Policy on the next page (privacy.md:40) discloses a sixth provider, "Dropbox (document backups)", and the server mirrors every client file to Dropbox (backup.ts:6 imports mirrorFile from dropbox.ts; dropbox.ts:6-8 "Verified client-file backup. Sensitive files are copied as ciphertext."). Section 20 disclaims responsibility for the third-party services it lists; the list omits the one that holds copies of the client's documents. Two lists for one fact.
   - Proposed replacement (not approved): The Services incorporate third-party services, including payment processing (Square), hosting and storage (Vercel), database services (Neon), email delivery (Resend), document backups (Dropbox), and address data (Smarty).
   - Rechecked by Codex at 455be76607d5f351dd9a0a80701f74af23683d1f: Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place.
-  - Fixed: batch 34 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 34 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit c91b101b9652a14906270d1422f8cc771f71e706, batch 34 revision 1, package d58da0289ab7. This records implementation, not acceptance or publication.
 
 ## Order form and payment — 88 open of 90
 
@@ -446,19 +495,24 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): StepRegisteredAgent.tsx says “and I can cancel at any time in my portal.” The cancellation route accepts notice on any day; the30-day rule determines whether the next renewal charge stops. The finding conflates notice availability with the charge cutoff, and its replacement implies later notice cannot be submitted.
   - **Codex rejected the proposed replacement:** Use “I may submit cancellation notice at any time. To stop the next renewal charge, I must give notice at least30 days before renewal.” This aligns the assessment with item144 and preserves the contractual timing.
   - Outcome: Notice may be given any day; only the charge cutoff is 30 days. Clarify, do not restrict: 'I may submit cancellation notice at any time. To stop the next renewal charge, I must give notice at least 30 days before renewal.'
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **46. [A2]** — **implemented**
   - Same tick (mine). Reads "…cannot be kept on file and will not be accepted for renewal." A gift-card client gets a payment link and may pay it with a gift card; only the keeping is refused. Replace: "…cannot be kept on file; if I pay with one, each year's renewal comes with a payment link instead."
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **47. [A6]** — **implemented**
   - Review step, agent card (mine). "Renewal card on file: Yes" before any card exists. Replace: "Keep card for renewal: Agreed".
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **48. [A7]** — **implemented**
   - steps.ts FIELD_STEP lacks raRenewalCardConsent; a server refusal lands on the Certify step. Replace: map it to the agent step.
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **49. [A8]** — **implemented**
   - Review, Members card "In Articles?" reads "No" for member-managed orders (server lists them as AMBR) and shows on a conversion. Replace: "Yes — listed as members (AMBR)" for member-managed new formations; no row on a conversion.
-  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 08 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit c22d47592edf06826e0bfbad69f42e349dda44f7, batch 08 revision 2, package 60ae581a29df. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **50. [A9]** — **open**
   - Managers step header and stepValidation on a conversion: "…because you elected to include a manager-managed statement in the Articles." Server version mentions an authorized representative row the form cannot make. Replace both: "A manager-managed LLC needs at least one Manager."
@@ -466,97 +520,116 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 - **51. [A10]** — **implemented**
   - Registered agent step on a conversion keeping its agent: header "Florida requires the agent's signed acceptance…", boxes "Your first name / Your last name", ticks "I am accepting this role personally" and "this is my physical street address". Replace on a conversion: "Keep the registered agent already on file", "Agent's first name / last name" plus entity name, one tick "This is the registered agent, and the Florida street address, that the Division has on file for my LLC. This order does not change it."
   - **Codex rejected the proposed replacement:** Correct direction, but supporting entity agents requires changes to data type, server SELF first/last requirements at server/validation.ts:223–231, payload and review, not just labels and an entity-name box. Also collect the existing agent’s agreement to serve the protected series.
-  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 06 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 00628225d59793891b00ab4aebe23468b104cdbd, batch 06 revision 1, package 6427938798ff. This records implementation, not acceptance or publication.
 - **52. [A11]** — **implemented** — waits on Adam's ruling
   - Principal office and mailing steps shown on a conversion; answers reach no sheet row. Replace: hide on a conversion, or add sheet rows. Ruling needed.
   - Codex (disputed): Principal and mailing screens do not feed conversion filingGroups (:246–303), but principalOfficeAddress is read by oaSeed at routes-portal.ts:87–93 and reaches generated agreement inputs :1464. “Answers reach no sheet row” does not mean they serve no purpose.
   - **Codex rejected the proposed replacement:** Do not hide and discard addresses blindly. Explain they are for the operating agreement/records and verify current existing-company addresses, or obtain them elsewhere before document generation.
   - Corrected after Codex's review: The principal address feeds the operating agreement (the seed reads principalOfficeAddress), so a conversion must still ask it. Say what it is for; do not hide it.
   - Ruling, 2026-09-19: Keep principal and mailing address questions for existing companies; explain principal address feeds the operating agreement, mailing is retained in office order records, and neither entry updates Sunbiz.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **53. [A12]** — **implemented**
   - Eligibility step "Formation type" shown to a converting client; changes nothing. Replace: hide on a conversion.
   - Codex (disputed): StepIntro.tsx:27 asks formation type on conversion, but it does change output: buildPayload.ts:25 stores it; routes-portal.ts:164 carries it and :1485 sets professional: seed.formationType === PLLC.
   - **Codex rejected the proposed replacement:** Ask the existing company’s actual type, or derive and verify it. Simply hiding the choice can omit professional descriptors.
   - Corrected after Codex's review: The formation type sets the agreement's professional wording (professional: seed.formationType === 'PLLC'), so a conversion must still ask it. Ask the existing company's actual type.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **54. [A13]** — **implemented** — waits on Adam's ruling
   - filing.ts member-managed "Any Other Provisions" sentence can never be produced. Replace: delete, or force the statement for member-managed too. Ruling needed.
   - Codex (housekeeping-only): filing.ts:141–142 has MEMBER_MANAGED provision, while StepManagement.tsx:75 sets includeManagementStatementInArticles false for that structure; its normal UI branch is unreachable.
   - **Codex rejected the proposed replacement:** Deleting the unused branch is supported. Forcing a new filed provision changes the product and requires a separate owner decision; the alternatives are not interchangeable.
   - Ruling, 2026-09-20: Batch 19: preserve the manager-managed Articles sentence and the office workflow that uses it; remove only the unused member-managed alternative. Adam clarified: “That is the language that will be added to the articles of a manager managed LLC. But we do that in the office”, then approved the clarified proposal with “Go. Approve all”.
-  - Fixed: batch 19 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 19 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **55. [A14]** — **implemented**
   - Country box: step allows empty; server refuses with no box marked. Replace: "Country required." on the step, error passed to the box (client, managers, members, correspondence).
-  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 08 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit c22d47592edf06826e0bfbad69f42e349dda44f7, batch 08 revision 2, package 60ae581a29df. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **56. [A15]** — **implemented**
   - ZIP: one or two characters pass the step; server says "ZIP is required". Replace: "Enter a full ZIP code." on step and server.
   - **Codex rejected the proposed replacement:** Align actual format rules as well as messages. “Enter a full ZIP code” alone does not define or enforce a full US ZIP; preserve postal-code support if foreign addresses are supported.
-  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 08 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit c22d47592edf06826e0bfbad69f42e349dda44f7, batch 08 revision 2, package 60ae581a29df. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **57. [A16]** — **implemented**
   - Managers "Email (optional)" and Certify "Email (optional)": malformed email refused after Submit with no message; Certify email/phone never stored. Replace: drop the Certify boxes; check the manager email on the step.
   - Ruling, 2026-09-19: Batch 08 item 5: “The only one required to provide an email is the user”. Apply the approved fix with optional non-user emails and the user email as the correspondence fallback.
-  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 08 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit c22d47592edf06826e0bfbad69f42e349dda44f7, batch 08 revision 2, package 60ae581a29df. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **58. [A17]** — **implemented**
   - Server alternate-name check runs on a conversion. Replace: skip on a conversion.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **59. [A18]** — **implemented**
   - Conversion certification paragraph says designations "and the change of registered agent"; the tick omits the agent change. Replace the tick to include it when our service is chosen.
-  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 06 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 00628225d59793891b00ab4aebe23468b104cdbd, batch 06 revision 1, package 6427938798ff. This records implementation, not acceptance or publication.
 - **60. [A19]** — **implemented** — waits on Adam's ruling
   - Correspondence "Company (optional)", "Phone (optional)" and the paper-mail address block reach nothing that mails. Replace: remove, or say what is mailed. Ruling needed.
   - Codex (disputed): StepCorrespondence.tsx:74,112,125–155 collects company, phone and paper address; filing.ts:449–454 explicitly displays “Mailing address for paper correspondence (ours, not Sunbiz’s)”. Absence of an automated postal-mail job does not prove office staff cannot use that address.
   - **Codex rejected the proposed replacement:** Explain the intended manual use or remove unused fields by policy; do not assert that no human correspondence can be sent merely because no mail job exists.
   - Corrected after Codex's review: No mail job exists, but the office sheet shows the address for hand use. Adam says what is mailed, or the fields go.
   - Ruling, 2026-09-19: Batch 08 item 6 proposed removing optional correspondence company, phone and additional paper-mail address, retaining name and email. Adam approved “the rest”, with item 5 requiring email only from the user; use the user email when no alternative correspondence email is supplied.
-  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 08 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit c22d47592edf06826e0bfbad69f42e349dda44f7, batch 08 revision 2, package 60ae581a29df. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **61. [A20]** — **implemented**
   - Effective date rule measured from the moment of Continue, described as the filing date. Replace: measure from an expected filing day and say so.
   - **Codex rejected the proposed replacement:** An expected filing day must actually be supplied and later rechecked at filing. Wording alone cannot ensure the legal date; separately fix UTC/local-day and bank-holiday defects reported below.
-  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
 - **62. [A21]** — **implemented**
   - Agent acceptance signature has no match-the-name rule (the Articles signature does). Replace: same rule.
-  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 06 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 00628225d59793891b00ab4aebe23468b104cdbd, batch 06 revision 1, package 6427938798ff. This records implementation, not acceptance or publication.
 - **63. [A22]** — **implemented** — waits on Adam's ruling
   - S election deadline described three ways. Replace all: "within 2 months and 15 days after your LLC's effective date (the date on your filed Articles, unless you chose a later effective date)".
   - Codex (disputed): StepOptionalDocs.tsx:69 says “2 months and 15 days from formation”; form2553Timing.ts:101–103 says effective date. IRS Form2553 Instructions, Item E, ties the deadline to the election effective tax-year date, using the earliest owners/assets/business date for a first tax year, not universally the Articles effective date. https://www.irs.gov/instructions/i2553
   - **Codex rejected the proposed replacement:** Use the Form2553 Item E effective date and its first-tax-year rule, with applicable deadline extensions/late-election exclusions. Do not universalize the Articles date.
   - Outcome: Codex's dispute not adopted: Codex's dispute is not adopted as written, and the wording is left to ADAM'S DECISION; it is not recorded as settled law. IRS Form 2553 instructions, item E: the deadline runs '2 months and 15 days after the date entered for item E', and for a first tax year that is the earliest of the day the entity 'first had shareholders (owners)', first had assets, or began doing business. Claude's reading is that a new LLC first has owners the day its Articles take effect, which matches A22's wording; Codex's review did not establish that every path the product supports satisfies that assumption.
   - Ruling, 2026-09-20: Batch 13 approved: state the Form 2553 deadline as within 2 months and 15 days after the LLC is officially formed with the Florida Division of Corporations; use a later effective date stated in the Articles rather than the earlier filing date.
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **64. [A25]** — **implemented**
   - Order confirmed: "Sign in to your portal" button for a first-time client; resend answers "already has a password" for a filed or formed order. Replace: button only for a returning client; treat filed/formed as paid.
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **65. [A26]** — **implemented**
   - Progress percent counts hidden steps and an unreachable "Submit" step (whose dead page says we send the operating agreement). Replace: remove the dead step; one denominator.
   - Part "dead-step" — implemented: The unreachable "Submit" step and its dead page, whose sentence says the operating agreement is sent with the filed documents, are removed.
-  - Fixed (dead-step): batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (dead-step): batch 19 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
   - Part "denominator" — implemented: The progress percent counts only the steps a client can reach: one denominator, no hidden steps.
-  - Fixed (denominator): batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (denominator): batch 19 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
   - Former part "all" (retired by 001-part-level-links, now dead-step, denominator): The whole finding.
 - **66. [A27]** — **implemented**
   - Service-fee box "Formation service" on a conversion vs receipt "Protected series service fee". Replace: same words.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **67. [A28]** — **implemented**
   - Optional documents header "from the Florida Division of Corporations" over two IRS items. Replace: "Optional documents and services".
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **68. [A29]** — **implemented** — waits on Adam's ruling
   - Intro and Certify ask the same two acknowledgments. Ruling needed.
   - **Codex rejected the proposed replacement:** No replacement is proposed. Choose the single retained acknowledgment point and migrate validation/payload consumers if consolidating; repetition alone is not a false statement.
   - Ruling, 2026-09-19: Show plain no-advice and public-record notices at Eligibility; require the corresponding checkboxes once at Certification.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **69. [B21]** — **implemented**
   - Order form, any address block with a locked state (the registered agent's Florida address), choosing a suggestion from the drop-down — `webapp/src/components/forms/florida-llc/AddressFields.tsx:47`
@@ -567,7 +640,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): AddressFields.tsx:47 does have state: lockState ?? s.state, but no product caller supplies lockState. The live agent screen instead uses AddressAutocomplete directly and overwrites state with FL at StepRegisteredAgent.tsx:225–229; its copy-client button does the same at :149–153.
   - **Codex rejected the proposed replacement:** Fix the actual agent suggestion/copy handlers, rejecting non-FL addresses rather than relabeling them. Changing only the unused lockState path would leave the defect live.
   - Corrected after Codex's review: No caller passes lockState. The live defect is in the registered agent step, which writes state 'FL' in the copy-my-address button and the suggestion handler. Fix those two handlers; refuse a non-Florida address rather than relabel it.
-  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 06 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 00628225d59793891b00ab4aebe23468b104cdbd, batch 06 revision 1, package 6427938798ff. This records implementation, not acceptance or publication.
 - **70. [B31]** — **implemented**
   - Registered agent step, the "I'll serve as my own registered agent" card and its address tick — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx:83`
   - Reads: You must have a physical Florida street address and you'll sign the acceptance on the next screen.
@@ -575,28 +649,32 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: s. 605.0113(1)(b)1: the registered agent must be "An individual who resides in this state and whose business address is identical to the address of the registered office". Nothing on the step asks or confirms Florida residency; stepValidation.ts:208-230 and server/validation.ts:223-232 check name, address, state FL and two ticks only.
   - Replace with: Card: "You must live in Florida and have a physical Florida street address; you'll sign the acceptance on the next screen." Tick (line 284): "I live in Florida, and this is my physical street address in Florida, not a P.O. Box."
   - **Codex rejected the proposed replacement:** Correct for a newly appointed individual agent. Make it conditional: a conversion retaining an existing corporate agent must not make the client affirm personal Florida residence.
-  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 06 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 00628225d59793891b00ab4aebe23468b104cdbd, batch 06 revision 1, package 6427938798ff. This records implementation, not acceptance or publication.
 - **71. [B32]** — **implemented** — same defect as 51
   - Registered agent step, the self-agent card on a conversion that keeps its agent — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx:83`
   - Reads: You must have a physical Florida street address and you'll sign the acceptance on the next screen. For an existing LLC, enter your agent's name and address exactly as the Division has them on file. This order does not change your agent.
   - Claims: The converting client will sign an acceptance on the next screen.
   - True: FloridaLLCFormationForm.tsx:296-298 hides the acceptance step for a conversion keeping its own agent, and stepValidation.ts:233-235 validates nothing there; no acceptance is signed.
   - Replace with: On a conversion: "Enter your agent's name and Florida street address exactly as the Division has them on file. This order does not change your agent, and there is nothing to sign."
-  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 06 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 00628225d59793891b00ab4aebe23468b104cdbd, batch 06 revision 1, package 6427938798ff. This records implementation, not acceptance or publication.
 - **72. [B33]** — **implemented**
   - Registered agent step, the note under "Your registered agent will be" — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx:105`
   - Reads: Nothing to sign here — we execute the registered agent acceptance when we prepare your filing, and anything we receive for your LLC is posted to your client portal.
   - Claims: Everything received at the agent address is posted to the portal.
   - True: Terms 10(b): we post "service of process and official government correspondence"; Terms 10(c): "Packages and general mail may be refused, returned to sender, or destroyed. We have no obligation to forward anything received through unauthorized use of the address."
   - Replace with: Nothing to sign here — we execute the registered agent acceptance when we prepare your filing, and any legal process or official government correspondence we receive for your LLC is posted to your client portal.
-  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 06 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 00628225d59793891b00ab4aebe23468b104cdbd, batch 06 revision 1, package 6427938798ff. This records implementation, not acceptance or publication.
 - **73. [B34]** — **implemented**
   - Agent acceptance step, the first tick — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx:113`
   - Reads: I accept the appointment and acknowledge the obligations of serving as registered agent for this Florida LLC.
   - Claims: This is the acceptance Florida requires.
   - True: s. 605.0113(2): "The statement of acceptance must provide that the registered agent is familiar with and accepts the obligations of that position." The tick says "acknowledge", not "familiar with and accept".
   - Replace with: I accept the appointment as registered agent for this Florida LLC, and I am familiar with and accept the obligations of that position.
-  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 06 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 00628225d59793891b00ab4aebe23468b104cdbd, batch 06 revision 1, package 6427938798ff. This records implementation, not acceptance or publication.
 - **74. [B36]** — **optional — open**
   - Certification & signature step, "Who is the authorized representative?" — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:153`
   - Reads: For a company being formed, Florida defines it as a person authorized by a prospective member to form the company by executing and filing its articles of organization (§605.0102(8)(a)).
@@ -611,7 +689,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: Reads as a list of three places the name might not appear.
   - True: The sentence means a bank or the Division of Workers' Compensation may ask; the comma after the parenthesis and before "or" breaks it. (Code comment at line 248 says these are Adam's words, 13 Sep 2026.)
   - Replace with: If your name does not appear on Sunbiz.org (the Florida Division of Corporations’ website), a bank or the Division of Workers’ Compensation may ask why the name on your formation document is not yours.
-  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 06 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 00628225d59793891b00ab4aebe23468b104cdbd, batch 06 revision 1, package 6427938798ff. This records implementation, not acceptance or publication.
 - **76. [B38]** — **optional — open** — waits on Adam's ruling
   - Certification & signature step, the "MyFloridaSeriesLLC signs for me" option and its appointment tick — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:273`
   - Reads: I appoint MyFloridaSeriesLLC as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete.
@@ -626,7 +705,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: Pressing it submits an intake.
   - True: handleFinalSubmit (lines 449-457) posts the order and sends the browser to Square's checkout page; nothing on the Certify step says payment comes next (the fees are shown only on the Review and Optional docs steps).
   - Replace with: {submitting ? "Taking you to payment…" : "Continue to payment"}
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **78. [B40]** — **implemented**
   - LLC name step, the "Final name preview" box while no designator is chosen — `webapp/src/components/forms/florida-llc/sections/StepName.tsx:315`
@@ -634,14 +714,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The typed name is defective.
   - True: The box above says "The base name without the LLC designator (we'll add it for you)" (line 174); buildFinalLlcName (validation.ts:20-36) appends the designator only once one is chosen, so this red text appears simply because the dropdown is still empty. The same rule reads differently in stepValidation.ts:142 ("must include LLC, L.L.C., or Limited Liability Company.").
   - Replace with: Choose a designator above to complete the name.
-  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
 - **79. [B41]** — **implemented**
   - Eligibility & basics step, the "Formation type" helper — `webapp/src/components/forms/florida-llc/sections/StepIntro.tsx:27`
   - Reads: Choose 'Professional LLC' if your business will provide a regulated professional service such as law, medicine, or accounting.
   - Claims: An option named "Professional LLC" exists.
   - True: The option is titled "Domestic Florida PLLC" (line 31).
   - Replace with: Choose 'Domestic Florida PLLC' if your business will provide a regulated professional service such as law, medicine, or accounting.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **80. [B42]** — **implemented** — same defect as 198
   - Your information step, the introduction, for a converting client — `webapp/src/components/forms/florida-llc/sections/StepClient.tsx:31`
@@ -649,7 +731,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The client will receive formation documents.
   - True: A conversion files Designations for a company already formed (StepIntro.tsx:22; FloridaLLCFormationForm.tsx:301-304). A24 records the same word in the emails and portal header.
   - Replace with: Tell us who you are. Your client portal, your filed documents, and our emails about your LLC all belong to the person named here — and later questions offer your name and address wherever they fit, so you won't retype them.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **81. [B43]** — **optional — implemented**
   - Getting started step, the "Converting an existing Florida LLC" card — `webapp/src/components/forms/florida-llc/sections/StepFilingPath.tsx:27`
@@ -660,7 +743,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): StepFilingPath.tsx:27 says “no Articles fee,” which is true: a conversion files no Articles. Its header supplies the broader $125 context. Different levels of detail are not contradictory facts.
   - **Codex rejected the proposed replacement:** If expanding, say no state fee to designate a new registered agent when retaining the current agent; “no registered agent fee” can be mistaken for absence of annual agent-service fees.
   - Outcome: 'No Articles fee' is true; if expanded, say no state fee to designate an agent when the current agent is kept.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **82. [B44]** — **implemented** — waits on Adam's ruling
   - Getting started step (and the site), the word "Converting" — `webapp/src/components/forms/florida-llc/sections/StepFilingPath.tsx:26`
@@ -669,7 +753,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: In chapter 605 "conversion" is the change of an entity's type (ss. 605.1041-605.1046; s. 605.0213(10) "certificate of conversion"); establishing a protected series is s. 605.2201, and the Intro tick (StepIntro.tsx:61) itself says the form "adds protected series to that company". The Terms never use "convert". The word is used site-wide (Pricing.tsx:55 "converting the Florida LLC you already have").
   - Replace with: Adding series to an existing Florida LLC (site-wide). Ruling needed.
   - Ruling, 2026-09-19: Use adding protected series to an existing Florida LLC in visible service wording; keep internal codes and existing orders compatible.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **83. [B45]** — **open** — waits on Adam's ruling
   - Management structure step, the "Recommended" badge and the panel title — `webapp/src/components/forms/florida-llc/sections/StepManagement.tsx:95`
@@ -687,7 +772,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: Shows the chosen date.
   - True: The date box (StepEffectiveDate.tsx:71-78, type="date") stores YYYY-MM-DD, so the review prints "2026-10-01" while every other date the client sees is written out (NameCheck.tsx:14-21 fmtDate).
   - Replace with: Format the value as "October 1, 2026" (the fmtDate pattern from NameCheck.tsx).
-  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
 - **85. [B47]** — **implemented**
   - Managers step and Initial members step, the type dropdowns — `webapp/src/components/forms/florida-llc/RepeatablePartyFields.tsx:89`
   - Reads: <SelectItem value="ENTITY">Business Entity</SelectItem>
@@ -695,7 +781,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: RepeatableMemberFields.tsx:85 calls the same choice "Entity" under "Member type" (line 73); Review prints "Business entity" for an agent (ReviewStep.tsx:137).
   - Replace with: Label "Manager type"; items "Individual" / "Business entity" on both steps.
   - **Codex rejected the proposed replacement:** Use Manager type on managers and Member type on members; do not label both steps Manager type. Standardize option capitalization.
-  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 08 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit c22d47592edf06826e0bfbad69f42e349dda44f7, batch 08 revision 2, package 60ae581a29df. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **86. [B48]** — **open** — waits on Adam's ruling
   - Your information, Initial members, Managers and Correspondence steps — the address block's State box — `webapp/src/components/forms/florida-llc/sections/StepClient.tsx:101`
@@ -711,7 +798,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The form is mailed.
   - True: The package's own deadline text says "Your Form 2553 must be filed (postmarked or faxed) by …" (form2553Timing.ts:95-96); A65 records the same mail/fax mismatch in the portal dialog.
   - Replace with: You review, sign, and fax or mail it; there is no IRS filing fee.
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **88. [B50]** — **dropped**
   - Series step, "How ownership works in this structure" — `webapp/src/components/forms/florida-llc/sections/StepSeries.tsx:98`
   - Reads: No series has its own separate owners, and ownership cannot differ from one series to the next.
@@ -727,7 +815,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The agreement is generated only after the portal questionnaire (A31; Terms s. 4 "completed with the information and the choices you make in the questionnaire"). The page is dead code (A26), so the fix is deletion; if kept, the sentence is wrong.
   - Replace with: Delete the page with the step (A26); otherwise: "Once the state accepts the filing, we post the filed documents and the Owner’s Manual to your portal; a short questionnaire there then completes your form Operating Agreement."
   - Codex (housekeeping-only): StepSubmissionPayload.tsx:56–58 promises the agreement with filed documents, but the submit page is unreachable through the normal form flow (65). No current reader sees this page.
-  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 19 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **90. [B52]** — **implemented** — waits on Adam's ruling
   - Name check result, the "held" verdict line — `webapp/src/components/forms/florida-llc/NameCheck.tsx:45`
@@ -739,7 +828,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - **Codex rejected the proposed replacement:** Describe a recently inactive record and this service’s conservative one-year hold; distinguish statutory administrative and other dissolution periods and avoid treating last transaction as proven dissolution.
   - Corrected after Codex's review: Do not assert a dissolution the data does not prove. Describe a recently inactive record and this service's one-year hold; cite s. 605.0715(5) and s. 605.0717(2).
   - Ruling, 2026-09-22: Keep the conservative inactive-name block; describe a recently inactive record without claiming the record proves dissolution. Apply consistently to the client and server explanations.
-  - Fixed: batch 29 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 29 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 835aff445f27531b0972f057514ce2b4cb37b993, batch 29 revision 4, package 5a1b075c3b93. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
   - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
@@ -752,14 +842,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): validation.ts:224 rejects PS-4; reproduced with imported helper. Statute605.2202 requires the abbreviation, not whitespace. But the suggested boundary substitution alone leaves dedupeKey(PS-4) as -4 and dedupeKey(PS 4) as4, contradicting the proposed equivalence.
   - **Codex rejected the proposed replacement:** Accept punctuation boundaries and explicitly normalize separator punctuation consistently in canonicalization and deduplication; do not promise hyphen/space equivalence from the boundary regex alone.
   - Corrected after Codex's review: Changing the boundary alone leaves 'PS-4' and 'PS 4' with different duplicate keys (reproduced: 'PS-4' vs '4'). Normalize the separator in the name rule, the canonical form and the duplicate key together.
-  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
 - **92. [B56]** — **implemented**
   - Order form, Name step: the backup-name rule — `webapp/src/components/forms/florida-llc/validation.ts:38`
   - Reads: export function nameContainsLegalDesignator(name: string): boolean { const lower = name.toLowerCase(); return ["limited liability company", "professional limited liability company", "llc", "l.l.c.", "pllc", "p.l.l.c."].some((d) => lower.includes(d)); }
   - Claims: A name carries a designator whenever the letters "llc" appear anywhere in it. stepValidation.ts:134-136 (and server/validation.ts:152-157) then refuse the backup name with "Leave the designator off — your designator above is added automatically."
   - True: "Millcreek Holdings", "Hillcrest Rentals", "Wellcome Farms" and "Fullcircle Properties" all contain "llc" inside a word and carry no designator; the client cannot enter any of them as a backup, and the message tells them to remove a designator that is not there. s. 605.0112(1)(a) (opened) requires the words or abbreviation as the entity indicator, not the letter sequence.
   - Replace with: Match a designator as its own word, at the end of the name: /(^|[\s,])(p\.?l\.?l\.?c\.?|l\.?l\.?c\.?|(professional\s+)?limited\s+liability\s+company)\s*$/i — used by nameContainsLegalDesignator and by the endsWith test in buildFinalLlcName (:27-33).
-  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
 - **93. [B57]** — **implemented**
   - Order form, Name step: a typed professional designator on a standard LLC — `webapp/src/components/forms/florida-llc/validation.ts:27`
   - Reads: const hasIt = lower.endsWith("llc") || lower.endsWith("l.l.c.") || lower.endsWith("limited liability company") || lower.endsWith("pllc") || lower.endsWith("p.l.l.c.") || lower.endsWith("professional limited liability company"); if (hasIt) return cleaned;
@@ -769,7 +861,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): validation.ts:27–34 accepts Acme PLLC unchanged even if LLC is selected; reproduced. The replacement tells the user to choose Professional LLC, an option absent from StepIntro, and only supplies the error for one direction of mismatch. 621.12(2)(a) also allows chartered; its text must not be reduced to an exhaustive three-option legal rule.
   - **Codex rejected the proposed replacement:** Validate the actual final suffix against the chosen supported product type, provide both mismatch messages, and use Domestic Florida PLLC as the option label.
   - Corrected after Codex's review: The option is labelled 'Domestic Florida PLLC'; check the typed ending against the chosen type in both directions; s. 621.12(2)(a) also permits 'chartered'.
-  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
 - **94. [B59]** — **implemented**
   - Order form, Members step, the empty-list refusal — `webapp/src/components/forms/florida-llc/stepValidation.ts:291`
   - Reads: "At least one initial member is required for internal formation records."
@@ -777,7 +870,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The step only runs for member-managed companies (:289 returns early otherwise), whose members are filed on the Articles as AMBR (filing.ts:537-568) and are public; StepMembers.tsx:52 tells the client that on the same screen.
   - Replace with: "At least one member is required — in a member-managed company the members are listed on the Articles of Organization."
   - **Codex rejected the proposed replacement:** Use separate conversion wording: an existing LLC’s members here are for its agreement, not new Articles. Proposed unconditional replacement is false on conversion.
-  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 08 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit c22d47592edf06826e0bfbad69f42e349dda44f7, batch 08 revision 2, package 60ae581a29df. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **95. [B62]** — **implemented** — related: 198
   - Order form banner, on the conversion path — `webapp/src/pages/FormLLC.tsx:15`
@@ -787,10 +881,12 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: On the conversion path: eyebrow "Florida Protected Series LLC", title "Convert your existing LLC into a <em>Florida Protected Series LLC</em>"; the formation wording stays for a new LLC.
   - **Codex rejected the proposed replacement:** Say “Add protected series to your existing Florida LLC”; proposed “Convert” perpetuates82’s terminology mismatch.
   - Part "eyebrow" — implemented: On the existing-LLC path the banner's eyebrow still says formation. — same defect as 198
-  - Fixed (eyebrow): batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (eyebrow): batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
   - Part "title" — implemented: The banner title on the existing-LLC path. (waits on ruling:82)
-  - Fixed (title): batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (title): batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **96. [B142]** — **implemented** — same defect as 90
   - Order form, LLC name step and Submit — why a name is unavailable when the record is inactive — `webapp/server/routes-payments.ts:327`
@@ -800,7 +896,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: "it belongs to a company that recently went inactive in the Division's records, and Florida can protect such a name for up to a year" (routes-payments.ts:330 and NameCheck.tsx:45); sunbiz.ts:245 `; recently inactive — the name may still be protected (s. 605.0715(5), Fla. Stat., for an administrative dissolution)`.
   - Codex (duplicate): Same unsupported dissolved-from-inactive explanation as90, repeated at routes-payments.ts:327–331 and sunbiz.ts:245; not marked same defect as in the open list.
   - Corrected after Codex's review: Also a live copy at stepValidation.ts:123; the hold uses last_txn_date/file_date, not a verified dissolution date.
-  - Fixed: batch 29 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 29 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 835aff445f27531b0972f057514ce2b4cb37b993, batch 29 revision 4, package 5a1b075c3b93. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
   - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
@@ -810,7 +907,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: If the agent changes, the $125 fee applies.
   - True: A change of agent is its own $25 filing — pricing.ts:77-81 charges "FL state fee — change of registered agent" at $25 and no Articles fee on a conversion; filing.ts:297 itself titles the group "Change of registered agent ($25) — Statement of Change". The ledger's own line (docs/facts.md:40 "a conversion skips both unless it changes its agent") carries the same ambiguity.
   - Replace with: value: "Protected Series Designations for an existing Florida LLC — filed online at the Division, $25 each; no Articles and no $125 Articles-and-agent fee; if the client took our agent service, the change of agent is a separate $25 Statement of Change, listed below",
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **98. [B145]** — **open**
   - Office, formation copy sheet — the empty Other Provisions box — `webapp/server/filing.ts:427`
@@ -825,7 +923,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The citation form for the statute.
   - True: The consent route in the same portal writes "(s. 605.2202, Fla. Stat.)" (routes-portal.ts:1593, :1599); this file, routes-portal.ts:1977, stepValidation.ts:189 and StepSeries.tsx:72 write "§605.2202". The statute itself (s. 605.2202(2)(b), read whole in the browser) requires the phrase "protected series" or the abbreviation "P.S." or "PS" — the rule is right, the citation form is the A64 defect in one more file.
   - Replace with: message: 'Series names must include "PS", "P.S.", or "protected series" (s. 605.2202, Fla. Stat.).',  — and the same form at routes-portal.ts:1977, stepValidation.ts:189, StepSeries.tsx:72.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **100. [A30h]** — **implemented** — housekeeping
   - Housekeeping: review rows printing codes or "—" for a self-agent's email/phone; no "exact name only" row on the Review name card; dead duplicate-member check; dead conversion branch in the formation sheet; member fields typed but never asked; ledger lacks the $99 renewal, 15/30-day rules and the four optional prices.
@@ -833,15 +932,18 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - **Codex rejected the proposed replacement:** Split visible wording/record defects from unused code. No concrete unified replacement is supplied, and ledger omissions are not false customer claims.
   - Corrected after Codex's review: A compound item, now split into three parts: the visible Review rows, the unused code, and the fact ledger's omissions.
   - Part "review-rows" — implemented: Review rows print codes or a dash for a self-agent's email and phone; the Review name card has no 'exact name only' row.
-  - Fixed (review-rows): batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (review-rows): batch 08 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit c22d47592edf06826e0bfbad69f42e349dda44f7, batch 08 revision 2, package 60ae581a29df. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
   - Part "unused-code" — implemented: The dead duplicate-member check, the dead conversion branch in the formation sheet, and member fields typed but never asked. Item 112 is the same dead check.
-  - Fixed (unused-code): batch 19 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections (unused-code): batch 19 revision 2, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
   - Part "fact-ledger" — implemented: The fact ledger lacks the $99 renewal, the 15- and 30-day rules and the four optional prices.
-  - Previous fix (fact-ledger): 27 r3, commit ; 1 assertion(s) retained. Replacement attempt: 28 r1, work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57.
-  - Previous fix (fact-ledger): 27 r3, commit ; 1 assertion(s) retained. Replacement attempt: 28 r2, work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b.
-  - Fixed (fact-ledger): batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Previous fix (fact-ledger): 27 r3, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 28 r1, work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57.
+  - Previous fix (fact-ledger): 27 r3, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 28 r2, work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b.
+  - Implemented protections (fact-ledger): batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
   - 2026-09-22 superseded by approved replacement: prior fix 27 r3 at ; approved work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57
@@ -853,7 +955,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: Per the comment at :26-27, that on a conversion 'whatever was typed on the new-formation path before switching stays off the record'.
   - True: finalName is computed at :16-19 from data.desiredLlcName and data.llcDesignator and sent regardless, so an abandoned typed name still reaches llcName.finalName; filing.ts:365 and order-summary.ts:151 print that value. The order's own name is safe only because routes-payments.ts:363-365 prefers existingLlcName on a conversion.
   - Replace with: ? { desiredName: "", designator: "", finalName: "", alternateNames: [], exactNameOnly: false }
-  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 02 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f902a8e41b973f62a96ca6c39067c33ae0fb61a2, batch 02 revision 1, package 57ca7c2f44aa. This records implementation, not acceptance or publication.
 - **102. [B19]** — **implemented** — housekeeping
   - Order form, the payload built at submit — `webapp/src/components/forms/florida-llc/buildPayload.ts:159`
   - Reads: exactNameOnly: data.exactNameOnly === true,
@@ -861,7 +964,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The same fact is sent at :39 under llcName.exactNameOnly, and on a conversion the two disagree (:29 forces false; :159 carries the typed value). Two values for one fact.
   - Replace with: Drop one of the two; keep llcName.exactNameOnly and read it wherever acknowledgments.exactNameOnly is read.
   - Codex (housekeeping-only): buildPayload.ts:29 forces llcName.exactNameOnly false on conversion while :159 duplicates the stale original in acknowledgments.
-  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 19 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **103. [B20]** — **implemented** — housekeeping
   - Order form, the payload built at submit, metadata — `webapp/src/components/forms/florida-llc/buildPayload.ts:176`
@@ -870,7 +974,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: It does: routes-payments.ts:346 'payload.metadata.ipAddress = clientIp(c);'. The TODO is stale.
   - Replace with: ipAddress: "", // the server fills this from the request (routes-payments.ts)
   - Codex (housekeeping-only): buildPayload.ts:176 still marks IP filling TODO; routes-payments.ts:346 already assigns clientIp(c).
-  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 19 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **104. [B22]** — **open** — housekeeping
   - Order form, the street-address box component — `webapp/src/components/forms/florida-llc/AddressAutocomplete.tsx:21`
@@ -889,7 +994,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): The SERVICE rendering branch at StepRegisteredAgentAcceptance.tsx:37–56 is unreachable, but proposed deletion also removes line19 isService, which the surviving effect still reads at :28.
   - **Codex rejected the proposed replacement:** Delete the dead rendering branch while preserving isService until its remaining effect use is refactored; the replacement as specified leaves an undefined identifier.
   - Corrected after Codex's review: Delete the unreachable screen (lines 37-56) only; isService on line 19 is still read by the effect at line 28.
-  - Fixed: batch 19 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 19 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **106. [B53]** — **implemented** — housekeeping
   - Certification & signature step, the electronic signature error — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:355`
@@ -898,7 +1004,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The whole block is already inside data.articlesSignerChoice === "SELF" (line 348); the second test is dead.
   - Replace with: (sigMismatch
   - Codex (housekeeping-only): StepCertification.tsx:355 repeats articlesSignerChoice===SELF inside the same condition at :348.
-  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 19 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **107. [B54]** — **dropped** — housekeeping
   - Registered agent step, the service card on a conversion — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx:57`
@@ -915,7 +1022,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The field is defaulted (defaults.ts) and reset by raService.ts and has no box on any step and no slot in SubmissionPayload (types.ts:267-287); grep across src and server finds no other reader.
   - Replace with: Delete the field from FloridaLLCFormData, defaults.ts, schema.ts and raService.ts.
   - Codex (housekeeping-only): types.ts:171 defines registeredAgentIsAffiliatedPerson; defaults/raService assign it and schema requires it, but no UI or payload consumer uses it.
-  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 19 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **109. [B68]** — **open** — housekeeping
   - Order form data model: a preparation fee filed under state fees — `webapp/src/components/forms/florida-llc/types.ts:329`
@@ -932,7 +1040,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: server/validation.ts does not require a member (manager-managed orders carry none; blank scaffold rows are dropped by memberRowIsBlank, validation.ts:55-59); the agent address rule applies only when the client is the agent; and no HTML/script rejection exists there. The list describes an intention from before the server existed.
   - Replace with: Delete the block, or replace it with one line: "The server re-runs the Zod schema and the rules in server/validation.ts; keep the two in step."
   - Codex (housekeeping-only): validation.ts:203–216 lists unconditional member and HTML-rejection expectations absent from server/validation.ts; it is a stale internal comment.
-  - Fixed: batch 19 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 19 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **111. [B70]** — **implemented** — housekeeping
   - Order form rules file: two exports only tests call — `webapp/src/components/forms/florida-llc/validation.ts:74`
@@ -941,7 +1050,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: No step asks a percentage (RepeatableMemberFields.tsx:32-35 seeds ownershipPercentage undefined and renders no box); the only caller of ownershipPercentageWarning is validation.test.ts, and totalOwnershipPct has none outside this file.
   - Replace with: Delete both functions and their test, with the MemberEntry fields A30h names.
   - Codex (housekeeping-only): validation.ts:74–92 exports unused percentage helpers; RepeatableMemberFields.tsx has no ownership boxes and production references search finds no caller.
-  - Fixed: batch 19 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 19 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **112. [B140]** — **implemented** — housekeeping; same defect as 100 (unused-code)
   - Order form, Submit — the second member check — `webapp/server/routes-payments.ts:308`
@@ -950,7 +1060,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: It never gets here: orderFormSchema (validation.ts:128-134) already refuses the same case as an issue on the members path with "At least one initial member is required.", and :290-296 returns before this line. Two wordings, one dead. (A30h.)
   - Replace with: Delete lines 305-310.
   - Codex (duplicate): Same dead second member validation explicitly included in100: routes-payments.ts:308–310 is preceded by orderFormSchema rejection using server/validation.ts:128–134.
-  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 19 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **113. [B141]** — **implemented** — housekeeping
   - Server, payment routes — the name-check docstring sits over the contact form — `webapp/server/routes-payments.ts:627`
@@ -959,7 +1070,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The route beneath (:635-665) is /contact; /name-check is at :688.
   - Replace with: Move the four-line docstring to sit above `app.post("/name-check", …)` at line 688.
   - Codex (housekeeping-only): routes-payments.ts:627–631 name-check docstring precedes contact route at635, while actual name-check route is688.
-  - Fixed: batch 19 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 19 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **114. [B146]** — **implemented** — housekeeping
   - Office, copy sheet module — the dead conversion branch and an orphan docstring — `webapp/server/filing.ts:320`
@@ -968,7 +1080,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: filing.ts:306 `if (p.filingPath === "CONVERT") return conversionGroups(p);` returns before this code for every conversion, so the branch is unreachable (A30h). Also filing.ts:187-188 `/** The registered agent's rows, shared by the Articles sheet and the conversion sheet's change-of-agent filing. */` sits above RA_SERVICE_SIGNER, not raFields (:198).
   - Replace with: value: "New Florida LLC", statement: true, }, — delete lines 323-328 — and move the docstring at 187-188 to line 197, above `function raFields`.
   - Codex (housekeeping-only): The conversion branch duplicates100, but this item also uniquely identifies a misplaced docstring at filing.ts:187–188 above RA_SERVICE_SIGNER instead of raFields(:198). Both changes affect internal code/comments, not reader output.
-  - Fixed: batch 19 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 19 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 29d7b470bcedcd03abe4842f171fb624f3e497ff, batch 19 revision 2, package c47e7180b81b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 19 revision 1; proceed with revision 2.
 - **N1.13. [substantive]** — **implemented**
   - Formation order, recovery after a payment-fulfillment failure — `webapp/server/routes-payments.ts:55`
@@ -981,14 +1094,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: A paid status means the client account and purchased services have already been fulfilled, so retry can return.
   - True: The paid transition at:55–60 precedes client creation/linking at:69–83 and purchased-service insertion at:93–104. A database failure after the claim leaves status paid with missing account or service; a retried webhook returns at:60 and can mark the event processed at:501–502. This is a statically verified failure path, not a claim of an observed production outage.
   - Replace with: Make fulfillment a resumable idempotent operation: distinguish payment recorded from fulfillment completed, insert/link the client and each purchased service idempotently, and mark completion only after all required records exist. Retry incomplete paid orders without charging again.
-  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
 - **N4.01. [substantive]** — **implemented**
   - Order form, Managers and Initial members: changing a row between a person and a business, then opening its agreement — `webapp/src/components/forms/florida-llc/RepeatablePartyFields.tsx:81`
   - Reads: update(entry.id, { personOrEntity: v as PartyKind })
   - Claims: The selected Person/Business Entity type identifies the legal party used in the review, state filing, and operating agreement.
   - True: RepeatablePartyFields.tsx:81–83 and RepeatableMemberFields.tsx:75–78 change only the discriminator and retain hidden names. buildPayload.ts:86,97 preserves both. ReviewStep.tsx:198,221 uses the discriminator, but routes-portal.ts:94–99,108–114,127–132 chooses any retained personal name before entityName/businessEntityName and infers isEntity from name absence. Enter John Smith, switch to Entity and enter Acme LLC: review identifies Acme LLC, while the OA seed identifies John Smith as an individual. In the reverse manager switch, filing.ts:512–523 instead prefers the retained businessEntityName. This is a reproducible deterministic data-path mismatch, not evidence of an actual customer document.
   - Replace with: When the row type changes, clear fields belonging to the other type. In the review, filing sheet, and agreement seed, choose the name and entity-signature treatment from memberType or personOrEntity; never infer the selected type from whichever hidden name remains populated.
-  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 02 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f902a8e41b973f62a96ca6c39067c33ae0fb61a2, batch 02 revision 1, package 57ca7c2f44aa. This records implementation, not acceptance or publication.
 - **N4.02. [substantive]** — **implemented**
   - Order form, Effective date: a Florida calendar date is shifted back one day — `webapp/src/components/forms/florida-llc/validation.ts:139`
   - Reads: Effective date cannot be more than 5 business days before the filing date.
@@ -996,7 +1111,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: validation.ts:128 parses YYYY-MM-DD as UTC, then :136 changes hours in the local time zone. Read-only imports under TZ=America/New_York with anticipated filing September 16, 2026 at noon rejected September 9 (the fifth preceding weekday) and accepted December 16 (91 calendar days later). Section 605.0207(2)(a)–(b), opened in the 2026 Online Sunshine chapter, permits five prior business days and 90 later days: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html. This is separate from prior61, which concerns the assumed filing day.
   - Replace with: Parse the year, month, and day as a Florida calendar date and compare Florida calendar dates; accept September 9 and reject December 16 when the anticipated filing date is September 16, 2026. Keep the five-business-day and 90-day messages only after applying those boundaries correctly.
   - Corrected after Codex's review: Reproduced in America/New_York: 9 Sep refused and 16 Dec accepted for a 16 Sep filing; correct in UTC.
-  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
 - **N4.03. [substantive]** — **implemented**
   - Order form, Effective date: bank holidays are counted as business days — `webapp/src/components/forms/florida-llc/validation.ts:109`
   - Reads: return day !== 0 && day !== 6;
@@ -1004,7 +1120,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: isBusinessDay excludes only Saturday and Sunday. Read-only evaluation returns true for Labor Day, September 7, 2026. Section 605.0102(9), opened on 2026 Online Sunshine, excludes days a national banking association is not open for normal business transactions; s.605.0207(2)(a) uses that business-day term. https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html Federal Reserve holiday calendar identifies September 7, 2026 as Labor Day: https://www.federalreserve.gov/aboutthefed/k8.htm. The earliest permitted date is therefore calculated too late around a bank holiday, independently of the UTC defect.
   - Replace with: Count only Monday through Friday dates on which national banking associations are open for normal business transactions, including observed bank-holiday rules, when computing the five-business-day lookback.
   - Corrected after Codex's review: Reproduced: Labor Day (7 Sep 2026) counts as a business day; s. 605.0102(9) excludes days a national bank is closed.
-  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
 - **N4.04. [substantive]** — **open**
   - Order form, Business purpose: the clause promised in every Articles filing is never added — `webapp/src/components/forms/florida-llc/sections/StepPurpose.tsx:65`
   - Reads: Your Articles will always include a general purpose covering any lawful business activity, so your LLC is never limited to one line of business.
@@ -1018,7 +1135,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: When the optional-purpose checkbox is unchecked, no specific purpose is requested for the ordinary LLC.
   - True: StepPurpose.tsx:23 resets an ordinary LLC only when purposeType is empty. Returning from PLLC preserves purposeType PROFESSIONAL and its text; :18 makes addingSpecific false, so the checkbox is unchecked and :101 hides the text box. server/validation.ts:167–171 permits this combination; buildPayload carries the purpose and filing.ts:416–417 still appends the retained professional text. Thus a client who switches to an ordinary LLC can receive Articles with the previous professional-purpose clause while this screen presents an unchecked optional-purpose box.
   - Replace with: When changing from PLLC to an ordinary LLC, reset purposeType to GENERAL and clear the former professional purpose, or visibly ask the client to retain it as a SPECIFIC purpose. Reject inconsistent type/purpose combinations on the server.
-  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 08 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit c22d47592edf06826e0bfbad69f42e349dda44f7, batch 08 revision 2, package 60ae581a29df. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **N4.06. [substantive]** — **implemented**
   - Payment confirmation, Resend the email: failure is reported as sent — `webapp/src/pages/OrderConfirmed.tsx:26`
@@ -1026,21 +1144,24 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The requested welcome/password-setting email has been successfully sent.
   - True: routes-payments.ts:618–621 catches a rejected sendMail call, logs it, and unconditionally returns sent:true. OrderConfirmed.tsx:23–26 trusts that flag. If the mail provider fails, the client sees Sent and loses the resend button despite no accepted delivery. Unlike prior64, this occurs for an otherwise eligible paid order and does not concern filed/formed eligibility. Correct behavior requires returning an API error on failed sendMail, preserving the resend control, and using the existing success sentence only after sendMail succeeds.
   - Replace with: Could not send the email. Please try again.
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **N4.07. [substantive]** — **implemented**
   - Order form, Adding series to an existing LLC while keeping its registered agent: the agent’s agreement is absent from the certification — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:117`
   - Reads: I am authorized to act for ${company}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations.
   - Claims: The listed confirmations cover the facts the service needs to file protected-series designations for an existing LLC.
   - True: 2026 s.605.2203(2) requires an agreement with the registered agent covering the company and each protected series before delivery of a designation; subsection(3) says the designation signer affirms this as fact. Opened text: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html. StepRegisteredAgent records the retained agent’s details and Florida-address acknowledgment but no agreement to serve every series; FloridaLLCFormationForm.tsx:296–298 hides acceptance for CONVERT+SELF; the certification at StepCertification.tsx:90–120 addresses authority and member consent only. This proves a missing intake confirmation, not that any particular agent has refused or no off-platform agreement exists. Add the proposed confirmation before filing and retain evidence or verification of the agreement.
   - Replace with: I am authorized to act for ${company}, its members have consented to establishing the protected series on this order, and I authorize MyFloridaSeriesLLC to prepare and file the Protected Series Designations with the Florida Division of Corporations. I confirm that the company’s registered agent has agreed to serve as registered agent for the company and every protected series in this order.
-  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 06 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 00628225d59793891b00ab4aebe23468b104cdbd, batch 06 revision 1, package 6427938798ff. This records implementation, not acceptance or publication.
 - **N4.08. [substantive]** — **implemented**
   - Order form, Management structure explanation: a transfer is incorrectly said to confer management — `webapp/src/components/forms/florida-llc/sections/StepManagement.tsx:106`
   - Reads: If a share later passes to a trust, a holding company, or a passive investor, the new owner inherits management authority — and the exposure — too.
   - Claims: A transfer of the ownership/economic interest automatically gives the recipient management authority in a member-managed LLC.
   - True: templates-oa-member.md:284–286 (§§10.2–10.3) expressly makes a transferee economic-only until admitted under §12.1; :308 imposes admission conditions. I opened those sections. The 2026 text of s.605.0502(1)(c), opened on Online Sunshine, likewise distinguishes transfer from management rights: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html. Admission can confer membership rights; receiving the transferred economic interest alone does not.
   - Replace with: If a transferee is admitted as a member of a member-managed LLC, the new member gains management rights and duties; receiving only an economic interest does not confer management authority.
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **N4.09. [substantive]** — **implemented**
   - Order form, changing to Member-managed after partially entering a manager: checkout validates the hidden manager — `webapp/src/components/forms/florida-llc/stepValidation.ts:258`
@@ -1048,7 +1169,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: An abandoned manager entry does not need completion once the member-managed path hides Managers.
   - True: FloridaLLCFormationForm.tsx:299 hides the step and stepValidation.ts:259 returns no manager errors, but submission :449–453 sends raw managers. schema.ts:178 validates all manager rows regardless of structure; server/validation.ts:342–374 never strips them. Read-only pure-function reproduction with MEMBER_MANAGED and a retained manager email invalid returned {} from validateStep(managers,...) and a server Enter a valid email issue at managers.0.email. Missing address fields similarly remain required. This differs from prior57’s missing visible email error: switching paths preserves an inapplicable row that blocks checkout.
   - Replace with: Before submitting or validating a member-managed order, omit abandoned manager rows that are inapplicable to the selected structure; apply the same rule on the server. If previously entered members are intentionally retained for the agreement after the reverse switch, display and validate them explicitly rather than hiding their errors.
-  - Fixed: batch 08 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 08 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit c22d47592edf06826e0bfbad69f42e349dda44f7, batch 08 revision 2, package 60ae581a29df. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Supersede the failed review revision to complete the omitted tests already authorized with Batch 08; product decisions unchanged. Adam: why did you need to stop and ask me.  if you need to do the tests, just fucking do them and dont waste my time
 - **N4.10. [wording]** — **implemented**
   - Payment confirmation reopened after filing or formation: the status message still says preparation has just begun — `webapp/src/pages/OrderConfirmed.tsx:101`
@@ -1056,14 +1178,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The current order is still awaiting filing and formation.
   - True: OrderConfirmed.tsx:58,63 deliberately treats paid, filed, and formed as paid, but :101–103 renders this same future-tense message for all three. A formed order can therefore show both an already-completed server state and a claim that its filing is being prepared. The conversion branch has the parallel stale claim about series being established. This is independent of prior64’s login/resend mismatch.
   - Replace with: Paid: “We’re preparing your filing.” Filed: “Your filing has been submitted.” Formed: “Your LLC has been formed.” For an existing LLC’s series order, use “Your protected series have been established” at completion. Render the message for the actual order status.
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **N4.11. [wording]** — **implemented**
   - Order form, Registered agent acceptance and Review: the agent’s suffix disappears — `webapp/src/components/forms/florida-llc/sections/StepRegisteredAgentAcceptance.tsx:24`
   - Reads: const raFullName = [data.registeredAgentFirstName, data.registeredAgentLastName]
   - Claims: The acceptance name carried over from the agent step is the complete legal name that the client entered.
   - True: The agent step collects registeredAgentSuffix, and buildPayload.ts:48 includes it in fullName; the acceptance prefill at StepRegisteredAgentAcceptance.tsx:24–30 omits it. ReviewStep.tsx:141–142 independently renders first and last name only. For John Smith Jr., acceptance and review show John Smith while the payload/filing identify John Smith Jr. This is a consistency defect, not a claim that every signature missing a suffix is legally invalid. Prior62 concerns absent signature/name comparison, not this loss of a collected name component.
   - Replace with: const raFullName = [data.registeredAgentFirstName, data.registeredAgentLastName, data.registeredAgentSuffix].map((x) => (x ?? "").trim()).filter(Boolean).join(" "); Use the same complete-name helper in Review.
-  - Fixed: batch 06 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 06 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 00628225d59793891b00ab4aebe23468b104cdbd, batch 06 revision 1, package 6427938798ff. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B1-N03. [wording]** — **implemented**
   - Formation order form, any street-address suggestion box after the client clears or shortens the street. — `webapp/src/components/forms/florida-llc/AddressAutocomplete.tsx:54`
   - Reads: if (!SMARTY_KEY || text.trim().length < 4) {
@@ -1071,7 +1195,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The early return at54–57 runs before clearTimeout at59; pending fetch results at99–100 repopulate/open suggestions without checking current input. Offline execution of the exact extracted query body: type100main, clear input, resolve the pending mock fetch; current value is empty but old100MAINST suggestions reopen. This is distinct from prior69 state coercion and104 unused onBlur.
   - Proposed replacement (not approved): Cancel the pending debounce timer and abort the active request at the start of every query, before the short-query return. Apply results only if that request is still current and not aborted. Cancel pending work on selection and component unmount as well.
   - Rechecked by codex-reader-5: Read actual AddressAutocomplete45–129: short-query return precedes timeout cancellation, and completion has no request-current guard. Choosing also leaves scheduled work. Proposed cancellation/current-request protection addresses demonstrated mechanism. Priors69/104 concern state coercion and unused blur prop, not stale results. Severity may be wording/usability rather than substantive data loss.
-  - Fixed: batch 22 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 22 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 3577d25d6c452215171683deb3f5ffc5e0c9636b, batch 22 revision 1, package fe903fe17147. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B2-01. [substantive]** — **implemented**
   - Order form, Create your protected series, full-name preview after changing to an existing LLC — webapp/src/components/forms/florida-llc/sections/StepSeries.tsx:31 — `webapp/src/components/forms/florida-llc/sections/StepSeries.tsx:31`
   - Reads:     buildFinalLlcName(data.desiredLlcName, data.llcDesignator) ||
@@ -1079,7 +1204,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: StepFilingPath.tsx:67 changes filingPath without clearing a previous desiredLlcName. StepSeries.tsx:30–34 prioritizes that abandoned new-company name before existingLlcName. The preview at190 therefore shows Old Name, LLC for a client now adding series to Existing Holdings, LLC. buildPayload.ts:30–31 already clears the new-name payload; prior101/155 cover payload/seed, not this surviving preview. Pure expression reproduction is retained; rendered recheck pending.
   - Proposed replacement (not approved): const llcName = (data.filingPath === "CONVERT" ? (data.existingLlcName ?? "").trim() : buildFinalLlcName(data.desiredLlcName, data.llcDesignator)) || "[Your LLC Name]";
   - Rechecked by codex-reader-5: Read StepSeries30–34, StepFilingPath67 and payload separation: abandoned desired name precedes selected existing name in preview. Replacement branches first and is correct. Related to prior101/155 abandoned-name family, but those exact payload/server fixes do not repair this independent preview expression; report crosslink, not regression of their fixed locations.
-  - Fixed: batch 22 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 22 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 3577d25d6c452215171683deb3f5ffc5e0c9636b, batch 22 revision 1, package fe903fe17147. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B2-02. [substantive]** — **implemented**
   - Order form, Your existing LLC, continuing after abandoning a new-company name — webapp/src/components/forms/florida-llc/stepValidation.ts:425 — `webapp/src/components/forms/florida-llc/stepValidation.ts:425`
   - Reads:   for (const [field, message] of Object.entries(englishTextProblems(data))) {
@@ -1087,7 +1213,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The newly added English-text scan validates every stored string, including hidden abandoned NEW name fields. With CONVERT, a valid existingLlcName and document number, and abandoned desiredLlcName Café, validateStep("name") returns a desiredLlcName error. ConversionName (StepName.tsx:78–131) displays only errors.existingLlcName/errors.sunbizDocumentNumber and no desired-name editor, so the client cannot see or correct the rejected field on this screen. The owner’s English-only rule remains; the defect is validation of discarded fields. Prior58 concerns a different server alternate-name equality check, which is fixed.
   - Proposed replacement (not approved): Before checking English characters, normalize the data to the active filing path and selected party/management types. Ignore discarded new-company fields when adding series to an existing LLC; continue checking every displayed or submitted business-text field. Show each remaining error beside a field the client can edit.
   - Rechecked by codex-reader-5: Read stepValidation425–428 and ConversionName30–132. English scan sees hidden desiredLlcName mapped to name step; conversion branch displays no desired-name editor or error. Custom Input permits onChange while marking invalid, so abandoned invalid text/legacy drafts can survive path switch. Preserve owner English-only rule while ignoring discarded fields. Prior58 is alternate-name equality; N2.20 is lossy PDF text handling, not hiddenfield deadend.
-  - Fixed: batch 22 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 22 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 3577d25d6c452215171683deb3f5ffc5e0c9636b, batch 22 revision 1, package fe903fe17147. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B2-03. [substantive]** — **implemented**
   - Order form, Your existing LLC, lookup results while editing the company name — webapp/src/components/forms/florida-llc/sections/StepName.tsx:53 — `webapp/src/components/forms/florida-llc/sections/StepName.tsx:53`
   - Reads:         setLookup({ forName: typed, available: r.available, matches: r.matches });
@@ -1095,7 +1222,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The effect at46–63 clears only its 700ms timer, not an already-started request. If request A starts, then B starts and completes, then A completes last, line53 overwrites the stored B result. current at64 becomes null because forName is A while typed is B, and the [typed]-only effect does not run again. Thus the current company choices disappear until the client edits again. This is a deterministic source race; no network timing was measured by this reader.
   - Proposed replacement (not approved): Ignore both success and failure completions from superseded lookup requests. Update looking only for the current request. Keep the current name’s matching response visible until that name changes.
   - Rechecked by codex-reader-5: Read full ConversionName effect46–64: cleanup cancels only timer; success/failure always set state for captured typed; stale A after B hides B through current-name comparison, with no rerun triggered by lookup change. Cancellation/current request guard handles both looking and result. No existing lookup race prior found; not address-state prior69.
-  - Fixed: batch 22 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 22 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 3577d25d6c452215171683deb3f5ffc5e0c9636b, batch 22 revision 1, package fe903fe17147. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch28-runtime-B-contact-form-fails-after-storing. [substantive]** — **implemented**
   - Contact page → Send, when the office email cannot be sent — `webapp/server/routes-payments.ts:663`
   - Reads:     await sendMail({
@@ -1103,7 +1231,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: Current handler inserts contact_messages657-660, then awaits sendMail663-668 without catch. A transport exception escapes before the success response670. The office contact-message listing still exists in routes-admin.ts:883 onward. Retrying can insert a second copy. No current provider failure injection was run.
   - Proposed replacement (not approved): Acknowledge durable message receipt even when the separate office notification fails, and retain a visible retryable delivery failure for the office. Update the comment that currently promises acknowledgment only after both. Idempotency is useful if added, but no claim of exactly-once delivery is warranted.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current handler inserts contact_messages657-660, then awaits sendMail663-668 without catch. A transport exception escapes before the success response670. The office contact-message listing still exists in routes-admin.ts:883 onward. Retrying can insert a second copy. No current provider failure injection was run.
-  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 - **AUD-claude-reconciled-batch29-reader-2-series-agreement-not-required-new-self. [substantive]** — **implemented**
   - Order form, Certify & sign step on a NEW formation where the client serves as their own registered agent: the tick 'I confirm that the company's registered agent has agreed to serve as registered agent for the company and each of its protected series…' — `webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:372`
@@ -1112,7 +1241,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: NEW SELF checkbox is rendered, but stepValidation.ts:385 requires it only for CONVERT; server/validation.ts:241-248 likewise checks it only under retained; buildPayload.ts:217 forces it false outside conversion. Current s.605.2203(2)-(3), independently opened, requires the company/series agent agreement before a designation and the signer affirms compliance. The code proves a displayed affirmative tick is discarded; no inference that the office actually filed an unlawful designation is made.
   - Proposed replacement (not approved): Require and preserve this displayed confirmation on every SELF path, keeping the current third-person certification unless the actual self-agent flow establishes the applicant is personally the agent. Verify unchecked refuses and checked survives payload/storage.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; NEW SELF checkbox is rendered, but stepValidation.ts:385 requires it only for CONVERT; server/validation.ts:241-248 likewise checks it only under retained; buildPayload.ts:217 forces it false outside conversion. Current s.605.2203(2)-(3), independently opened, requires the company/series agent agreement before a designation and the signer affirms compliance. The code proves a displayed affirmative tick is discarded; no inference that the office actually filed an unlawful designation is made.
-  - Fixed: batch 29 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 29 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 835aff445f27531b0972f057514ce2b4cb37b993, batch 29 revision 4, package 5a1b075c3b93. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
   - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
@@ -1123,7 +1253,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: Current seriesDedupeKey at validation.ts:177-180 only strips PS variants/case. New in-memory execution of the extracted current functions returned RENTAL versus RENTALS and SMITH & SONS versus SMITH AND SONS; both pairs remain distinct keys used by client/server duplicate checks. Opened ss.605.2202(1) and605.0112(1)(b): distinguishability applies, but statute includes filed-consent and excluded-filing qualifications. A statement that these particular filings will necessarily be refused was not independently tested. Proposed normalizeEntityName implementation at nameSimilarity.ts:23-39 is heuristic: drops AND completely and strips only final S; it is not a complete legal distinguishability oracle and the local list cannot check all existing filings.
   - Proposed replacement (not approved): Describe distinguishability accurately, preserve the consent exception where relevant, and apply tested local collision checks. Keep a separately identified office/live-record review for existing filings; do not promise complete statutory validation from this normalizer.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; Current seriesDedupeKey at validation.ts:177-180 only strips PS variants/case. New in-memory execution of the extracted current functions returned RENTAL versus RENTALS and SMITH & SONS versus SMITH AND SONS; both pairs remain distinct keys used by client/server duplicate checks. Opened ss.605.2202(1) and605.0112(1)(b): distinguishability applies, but statute includes filed-consent and excluded-filing qualifications. A statement that these particular filings will necessarily be refused was not independently tested. Proposed normalizeEntityName implementation at nameSimilarity.ts:23-39 is heuristic: drops AND completely and strips only final S; it is not a complete legal distinguishability oracle and the local list cannot check all existing filings.
-  - Fixed: batch 29 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 29 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 835aff445f27531b0972f057514ce2b4cb37b993, batch 29 revision 4, package 5a1b075c3b93. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
   - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
@@ -1135,7 +1266,9 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Florida establishes a protected series when a Protected Series Designation, signed for the company and filed with the Division of Corporations with the consent of all of its members, takes effect (§605.2201). There are no Articles to sign: your company already exists.
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 2: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md.
-  - Fixed: batch 31 revision 3, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 31 revision 3, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - **Owner retained the wording.** Technical lifecycle: implemented; protections do not mean the proposed wording change was made. Ruling: Batch 31 review item 2: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md.
+  - Implementation evidence: commit 4754c5116dcc2a0105acd4a0adede646d3c6f41a, batch 31 revision 3, package aaeabc755635. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 
@@ -1144,81 +1277,102 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 - **115. [A47]** — **implemented**
   - Questionnaire and amendment error "We couldn't find a formed LLC on your account yet" where the check is for a paid order. Replace: "a paid order".
   - **Codex rejected the proposed replacement:** Use “a paid order” for NO_LLC only; distinguish network/server errors rather than replacing every failed request with this explanation.
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **116. [A48]** — **implemented**
   - Consent dialog help "Leave blank to point at the Asset Schedule." prints a dash; and (mine) the consent prints "—" where the agreement's exhibit prints "None". Replace: both "None"; help says so.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **117. [A49]** — **implemented**
   - Consent adopter blocks (mine) carry a "Date:" line the agreement's exhibit blocks do not. Replace: drop it on exhibit blocks.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **118. [A50]** — **implemented** — related: 258
   - Consent exhibit "Initial Associated Assets" reads "Members" where the multi-member agreements read "Member(s)"; Asset Schedule four rows vs five. Replace: match the agreements.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **119. [A51]** — **implemented**
   - Consent dialog special-terms note omits Article 9 for S companies. Replace: add it.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **120. [A52]** — **implemented**
   - Consent document listed "New Protected Series — …" while the dialog says "Consent & Series Exhibit" and "Prepare the documents". Replace: title "Consent & Series Exhibit — [series]"; button "Prepare the consent".
   - Part "title" — implemented: The consent document's title in the portal: "Consent & Series Exhibit — [series]".
-  - Fixed (title): batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (title): batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
   - Part "button" — implemented: The dialog's button: "Prepare the consent".
-  - Fixed (button): batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (button): batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
   - Former part "all" (retired by 001-part-level-links, now title, button): The whole finding.
 - **121. [A53]** — **implemented**
   - S election dialog and "Editable until" row say the package is "deleted"; it is replaced with a record copy. Replace both to say so.
   - **Codex rejected the proposed replacement:** Say the editable original is removed and a record copy is normally posted; do not promise system-wide SSN destruction: backup.ts:13-14/17-28 retains ciphertext and Dropbox retains old files. Handle a failed record-copy rebuild explicitly.
-  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 03 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fae579f41b46e94b55a78ff08dd69d053488ddb8, batch 03 revision 1, package 6ee881943907. This records implementation, not acceptance or publication.
 - **122. [A54]** — **open**
   - Formed-first dialog S election branch: "…and that has been assigned an EIN." The form accepts Applied For. Replace: drop the clause.
   - Ruling, 2026-09-20: Batch 13 item 2 rejected: leave the issued-EIN prerequisite as is. Our Form 2553 filing package requires an issued EIN.
 - **123. [A55]** — **implemented**
   - EIN details dialog: "…application for Federal EIN — Acme, LLC." Replace: the company or series name.
-  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 02 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f902a8e41b973f62a96ca6c39067c33ae0fb61a2, batch 02 revision 1, package 57ca7c2f44aa. This records implementation, not acceptance or publication.
 - **124. [A56]** — **implemented**
   - Help "Additional Capital Calls" and its label: "a majority of the owners"; the agreement: Majority in Interest. Replace: "owners holding a majority of the ownership percentages".
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **125. [A57]** — **implemented**
   - Help, transfer on death: "the same rule that applies to lifetime transfers." Replace: majority in interest for a beneficiary or family transferee; all owners otherwise.
   - **Codex rejected the proposed replacement:** State explicitly that this is admission as a voting member, not permission to transfer. Say “For a TOD beneficiary or permitted family transferee, owners holding a majority of the remaining ownership interests must consent; other new members need all members’ consent.” Keep the signed-agreement requirement; outsider transfers separately require Manager and majority consent at :280.
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **126. [A58]** — **implemented**
   - S corporation warning (mine) cites Section 12.1 on forms where 12.1 is Amendments. Replace: "…its admission section admits only an eligible shareholder."
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **127. [A59]** — **implemented**
   - Sole-owner S title "Single-Member S Corporation…" vs pill "S Corporation"; "Amended & Restated (No. 2)" vs the document's full title. Replace: one label table; full title.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **128. [A60]** — **implemented**
   - Default dates from the device's UTC day (consent, questionnaire, amendment); two dates rendered in the viewer's zone. Replace: Florida's date from the server; formatDate.
   - Part "florida-date" — implemented: The consent, questionnaire and amendment forms default their dates from Florida's date given by the server, not the device's UTC day.
-  - Fixed (florida-date): batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (florida-date): batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
   - Part "viewer-zone-display" — implemented: The two dates rendered in the viewer's zone are formatted with formatDate.
-  - Fixed (viewer-zone-display): batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (viewer-zone-display): batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
   - Former part "all" (retired by 001-part-level-links, now florida-date, viewer-zone-display): The whole finding.
 - **129. [A61]** — **implemented**
   - Consent exhibit-identifier default fails for "Protected Series 4". Replace: accept that spelling.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **130. [A62]** — **implemented**
   - Spouse pairing "JTWROS". Replace: "Joint tenants with right of survivorship".
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **131. [A63]** — **implemented**
   - Amendment card names "Update/regenerate" under "Operating Agreement"; the button and heading read differently. Replace the button and heading.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **132. [A64]** — **implemented**
   - Two refusals cite "§605.2202" and "s. 605.2202, Fla. Stat.". Replace: the second.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 4 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 4 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **133. [A65]** — **implemented**
   - S election dialog "mail it" where the package recommends fax. Replace: "fax or mail it".
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **134. [A66]** — **implemented**
   - Help "Effective Date": "We've pre-filled today's date" true only the first time. Replace: say the saved date is kept.
-  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 01 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 3465320475ab690615f08cc3291f7cf186ebf814, batch 01 revision 1, package 2647aabafe93. This records implementation, not acceptance or publication.
 - **135. [B58]** — **implemented**
   - Client portal, operating agreement questionnaire, first screen, note under "Will there be more than one LLC owner?" — `webapp/src/pages/portal/OAQuestionnaire.tsx:432`
   - Reads: You'll list the owners by name on the next screen. Owners are never filed with the State, so this can differ from what you told us when the company was formed.
@@ -1228,7 +1382,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): Actual OAQuestionnaire.tsx:432 says “Owners are never filed with the State”, which is false for this product’s AMBR filings. But the finding’s replacement also says every ownership change requires amended Articles. 2026 s.605.0202(5) concerns inaccurate filed information; merely adding an owner need not make an existing authorized-member listing inaccurate (s.605.0201(3)(c) permits one or more members).
   - **Codex rejected the proposed replacement:** Keep the privacy correction, but say “If information on your filed Articles is no longer accurate, arrange the appropriate correction as well.” Do not prescribe amended Articles for every ownership change. Verified https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html .
   - Corrected after Codex's review: The privacy sentence is false for member-managed companies. But s. 605.0202(5) requires an amendment only when filed information became inaccurate; do not prescribe amended Articles for every ownership change.
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **136. [B60]** — **implemented**
   - Client portal, Orders in progress, the Consent & Series Exhibit dialog's opening sentence — `webapp/src/pages/portal/OrdersInProgress.tsx:311`
@@ -1236,7 +1391,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The statute itself permits establishment only on unanimous consent.
   - True: s. 605.2201(1) (opened): "With the affirmative vote or consent of all members of a limited liability company, the company may establish a protected series." — and s. 605.2107(1)(i) (opened) lets an operating agreement vary "the manner in which a series limited liability company approves establishing a protected series", so the statute's rule is a default, not an "only". The consent document itself says it correctly (templates-new-series.md:11: "a limited liability company may establish a protected series with the affirmative vote or consent of all of its members, and Section 3.1 of the Agreement requires that consent"), and new-series.ts:7-11 explains why. The comment at :137-139 repeats the dialog's overstatement.
   - Replace with: Florida's rule, unless an operating agreement changes it, is that a protected series is established with the consent of all members (s. 605.2201(1)), and Section 3.1 of your agreement requires exactly that.
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **137. [B61]** — **implemented** — waits on Adam's ruling
   - Client portal, Amendment to Operating Agreement page, the grey guidance box — `webapp/src/pages/portal/AmendAgreement.tsx:142`
@@ -1248,7 +1404,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - **Codex rejected the proposed replacement:** Ask whether an agreement has actually been adopted and use that answer. Suggested guidance: “If you are replacing an adopted agreement, select Amended and Restated. If you are correcting an unsigned first draft, select First operating agreement.” Do not disable First merely because a generation exists.
   - Corrected after Codex's review: A generated PDF is not an adopted agreement. Ask whether an agreement was adopted; do not disable 'first' merely because a generation exists. Ruling needed.
   - Ruling, 2026-09-20: Batch 14 approved: explicitly ask whether an agreement has been adopted, including oral or implied; correcting an unused draft stays a first agreement. Require a company-specific predecessor or outside/unknown-date choice for restatement.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **138. [B63]** — **optional — implemented**
   - Client portal, questionnaire help screen "Initial Contributions", the "If you're not sure yet" choice — `webapp/src/content/oaLearnMore.tsx:348`
   - Reads: List what you plan to contribute — the exhibits can be regenerated when the list changes. What matters most is that what actually moved matches what the records say.
@@ -1258,7 +1415,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): Actual oaLearnMore.tsx:348 says “the exhibits can be regenerated”, not that they can be regenerated alone; whole-agreement generation does regenerate its exhibits. The proposed replacement additionally promises every new document is Amended and Restated, which OAQuestionnaire.tsx:109-111/792-794 does not ensure.
   - **Codex rejected the proposed replacement:** Optional clarification: “When the list changes, update it here and regenerate the agreement, including its exhibits.” Whether it should be amended depends on an adopted prior agreement, not the existence of a PDF.
   - Outcome: 'The exhibits can be regenerated' is not false; regenerating the agreement regenerates them.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **139. [B64]** — **open**
   - Client portal, questionnaire help screen "S Corporation Status", the "If you choose No" choice — `webapp/src/content/oaLearnMore.tsx:40`
   - Reads: Your agreement uses our standard form — with one owner, the company is simply part of your personal tax return; with multiple owners, it is taxed as a partnership.
@@ -1266,6 +1424,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The sole owner may be a company or trust — the Owner card offers "This owner is a company or trust" (OaOwnersSections.tsx:134-144) and the single-member forms sign through an entity's signer — and then the company is reported on that owner's return, not the reader's personal one.
   - Replace with: Your agreement uses our standard form — with one owner, the company is disregarded for income tax and reported on its owner's own return; with multiple owners, it is taxed as a partnership.
   - **Codex rejected the proposed replacement:** Qualify default treatment and entity ownership: “Without a corporate tax election, a one-owner LLC is generally disregarded for federal income tax purposes and a multiple-owner LLC is generally taxed as a partnership. An entity owner’s reporting depends on its own tax treatment.” Selecting No to S status does not rule out C-corporation treatment.
+  - Ruling, 2026-09-20: Batch 12 review item 8: Adam rejected the proposed operating-agreement questionnaire help change and directed that the existing wording stay unchanged.
 - **140. [B65]** — **implemented**
   - Client portal, Orders in progress, the "formed first" dialog, for a converting client — `webapp/src/pages/portal/OrdersInProgress.tsx:399`
   - Reads: Your LLC must be formed first. … An EIN can be obtained only for a company that exists. The IRS application is built on your filed Articles of Organization. We're preparing your filing now. You'll get an email when your LLC is formed.
@@ -1274,7 +1433,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: Add isConversion to /api/portal/services and, when it is true: title "Your protected series must be filed first." and "We're filing your Protected Series Designations now. You'll get an email when they are established, and you'll be able to complete the EIN application then."
   - **Codex rejected the proposed replacement:** Branch on conversion and explain this service’s gate, not a legal prerequisite: “We are filing your Protected Series Designations. Our EIN-details form opens after those filings are completed.” An existing LLC need not legally wait for a new series to obtain its own EIN.
   - Ruling, 2026-09-20: Batch 13 item 4: let the client complete the EIN application questionnaire if the LLC is already formed, without waiting for protected-series filings.
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **141. [B66]** — **implemented**
   - Client portal, questionnaire, Owners card, the note under the heading (manager-managed companies) — `webapp/src/pages/portal/OaOwnersSections.tsx:99`
   - Reads: They start from what you gave us when the company was formed — change them if ownership has changed since.
@@ -1283,14 +1443,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: They start from the people named on your order — add, remove, or change them so the list is the owners as they are today.
   - Codex (disputed): OaOwnersSections.tsx:99 says the rows start from formation information. The finding claims a manager-managed client sees one blank row, but routes-portal.ts:95-121 seeds a clientOwner and OAQuestionnaire.tsx:123-127 copies that name/address; suggested owners are separate chips. The assertion of a blank row is wrong.
   - Corrected after Codex's review: A manager-managed client is pre-filled as the first owner (no blank row). The replacement wording stands: 'They start from the people named on your order'.
-  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 01 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 3465320475ab690615f08cc3291f7cf186ebf814, batch 01 revision 1, package 2647aabafe93. This records implementation, not acceptance or publication.
 - **142. [B73]** — **implemented**
   - Client portal, the Operating agreement card before an agreement exists — `webapp/src/pages/portal/PortalDashboard.tsx:206`
   - Reads: Answer a short questionnaire and we'll generate your operating agreement as a signed-ready PDF.
   - Claims: The PDF is 'signed-ready'.
   - True: The PDF is unsigned and ready for the members to sign; 'signed-ready' reads as if already signed. The sibling wording on the same screen is 'ready to sign' nowhere; the S election tile (ServicesCard.tsx:403) says 'completed and ready to sign'.
   - Replace with: Answer a short questionnaire and we'll generate your operating agreement as a PDF ready to sign.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **143. [B74]** — **implemented**
   - Client portal, the Operating agreement card when the status request fails — `webapp/src/pages/portal/PortalDashboard.tsx:199`
   - Reads: Your agreement questionnaire unlocks once your order is paid.
@@ -1298,7 +1460,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The sentence is shown for any error from /api/portal/oa (`oaQuery.isError`, :197), including a dropped request. The route's only refusal is routes-portal.ts:1108 'No formed LLC found on your account.' (a 400); a 500 or a lost connection also lands here and tells a paid client they have not paid. The same file already distinguishes a 401 from other failures for the portal itself (:624-636).
   - Replace with: Show 'Your agreement questionnaire unlocks once your order is paid.' only when the error is a 400 (ApiError status 400); otherwise 'We couldn't check your agreement just now.' with a Try again button, as at lines 630-633.
   - **Codex rejected the proposed replacement:** Use the specific NO_LLC API error, not every400; distinguish401 (sign in again), transport failure and server failure. The suggested retry message is correct for the latter failures.
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **144. [B75]** — **optional — implemented** — same defect as 45
   - Client portal, Registered agent service card, the status sentence — `webapp/src/pages/portal/PortalDashboard.tsx:367`
   - Reads: Your registered agent service is active and renews on {date}. You can cancel here at any time.
@@ -1307,7 +1470,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: Your registered agent service is active and renews on {date}. You can cancel here; notice given at least 30 days before the renewal date stops the renewal charge.
   - Codex (disputed): Actual PortalDashboard.tsx:367 says “You can cancel here at any time”; routes-portal.ts cancellation accepts notice any day and the dialog at :403-405 explains the30-day renewal cutoff. Cancellation submission and stopping the upcoming charge are different acts; the quoted sentence does not promise that late notice stops that charge.
   - Outcome: Same as 45: cancellation is available any day; the clarification about the 30-day cutoff is useful, not required.
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **145. [B76]** — **implemented**
   - Client portal, Your documents card, empty state — `webapp/src/pages/portal/PortalDashboard.tsx:720`
   - Reads: Your documents will appear here once your formation is prepared.
@@ -1317,7 +1481,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): Actual empty state says “Your documents will appear here once your formation is prepared.” It is unsuitable for conversions, but the finding incorrectly says the first possible document is always returned Articles: routes-portal.ts:1107-1108 permits questionnaire access after payment and generated agreements appear before state filing. The replacement restricts the explanation to Division-returned documents.
   - **Codex rejected the proposed replacement:** Use “Your documents will appear here as they are prepared or uploaded.” This covers self-generated agreements and conversion filings as well as state-returned documents.
   - Corrected after Codex's review: Generated agreements can appear before any state document. Use 'Your documents will appear here as they are prepared or uploaded.'
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **146. [B77]** — **implemented**
   - Client portal with two or more companies, the Legal mail card under each company tab — `webapp/src/pages/portal/PortalDashboard.tsx:660`
   - Reads: const legalMail = docs.filter((d) => d.kind === "legal_mail");
@@ -1325,7 +1490,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Legal mail is never tied to a company: the office's upload dialog sends an orderId only for kind 'package' (AdminDashboard.tsx:254 `if (kind === "package" && orderId)`), so every company's tab shows every piece of legal mail, and nothing on the row names the LLC it was served on (the row shows title, received date and download, :98-129). Package documents on the same screen are scoped per tab (:654-658). A client with two LLCs cannot tell which company a summons was served on unless the office typed it into the title.
   - Replace with: Ask 'Company' on a legal-mail upload as the package upload does (AdminDashboard.tsx:329-346), store it as order_id, and filter legal mail by tab the way packageDocs is: `docs.filter((d) => d.kind === "legal_mail" && (!multiCompany || d.order_id === company))`; print the company name on the row.
   - **Codex rejected the proposed replacement:** The new company selection and attribution are right, but simply filtering existing mail by order_id hides all unassigned mail. Provide an explicit unassigned-mail section or assign existing records before applying the company filter.
-  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 02 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f902a8e41b973f62a96ca6c39067c33ae0fb61a2, batch 02 revision 1, package 57ca7c2f44aa. This records implementation, not acceptance or publication.
 - **147. [B80]** — **implemented**
   - Client portal, Reset your password page — `webapp/src/pages/portal/PortalForgot.tsx:40`
   - Reads: Enter the email address you used when you signed up, and we'll send a link to choose a new password.
@@ -1335,21 +1501,24 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): PortalForgot.tsx:40 uses the loose phrase “signed up”, but the proposed “email address on your order” is wrong after the account email is changed using AccountCard. The reset route queries current clients.email at routes-portal.ts:975, not historical order contact_email.
   - **Codex rejected the proposed replacement:** Use “Enter the email address you currently use to sign in, and we’ll send a link to choose a new password.”
   - Corrected after Codex's review: The reset looks up the current sign-in email, not the order's. Use 'Enter the email address you sign in with'.
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **148. [B81]** — **implemented**
   - Client portal, Sign in page, the error line — `webapp/src/pages/portal/PortalLogin.tsx:26`
   - Reads: setError(status === 429 ? "Too many attempts. Try again in a few minutes." : status ? "Incorrect email or password." : "We could not reach the server. Check your connection and try again.");
   - Claims: Any response other than a lockout or a lost connection means the credentials were wrong.
   - True: The route answers 401 for bad credentials (routes-portal.ts:925), 400 'Email and password are required.' (:919), and app.ts:19-22 turns any thrown error into a 500 'Something went wrong on our end.' — a database fault is reported to the client as their own mistake. Twin of A79 on the admin page.
   - Replace with: status === 429 ? "Too many attempts. Try again in a few minutes." : status === 401 ? "Incorrect email or password." : status ? "Something went wrong on our end. Please try again." : "We could not reach the server. Check your connection and try again."
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **149. [B82]** — **implemented** — same defect as 198
   - Client portal, Sign in page, the sentence under the heading — `webapp/src/pages/portal/PortalLogin.tsx:38`
   - Reads: Access the documents from your formation package and anything we have received for you as registered agent.
   - Claims: Every client has a formation package.
   - True: A converting client has filed Designations, not a formation package (OrderDetail.tsx:626 names their section 'Protected Series Designations'; routes-admin.ts:526 'A conversion has no Articles of Organization'). Twin of A24.
   - Replace with: Access your filed documents and anything we have received for you as registered agent.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **150. [B83]** — **implemented**
   - Client portal, S election details form, the EIN box and its 'Still needed' item — `webapp/src/pages/portal/SElectionDetailsForm.tsx:316`
@@ -1358,7 +1527,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Every other label on the form is in our voice to the client ('Enter the date the Division filed your Articles', 'Choose who signs…'), and the matching 'Still needed' item at :217 flips the pronouns — 'Enter the 9-digit EIN, or tick that you're obtaining ours' — which, read in our voice, says the client is obtaining our EIN. One fact, two voices.
   - Replace with: :316 'We're obtaining your EIN — we'll use it when it is issued'; :217 'Enter the 9-digit EIN, or tick that we're obtaining it for you'.
   - Ruling, 2026-09-20: Batch 13 item 5: the obtaining-EIN checkbox is available only when the client hired us to obtain that company EIN; otherwise require the issued number.
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **151. [B84]** — **optional — implemented**
   - Client portal, S election details form, the footer beside the build button — `webapp/src/pages/portal/SElectionDetailsForm.tsx:690`
   - Reads: We build your package immediately — you'll be able to download it here.
@@ -1367,7 +1537,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: We build your package immediately — it appears in Your documents, ready to download.
   - Codex (disputed): Actual SElectionDetailsForm.tsx:690 says the package can be downloaded “here”; onDone closes the dialog and the package is downloadable in the same portal. “Here” does not expressly mean within this dialog, so the claimed false location is an inference.
   - Outcome: 'Here' is loose, not false; the package is downloadable in the same portal.
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **152. [B85]** — **implemented** — same defect as 63
   - Client portal, S election details form, help under 'Date the Division filed your Articles' — `webapp/src/pages/portal/SElectionDetailsForm.tsx:283`
   - Reads: It's on your Articles of Organization, in your documents above. Your Form 2553 deadline runs from this date.
@@ -1377,7 +1548,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): The filing-date sentence is overbroad, but the proposed replacement endorses any later entered date as the controlling election date. IRS Form2553 Item E says a first-year election begins at the earliest owner/asset/business date; the UI’s permissive timing calculator does not make every later selected date legally valid.
   - **Codex rejected the proposed replacement:** Say the deadline runs from the proper election effective date and explain the IRS first-year rule. Do not tell users an arbitrary later date moves a first-year deadline. Verified https://www.irs.gov/instructions/i2553 .
   - Outcome: Codex's dispute not adopted: Same as 63; waits on Adam's decision there.
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **153. [B86]** — **implemented** — same defect as 63
   - Client portal, Order services, the S Corporation Election Package dialog — `webapp/src/pages/portal/ServicesCard.tsx:411`
   - Reads: The IRS deadline is strict — 2 months and 15 days from the start of the company's first tax year — which is why this package is only available until {date}. Choose this only if your tax professional recommends the election.
@@ -1387,14 +1559,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): Actual ServicesCard.tsx:411 refers to the start of the first tax year, matching IRS Form2553 Item E. The proposed replacement equates that with an LLC effective date and optional later selected date; the IRS instead specifies earliest shareholders, assets or business activity for a first-year election.
   - **Codex rejected the proposed replacement:** Retain the first-tax-year distinction, clarify that the65-day ordering window is the service’s separate cutoff, and use the actual legally applicable election date for the IRS deadline. https://www.irs.gov/instructions/i2553 .
   - Outcome: Codex's dispute not adopted: Same as 63. 'The start of the company's first tax year' is the IRS's own phrase; A22 chose one wording for every place. Waits on Adam's decision on 63.
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **154. [B87]** — **implemented** — same defect as 237
   - Client portal, Order services, the Federal EIN dialog, third paragraph — `webapp/src/pages/portal/ServicesCard.tsx:182`
   - Reads: Questions about the technicalities? Check the User's Manual and ask your attorney or accountant.
   - Claims: The deliverable is a 'User's Manual'.
   - True: docs/facts.md, 'The deliverables': 'the Series LLC Owner's Manual'; the portal's own Reference library card calls it 'The Series LLC Owner's Manual' (PortalDashboard.tsx:272); the office publishes it under that title (LibrarySection.tsx:48, :116). A88 corrects the same word in the Instructions.
   - Replace with: Questions about the technicalities? Check the Owner's Manual and ask your attorney or accountant.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **155. [B129]** — **implemented**
   - Client portal, the operating agreement, consent and S election for a converted company — the company name the seed prefers — `webapp/server/routes-portal.ts:162`
@@ -1402,7 +1576,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The stored payload's finalName is the company's name, and the order's llc_name is only a fallback.
   - True: On a conversion buildPayload.ts:16-19 and :28-29 still fill finalName from desiredLlcName and llcDesignator — whatever the client typed on the new-formation path before switching (the form never clears it: StepFilingPath.tsx:68 patches filingPath only) — while the order itself is named from existingLlcName (routes-payments.ts:363-365). A client who typed "Acme" + LLC, then chose the conversion path for "Sunshine Holdings, LLC", gets an operating agreement, consent and Exhibit headed "Acme, LLC" (OaInputs.companyName at :1463 comes from seed.llcName), and the consent route refuses their real series name because it "must begin with \"Acme, LLC\"" (:1591-1595).
   - Replace with: llcName: (p.filingPath === "CONVERT" ? "" : p.llcName?.finalName) || orders[0].llc_name,  — and, in buildPayload.ts:28-29, finalName: "" on the conversion branch.
-  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 02 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f902a8e41b973f62a96ca6c39067c33ae0fb61a2, batch 02 revision 1, package 57ca7c2f44aa. This records implementation, not acceptance or publication.
 - **156. [B130]** — **implemented**
   - Client portal, Amended and Restated agreement — Recital D names the agreement it supersedes — `webapp/server/routes-portal.ts:1258`
   - Reads: const priorGens = await db.query<{ created_at: unknown }>(     "SELECT created_at FROM oa_generations WHERE client_id = $1 ORDER BY created_at DESC LIMIT 1",     [session.clientId],   );   // Drivers differ: Neon returns ISO strings, PGlite returns Date objects.   const priorDate =     priorGens.length > 0       ? new Date(String(priorGens[0].created_at)).toLocaleDateString("en-US", {           year: "numeric",           month: "long",           day: "numeric",         })       : null;
@@ -1410,14 +1585,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: oa.ts:528-529 prints it as "the Operating Agreement of the Company dated <priorDate>". Three things are wrong with the value: (1) it is taken across every company on the account (no order_id filter, unlike the count at :1251-1253), so a second company's Amended and Restated agreement recites the first company's date; (2) it is the generation timestamp, not the agreement's Effective Date the client chose (:1467 `effectiveDate: fmtDate(a.effectiveDate)`, stored in inputs), so an agreement generated on 1 September with an effective date of 1 August is superseded "dated September 1, 2026"; (3) toLocaleDateString runs in the server's zone (UTC on Vercel), so a 9 pm Eastern generation is dated the next day. The amendment route already asks the client for the agreement's date (:1730, :1780).
   - Replace with: const priorGens = await db.query<{ effective_date: string | null }>("SELECT inputs->>'effectiveDate' AS effective_date FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1", [session.clientId, seed.orderId]); const priorDate = priorGens[0]?.effective_date ?? null;
   - **Codex rejected the proposed replacement:** Select by this exact order and the actually adopted prior agreement. The proposed OR order_id IS NULL still admits unrelated legacy company drafts, and latest generated is not necessarily adopted. Where no adopted predecessor is known, ask the client for its date.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **157. [B131]** — **implemented**
   - Client portal, Services card — the S election, certificate and EIN refusals point the reader "below" — `webapp/server/routes-portal.ts:1921`
   - Reads: "You already have an S election order — see your orders below."
   - Claims: The client's orders are listed beneath the Services card.
   - True: The refusal is rendered inside the Services card (ServicesCard.tsx:252, 363, 416, 505), and the dashboard places Orders in progress above that card: PortalDashboard.tsx:747 `<OrdersInProgress …/>`, then :761 `<ServicesCard …/>`. The same wrong direction is at routes-portal.ts:2049 ("is already on order — see your orders below."), :2119-2120 and :2134 ("already ordered — see your orders below.").
   - Replace with: "You already have an S election order — see Orders in progress above." (and "— see Orders in progress above." at 2049, 2119, 2120, 2134)
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **158. [B132]** — **implemented**
   - Client portal, registered agent card — the refusal when a company did not take our service — `webapp/server/routes-portal.ts:2584`
   - Reads: return c.json(err(`${order.llc_name} is its own registered agent; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
@@ -1425,14 +1602,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The only other choice is SELF (validation.ts:15), under which the client names an individual — first and last name (validation.ts:223-232) — who accepts personally; the company is never its own agent. The sentence reaches the screen through PortalDashboard.tsx:426.
   - Replace with: return c.json(err(`${order.llc_name} did not take our registered agent service; there is nothing to cancel.`, "NOT_OUR_SERVICE"), 400);
   - Codex (housekeeping-only): routes-portal.ts:2584 calls a SELF-agent LLC its own agent, but SELF names an individual. Contrary to the finding’s delivery assertion, PortalDashboard.tsx:426 shows a generic cancellation error, so this exact server sentence is not currently shown.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **159. [B133]** — **implemented**
   - Client portal, Services card — buying another series, the one refusal for every shape problem — `webapp/server/routes-portal.ts:1966`
   - Reads: if (!body.success) return c.json(err("A series identifier is required.", "INVALID_INPUT"), 400);
   - Claims: The identifier was left blank.
   - True: The schema at :1963-1965 also refuses an identifier over 60 characters and a purpose over 300 (`suffix: z.string().min(1).max(60), purpose: z.string().max(300).optional()`); both answer "A series identifier is required." The consent route was given per-box refusals for exactly this on 15 Sep 2026 (:1569-1582).
   - Replace with: const first = body.error.issues[0]; const field = String(first?.path?.[0] ?? ""); const msg = field === "suffix" ? (first?.code === "too_big" ? "The series identifier can be at most 60 characters." : "Enter a series identifier.") : field === "purpose" ? "The purpose can be at most 300 characters." : "A series identifier is required."; return c.json(err(msg, "INVALID_INPUT"), 400);
-  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
 - **160. [B134]** — **implemented**
   - Client portal sign-in — the refusal for a malformed email — `webapp/server/routes-portal.ts:919`
   - Reads: if (!body.success) return c.json(err("Email and password are required.", "INVALID_INPUT"), 400);
@@ -1440,7 +1619,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: loginSchema at :37 is `z.object({ email: z.string().email(), password: z.string().min(1) })`, so a typed but malformed address ("adam@") is answered "required". The sign-in page maps any 4xx other than 429 to "Incorrect email or password." (PortalLogin.tsx:26), so this text reaches no reader today; it is wrong for the day the page starts showing it.
   - Replace with: if (!body.success) return c.json(err("Enter your email address and password.", "INVALID_INPUT"), 400);
   - Codex (housekeeping-only): routes-portal.ts:919 returns required for malformed email, but PortalLogin.tsx:26 replaces that response text. Changing this response alone changes no currently displayed text.
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **161. [B135]** — **implemented** — same defect as 115
   - Client portal, Services card — the S election package refused for a conversion or an unpaid company — `webapp/server/routes-portal.ts:1924`
   - Reads: : "The S election package is available only for new LLCs we formed.";
@@ -1448,7 +1628,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: sElectionEligibility (:478-489) asks for a paid order with package = 'NEW' — formed or not; the package is sold from the day the formation is paid (:490-491). The formed gate is applied later, on the details (:2269-2271).
   - Replace with: : "The S election package is available only for new LLCs formed through us.";
   - **Codex rejected the proposed replacement:** Use “The S election package is available only for new LLCs ordered through us.” Keep the separate later gate on completing the details.
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **162. [B136]** — **implemented** — same defect as 121
   - Client portal, S election details — the refusal after the two-week window — `webapp/server/routes-portal.ts:2277`
   - Reads: "The two-week window for changing this package has closed, and the details have been deleted. Contact us if you need a new one.",
@@ -1456,14 +1637,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: purgeExpiredSElections (:548-630) deletes the encrypted Social Security numbers (:623 `ein_secret = NULL`) and rebuilds the package as a record copy showing last-four digits (:581-586); the details themselves are kept (:566 `const kept = { ...d, purgedAt }`). This is the server half of A53; the text is shown by SElectionDetailsForm.tsx:677.
   - Replace with: "The two-week window for changing this package has closed: the Social Security numbers have been destroyed and the package replaced with a record copy. Contact us if you need a new one.",
   - **Codex rejected the proposed replacement:** Replace details-deletion language with a precise live-system statement; do not claim all SSNs have been destroyed when backups and mirror copies persist, or promise a record copy exists if its rebuild failed.
-  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 03 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fae579f41b46e94b55a78ff08dd69d053488ddb8, batch 03 revision 1, package 6ee881943907. This records implementation, not acceptance or publication.
 - **163. [B137]** — **implemented**
   - Client portal, Your documents — deleting one of your agreements when the server refuses — `webapp/server/routes-portal.ts:1704`
   - Reads: return c.json(err("Not found", "NOT_FOUND"), 404);
   - Claims: The client is told the agreement could not be found.
   - True: The screen has no line for it: PortalDashboard.tsx:488-494 `deleteGeneration = useMutation({ mutationFn: (id) => api.delete(`/api/portal/oa/generations/${id}`), onSuccess: … })` has no onError, and nothing renders deleteGeneration.isError — a refused delete (or a lost connection) leaves the row in place with no message.
   - Replace with: In PortalDashboard.tsx add `onError: (e) => setDeleteError(e instanceof ApiError ? e.message : "We could not delete that agreement. Try again.")` and render it under the agreements list; and make the refusal say what it means: err("That agreement is no longer on your account.", "NOT_FOUND").
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **164. [B138]** — **implemented**
   - Client portal, operating agreement questionnaire — the seed carries no Florida date for the effective-date box — `webapp/server/routes-portal.ts:1135`
   - Reads: return c.json({     data: {       seed,       version,       multiOwner,       memberManaged,       blocked: false,       templateVersion: OA_TEMPLATE_VERSION,       answers: savedAnswers,       generations,     },   });
@@ -1471,23 +1654,27 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The questionnaire and the amendment form default their dates from the device's UTC day (OAQuestionnaire.tsx:57, AmendAgreement.tsx:26 `new Date().toISOString().slice(0, 10)`) — A60 — because this response gives them nothing better, while /portal/services already sends `todayEastern: easternDateIso()` (:1892). Also `blocked: false` is written and read nowhere (OAQuestionnaire.tsx:48 types it only).
   - Replace with: Add `todayEastern: easternDateIso(),` to the data object and drop `blocked: false`; then OAQuestionnaire.tsx:57 and AmendAgreement.tsx:26 default from it.
   - Part "date" — implemented: The questionnaire seed carries todayEastern, so the questionnaire and amendment forms default from Florida's date. — same defect as 128 (florida-date)
-  - Fixed (date): batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (date): batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
   - Part "blocked-field" — implemented: `blocked: false` is written and read nowhere; dropped from the response and the type.
-  - Fixed (blocked-field): batch 20 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections (blocked-field): batch 20 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
   - Former part "all" (retired by 001-part-level-links, now date, blocked-field): The whole finding.
 - **165. [A66h]** — **implemented** — housekeeping
   - Housekeeping: four contribution answer fields saved and never used; two account-route values nothing reads; S election deadline printed 03/21/2027 in one place (Adam's ported module).
   - Codex (disputed): The four obsolete contribution fields are present in oaTypes.ts and superseded by computeCapital in routes-portal.ts:1449-1479; account response fields are unused. However, the alleged printed “03/21/2027” is not present in product source and no file/line is supplied for it.
   - **Codex rejected the proposed replacement:** Retain the evidenced code-only fields as housekeeping; remove or locate and quote the purported deadline before proposing a correction. This compound item cannot be confirmed wholesale.
   - Corrected after Codex's review: The '03/21/2027' print exists nowhere in the product (searched src, server and docs). Keep the code-only fields.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **166. [B71]** — **implemented** — housekeeping
   - Client portal, questionnaire Ownership card, the Equal ownership button — `webapp/src/pages/portal/OwnershipEditor.tsx:82`
   - Reads: const ok = window.confirm(`${rows.length} owners can't split 100% evenly — 33.33 three times is 99.99. Use fractions instead (1/${rows.length} each)?`);
   - Claims: A browser confirm box is the prompt.
   - True: webapp/CLAUDE.md: "Use Dialog/AlertDialog from shadcn/ui, not window.alert() or window.confirm()." Every other question in the portal is a Dialog; this one is the browser's unstyled box, which the Vibecode webview may suppress.
   - Replace with: An AlertDialog with the same sentence and two buttons, "Use fractions" and "Keep percentages".
-  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 01 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 3465320475ab690615f08cc3291f7cf186ebf814, batch 01 revision 1, package 2647aabafe93. This records implementation, not acceptance or publication.
 - **167. [B72]** — **implemented** — housekeeping; same defect as 136
   - Client portal, Orders in progress: the comment over the consent state — `webapp/src/pages/portal/OrdersInProgress.tsx:137`
   - Reads: // s. 605.2201(1) and Section 3.1 require the consent of all members before a series is established, and the designation filed with the state is signed by the company — so nothing on the public record shows the members agreed.
@@ -1495,7 +1682,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Same as the dialog finding above: s. 605.2107(1)(i) lets the agreement vary the approval; only Section 3.1 makes it unanimous. new-series.ts:7-11 states this correctly.
   - Replace with: // Section 3.1 requires the consent of all members before a series is established (s. 605.2201(1) is the default, variable under s. 605.2107(1)(i)), and the designation is signed by the company — so nothing on the public record shows the members agreed.
   - Codex (duplicate): Same unanimity-default defect as136, repeated in the OrdersInProgress.tsx:137 comment. The comment changes no reader-facing text.
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **168. [B78]** — **implemented** — housekeeping
   - Client portal, Sign in page and Reset page — code only — `webapp/src/pages/portal/PortalDashboard.tsx:45`
@@ -1504,14 +1692,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Nothing reads them: RegisteredAgentCard takes CompanyInfo (:301-313, :320), and :335 builds a shim `const me = { raRenewalDate: company.raRenewalDate }` so the old `me?.raRenewalDate` reads at :367 and :404 still compile. The route still computes and sends them (routes-portal.ts:950-962).
   - Replace with: Drop the three fields from `Me`, delete the shim at :335, and read `company.raRenewalDate` at :367 and :404.
   - Codex (housekeeping-only): PortalDashboard.tsx:45-48 types three unused account RA values and :335 creates a shim from CompanyInfo; visible RA state already comes from the company. Removing the redundant fields/shim preserves displayed text.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **169. [B79]** — **implemented** — housekeeping
   - Client portal, deleting a self-generated agreement — code only — `webapp/src/pages/portal/PortalDashboard.tsx:725`
   - Reads: const ok = window.confirm(
   - Claims: —
   - True: webapp/CLAUDE.md (ux): 'Use Dialog/AlertDialog from shadcn/ui, not window.alert() or window.confirm().' The same file uses AlertDialog for the cancellation at :386-423.
   - Replace with: An AlertDialog with the two sentences at :727-728 and the actions 'Keep it' / 'Delete'.
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **170. [B139]** — **implemented** — housekeeping
   - Server, portal routes — stale and misplaced comments — `webapp/server/routes-portal.ts:287`
   - Reads: // Who owns the company, as the client last said. … /** A person's printed legal name … */ /** Operating agreements a company may keep in its documents list. */ export const OA_KEEP_MAX = 5;
@@ -1520,28 +1710,32 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: Move each docstring to the declaration it describes; change :327 to "null when the text is not a date"; change :513-516 to "before the Social Security numbers are destroyed and the package replaced with a record copy"; delete :638-639; delete the office sentence at :803-805.
   - Codex (housekeeping-only): routes-portal.ts:287-295/327/513-516/638-639/701-702/800-805 contain the cited misplaced or stale comments; none of those comments is rendered.
   - **Codex rejected the proposed replacement:** Move the docstrings and correct null/obsolete office handling as proposed, but describe deletion of the live SSN field rather than implying destruction of every retained copy.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **N1.04. [substantive]** — **implemented**
   - S-election package, company address on Form2553 and its record copy — `webapp/server/routes-portal.ts:828`
   - Reads: const seed = await oaSeed(so.client_id);
   - Claims: The address used for this company's tax package belongs to this company.
   - True: oaSeed without an order argument selects the newest paid company at routes-portal.ts:78–90. postSElectionPackage uses that unscoped seed at:828,837 although :879 retrieves the actual formation_order_id. The same mistake occurs during redaction at:569–574 and office draft at routes-admin.ts:1238–1241. An older company's form can carry the newer company's address.
   - Replace with: Resolve the service order's formation_order_id before building the package and call oaSeed(clientId, formationOrderId) for the original, office draft, corrections and redacted copy. Refuse an unresolved association rather than selecting another company.
-  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 02 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f902a8e41b973f62a96ca6c39067c33ae0fb61a2, batch 02 revision 1, package 57ca7c2f44aa. This records implementation, not acceptance or publication.
 - **N1.05. [substantive]** — **implemented**
   - Operating agreement questionnaire and generated Series Exhibit, list of this company's series — `webapp/server/routes-portal.ts:150`
   - Reads: "SELECT details FROM service_orders WHERE client_id = $1 AND type = 'series' AND status IN ('in_progress','fulfilled')",
   - Claims: Purchased extra series appended to the agreement belong to the selected company.
   - True: oaSeed first selects a company at:72–85 but its added-series query at:149–151 filters only client_id. It appends all paid in-progress/fulfilled series for the account to the selected intake series at:153–158. These seed series are used for generated agreements at:1460. A two-company account receives another company's protected series in its agreement.
   - Replace with: SELECT details FROM service_orders WHERE client_id = $1 AND formation_order_id = $2 AND type = 'series' AND status IN ('in_progress','fulfilled') [Bind the selected orders[0].id as $2; explicitly resolve any legacy unscoped orders.]
-  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 02 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f902a8e41b973f62a96ca6c39067c33ae0fb61a2, batch 02 revision 1, package 57ca7c2f44aa. This records implementation, not acceptance or publication.
 - **N1.06. [substantive]** — **implemented**
   - Client portal, buying an EIN for a second company — `webapp/server/routes-portal.ts:2118`
   - Reads: Your LLC's EIN is already ordered — see your orders below.
   - Claims: The selected LLC already has an EIN order.
   - True: The purchase resolves purchaseCompanyId at:2090, but :2102–2112 searches every non-pending EIN order on the client account and treats any company-target EIN as a duplicate. CompanyA's EIN therefore blocks the first EIN purchase for companyB.
   - Replace with: Scope the duplicate query to formation_order_id = purchaseCompanyId as well as client_id, then compare the target within that company. Keep the existing error only when that company already has the order.
-  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 02 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f902a8e41b973f62a96ca6c39067c33ae0fb61a2, batch 02 revision 1, package 57ca7c2f44aa. This records implementation, not acceptance or publication.
 - **N1.08. [substantive]** — **implemented**
   - Operating agreement questionnaire, equal ownership fractions — `webapp/src/lib/ownership.ts:50`
   - Reads: num = num * d + n * den;
@@ -1552,7 +1746,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: This multiplies denominators without reduction in JavaScript Number. A pure in-memory import of the existing helper returned false for equalShares('fraction',17) and for19, although17×1/17 and19×1/19 each equal1. The20-owner questionnaire limit permits both cases. Valid equal ownership therefore blocks validation.
   - Replace with: Accumulate numerator and denominator with BigInt, reducing by greatest common divisor on every addition, and compare the exact reduced numerator and denominator. Preserve the existing positive-integer validation.
   - Corrected after Codex's review: Reproduced: 17 and 19 equal owners fail the exact-total check.
-  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 01 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 3465320475ab690615f08cc3291f7cf186ebf814, batch 01 revision 1, package 2647aabafe93. This records implementation, not acceptance or publication.
 - **N1.15. [substantive]** — **implemented**
   - Client portal, correcting and regenerating an S-election package — `webapp/server/routes-portal.ts:867`
   - Reads: await db.query("DELETE FROM documents WHERE id = $1 AND client_id = $2", [args.priorDocumentId, so.client_id]);
@@ -1569,14 +1764,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The previous document row and file are deleted at:867–868 before putFile at:872–876 and the replacement insert at:880–884. If storage or insertion fails, the original is already gone and the stored documentId still names it. This can occur during the promised14-day edit window.
   - Replace with: Upload and insert the new package first, atomically update the service order's documentId/details, then retire the old document. On failure remove only the staged replacement and retain the existing filing copy.
   - Part "all" — implemented: The whole finding.
-  - Previous fix (all): 05 r1, commit ; 1 assertion(s) retained. Replacement attempt: 28 r1, work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57.
-  - Previous fix (all): 05 r1, commit ; 1 assertion(s) retained. Replacement attempt: 28 r2, work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b.
-  - Fixed (all): batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Previous fix (all): 05 r1, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 28 r1, work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57.
+  - Previous fix (all): 05 r1, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 28 r2, work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b.
+  - Implemented protections (all): batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 superseded by approved replacement: prior fix 05 r1 at ; approved work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
   - 2026-09-22 superseded by approved replacement: prior fix 05 r1 at ; approved work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b
   - Part "staged-cleanup" — implemented: Remove only an unsuccessful newly staged S-election replacement, preserving the existing usable package and recorded Batch05 repair.
-  - Fixed (staged-cleanup): batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Implemented protections (staged-cleanup): batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 - **N1.16. [substantive]** — **implemented**
   - Client portal, S-election shareholder Social Security number validation — `webapp/src/lib/ssn.ts:28`
@@ -1584,56 +1781,64 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: A nine-digit SSN with an allowed area number needs no further structural correction.
   - True: ssnTypingProblem at:16–20 checks area and length only; routes-portal.ts:765–783 repeats those rules for both owners. Structurally impossible numbers with middle digits00 or final digits0000 pass, e.g.123-00-1234 and123-45-0000. SSA explicitly states those groups are never assigned: https://www.ssa.gov/employer/randomizationfaqs.html (opened, lines71–73). This concerns syntax checks, not verification that a real number belongs to a person.
   - Replace with: Reject middle digits 00 and final digits 0000 in both the shared client helper and the server schema, in addition to the existing length and area checks. Message: “That is not a valid Social Security number — the middle two digits cannot be 00 and the last four digits cannot be 0000.”
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **N3.01. [substantive]** — **implemented**
   - Client portal → Operating agreement questionnaire → returning to Initial contributions — `webapp/src/pages/portal/OAQuestionnaire.tsx:383`
   - Reads: Your answers save automatically — you can return anytime, and regenerate whenever anything changes.
   - Claims: A returning client recovers the contributions already entered and saved.
   - True: OAQuestionnaire.tsx:105-138 reconstructs the saved answers but never copies saved.assets. Its Initial contributions card at :713 receives a.assets ?? [], and any later edit saves this reconstructed object at :145/168-174. routes-portal.ts:1174-1185 replaces the complete answers object; :1449 computes the exhibits from a.assets. oa-capital.ts:46 treats missing assets as an empty list, :130 gives zero contributions, and :133-136 prints None. Thus reopening loses the visible asset list, and generating from it can silently replace actual contributions with zero/None.
   - Replace with: Preserve the sentence only after restoring the actual saved assets. Add to the saved-answer initializer: assets: saved.assets ?? [],
-  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 01 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 3465320475ab690615f08cc3291f7cf186ebf814, batch 01 revision 1, package 2647aabafe93. This records implementation, not acceptance or publication.
 - **N3.02. [substantive]** — **implemented**
   - Client portal → Operating agreement questionnaire → saving edits after leaving and returning — `webapp/src/pages/portal/OAQuestionnaire.tsx:83`
   - Reads: const revRef = useRef(0);
   - Claims: A newly opened editor can continue saving an existing draft with monotonically increasing revisions.
   - True: Each mount starts revision0; edits increment it at :171. The GET response routes-portal.ts:1110/1135-1144 returns answers but no revision. The PUT writes only if oa_profiles.rev < the supplied revision at :1174-1176, otherwise returns HTTP200 with stale:true at :1180. The client’s :146 onSuccess clears its error without inspecting stale. A draft at revision20 silently discards the next20 edits after reopening, despite the automatic-save promise at :383-384.
   - Replace with: Return and initialize from the stored revision, reject stale writes visibly, and distinguish a rejected save from success. Conflict message: “Your latest changes were not saved because this draft changed elsewhere. Reload the draft before continuing.”
-  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 01 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 3465320475ab690615f08cc3291f7cf186ebf814, batch 01 revision 1, package 2647aabafe93. This records implementation, not acceptance or publication.
 - **N3.03. [substantive]** — **implemented**
   - Client portal → Operating agreement questionnaire → removing an owner after allocating contributions by share — `webapp/src/pages/portal/OAQuestionnaire.tsx:218`
   - Reads: patch({ members, couples: nextCouples });
   - Claims: Removing an owner preserves which remaining owner contributed each asset.
   - True: removeOwner at :213-218 remaps couples but leaves every asset.contributedBy.shares array unchanged; units at :230-250 then renumber. OaAssetsCard.tsx:59/113-123 binds shares by the new unit index. For owners A/B/C and contributed shares [0,100,0], deleting A leaves B/C receiving [0,100], a valid100 total now attributed to C. oa-capital.ts:69-81 uses the same positions to print contributions and contributor names.
   - Replace with: Bind contributor shares to stable owner/unit IDs. When deleting, pairing or unpairing owners, preserve the surviving identities and require confirmation of any changed allocation: “The owner list changed. Confirm who contributed each asset before generating the agreement.”
-  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 01 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 3465320475ab690615f08cc3291f7cf186ebf814, batch 01 revision 1, package 2647aabafe93. This records implementation, not acceptance or publication.
 - **N3.04. [substantive]** — **implemented**
   - Client portal → Operating agreement questionnaire → dollar amounts for contributions, capital calls and borrowing — `webapp/src/pages/portal/OaAssetsCard.tsx:16`
   - Reads: const digits = typed.replace(/[^\d]/g, "");
   - Claims: A typed dollar amount is represented as that amount, rather than changing its magnitude.
   - True: The parser strips a decimal point and minus sign instead of validating them: pasting100.50 produces10050, and -100 produces100. The same parser is used for agreed value at :93 and cash allocations at :152; OAQuestionnaire.tsx:65-67 repeats the defect for capital-call caps and borrowing limits. oa-capital.ts:37-38/61 accepts and prints monetary values with up to two decimals, so the inflation is introduced by the UI parser.
   - Replace with: Parse a nonnegative dollar amount without deleting its decimal point or sign; reject invalid input rather than changing the number. Validation text: “Enter a nonnegative dollar amount with no more than two decimal places.”
-  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 01 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 3465320475ab690615f08cc3291f7cf186ebf814, batch 01 revision 1, package 2647aabafe93. This records implementation, not acceptance or publication.
 - **N3.06. [wording]** — **implemented**
   - Client portal → S election details → owner mailing address — `webapp/src/pages/portal/SElectionDetailsForm.tsx:533`
   - Reads: Verified address
   - Claims: The displayed address has been selected and verified through the address lookup.
   - True: The live lookup sets verified:true at :525-527, but reopening any stored shareholder sets verified:true and verified2:true unconditionally at :119-134. Selecting an owner also sets verified:Boolean(m.address) at :486, regardless of address provenance. A manually entered nonempty address therefore gains the verification label after save/reopen or selection without lookup verification.
   - Replace with: Show “Address on file” for imported or previously saved addresses unless lookup verification was actually recorded. Reserve “Verified address” for a successful lookup result.
-  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 01 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 3465320475ab690615f08cc3291f7cf186ebf814, batch 01 revision 1, package 2647aabafe93. This records implementation, not acceptance or publication.
 - **N3.07. [substantive]** — **implemented**
   - Client portal → Reset your password → response after a failed request — `webapp/src/pages/portal/PortalForgot.tsx:34`
   - Reads: If an account exists for that email address, a reset link is on its way.
   - Claims: A reset request reached the service and initiated mail whenever that account exists.
   - True: The catch at :19-20 swallows every failure and finally at :22 sets sent=true, including a lost connection or500 before the reset route runs. routes-portal.ts:972-987 already gives the same successful response for existing/nonexisting accounts, so avoiding account enumeration does not require turning transport/server failure into success.
   - Replace with: On a failed request show: “We could not request a reset link. Check your connection and try again.” Show the existing neutral success message only after a successful response.
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **N3.09. [substantive]** — **implemented**
   - Client portal → Legal mail → failed document-list request — `webapp/src/pages/portal/PortalDashboard.tsx:742`
   - Reads: Nothing here — that's good news. Anything we receive for you as registered agent will be posted here, and you'll get an email the moment it is.
   - Claims: No legal mail exists for the account.
   - True: docsQuery fetches at :471-475, but :645 treats unavailable data as [] and :660 filters that empty array. DocList at :740-742 therefore shows the reassuring empty state after a failed request, including while served documents may exist. No docsQuery.isError branch distinguishes unavailable mail from no mail.
   - Replace with: On a document-list failure show: “We could not load your documents or legal mail. Try again.” Show the no-mail sentence only after a successful empty response.
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **N3.10. [substantive]** — **implemented** — waits on Adam's ruling
   - Client portal → Your documents → operating agreement status badges — `webapp/src/pages/portal/PortalDashboard.tsx:111`
   - Reads: {mine.isCurrent ? "Current" : "Superseded"}
@@ -1641,14 +1846,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The only test is generation order: :501-505 sets isCurrent to i===0. It does not record signing, adoption or effective date. OAQuestionnaire.tsx:797-798 says the generated PDF is still ready to print and sign, and :113 accepts the client’s chosen effective date. Merely creating a new unsigned or future-effective draft cannot establish that the earlier adopted agreement is superseded. The questionnaire’s generation list repeats the labels.
   - Replace with: Use “Most recently generated” and “Earlier generated copy” unless adoption and effectiveness are actually recorded. Explain: “Generation order does not determine which agreement is legally in effect.”
   - Ruling, 2026-09-20: Batch 14 approved: label generation order Most recently generated / Earlier generated copy; state that generation order does not determine legal effect. No inferred adoption tracker.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **N3.11. [substantive]** — **implemented**
   - Client portal → Operating agreement help → Deadlock Buy-Sell Provision — `webapp/src/content/oaLearnMore.tsx:154`
   - Reads: Without a plan, the only exit is asking a court to dissolve the company.
   - Claims: Without the optional buy-sell clause, no negotiated exit is possible.
   - True: The same help at :167-168 expressly identifies negotiation or a court proceeding. templates-oa-multi.md:280/282 permits consensual transfers and :316 permits withdrawal with all other members’ written consent; the buy-sell clause is not the sole route to a negotiated solution. This finding concerns the categorical only-exit sentence, not a prediction that parties will agree.
   - Replace with: Without an agreed exit mechanism, owners may need to negotiate a solution or ask a court for relief.
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **N3.12. [substantive]** — **implemented** — waits on Adam's ruling
   - Client portal → Operating agreement questionnaire → instructions for changing managers — `webapp/src/pages/portal/OAQuestionnaire.tsx:804`
@@ -1657,14 +1864,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The complete questionnaire has owner add/remove controls, but no manager-list editor. At :396-399 it says managers come from the formation record and there is nothing to choose; :333 derives entityManagers from data.seed.managerNames and only collects their signers. routes-portal.ts OA assembly uses the seeded manager list. AmendAgreement.tsx:137 and PortalDashboard.tsx:238 repeat the unavailable-manager-edit instruction.
   - Replace with: To add or remove members, change ownership percentages, or change an option you chose here, update your answers and regenerate. Managers are taken from your formation record and cannot be added or removed in this questionnaire; changes the questionnaire cannot make require a separate amendment.
   - Ruling, 2026-09-20: Batch 14 approved: implement editing, adding and removing managers in the manager-managed operating-agreement questionnaire, preserving each entity signer with its manager and leaving state filing records unchanged.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **N3.13. [substantive]** — **implemented**
   - Client portal → Operating agreement questionnaire → full legal name of an entity owner — `webapp/src/pages/portal/OAQuestionnaire.tsx:330`
   - Reads: const incompleteOwner = owners.some((o) => !hasFirstAndLast(o.name) || !(o.address ?? "").trim());
   - Claims: Every owner’s legal name must consist of a human first and last name, including owners identified as companies or trusts.
   - True: OaOwnersSections.tsx:134-143 explicitly permits a company or trust and :126 asks its full legal name. OAQuestionnaire.tsx:330 nevertheless applies hasFirstAndLast to all owners, including isEntity:true; routes-portal.ts:1215-1217 repeats the restriction. An entity’s one-word legal name therefore blocks generation even with its separate human signer’s full name and title supplied at :335. The form conflates the entity’s legal name with the signer’s personal name.
   - Replace with: Require a nonblank full legal entity name for isEntity owners and apply first/last-name validation only to individual owners and human signers. Entity label: “Full legal name of the company or trust”.
-  - Fixed: batch 01 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 01 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 3465320475ab690615f08cc3291f7cf186ebf814, batch 01 revision 1, package 2647aabafe93. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B3-01. [substantive]** — **implemented**
   - Client portal, EIN application details for a protected series, Number of members. — `webapp/src/pages/portal/OrdersInProgress.tsx:545`
   - Reads:                 <Input name="memberCount" inputMode="numeric" autoComplete="off" aria-label="Number of members" defaultValue={(detailsFor ? einDrafts[detailsFor.id] : undefined)?.memberCount ?? String(Math.max(1, data.members.length))} />
@@ -1672,7 +1881,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: routes-portal.ts:1853–1859 derives data.members from parent OA owners. OrdersInProgress.tsx:545 uses that count for a series EIN too, even though templates-oa-multi.md:120/132 give the Company the entire protected-series interest. Submitted memberCount persists at routes-portal.ts:2198 and reaches ServiceOrdersSection.tsx:328. Source-confirmed; not a claim of observed external IRS submission. The adjacent parent-S-package tax hint is recorded as residual prior N1.07 rather than another new defect.
   - Proposed replacement (not approved): For a protected-series EIN, derive the initial owner count from that series' ownership. For the company-owned series created by these agreements, prefill 1. Do not count the parent company's members as owners of its series.
   - Rechecked by codex-reader-5: Actual OrdersInProgress545 seed uses parent data.members and API1853–1859 obtains parent effectiveOwners;2198 persists supplied count; master3.6 gives Company entire series interest. Wrong series member-count seed is new. However portal taxhint547–549 infers series S treatment from parent package: same inference already covered by priorN1.07, whose replacement specifically says not to infer series treatment from parent package. Split into new member-count finding and residual priorN1.07 sighting. Avoid universal tax-classification advice; root IRS review required for any specific tax treatment. A generic entity-specific explanation is supported. Root narrowed this finding to owner count; no tax-classification replacement remains.
-  - Fixed: batch 24 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 24 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 2559e18f5094b70c8eba1eb64e3c3519aa609f3e, batch 24 revision 1, package 926611ba9446. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B3-02. [substantive]** — **implemented**
   - Client portal, EIN application details, certification checkbox after closing one order and opening another. — `webapp/src/pages/portal/OrdersInProgress.tsx:707`
   - Reads:                 checked={einCertified}
@@ -1680,7 +1890,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: einCertified is component-wide state at53, reset only on successful submission at125. Opening another order restores other values at64–74 but not certification. Closing433 snapshots and clears detailsFor only. Checking order A, closing it and opening B therefore leaves B checked; submitDetails121 always transmits certified:true. Source trace confirmed; no browser reproduction claimed.
   - Proposed replacement (not approved): Reset the EIN certification to unchecked whenever the application order changes or the dialog closes; require a new affirmative check for the currently displayed application.
   - Rechecked by codex-reader-5: Read OrdersInProgress state/effect53–74, mutation121–126, close433, checkbox707 andbutton717. setEinCertified(false) occurs only successfulsubmit, so certification carries from A to B without fresh action. Reset on app identity/open/close correct. Priors59/74/75/76/106/N4.07 concern formation certifications/labels or agentagreement, different facts.
-  - Fixed: batch 22 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 22 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 3577d25d6c452215171683deb3f5ffc5e0c9636b, batch 22 revision 1, package fe903fe17147. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B3-03. [substantive]** — **implemented**
   - Client portal, Your account, changing the sign-in email address, success notice. — `webapp/src/pages/portal/AccountCard.tsx:47`
   - Reads:       setDone(`Check ${res.pendingEmail} for a confirmation link. Your address changes only after you confirm it.`);
@@ -1688,7 +1899,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: routes-portal.ts:2505–2509 starts both sends without awaiting them and catches failures only in logs;2510 returns success regardless. AccountCard.tsx:45–47 displays success when either send fails. Unlike fixed reset/resend flows, no response is tied to mail acceptance. Source-confirmed failure path; injected failure remains pending coordinator probe.
   - Proposed replacement (not approved): Await confirmation-email acceptance before displaying success. If it fails, preserve retry and show: “We could not send the confirmation link. Please try again.” Report old-address notification failure separately rather than asserting it was sent.
   - Rechecked by codex-reader-5: Read AccountCard43–51 and routes-portal2495–2511: both sends are fire-and-forget with logging-only catches while API returns success. Await confirmation acceptance and expose retry truthful. Prior200 concerns invalidating pending changes on passwordreset; N4.06 welcome delivery failure is a different endpoint, so not same fixed location. No injected mail failure performed here.
-  - Fixed: batch 22 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 22 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit 3577d25d6c452215171683deb3f5ffc5e0c9636b, batch 22 revision 1, package fe903fe17147. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B3-05. [substantive]** — **implemented** — waits on Adam's ruling
   - Client portal, operating-agreement questionnaire, Owners, adding the twenty-first owner. — `webapp/src/pages/portal/OaOwnersSections.tsx:230`
   - Reads:                   Add owner
@@ -1697,7 +1909,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Choose and apply one supported owner limit throughout the operating-agreement editor, API and contribution allocations. If the approved limit is100, support100 in all three; show the limit before adding an unsupported row instead of rejecting autosave afterward.
   - Rechecked by codex-reader-5: Read OaOwnersSections227–231 and OAQuestionnaire244 unlimited append against routes-portal198–221 max20 and245 contributor max20. Direct editor/API mismatch confirmed. Do not infer applicable OA ceiling100 from a differently scoped ruling; proposal correctly requires one approved capacity and UI prevention. No prior member-count/20-owner finding found.
   - Ruling, 2026-09-21: Adam approved Batch 22 item 8 with his whole message "Go. Approve all" after the proposal expressly stated: "Support up to 100 owners consistently in the questionnaire, saving, contribution allocations, and agreement generation. Prevent adding owner 101 and explain the limit before the client enters unsupported information." This records that approved capacity for the operating-agreement questionnaire; it is not package acceptance or publication authorization.
-  - Fixed: batch 22 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 22 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit 3577d25d6c452215171683deb3f5ffc5e0c9636b, batch 22 revision 1, package fe903fe17147. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B6-01. [substantive]** — **implemented**
   - Client portal company selection: operating-agreement generation, consent, amendment and service purchases — `webapp/server/routes-portal.ts:1174`
   - Reads:   const genCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
@@ -1707,7 +1920,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: resolveCompanyOrder at390-402 returns null when an explicitly requested UUID is nonexistent or belongs to another client. oaSeed at81-93 interprets null as latest paid company, so generate1174-1176 silently generates against another company in the account. GET1058-1060, consent1572-1574 and amendment1729-1731 repeat the fallback; purchase routes1897,1956,2023,2080 pass null into clientLlcName and then insert an unassociated service order. PUT answers1132-1133 and cancellation2574-2582 already reject failed resolution, showing the inconsistency. This is a statically established wrong-company path, not observed production access to another client data. Independently exercised actual offline HTTP routes: two paid formations under one account returned their own company seeds for valid IDs, but GET /api/portal/oa?company=11111111-1111-4111-8111-111111111111 returned200 and Root Scope Beta, LLC's seed. See root-company-route-proof.
   - Proposed replacement (not approved): Distinguish omitted company from explicitly supplied invalid/nonowned company. Return400/404 for failed explicit resolution before calling seed/name/profile helpers or writing records. Use a resolved owned company ID for every generated document and purchased service; preserve intended default selection only when no company was supplied. Exercise nonexistent and another-client UUIDs against all company-scoped routes.
   - Rechecked by codex-reader-5: routes-portal.ts:390–402 resolves explicit nonexistent/nonowned UUID to null. oaSeed81–93 and clientLlcName374–385 interpret null as latest owned paid order. GET1058, generation1174, consent1572, amendment1729 and purchases1897/1956/2023/2080 pass this null onward; PUT1133 refuses. Actual source confirms latent wrong-company fallback WITHIN signed-in account, not access to another client data. PriorN1.04 is service association for tax package addresses; N1.05 extra series scoping; N1.06 company-specific duplicate check. None addresses invalid requested-company fallback. No live route mutation performed.
-  - Fixed: batch 22 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 22 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 3577d25d6c452215171683deb3f5ffc5e0c9636b, batch 22 revision 1, package fe903fe17147. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch28-runtime-B-no-way-to-replace-the-renewal-card. [substantive]** — **implemented**
   - Client portal → Registered agent service card ('Renewal card: Visa ending 1111'); the renewal notice email; Terms 9(c) and 9(e) — `webapp/src/pages/portal/PortalDashboard.tsx:380`
   - Reads:                 <p className="mt-1" data-testid="renewal-card">Renewal card: {brandWord(company.cardBrand)} ending {company.cardLast4}.</p>
@@ -1715,7 +1929,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: No dedicated card-update control is present. However PortalDashboard:422 offers Pay renewal now / use another card whenever an open link exists. renewals.ts:127-141 creates that link with the60-day notice, before decline, and ra-checkout.ts:55-62 saves a new eligible card during payment. Historical claim that replacement is possible only after decline is false. email.ts:111-112 still says nothing needs doing and there is no independent replacement path outside an open payable renewal. No provider or payment route run.
   - Proposed replacement (not approved): A standalone card-update action requires a supported token-to-card design, saved-card consent and eligible-card checks. Explain the existing pre-decline payment option accurately. Do not promise an office payment link outside a payable renewal unless implemented.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. No dedicated card-update control is present. However PortalDashboard:422 offers Pay renewal now / use another card whenever an open link exists. renewals.ts:127-141 creates that link with the60-day notice, before decline, and ra-checkout.ts:55-62 saves a new eligible card during payment. Historical claim that replacement is possible only after decline is false. email.ts:111-112 still says nothing needs doing and there is no independent replacement path outside an open payable renewal. No provider or payment route run.
-  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 - **AUD-claude-reconciled-batch28-runtime-B-undelivered-s-election-numbers-never-expire. [substantive]** — **implemented**
   - Client portal → Orders in progress → S corporation election details saved while we are obtaining the company EIN; Privacy Policy §2 — `webapp/server/routes-portal.ts:568`
@@ -1724,7 +1939,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: Current purge filters status fulfilled and fulfilled_at older than14days at574. Pending-EIN saves2419-2422 retain encrypted numbers in_progress with no independent expiry. Privacy15 describes the post-delivery editing window; it does not state an abandonment/cancellation horizon. This is an unbounded pre-delivery state, not evidence that the stated post-delivery14day rule itself is violated. RulingsN1.01/140/150 intentionally permit pending completion but do not specify abandoned pre-delivery retention.
   - Proposed replacement (not approved): Choose a finite pre-delivery/abandonment retention rule or clearly disclose retention through delivery, then make cleanup and re-entry behavior match. Any purge path must return the order to a usable re-entry state and remove full numbers rather than completed retained PDFs.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current purge filters status fulfilled and fulfilled_at older than14days at574. Pending-EIN saves2419-2422 retain encrypted numbers in_progress with no independent expiry. Privacy15 describes the post-delivery editing window; it does not state an abandonment/cancellation horizon. This is an unbounded pre-delivery state, not evidence that the stated post-delivery14day rule itself is violated. RulingsN1.01/140/150 intentionally permit pending completion but do not specify abandoned pre-delivery retention.
-  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 - **AUD-claude-reconciled-batch29-reader-4-s-election-officer-title-default. [substantive]** — **implemented**
   - Client portal → S-election details form → the pre-filled Officer title box beside Signing officer, and the Form 2553 the package prints from it (contact line H, the Sign Here title line, the cover letter and the instruction sheet) — `webapp/src/pages/portal/SElectionDetailsForm.tsx:117`
@@ -1733,7 +1949,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: The form still defaults officerTitle to Manager for every company. services response routes-portal.ts:1876-1904 supplies no management structure; the editable title is then printed by s-election.ts. A member-managed company therefore gets an unsupported Manager default. Current IRS Form2553 instructions require an authorized officer; management form alone does not prove which signer/title is legally appropriate.
   - Proposed replacement (not approved): Use management information to avoid the false Manager assumption, and ask the client to confirm the authorized signer and actual title. A blank required title with clear help is safer than inventing office status from management type.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; The form still defaults officerTitle to Manager for every company. services response routes-portal.ts:1876-1904 supplies no management structure; the editable title is then printed by s-election.ts. A member-managed company therefore gets an unsupported Manager default. Current IRS Form2553 instructions require an authorized officer; management form alone does not prove which signer/title is legally appropriate.
-  - Fixed: batch 29 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 29 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 835aff445f27531b0972f057514ce2b4cb37b993, batch 29 revision 4, package 5a1b075c3b93. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
   - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
@@ -1744,7 +1961,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: OrdersInProgress:500–506 still names typically the manager while the same questionnaire supports member-managed clients. IRS SS-4 instructions, opened live, define the role through ultimate ownership/control and practical control over funds; they do not establish the frequency claim in either the old or proposed heading. The explanatory paragraph already gives the appropriate functional test. Source comment is evidence of a past request, not a full recorded leave-unchanged ruling.
   - Proposed replacement (not approved): Use the neutral heading “Responsible party” and retain the existing explanation of ultimate ownership or control.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; OrdersInProgress:500–506 still names typically the manager while the same questionnaire supports member-managed clients. IRS SS-4 instructions, opened live, define the role through ultimate ownership/control and practical control over funds; they do not establish the frequency claim in either the old or proposed heading. The explanatory paragraph already gives the appropriate functional test. Source comment is evidence of a past request, not a full recorded leave-unchanged ruling.
-  - Fixed: batch 29 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 29 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 835aff445f27531b0972f057514ce2b4cb37b993, batch 29 revision 4, package 5a1b075c3b93. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
   - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
@@ -1755,7 +1973,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: SElectionDetailsForm:520–540 labels every nonempty unverified value Address on file; :526 sets verified false on typing. :120–138 initializes drafts/stored rows and :488 handles imported owners. ServicesCard ShareholderRow lacks provenance fields. The proposed flags address the core defect, but reopened saved-draft semantics and second-address reset paths must be considered rather than treating all draft flags as authoritative.
   - Proposed replacement (not approved): Track whether each address came from saved/imported data; clear that status on typing for both owners; show no on-file label on unsaved typed text. Preserve lookup verification and correctly initialize reopened saved drafts.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; SElectionDetailsForm:520–540 labels every nonempty unverified value Address on file; :526 sets verified false on typing. :120–138 initializes drafts/stored rows and :488 handles imported owners. ServicesCard ShareholderRow lacks provenance fields. The proposed flags address the core defect, but reopened saved-draft semantics and second-address reset paths must be considered rather than treating all draft flags as authoritative.
-  - Fixed: batch 29 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 29 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 835aff445f27531b0972f057514ce2b4cb37b993, batch 29 revision 4, package 5a1b075c3b93. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
   - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
@@ -1766,7 +1985,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: PortalDashboard:376 and :421 print raw end/due/submitted dates. routes-portal:992–994 returns ISO calendar strings. datetime.ts:28–38 handles YYYY-MM-DD without a viewer-zone shift. The neighboring cancellation date already uses formatDate. Prior 128 concerns other date displays, not these four locations.
   - Proposed replacement (not approved): Apply formatDate to all four resignation/end-date interpolations in the registered-agent card.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; PortalDashboard:376 and :421 print raw end/due/submitted dates. routes-portal:992–994 returns ISO calendar strings. datetime.ts:28–38 handles YYYY-MM-DD without a viewer-zone shift. The neighboring cancellation date already uses formatDate. Prior 128 concerns other date displays, not these four locations.
-  - Fixed: batch 29 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 29 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 835aff445f27531b0972f057514ce2b4cb37b993, batch 29 revision 4, package 5a1b075c3b93. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
   - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
@@ -1777,7 +1997,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: PortalDashboard:814 omits the sentence. Current rulings.md:12 expressly retains it and defines download-only as uneditable. Batch 03 approves encrypted retention but does not expressly revoke this instruction. This is an instruction/implementation mismatch; interpreting download-only to prohibit deletion would be wrong.
   - Proposed replacement (not approved): Restore “Documents are download-only.” before the current retention explanation, preserving the current support link and encrypted-retention wording.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; PortalDashboard:814 omits the sentence. Current rulings.md:12 expressly retains it and defines download-only as uneditable. Batch 03 approves encrypted retention but does not expressly revoke this instruction. This is an instruction/implementation mismatch; interpreting download-only to prohibit deletion would be wrong.
-  - Fixed: batch 29 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 29 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 835aff445f27531b0972f057514ce2b4cb37b993, batch 29 revision 4, package 5a1b075c3b93. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
   - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
@@ -1792,7 +2013,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: Current routes-portal:1265–1269 increments before shares/options/capital/stale-base checks and rate limit at ~1488. Historical runtime-A report records first success No.4 after refusals. Current source confirms the same ordering. However the recorded owner rule concerns rate-limit allowance, not a stated requirement that generated identifiers be consecutive; gaps alone do not invalidate an agreement. Later render/storage failure can still consume a number under Claude’s move.
   - Proposed replacement (not approved): Allocate the number after validation, stale-draft and rate-limit refusals, and assign inputs.generationNumber after allocation. Preserve never-reuse behavior; do not promise gap-free numbering after rendering/storage failures.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Source and independent review retained in batches/29/evidence/reconciled-source.json. Reopened against 3f178aa; Current routes-portal:1265–1269 increments before shares/options/capital/stale-base checks and rate limit at ~1488. Historical runtime-A report records first success No.4 after refusals. Current source confirms the same ordering. However the recorded owner rule concerns rate-limit allowance, not a stated requirement that generated identifiers be consecutive; gaps alone do not invalidate an agreement. Later render/storage failure can still consume a number under Claude’s move.
-  - Fixed: batch 29 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 29 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 835aff445f27531b0972f057514ce2b4cb37b993, batch 29 revision 4, package 5a1b075c3b93. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Declare updates to the prior walkthrough for the approved personal-agent identity and neutral responsible-party heading.
   - 2026-09-22 rejected r2: Include the fourth copy of the approved inactive-name explanation in the name-check results card.
   - 2026-09-22 rejected r3: Standing authorization for automatic revisions: declare shared Batch06 fixture correction required by approved personal-agent restriction; preserve all assertions. — Advance under Adam’s standing authorization to declare the shared personal-agent fixture repair.
@@ -1807,7 +2029,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Add `generationId: z.string().uuid()` to amendSchema; load `SELECT inputs FROM oa_generations WHERE id = $1 AND client_id = $2 AND order_id = $3` with [a.generationId, session.clientId, seed.orderId] and refuse with "Choose the agreement you are amending." when absent; the form offers the same generation list the restatement uses, defaulting the confirmed date from the chosen generation. (Design follows Rulings 137/N3.10; the exact wording needs Adam's ruling.)
   - Rechecked by Codex reconciliation of Claude independent evidence: Reopened at 835aff4; original evidence retained in batches/30/evidence/reconciled-source.json. Ask which company-specific agreement supplies the amendment parties and confirm the effective date for that selection. Do not infer adoption from recency. Reject another company’s selection and explicitly handle outside/legacy predecessors.
   - Ruling, 2026-09-22: Approved Batch30 proposal: explicitly select the company agreement, show its parties and confirm its effective date; stop if the required agreement is unavailable. Go. Approve all.
-  - Fixed: batch 30 revision 3, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 30 revision 3, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 9efcb29c4571efc3ddce69c8612f439569c455cf, batch 30 revision 3, package 30180be42289. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Automatic revision under Adam’s standing authorization: declare the consent assertion replacement and joint-signature pagination support.
   - 2026-09-22 rejected r2: Automatic revision under Adam’s standing authorization: combine the preserved office assertion into the new regression check so the baseline proof tests the new defect, without requiring an already-fixed office test to fail.
 - **AUD-claude-reconciled-batch30-runtime-A-consent-from-draft. [substantive]** — **implemented** — waits on Adam's ruling
@@ -1820,7 +2043,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): In app.post("/portal/series/consent") derive the owners and Managers the way the amendment does: read the most recent oa_generations row for the company (`SELECT inputs FROM oa_generations WHERE client_id = $1 AND (order_id = $2 OR order_id IS NULL) ORDER BY created_at DESC LIMIT 1`) and take `memberNames` from `inputs.members` (each member's `signatories ?? [name]`, with `entitySigner` for entity owners) and `managerNames`/`managerEntitySigners` from the inputs; fall back to `savedOaAnswers` only when no agreement has been generated, and say so in the dialog (OrdersInProgress.tsx, the Consent & Series Exhibit description) — or, if Adam prefers the draft, make the dialog state that the consent names the owners as currently answered in the questionnaire and that the agreement on file must be regenerated to match. Ruling needed: which record is the source of the members for a signed consent.
   - Rechecked by Codex reconciliation of Claude independent evidence: Reopened at 835aff4; original evidence retained in batches/30/evidence/reconciled-source.json. Show the members/managers the consent will name and require the user to confirm the current authorized parties, using an explicitly selected source. Preserve entity/joint signers. Do not tell users regeneration alone changes legal ownership or fixes adoption.
   - Ruling, 2026-09-22: Approved Batch30 proposal: select an agreement supplying current members/managers, display and confirm them, preserve entity and joint signatures. Go. Approve all.
-  - Fixed: batch 30 revision 3, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 30 revision 3, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 9efcb29c4571efc3ddce69c8612f439569c455cf, batch 30 revision 3, package 30180be42289. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Automatic revision under Adam’s standing authorization: declare the consent assertion replacement and joint-signature pagination support.
   - 2026-09-22 rejected r2: Automatic revision under Adam’s standing authorization: combine the preserved office assertion into the new regression check so the baseline proof tests the new defect, without requiring an already-fixed office test to fail.
 - **AUD-claude-reconciled-batch31-reader-3-consent-department-wording. [wording]** — **implemented** — waits on Adam's ruling
@@ -1831,7 +2055,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Exactly as filed with the Florida Division of Corporations.
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 3: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
-  - Fixed: batch 31 revision 3, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 31 revision 3, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 4754c5116dcc2a0105acd4a0adede646d3c6f41a, batch 31 revision 3, package aaeabc755635. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 - **AUD-claude-reconciled-batch33-reader-6-ra-cancel-route-comment. [housekeeping]** — **implemented** — housekeeping
@@ -1844,7 +2069,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Terms 9(g) (terms.md:54) has no (i) sub-item, and it and 10(e) (terms.md:65) with Ruling 28 say that if replacement proof is missing by the renewal date we submit our resignation on that date and charge $99 — the agency also ends by resignation, and the daily job (renewals.ts:114) schedules it. The comment describes the pre-Batch-07 policy.
   - Proposed replacement (not approved): /** Online cancellation of registered agent service — required by s. 501.165 because the service is accepted online. Recording the request is the Terms 9(g) notice; the agency ends when replacement proof arrives or, if none by the renewal date, when our resignation takes effect (Terms 9(g), 10(e); renewals.ts). */
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-claude-release-group-a-2026-09-23-item-1. [substantive]** — **implemented**
   - Client portal: show a submitted registered-agent resignation — `webapp/src/pages/portal/PortalDashboard.tsx:382`
   - Reads:                 {company.raEndedDate ? `Our registered-agent appointment ends on ${formatDate(company.raEndedDate)}.` : company.raAppointmentDate ? `Your registered agent service is active${company.raRenewalDate ? ` and renews on ${new Date(`${company.raRenewalDate}T12:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}` : ""}.` : "Your appointment date has not yet been recorded. Your first service year begins when our appointment takes effect."} You may give cancellation notice here at any time. Give notice at least 30 days before renewal and provide replacement proof by renewal to avoid a resignation charge.
@@ -1852,7 +2078,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Batch 28 already approved recording all four grounds; the office display already distinguishes submission. This completes that behavior, without changing billing or legal end dates. Source reconciliation: RR-AGENT-1
   - Proposed replacement (not approved): Show the submitted date for every resignation ground. Replace the ordinary renewal and avoid-a-charge invitation with the resignation state. Distinguish submission, recorded state filing, and the appointment ending; do not imply submission immediately ends the appointment. Keep outstanding payment information accurate. Exact wording: Resignation submitted [date]. We will display the appointment end date when it is recorded.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -1863,7 +2090,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Batch 28 approved 90-day expiry before delivery; Batch 03 approved keeping encrypted completed documents until the client deletes them. Source reconciliation: RR-DATA-02
   - Proposed replacement (not approved): Make this dialog match the already-approved Privacy Policy. Preserve the existing retention periods, encrypted completed documents, and secure re-entry process. This does not add a new email. Exact wording: Social Security numbers are encrypted. Our scheduled cleanup removes them from the questionnaire after the fourteen-day editing window following delivery. If your package has not been delivered, our scheduled cleanup removes them after 90 days without an update to this questionnaire. Your other answers remain available, but you must re-enter the numbers securely before we can complete the package. Your completed document stays encrypted in Your documents until you choose to delete it.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -1874,7 +2102,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Batch 30 already requires rejection of unavailable, foreign and incomplete sources. Source reconciliation: RR-PORTAL-03
   - Proposed replacement (not approved): Base the empty-state message on the successfully loaded usable source list, not the separate history count. Keep loading and failed requests distinct. Do not alter sample records or weaken source validation. Exact wording: No usable operating agreement is available for this company. Go to the operating agreement questionnaire to create one before using this amendment form.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -1885,7 +2114,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Adam already approved a maximum of 100 and an explanation before unsupported entry. Source reconciliation: RR-PORTAL-05
   - Proposed replacement (not approved): Return the specific owner-limit message when that validation fails. Preserve the general fallback for unrelated malformed requests. Exact wording: The operating agreement supports up to 100 owners. Remove an owner before saving.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -1895,54 +2125,69 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 - **171. [A68]** — **implemented** — related: 184
   - Registered Agent Clients Card column (mine): no permission on the order shows "—", no amber. Replace: "no card — no permission on the order", amber.
   - **Codex rejected the proposed replacement:** Null does not by itself prove no permission: it can precede a card-save attempt or reflect an incomplete/failed capture path. Derive permission from the order’s consent and show “Card status not recorded” unless absence of consent is independently established.
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **172. [A69]** — **implemented**
   - Cancellation shown twice on a row; the client-level chip keeps the first company's date forever. Replace: keep the per-company text; drop the chip on that tab.
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **173. [A70]** — **implemented**
   - Clients tab "Invite sent" means only "no password yet". Replace: "No password yet".
-  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
 - **174. [A71]** — **implemented**
   - Emails dialog "delivered" (provider acceptance); "Every email" (500). Replace: "accepted"; "The newest 500 emails".
-  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
 - **175. [A72]** — **implemented**
   - "Mark sent" and "move back" refusals name the wrong column for a formed order. Replace: whereItIs wording.
-  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
 - **176. [A73]** — **implemented**
   - Certificates block: a refused upload on a With The State order shows its red line under another button. Replace: its own error line.
-  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
 - **177. [A74]** — **implemented**
   - Articles box shape check only when we signed; server checks whenever typed. Replace: match.
-  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
 - **178. [A75]** — **implemented**
   - Fulfil dialog: EIN hint promises an S election rebuild for a series EIN; S election date row "entered by the client" after correction; series text "once … uploaded" though the dialog uploads; a typed EIN survives closing. Replace each.
   - **Codex rejected the proposed replacement:** The item supplies no verbatim replacements. Use company-only rebuild wording; “Articles filing date”; “Upload the filed Designation here”; clear the EIN draft when switching orders or closing. A series EIN must not trigger company-election instructions.
   - Part "ein-hint-2553" — implemented: The EIN hint mentions Form 2553 only when a company EIN is being entered AND a matching S election package exists; a series EIN goes on no 2553.
-  - Fixed (ein-hint-2553): batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (ein-hint-2553): batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
   - Part "s-election-date-row" — implemented: The S election date row no longer says "entered by the client" after a correction.
-  - Fixed (s-election-date-row): batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (s-election-date-row): batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
   - Part "series-uploaded-text" — implemented: The series text no longer says "once … uploaded" inside the dialog that does the uploading.
-  - Fixed (series-uploaded-text): batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (series-uploaded-text): batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
   - Part "typed-ein-survives" — implemented: A typed EIN does not survive closing the dialog.
-  - Fixed (typed-ein-survives): batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (typed-ein-survives): batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
   - Former part "all" (retired by 001-part-level-links, now ein-hint-2553, s-election-date-row, series-uploaded-text, typed-ein-survives): The whole finding.
 - **179. [A76]** — **implemented**
   - Reference Library backup line (four tables; "own company") and mirror line ("every file" nightly; nothing overwritten). Replace both sentences.
   - Codex (disputed): LibrarySection.tsx:177-179 lists four table categories without saying only four; :244-246 says deletions never propagate, not that mirror uploads can never overwrite. BACKUP_TABLES has ten entries and mirror processing is capped, so there are real precision issues, but the finding attributes exclusive/no-overwrite statements the UI does not make.
   - **Codex rejected the proposed replacement:** Use “A nightly snapshot of the ten backed-up tables is stored in private Vercel Blob storage.” For mirroring say “Each run attempts up to200 pending client files. Files may be replaced at the same destination; source deletions do not remove mirror copies.” Name providers rather than make an unverified corporate-ownership claim.
   - Corrected after Codex's review: Say ten backed-up tables, and that each run attempts up to 200 pending files; name the providers.
-  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 03 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fae579f41b46e94b55a78ff08dd69d053488ddb8, batch 03 revision 1, package 6ee881943907. This records implementation, not acceptance or publication.
 - **180. [A77]** — **implemented**
   - "Regenerate from the master" silently replaces a hand-uploaded manual. Replace: say so on the screen.
   - **Codex rejected the proposed replacement:** Verbatim clarification: “Regenerating replaces the currently published manual, including any PDF you uploaded by hand, with a new PDF from the master.”
-  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
 - **181. [A78]** — **implemented**
   - Board "1 days"; "search to reach the rest" while searching; open status worded two ways. Replace each.
   - **Codex rejected the proposed replacement:** Use singular “1 day”; while searching say “Showing the newest matching orders; narrow your search to find another order.” Use one shared display label for awaiting_info.
-  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
 - **182. [A79]** — **implemented**
   - Admin sign-in "Incorrect password." for any server error. Replace: only for a 401.
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **183. [B88]** — **optional — open**
   - Office, Clients tab, the Upload dialog, Document title box — `webapp/src/pages/admin/AdminDashboard.tsx:301`
   - Reads: placeholder="e.g. Operating Agreement"
@@ -1957,34 +2202,41 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: 'no card' with a reason only for a wallet payment.
   - True: renewals.ts:85 and :98 store a reason on every 'none': 'no payment id', or square.ts's 'wallet payment' (:135), 'customer' (:153) or 'not saveable' (:164). Only 'wallet payment' is shown; a card Square refused to save reads simply 'no card', indistinguishable from a wallet payment, and the office cannot tell whether to ask the client for a card. Adjacent to A68.
   - Replace with: : c.card_status === "none" ? `no card${c.card_note ? ` — ${c.card_note}` : ""}`
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **185. [B91]** — **implemented**
   - Office, Reference Library tab, the manual's edition label — `webapp/src/pages/admin/LibrarySection.tsx:49`
   - Reads: fd.set("edition", edition || new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" }));
   - Claims: A blank edition box publishes the manual under the current month and year.
   - True: The edition scheme every document footer uses is 'First Edition — August 2026' (docs/facts.md, 'The edition label on every generated document'; the box's own placeholder at :138 shows 'Second Edition — January 2027'). A blank box publishes 'September 2026' with no edition number, and the portal prints that label to every client beside 'always the latest edition' (PortalDashboard.tsx:281).
   - Replace with: Require the label: disable the Publish/Replace button while `edition.trim() === ""` and drop the month-year default.
-  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
 - **186. [B96]** — **implemented**
   - Office, the Fulfil dialog, the 'Placed:' line — `webapp/src/pages/admin/ServiceOrdersSection.tsx:69`
   - Reads: const day = (iso: string | null) => iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—";
   - Claims: 'Placed: Sep 5' identifies when the order was placed.
   - True: No year: an S election order viewed a year on (the SSNs are gone at 14 days but the row stays, :186-187) reads 'Placed: Sep 5' whichever year it was. AdminDashboard.tsx:226-227's `day` prints the year.
   - Replace with: { month: "short", day: "numeric", year: "numeric" }
-  - Fixed: batch 10 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 10 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80277f5dffd5c765a8ca8c81b6c93679a8252a83, batch 10 revision 1, package 1263a2004e2c. This records implementation, not acceptance or publication.
 - **187. [A79h]** — **comments: implemented; unused-fields: implemented; unused-helpers: implemented; dead-branches: implemented; notify-options: open** — housekeeping
   - Housekeeping: eleven misplaced or stale comments; three unused board fields; two unused helpers; dead branches; unreachable notify options.
   - Codex (housekeeping-only): The cited family contains real code-only issues: AdminDashboard.tsx:497 constant sortable, OrderBoard.tsx unused declarations, OrderDetail.tsx:45 unused services, serviceOrders.helpers.ts unused exports, and orphan ServiceOrdersSection.tsx:74-77 comment.
   - **Codex rejected the proposed replacement:** Do not certify the summary’s exact eleven/three counts: raw bucket4 itself identifies five unused board fields, and gives no complete eleven-comment list. Remove only enumerated, verified unused code; reader-facing defects are separately assessed.
   - Ruling, 2026-09-20 (notify-options): Batch 20 item 10: Leave the notification options unchanged. The server accepts them, tests exercise them, and the document-upload screen has a real notification checkbox. The proposed cleanup deletion is rejected.
   - Part "comments" — implemented: Eleven misplaced or stale comments in the office code.
-  - Fixed (comments): batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections (comments): batch 20 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
   - Part "unused-fields" — implemented: The unused board and drawer fields and the columns and subquery that feed them. An intentional work bundle: 190 (five board fields) and 191 (the drawer's services field) are distinct repairs done together.
-  - Fixed (unused-fields): batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections (unused-fields): batch 20 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
   - Part "unused-helpers" — implemented: The two unused helpers in serviceOrders.helpers.ts.
-  - Fixed (unused-helpers): batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (unused-helpers): batch 20 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
   - Part "dead-branches" — implemented: The dead branches behind a constant that is always true.
-  - Fixed (dead-branches): batch 20 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections (dead-branches): batch 20 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
   - Part "notify-options" — open: The unreachable notify options.
   - Former part "all" (retired by 001-part-level-links, now comments, unused-fields, unused-helpers, dead-branches, notify-options): The whole finding.
 - **188. [B90]** — **implemented** — housekeeping; same defect as 187 (dead-branches)
@@ -1994,7 +2246,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: A constant that is always true: the `: (` branches at :511-513 (plain heading) and :525 (no search box) can never render.
   - Replace with: Delete the constant and the two dead branches.
   - Codex (duplicate): Same dead sortable branch already included in187/A79h; AdminDashboard.tsx:497 assigns true unconditionally, leaving the alternate header/search branches unreachable.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **189. [B92]** — **open** — housekeeping
   - Office, the order board — code only — `webapp/src/pages/admin/OrderBoard.tsx:258`
   - Reads: for (const o of orders) { if (o.client_id && !newestByClient.has(o.client_id)) newestByClient.set(o.client_id, o.id); }
@@ -2010,7 +2263,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: total_cents, paid_at, filed_at, ein_purchased and ein_outstanding each appear exactly once in the file (their declaration); the board renders none of them, and routes-admin.ts:215-223 computes ein_outstanding with a subquery for nothing. A79h counted three; there are five.
   - Replace with: Drop the five fields from BoardOrder and the matching columns/subquery from the /admin/orders SELECT, or use them.
   - Codex (duplicate): Same unused board fields already included in187/A79h (raw bucket4 explicitly lists all five); the narrower finding corrects the summary’s three-versus-five count.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **191. [B94]** — **implemented** — housekeeping; same defect as 187 (unused-fields)
   - Office, the order drawer — code only — `webapp/src/pages/admin/OrderDetail.tsx:45`
   - Reads: services: { id: string; type: string; status: string; llc_name: string }[];
@@ -2018,7 +2272,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: `d.services` is never read; the drawer's service rows come from the `services` prop (:251, :834). The route still assembles the array.
   - Replace with: Drop the field from OrderDetailData and from the route's response.
   - Codex (duplicate): Same unused OrderDetailData.services already included in187/A79h raw bucket4; the component renders its services prop instead.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **192. [B95]** — **implemented** — housekeeping; same defect as 187 (unused-helpers)
   - Office, service-order helpers — code only — `webapp/src/pages/admin/serviceOrders.helpers.ts:5`
   - Reads: export const money = (cents: number) => `$${(cents / 100).toFixed(2)}`; export const STATUS_STYLE: Record<string, string> = { … };
@@ -2026,7 +2281,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Neither is imported anywhere under webapp/src (the three importers take boughtAfterFormation, serviceIsOpen, serviceLabel, summaryOf). `money` here prints '$50.00' while the portal's money (services.helpers.ts:15-17) prints '$50' — a second format for one price, unused.
   - Replace with: Delete both exports.
   - Codex (duplicate): Same unused money and STATUS_STYLE exports already included in187/A79h; the actual importers take the other helpers.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **193. [B97]** — **implemented** — housekeeping; same defect as 187 (comments)
   - Office, the Fulfil dialog — code only — `webapp/src/pages/admin/ServiceOrdersSection.tsx:74`
   - Reads: /** The one-line name for a service order. The surrounding card or dialog already names the LLC, so series names are shortened to their own part — "Jimmy Flanagan, LLC - PS 3" reads "PS 3". Never truncated, only wrapped. */
@@ -2034,7 +2290,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Nothing is beneath it: serviceLabel moved to serviceOrders.helpers.ts:21 on 29 Aug 2026 and the comment stayed. Counted in A79h.
   - Replace with: Delete lines 74-77 (or move the comment above serviceLabel in serviceOrders.helpers.ts).
   - Codex (duplicate): Same orphan serviceLabel docstring already counted in187/A79h, as this finding itself notes.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **N1.03. [substantive]** — **implemented**
   - Office, fulfilling an S-election package manually; client record-copy retention — `webapp/server/routes-admin.ts:1372`
   - Reads: await db.query(
@@ -2044,17 +2301,19 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: Marking an uploaded S-election package fulfilled leaves a package that the standard14-day purge can identify and redact.
   - True: The manual fulfill route accepts awaiting_info orders (:1295–1297), inserts a PDF (:1360–1367), but does not store its documentId or the formation/shareholder details in service_orders.details. purgeExpiredSElections at routes-portal.ts:568 requires shareholder details and dateIncorporated before touching a PDF and otherwise merely clears ein_secret at:623. An office-uploaded full-SSN PDF can remain in the portal indefinitely.
   - Replace with: For S-election fulfillment, require the structured details needed for redaction and persist the uploaded document ID on the service order before setting fulfilled. If those details are unavailable, remove the linked filing PDF when the edit window closes instead of leaving it accessible.
-  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 03 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fae579f41b46e94b55a78ff08dd69d053488ddb8, batch 03 revision 1, package 6ee881943907. This records implementation, not acceptance or publication.
 - **N1.07. [substantive]** — **implemented**
   - Office, EIN application instructions, Tax classification row — `webapp/server/routes-admin.ts:1136`
   - Reads: "SELECT id FROM service_orders WHERE client_id = (SELECT client_id FROM service_orders WHERE id = $1) AND type = 's-election' AND status NOT IN ('pending_payment', 'cancelled') LIMIT 1",
   - Claims: A paid S-election order on this client account proves the entity in the current EIN application should be described as an S corporation.
   - True: ServiceOrdersSection.tsx:326 uses sElectionPaid directly for the IRS Tax classification instruction. This query does not match formation_order_id or the EIN details.target. CompanyA's S package can label companyB's EIN as S corporation; a series-target EIN also inherits the account-wide flag.
   - Replace with: Derive tax classification from the EIN target entity and its actual intended tax treatment. For a company target, match any supporting S-election order by formation_order_id; do not infer the classification of a series from a package purchased for the parent or another company.
-  - Previous fix: 02 r1, commit ; 1 assertion(s) retained. Replacement attempt: 30 r1, work order a9d1dd44e9885c7273f956a1cccf4347d3626dc42e7ea293a0918418ffc28ab8.
-  - Previous fix: 02 r1, commit ; 1 assertion(s) retained. Replacement attempt: 30 r2, work order 9f116dbefaf4537acb16be86448bf0e8e85c7d9423092946490e28d823598f43.
-  - Previous fix: 02 r1, commit ; 1 assertion(s) retained. Replacement attempt: 30 r3, work order 89553dc2808b2de71117445c52058545007d2ae7a28662057be4aa7fca5d6272.
-  - Fixed: batch 30 revision 3, commit , by Codex; protected by 1 assertion(s).
+  - Previous fix: 02 r1, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 30 r1, work order a9d1dd44e9885c7273f956a1cccf4347d3626dc42e7ea293a0918418ffc28ab8.
+  - Previous fix: 02 r1, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 30 r2, work order 9f116dbefaf4537acb16be86448bf0e8e85c7d9423092946490e28d823598f43.
+  - Previous fix: 02 r1, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 30 r3, work order 89553dc2808b2de71117445c52058545007d2ae7a28662057be4aa7fca5d6272.
+  - Implemented protections: batch 30 revision 3, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 9efcb29c4571efc3ddce69c8612f439569c455cf, batch 30 revision 3, package 30180be42289. This records implementation, not acceptance or publication.
   - 2026-09-22 superseded by approved replacement: prior fix 02 r1 at ; approved work order a9d1dd44e9885c7273f956a1cccf4347d3626dc42e7ea293a0918418ffc28ab8
   - 2026-09-22 rejected r1: Automatic revision under Adam’s standing authorization: declare the consent assertion replacement and joint-signature pagination support.
   - 2026-09-22 superseded by approved replacement: prior fix 02 r1 at ; approved work order 9f116dbefaf4537acb16be86448bf0e8e85c7d9423092946490e28d823598f43
@@ -2068,21 +2327,24 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: A partial failure preserves the intact prior package.
   - True: During staging :801 calls issueStatement, whose :507–509 immediately deletes the prior statement and blob. A later certificate or designation upload failure reaches :836–843 and deletes the new statement too. The portal then has neither statement, contrary to the rollback comment.
   - Replace with: Stage the replacement statement without retiring its predecessor. Retire all prior package documents only after the complete new package succeeds; on failure delete only staged new rows and blobs.
-  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
 - **N3.05. [substantive]** — **implemented**
   - Office → service order → Federal EIN for a protected series → IRS assistant answer list — `webapp/src/pages/admin/ServiceOrdersSection.tsx:333`
   - Reads: ["Legal name", viewing.llc_name],
   - Claims: The listed legal name belongs to the entity for which this EIN was ordered.
   - True: At :291-292 the same dialog correctly says EIN for details.seriesName when target is series. The assistant’s legal-name row at :333 nevertheless always supplies the parent LLC name, although the office is told at :309-310 to type these answers straight down. This can submit the parent name on an application intended for the separately named series.
   - Replace with: ["Legal name", viewing.details.target === "series" ? viewing.details.seriesName ?? "" : viewing.llc_name],
-  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 02 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f902a8e41b973f62a96ca6c39067c33ae0fb61a2, batch 02 revision 1, package 57ca7c2f44aa. This records implementation, not acceptance or publication.
 - **N3.08. [substantive]** — **implemented**
   - Office → order board → Complete column when service orders have not loaded — `webapp/src/pages/admin/OrderBoard.tsx:380`
   - Reads: Everything delivered — documents and services
   - Claims: Every order in this column has no outstanding purchased service.
   - True: servicesQuery runs independently at :233-237. Until it succeeds, or after it fails without cached data, :263 substitutes an empty service list. everythingDone at :282-283 then accepts formed orders with delivered certificates, and :295 places them in Complete even when outstanding services have not been checked. The query has no visible failure state; only ordersQuery errors are shown.
   - Replace with: Require a successfully loaded service list before marking delivery complete. While it is unavailable show: “We could not check the remaining service orders. Try again.”
-  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B4-EMAIL-ERROR-EMPTY. [substantive]** — **implemented**
   - Office → Clients → Emails, when initial email-history request fails — `webapp/src/pages/admin/AdminDashboard.tsx:129`
   - Reads: Nothing has been sent to this address since the record began.
@@ -2090,7 +2352,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The query is independent. After its initial request fails without cached data, isPending is false and list.data is undefined. Lines126–129 substitute [] and render this factual empty-history statement; no list.isError branch exists. Individual email-body failure also remains Loading indefinitely at106–123. This is a source-proven failure branch; no claim that a live outage occurred. Compared with priorN3.08 (board completion) andN3.09 (portal legal mail): different screen, dataset, and claim.
   - Proposed replacement (not approved): Render a retryable error when email history could not be loaded; use the empty-history statement only after a successful empty response. Give an explicit retryable error for an individual email-body request as well.
   - Rechecked by codex-reader-5: AdminDashboard.tsx:106–129 has neither list nor individual-query error branch. With failed initial list data undefined and pending false, nullish [] yields the factual nothing-sent sentence; individual body remains Loading. Prior174 corrected provider acceptance and500limit; N3.08 concerned board service completion and N3.09 portal legal mail. Different datasets/screens, hence new failure-state defect. No outage reproduced.
-  - Fixed: batch 23 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 23 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 81a7290cc77d13c42685a57d9d37f5103cf6d4c4, batch 23 revision 1, package 878d45c6f898. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B4-EIN-ERROR-MISSING. [substantive]** — **implemented**
   - Office → service order → Fulfil EIN dialog, when protected service details fail to load — `webapp/src/pages/admin/ServiceOrdersSection.tsx:306`
   - Reads: "— not yet provided —"
@@ -2098,7 +2361,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The SSN is supplied only by detailQuery at118–122. At303–306 the component distinguishes loading and a truthy tin but never checks query error. A failed initial request with no cached data therefore renders not yet provided even for a submitted EIN application; the IRS assistant answer list at312 also disappears. Unknown retrieval state is presented as a missing client submission. No live outage asserted. PriorN3.05 is the separate series-name fix, andN3.08 concerns board completion.
   - Proposed replacement (not approved): Show a retryable service-details error when detailQuery fails. Display not yet provided only after a successful response confirms no SSN/ITIN; require loaded details before presenting the IRS-assistant answers as ready.
   - Rechecked by codex-reader-5: ServiceOrdersSection.tsx:118–122 independently fetches protected details;303–306 uses loading/tin only, and312 gates assistant answers on detail data. Failed initial retrieval without cache renders not yet provided. PriorN3.05 concerns series legal-name row, not retrieval failure; N3.08 is separate board completion. No actual IRS submission or live outage claimed.
-  - Fixed: batch 23 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 23 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 81a7290cc77d13c42685a57d9d37f5103cf6d4c4, batch 23 revision 1, package 878d45c6f898. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B5-ARTICLES-METADATA. [substantive]** — **implemented**
   - Office formation-package Articles replacement — `webapp/server/routes-admin.ts:742`
   - Reads: VALUES ($1, $2, 'articles', $3, $4, $5, $6, '{}'::jsonb) RETURNING id`,
@@ -2106,7 +2370,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Initial /articles stores documentNumber in meta at503. Full formation-package replacement inserts new Articles with empty meta then retires prior Articles. For a self-signed company there is no Statement metadata fallback at407, so the admin detail loses its stored document number even when form.documentNumber was supplied. Source-confirmed; coordinator runtime pending. Compared ledger177 (different frontend validation mismatch),208 (dates),N1.14 (rollback); none covers lost metadata.
   - Proposed replacement (not approved): Preserve existing validated documentNumber when replacing Articles, or replace it with a newly supplied validated number. Store it on replacement Articles for both signing paths. Verify self-signed and office-signed replacement retain the number.
   - Rechecked by codex-root-independent: Root independently reopened routes-admin.ts385–414,488–510,724–760. Initial upload stores documentNumber; replacement writes empty JSON. Detail reads Articles then Statement; self-signed replacement lacks fallback. Compared prior177,208,N1.14; distinct metadata loss. Source proof, no external incident claimed.
-  - Fixed: batch 23 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 23 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 81a7290cc77d13c42685a57d9d37f5103cf6d4c4, batch 23 revision 1, package 878d45c6f898. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch28-runtime-B-legal-mail-notice-lost-with-no-resend. [substantive]** — **implemented**
   - Office → Clients → Upload → Legal mail (and other documents) when the email provider fails; Terms 10(b) — `webapp/server/routes-admin.ts:1565`
   - Reads:     notified = await sendMail({ to: clients[0].email, ...mail }).then(
@@ -2114,7 +2379,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: Current upload stores the document at1565-1570 then records notified false when sending rejects at1580-1585. Search of all routes in routes-admin.ts found no existing-document notify route; current UI toast is transient. Uploading again is not a retry of the same document. Existing email logs record failures, but matching only a subject cannot reliably associate a generic new-document subject with one specific document.
   - Proposed replacement (not approved): Add an authenticated office resend action keyed to document ID, preserve legal-mail context and current recipient, and retain delivery status keyed to that document. Reuse the existing stored document; report send acceptance truthfully.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current upload stores the document at1565-1570 then records notified false when sending rejects at1580-1585. Search of all routes in routes-admin.ts found no existing-document notify route; current UI toast is transient. Uploading again is not a retry of the same document. Existing email logs record failures, but matching only a subject cannot reliably associate a generic new-document subject with one specific document.
-  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 - **AUD-claude-reconciled-batch28-reader-5-clients-tab-cancel-chip. [wording]** — **implemented**
   - Office, Clients tab — the amber 'RA cancel requested …' chip beside a client's name — `webapp/server/routes-admin.ts:895`
@@ -2123,7 +2389,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: routes-admin:904 reads clients.ra_cancellation_requested_at; AdminDashboard:562–564 renders it. Portal route :2635 writes the legacy client column; ra-office:38–40 records email cancellations on orders only. Proposed subquery fixes the missing office event but still collapses multiple companies and drops an appointment whose ra_ended_date is set to a future effective date (ra-office filed action sets date +31). An IS NULL test is not equivalent to not ended yet.
   - Proposed replacement (not approved): Derive cancellation summaries from company order records and identify the affected company; if keeping an account summary, use a clearly defined active/pending-company rule that handles a future appointment-end date.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. routes-admin:904 reads clients.ra_cancellation_requested_at; AdminDashboard:562–564 renders it. Portal route :2635 writes the legacy client column; ra-office:38–40 records email cancellations on orders only. Proposed subquery fixes the missing office event but still collapses multiple companies and drops an appointment whose ra_ended_date is set to a future effective date (ra-office filed action sets date +31). An IS NULL test is not equivalent to not ended yet.
-  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 - **AUD-claude-reconciled-batch33-reader-5-ein-pending-per-client-unused. [housekeeping]** — **implemented** — housekeeping
   - Office, Service orders list (GET /admin/services) — the ein_pending column — `webapp/server/routes-admin.ts:1054`
@@ -2132,7 +2399,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Lines 1054-1058 match any open EIN order on the same client_id, not the same company or target (the defect shape Batch 02 fixed for sElectionPaid at :1094-1097), and nothing reads it: ServiceOrdersSection.tsx:54 only declares `ein_pending: boolean` and git grep finds no other use in webapp/src. The office screens use details.einPending instead (:192, :221). Dead, and wrong if ever used.
   - Proposed replacement (not approved): Delete lines 1054-1058 and the `ein_pending: boolean;` field at ServiceOrdersSection.tsx:54; or, if wanted, scope it: `(so.type = 's-election' AND EXISTS (SELECT 1 FROM service_orders e WHERE e.client_id = so.client_id AND e.formation_order_id = so.formation_order_id AND e.type = 'ein' AND COALESCE(e.details->>'target','company') = 'company' AND e.status NOT IN ('fulfilled', 'cancelled'))) AS ein_pending,`
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-owner-office-board-2026-09-22-completed-orders. [wording]** — **implemented**
   - Office: Formations & Service Orders board and new Completed Orders tab — `webapp/src/pages/admin/OrderBoard.tsx:376`
   - Reads: title="Complete"
@@ -2140,7 +2408,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Owner requested a separate Completed Orders tab and Post-Filing Items third column, then approved the proposed placement, automatic movement, searchable pagination and returning purchases with Go. Implement this.
   - Proposed replacement (not approved): Show New Orders, With The State and Post-Filing Items on the active board; put fully delivered orders in searchable, paginated Completed Orders; new purchases return as green New Orders.
   - Rechecked by Codex source comparison with owner-approved feature request: This is a new owner-requested workflow, not an independently discovered audit defect. Compared OrderBoard.tsx and routes-admin.ts at 1aa316b.
-  - Fixed: batch 36 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 36 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 3ff5edd95c196550019e3bb7595eff70d843b41f, batch 36 revision 4, package 8cb044c94f11. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the fact-ledger update required by Adam's approved Completed Orders tab and Post-Filing Items column.
   - 2026-09-23 rejected r2: Declare updates to Batch05 and Batch10 browser fixtures for the approved queue API and Completed Orders navigation; preserve their substantive assertions.
   - 2026-09-23 rejected r3: Include the third nonempty Office board fixture (Batch02) in the same queue-response update; no product behavior or prior assertion changed.
@@ -2151,7 +2420,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The existing EIN-details repair already establishes this error-handling rule. Source reconciliation: RR-PORTAL-01
   - Proposed replacement (not approved): Use loading, failed-with-Retry, and successful-response states for the S-election branch, as the EIN branch already does. Only a successful response can establish missing answers. Exact wording: We couldn’t load the S-election details. Please try again.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -2162,7 +2432,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Adam’s later explicit instruction governs: “The only tax classification for a series we permit is disregarded entity.” An older auditor’s caution is not a contrary owner ruling. Source reconciliation: RR-PORTAL-02
   - Proposed replacement (not approved): Show Disregarded entity for a protected-series target. Keep parent-company scoping and parent tax choices separate. This describes the service you permit, not universal tax advice about all possible series. Exact wording: Disregarded entity
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -2173,7 +2444,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Batch 28 approved identifying the affected company in the cancellation summary. Source reconciliation: RR-PORTAL-06
   - Proposed replacement (not approved): Render the badge only when there is company-specific cancellation text to display. Keep the existing company eligibility and end-date rules.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -2182,25 +2454,30 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
 - **194. [A3]** — **implemented** — related: 212
   - Renewal notice timing (mine). renewals.ts NOTICE_DAYS = 45. Terms 9(d): notice 30–60 days before the cancellation deadline; deadline is renewal − 30 (9(g)); so notice must be 60–90 days before the date. Replace: 60.
-  - Previous fix: 07 r1, commit ; 1 assertion(s) retained. Replacement attempt: 28 r2, work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b.
-  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Previous fix: 07 r1, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 28 r2, work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b.
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 superseded by approved replacement: prior fix 07 r1 at ; approved work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b
 - **195. [A4]** — **implemented**
   - Renewal retry (mine). The retry reuses idempotency key `ren-<id>-1`; Square returns the first decline; the email promises a retry. Replace: store the attempt count on every decline; retry key numbered 2.
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **196. [A5]** — **implemented**
   - Renewal receipt after a link payment (mine). "We charged $99 to your card ending 1234" when the client paid the link. Replace: "We received $99 for registered agent service for [company] through [date]."
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **197. [A23]** — **implemented**
   - Formed email, EIN line: "that's our next step." The order waits on the client's details. Replace: "…it is waiting for the responsible party's details from you: sign in, open Orders in progress, and choose Provide details securely."
   - Codex (disputed): email.ts:468–472 says the open EIN/S-election orders are our next step. routes-admin.ts:879 selects both awaiting_info and in_progress; for in_progress the client has already supplied the details. The proposed universal statement that details are waiting from the client is false for that state.
   - **Codex rejected the proposed replacement:** Pass each service status to the email. Ask for details only for awaiting_info and describe processing for in_progress.
   - Corrected after Codex's review: An in-progress order already has the client's details. Pass each order's status to the email and ask for details only when they are awaited.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **198. [A24]** — **implemented**
   - Welcome email and Your information header say "formation documents" to a converting client. Replace: "filed Designations" / "your filed documents".
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **199. [B99]** — **implemented** — same defect as 195
   - Registered agent renewal, the email after the retry charge is declined (renewals job) — `webapp/server/email.ts:166`
@@ -2208,7 +2485,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: That a further attempt will be made on the date named.
   - True: After the retry (the second attempt) is declined for insufficient funds, renewals.ts:257 sets retryAfter again because `attempt < 2` is still true (attempt is 1 — see A4), :260 stores retries = 1, and :263 passes willRetry: true, so the client is promised a third attempt; on the next pass :235 `row.retries < 1` is false and no charge runs. The promise is never kept.
   - Replace with: Store the attempt count on every decline (renewals.ts:260 `retries = attempt`), compute retryAfter only when `attempt < 2` with attempt counting both attempts (first decline attempt=1 → retry allowed; second decline attempt=2 → none), and allow the retry with `row.retries < 2` at :235. The email then says 'once more' only once.
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **200. [B100]** — **implemented**
   - The 'A change to your portal email was requested' notice sent to the old address — `webapp/server/email.ts:222`
   - Reads: If this was not you, sign in and change your password immediately, then email support@myfloridaseriesllc.com. This address remains on the account until the new one is confirmed.
@@ -2216,9 +2494,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Changing the password (routes-portal.ts:2420-2455) deletes other sessions but leaves pending_email set and the verify_email token valid for its hour; pending_email is cleared only when a link is confirmed (routes-portal.ts:2541, :2545) or by the office (routes-admin.ts:1076), and no portal control withdraws a pending change (AccountCard.tsx:65-67 only displays it). Someone holding the new inbox can still confirm the change after the password is changed. Requesting a new change to the old address does cancel the earlier link (routes-portal.ts:2478-2482 marks older tokens used) but the email does not say so.
   - Replace with: Code: on a password change, `UPDATE clients SET pending_email = NULL` and mark outstanding verify_email tokens used. Email: 'If this was not you, sign in and change your password immediately — that also cancels this request — then email support@myfloridaseriesllc.com.'
   - Part "all" — implemented: The whole finding.
-  - Fixed (all): batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (all): batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
   - Part "pending-email-notice" — implemented: After a successful password change, refresh the client portal Account card so the cancelled pending-email notice disappears without a page reload.
-  - Fixed (pending-email-notice): batch 04-followup revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (pending-email-notice): batch 04-followup revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit ef1f5d75620891ec94004a96a24732924546160b, batch 04-followup revision 1, package 89099bd24abd. This records implementation, not acceptance or publication.
 - **201. [B101]** — **implemented** — same defect as 28
   - Registered agent cancellation confirmation email, point 2 — `webapp/server/email.ts:285`
   - Reads: Until we receive that proof, we remain your agent of record and service is billed at the then-current rate, prorated monthly, as described in the Terms of Service.
@@ -2227,7 +2507,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: Either build it (a monthly charge or payment link for a cancelled company still on file, with the office row turning amber) or, until then, soften the email to 'Until we receive that proof, we remain your agent of record and the Terms of Service let us bill for that time at the then-current rate, prorated monthly.'
   - Codex (duplicate): Same missing automated monthly-proration mechanism and same Terms9(g) promise as item28; this separate email occurrence was not marked same defect as in findings-open.
   - **Codex rejected the proposed replacement:** Neither absence of automation nor this email proves no manual billing can occur. Preserve the contractual monthly rate; the alternative wording can clarify manual administration, while replacing it with an annual fee would change the bargain.
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **202. [B102]** — **implemented** — same defect as 63
   - Formed email, S election paragraph — `webapp/server/email.ts:494`
   - Reads: IRS Form 2553 must be filed within 2 months and 15 days of the date on your filed Articles, so please complete the form soon.
@@ -2237,14 +2518,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): email.ts:494 reads IRS Form2553 must be filed within2 months and15 days of the date on your filed Articles. IRS Instructions for Form2553, When To Make the Election and ItemE, tie the deadline to the tax year/election effective date; the first tax year uses the earliest ownership, assets or business date. Automatically substituting LLC effective date remains an oversimplification.
   - **Codex rejected the proposed replacement:** Use the election effective date determined under IRS ItemE, explain the first-year rule and any applicable weekend/holiday adjustment. Source opened: https://www.irs.gov/instructions/i2553 .
   - Outcome: Codex's dispute not adopted: Same as 63; waits on Adam's decision there.
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **203. [B103]** — **implemented** — same defect as 133
   - 'Your Form 2553 package is ready' email — `webapp/server/email.ts:404`
   - Reads: ready to download in your portal: the completed IRS Form 2553, a cover letter, and step-by-step instructions for signing and mailing it to the IRS.
   - Claims: That the instructions are for mailing.
   - True: The package's instructions recommend fax: s-election.ts:238 '**Fax (recommended):** ${IRS_FAX}. Keep the fax transmission confirmation…' (the cover letter line at :216 says 'mail it'). Same as A65 in the portal.
   - Replace with: …step-by-step instructions for signing it and faxing or mailing it to the IRS.
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **204. [B104]** — **dropped**
   - Legal mail received email — `webapp/server/email.ts:253`
   - Reads: In Florida a lawsuit typically allows 20 days to respond BUT THIS IS NOT ALWAYS THE CASE. Contact an attorney immediately so they can provide you with proper legal guidance.
@@ -2259,7 +2542,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The sign-in page has a link called 'Forgot password'.
   - True: The sign-in page link reads 'Forgot your password?' (PortalLogin.tsx:71) and the password-changed email at email.ts:193 says 'Forgot your password' — two wordings for one link. (The 7 days is true: routes-payments.ts:112 and :614.)
   - Replace with: This link expires in 7 days. If it expires, use "Forgot your password?" on the portal sign-in page with this email address.
-  - Fixed: batch 04 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 04 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 80d4c558ce2c5295ae7610f323e4a30cc12a514a, batch 04 revision 1, package 47ac74aca838. This records implementation, not acceptance or publication.
 - **206. [B107]** — **optional — implemented**
   - Portal purchase confirmation email (series, certificate of status, certified copy) — `webapp/server/email.ts:335`
   - Reads: No further action is needed from you. We'll post the confirmation to your portal when the work is complete.
@@ -2268,7 +2552,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: No further action is needed from you. We'll post the document to your portal when the work is complete.
   - Codex (disputed): email.ts:335 reads No further action is needed from you. We'll post the confirmation to your portal when the work is complete. A filed designation or certificate can confirm completion; the finding treats this ordinary meaning as excluding the deliverable without evidence.
   - Outcome: 'Confirmation' can mean the filed document; 'document' is clearer.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **207. [B108]** — **implemented**
   - Office email 'EIN details submitted — ready to file' — `webapp/server/email.ts:374`
@@ -2277,14 +2562,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: GET /admin/services/:id decrypts the number on every call (routes-admin.ts:1124-1132); nothing limits viewing to once. The deletion clause is true (:1372-1375).
   - Replace with: View them in the admin dashboard; the identification number is deleted automatically when you mark the order fulfilled.
   - **Codex rejected the proposed replacement:** Remove once. Qualify deletion as removal from the active service-order record unless backup retention is also corrected; the existing blanket deletion clause is not true for archived snapshots.
-  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 03 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fae579f41b46e94b55a78ff08dd69d053488ddb8, batch 03 revision 1, package 6ee881943907. This records implementation, not acceptance or publication.
 - **208. [B111]** — **implemented**
   - Office: uploading a replacement formation package (Articles or designations) after the company is formed — `webapp/server/routes-admin.ts:860`
   - Reads: UPDATE orders SET status = 'formed', formed_at = now(), ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date WHERE id = $1
   - Claims: Runs once, when the company is formed.
   - True: The route is also the replacement path (:466-471 'A wrong file is replaced later by the formed-step package upload, which retires priors'), and the UPDATE is unconditional, so every re-upload moves formed_at and pushes ra_renewal_date to a year after the re-upload — including after a renewal has been charged and the date advanced (renewals.ts:252). The renewal date the client was told (email.ts:129-133) and the cancellation deadline built from it silently change.
   - Replace with: UPDATE orders SET status = 'formed', formed_at = COALESCE(formed_at, now()), ra_renewal_date = COALESCE(ra_renewal_date, ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date) WHERE id = $1 (and the non-agent branch likewise for formed_at).
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **209. [B112]** — **implemented**
   - Formed email — the 'Your Federal EIN order / S election package order is in your portal as well' line, for a client with two companies — `webapp/server/routes-admin.ts:879`
   - Reads: SELECT type FROM service_orders WHERE client_id = $1 AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')
@@ -2292,14 +2579,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The query is by client, not by formation order: a client forming a second company whose first company still has an open EIN order is told, in the second company's formed email, that 'Your Federal EIN order is in your portal as well' (email.ts:466-473, :492-495). service_orders carries formation_order_id for both intake and portal purchases (routes-payments.ts:93-104; routes-portal.ts:1934, :1989, :2057, :2143).
   - Replace with: …WHERE client_id = $1 AND (formation_order_id = $2 OR formation_order_id IS NULL) AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress') with o.id as $2.
   - **Codex rejected the proposed replacement:** Require the matching formation_order_id. Resolve legacy NULL associations to a specific order before inclusion; OR formation_order_id IS NULL otherwise repeats the ambiguity for every company.
-  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 02 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f902a8e41b973f62a96ca6c39067c33ae0fb61a2, batch 02 revision 1, package 57ca7c2f44aa. This records implementation, not acceptance or publication.
 - **210. [B113]** — **implemented**
   - Certificate titles as the client sees them in the portal ('Certificate of Status - Sep 16, 2026 — Acme, LLC') — `webapp/server/routes-admin.ts:250`
   - Reads: return `${kindTitle} - ${day} — ${llcName}`;
   - Claims: A title in the house style.
   - True: One title mixes a hyphen and an em dash; every other document title uses ' — ' alone (:558 Articles, :827 designations, :1336-1343 service deliverables).
   - Replace with: return `${kindTitle} (${day}) — ${llcName}`;
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **211. [B114]** — **implemented** — same defect as 178 (ein-hint-2553)
   - Office fulfil dialog refusal when the EIN box is empty, for an EIN bought for a series — `webapp/server/routes-admin.ts:1308`
@@ -2310,7 +2599,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (duplicate): Same unconditional company-Form2553 hint as item178, now repeated in routes-admin.ts:1308; findings-open did not mark this as same defect as178.
   - **Codex rejected the proposed replacement:** The proposed target check fixes series EINs, but a company EIN also need not have a purchased S-election package. Mention Form2553 only when a matching company package exists.
   - Corrected after Codex's review: Codex adds: a company EIN with no S election package has no Form 2553 either; mention the form only when a matching package exists.
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **212. [B116]** — **implemented** — related: 194
   - The registered agent renewal date — which anniversary — `webapp/server/routes-admin.ts:862`
   - Reads: ra_renewal_date = ((now() AT TIME ZONE 'America/New_York') + interval '1 year')::date
@@ -2318,7 +2608,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The date is a year after the day the office uploads the formed package, which can be days or weeks after the Articles' effective date on which the agent designation took effect (s. 605.0207; the Articles carry the agent's acceptance, s. 605.0201(2)(c)). The Terms do not say which anniversary; the portal (PortalDashboard.tsx:367) and every renewal email show this one. Adam should say whether the anniversary is the upload day or the Articles' effective date.
   - Replace with: If the effective date is meant: set ra_renewal_date from the Articles' effective date typed at upload (the office already types the document number there), and say 'the anniversary of your LLC's effective date' in Terms 9(c).
   - **Codex rejected the proposed replacement:** The proposed fix is conditional, not a settled replacement, and the original effective date of an old converting LLC is unsuitable. Define anniversary as the start of this purchased agent term, or explicitly as the initial completed-package date, then calculate consistently.
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **213. [B123]** — **implemented**
   - Chapter 605 notes, Administration, the entity-transactions bullet — `webapp/server/chapter-605-notes.md:140`
   - Reads: s. 605.2602–605.2604 — a protected series may not convert, domesticate, or participate in an interest exchange, and may merge only through the single channel in s. 605.2604 (every other party an LLC; surviving company not created in the merger).
@@ -2326,7 +2617,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: s. 605.2602 (read today): 'Except as provided in ss. 605.2605(2), 605.2606(2), and 605.2607(1), a protected series may not participate in; be a party to; result from; or be formed, organized, established, or created by … (1) A conversion, domestication, interest exchange, or merger'. The merger channel in s. 605.2604 belongs to the series limited liability COMPANY ('A series limited liability company may be a party to a merger … only if … (1) Each other party to the merger is a limited liability company. (2) The surviving company is not created in the merger.'); a protected series is only relocated, continued or terminated inside the company's merger under ss. 605.2605-605.2607. The masters have it right (facts.md: 'except as ss. 605.2602 and 605.2605–605.2607, Florida Statutes, permit') and facts.md retires exactly this note's wording ('605.2602–605.2604', 'single statutory channel provided in s. 605.2604').
   - Replace with: s. 605.2602 — a protected series may not be a party to, result from, or be created by a conversion, domestication, interest exchange or merger, except that in the company's own merger under s. 605.2604 (every other party an LLC; surviving company not created in the merger) a protected series is relocated, continued or terminated as ss. 605.2605–605.2607 provide. s. 605.2603 bars the series LLC itself from conversion, domestication and interest exchange.
   - Codex (housekeeping-only): chapter-605-notes.md:140 wrongly assigns605.2604 merger-party permission to a protected series;2026 sections605.2602–2607 distinguish the company's merger from continuation/relocation of its series. This is an internal reference note, not delivered product text.
-  - Fixed: batch 17 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 17 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **214. [B124]** — **implemented**
   - Chapter 605 notes, fee schedule, 'Conflicts with what we charge' — `webapp/server/chapter-605-notes.md:264`
@@ -2335,7 +2627,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Stale. validation.ts:178-179 now `articlesOfOrganization = isConversion ? 0 : 100` and `registeredAgentDesignation = … : 25`; pricing.ts:72-81 prints two lines, 'FL state fee — Articles of Organization' and 'FL state fee — registered agent designation'; docs/facts.md ledger 'The $125 a new company pays the state' fixes the split at $100 + $25 and retires '$125 Articles filing fee'.
   - Replace with: Resolved: since the facts ledger, the calculator and the line items split the $125 as the statute does — $100 under (2) and $25 under (7).
   - Codex (housekeeping-only): chapter-605-notes.md:264 describes the old125/0 fee split, while validation.ts:178–179 and pricing.ts:72–81 now split100/25. It changes only the internal historical note.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **215. [B125]** — **implemented**
   - Chapter 605 notes, fee schedule, 'Conversion gap' — `webapp/server/chapter-605-notes.md:270`
@@ -2344,7 +2637,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Stale. pricing.ts:44-46 and :53 pass `registeredAgentChange` ('A converting client who takes our registered agent service is changing the agent on file — s. 605.0213(7), $25'), validation.ts:179 charges it, and pricing.ts:77-78 prints 'FL state fee — change of registered agent'.
   - Replace with: Resolved: a converting client who takes our agent service is charged the $25 change-of-agent fee under (7).
   - Codex (housekeeping-only): chapter-605-notes.md:270 says the conversion agent-change fee stopped being collected; pricing.ts:44–53 and validation.ts:179 collect25 when applicable. Internal note only.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **216. [B126]** — **implemented**
   - Chapter 605 notes, fee schedule, 'Annual report unresolved' — `webapp/server/chapter-605-notes.md:275`
@@ -2353,7 +2647,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: They are statutory. s. 607.193(1) (read today on Online Sunshine): 'an annual supplemental corporate fee of $88.75 is imposed on each business entity that is authorized to transact business in this state and is required to file an annual report with the Department of State under s. 605.0212, s. 607.1622, or s. 620.1210.' $50 (s. 605.0213(5)) + $88.75 = $138.75. s. 607.193(2)(b): 'a late charge of $400 shall be imposed if the supplemental corporate fee is remitted after May 1' — $538.75.
   - Replace with: Annual report, verified: $50 under s. 605.0213(5) plus the $88.75 supplemental corporate fee under s. 607.193(1) = $138.75; the $400 late charge is s. 607.193(2)(b), payable when the fee is remitted after May 1 — $538.75.
   - Codex (housekeeping-only): chapter-605-notes.md:275 labels the annual-report total unverified. Opened2026 s.607.193(1)–(2):88.75 supplemental fee and400 late charge, added to605.0213(5)50, establish138.75/538.75.
-  - Fixed: batch 09 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 09 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 880d1b2389eb19b9854fb3dd8467a619d69beefc, batch 09 revision 2, package af2885ae7206. This records implementation, not acceptance or publication.
   - 2026-09-19 rejected r1: Administrative supersession to complete approved item 52: declare the shared address-hint component discovered during rendered review, preserve earlier evidence, and use a complete revision 2 work order. This records implementation bookkeeping under the existing Go, not a new product rejection, acceptance, or publication decision.
 - **217. [B127]** — **implemented**
   - Chapter 605 notes, General act, the s. 605.0105(3) bullet, item (p) — `webapp/server/chapter-605-notes.md:173`
@@ -2362,7 +2657,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: s. 605.0105(3)(p) has a fourth item: '4. A breach of duties or obligations under s. 605.04091, taking into account a restriction, an expansion, or an elimination of such duties and obligations provided for in the operating agreement to the extent allowed by subsection (4).' It matters to the Indemnification sections, which A80 is already about.
   - Replace with: (p) may not indemnify for bad faith, willful or intentional misconduct, improper personal benefit, s. 605.0406 liability, or a breach of the s. 605.04091 duties as the agreement has shaped them.
   - Codex (housekeeping-only): chapter-605-notes.md:173 omits605.0105(3)(p)4 from the internal indemnification summary. The missing category is breach of605.04091 duties as permissibly shaped by the agreement.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **218. [B128]** — **implemented**
@@ -2373,7 +2669,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: …a sale of substantially all the assets where the member could vote on it (unless by court order, or for cash with the proceeds distributed within a year)…
   - Codex (housekeeping-only): chapter-605-notes.md:508 omits exceptions from the internal summary of605.1006(1)(d). The statute distinguishes court-ordered sales and qualifying cash-sale distribution plans.
   - **Codex rejected the proposed replacement:** Say cash pursuant to a plan distributing all or substantially all NET proceeds to interest holders within one year; not merely any proceeds distributed within a year.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **219. [B106]** — **implemented** — housekeeping
@@ -2383,7 +2680,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The manual reaches library_documents only when refreshOwnersManual runs (routes-admin.ts:40-70) — the nightly cron at 08:45 UTC (vercel.json) or the office's button (:85-96); nothing publishes at boot (no call in app.ts or vercel-entry.ts). On a fresh production database the first client paid before that runs finds an empty library.
   - Replace with: Publish the manual on first boot when no 'owners-manual' row exists (call refreshOwnersManual(false) from the cron and from app start), or word it 'will be in your portal's library'.
   - **Codex rejected the proposed replacement:** Ensure an awaited successful publication before the first welcome or state availability only after checking the library. An unawaited app-start call or unconditional will-be promise does not establish availability.
-  - Fixed: batch 05 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 05 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f2aa05568a2f057808066fdba3ac6055a7578ef2, batch 05 revision 1, package 2b176d47f80e. This records implementation, not acceptance or publication.
 - **220. [B109]** — **implemented** — housekeeping
   - 'About the card you paid with' email (prepaid gift card), the renewal date in parentheses — `webapp/server/email.ts:107`
   - Reads: Before your renewal date${renewalDate ? ` (${escapeHtml(renewalDate)})` : ""} you will receive an email with a payment link.
@@ -2391,7 +2689,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The email is sent from saveRenewalCard at payment (routes-payments.ts:66), and renewals.ts:108-109 reads ra_renewal_date then — but the date is written only at formation (routes-admin.ts:862), so it is always NULL here and the parenthesis never prints. Dead branch; the sentence without the date is true.
   - Replace with: Drop the renewalDate parameter (renewals.ts:108-109, email.ts:99, :107), or send the gift-card email at formation when the date exists.
   - Codex (housekeeping-only): saveRenewalCard reads ra_renewal_date at renewals.ts:108–109 during initial payment, before the formation upload sets it; the optional date parameter changes no currently emitted initial-payment email. fulfillPaidRenewal uses saveCardFromPayment directly, not this gift-card email.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **221. [B110]** — **implemented** — housekeeping
   - Registered agent renewal paid through its payment link — where the client lands afterwards — `webapp/server/renewals.ts:164`
   - Reads: redirectUrl: `${env.PUBLIC_BASE_URL}/portal?renewed=${row.id}`,
@@ -2399,7 +2698,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Nothing in webapp/src reads a `renewed` query parameter (grep of src for 'renewed': no matches); the client lands on the plain portal and the only acknowledgment is the receipt email (renewals.ts:308-309).
   - Replace with: Either read `renewed` on the portal and show 'Thank you — your registered agent service is renewed through [date]' on the Registered agent service card, or redirect to `/portal` and drop the parameter.
   - Codex (housekeeping-only): renewals.ts:164 appends renewed=<id>; the portal does not consume it. The query parameter itself promises no acknowledgment to a reader, who still receives a receipt email.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **222. [B115]** — **implemented** — housekeeping
   - Office order drawer query — `webapp/server/routes-admin.ts:359`
   - Reads: SELECT *, rejected_at, ra_renewal_date FROM orders WHERE id = $1
@@ -2407,14 +2707,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: `*` already returns rejected_at and ra_renewal_date; the two names are redundant.
   - Replace with: SELECT * FROM orders WHERE id = $1
   - Codex (housekeeping-only): routes-admin.ts:359 selects *, rejected_at, ra_renewal_date; * already includes the two named columns and no reader-visible value changes.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **223. [B117]** — **implemented** — housekeeping
   - Nightly database backup — what it contains — `webapp/server/backup.ts:17`
   - Reads: export const BACKUP_TABLES = ["clients", "orders", "service_orders", "documents", "oa_profiles", "oa_generations", "library_documents", "webhook_events", "fl_sync_state", "contact_messages"] as const;
   - Claims: The header (:6) says these are 'the tables that cannot be rebuilt from anywhere else' and :9-12 lists the deliberate exclusions (fl_entities, sessions, auth_tokens).
   - True: Two tables added since are neither dumped nor listed as excluded: email_log (db.ts:405-417, kept so the office can prove 'that we sent them something') and ra_renewals (db.ts:442-461 — each renewal's notice, charge, Square payment id, decline code and payment link). A Neon-side loss takes the email record and every renewal's history with it. rate_limits and schema_migrations are also absent (harmless; the restore script must recreate the ledger).
   - Replace with: Add "email_log" and "ra_renewals" to BACKUP_TABLES and to scripts/db-restore.ts; list rate_limits with the deliberate exclusions in the header.
-  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 03 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fae579f41b46e94b55a78ff08dd69d053488ddb8, batch 03 revision 1, package 6ee881943907. This records implementation, not acceptance or publication.
 - **224. [B118]** — **implemented** — housekeeping
   - Nightly Dropbox mirror — its own description — `webapp/server/dropbox.ts:112`
   - Reads: /** Copies every not-yet-mirrored document. One failure doesn't strand the rest — errors are counted and the document stays pending for the next sweep. */
@@ -2422,14 +2724,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: :139 `LIMIT 200` — a sweep copies at most 200; with more pending, the rest wait a night each. The office line A76 covers ('every file' nightly) rests on this.
   - Replace with: Comment: 'Copies up to 200 not-yet-mirrored documents a sweep…'; or loop until the query returns fewer than 200.
   - Codex (housekeeping-only): dropbox.ts:112 says every not-yet-mirrored document; :139 caps each sweep at200. Only the internal comment is corrected by the bounded-batch wording.
-  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 03 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fae579f41b46e94b55a78ff08dd69d053488ddb8, batch 03 revision 1, package 6ee881943907. This records implementation, not acceptance or publication.
 - **225. [B119]** — **implemented** — housekeeping
   - Nightly Dropbox mirror — which folder legal mail lands in for a client with two companies — `webapp/server/dropbox.ts:132`
   - Reads: COALESCE((SELECT o.llc_name FROM orders o WHERE o.id = d.order_id), (SELECT o.llc_name FROM orders o WHERE o.client_id = d.client_id AND o.paid_at IS NOT NULL ORDER BY o.paid_at DESC LIMIT 1)) AS llc_name
   - Claims: A document with no company is filed under the client's newest paid company.
   - True: Legal mail carries no order_id by design (routes-admin.ts:1565 'Legal mail stays one shared section and carries no company'), so every piece of legal mail for a two-company client is mirrored into the newer company's folder whichever company it was served on.
   - Replace with: For kind = 'legal_mail' use the client's email as the folder (`safePathPart(doc.email)`), or add a per-piece company when the office uploads it.
-  - Fixed: batch 02 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 02 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit f902a8e41b973f62a96ca6c39067c33ae0fb61a2, batch 02 revision 1, package 57ca7c2f44aa. This records implementation, not acceptance or publication.
 - **226. [B120]** — **implemented** — housekeeping
   - Encryption note on when the secrets are deleted — `webapp/server/crypto.ts:47`
   - Reads: rotating SESSION_SECRET orphans stored ciphertexts, which is acceptable because these secrets are deleted at fulfillment by design.
@@ -2439,7 +2743,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): crypto.ts:49–51 reads rotating SESSION_SECRET orphans stored ciphertexts, which is acceptable because these secrets are deleted at fulfillment by design. The finding rightly notices14-day S-election retention, but its replacement permits rotation whenever no S window is open even if an active EIN order still needs decryption.
   - **Codex rejected the proposed replacement:** Document both lifetimes and require migration/re-encryption of ALL live encrypted secrets before key retirement; pending EIN secrets and retained S-election secrets both matter.
   - Corrected after Codex's review: Pending EIN secrets matter as well as the 14-day S election window. Rotate only when no encrypted secret of either kind is live, or re-encrypt first.
-  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 03 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fae579f41b46e94b55a78ff08dd69d053488ddb8, batch 03 revision 1, package 6ee881943907. This records implementation, not acceptance or publication.
 - **227. [B121]** — **implemented** — housekeeping
   - Environment notes — `webapp/server/env.ts:35`
   - Reads: /** Shared secret for the daily purge cron. Required in production. */
@@ -2447,7 +2752,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Six do: /cron/ra-renewals, /cron/library-refresh, /cron/sunbiz-sync, /cron/purge, /cron/db-backup, /cron/file-mirror (routes-ops.ts:257-328; vercel.json crons).
   - Replace with: /** Shared secret for the nightly crons (renewals, library refresh, Sunbiz sync, purge, backup, mirror). Required in production. */
   - Codex (housekeeping-only): env.ts:35 describes CRON_SECRET as the daily purge secret; routes-ops.ts:257–328 uses it for six jobs. The original description is incomplete rather than exclusive, and no reader-facing text changes.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **228. [B122]** — **implemented** — housekeeping; same defect as 127
   - Taxation label helper (the label A59 says disagrees with the portal pill) — `webapp/server/datetime.ts:44`
   - Reads: if (version === "single-s" || version === "member-single-s") return "Single-Member S Corporation";
@@ -2457,7 +2763,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (duplicate): Same tax-label inconsistency as item127, repeated in server/datetime.ts:44; the finding itself says Nothing new but was not marked same defect as in findings-open.
   - **Codex rejected the proposed replacement:** Use one shared label mapping imported by both client and server; editing only server/datetime.ts does not update the separate src/lib/datetime.ts mapping.
   - Corrected after Codex's review: Both label tables change together: src/lib/datetime.ts and server/datetime.ts.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **N1.02. [substantive]** — **implemented** — waits on Adam's ruling
@@ -2468,7 +2775,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: dropbox.ts:128–152 mirrors every pending document, without excluding full-SSN S-election packages. purgeExpiredSElections at routes-portal.ts:589–598 replaces only the live document/blob; it neither removes the old Dropbox object nor clears mirrored_at. The mirror filename includes the old title, so copying a differently titled Record Copy alone would not remove the original.
   - Replace with: Exclude full-SSN S-election filing copies from the offsite mirror. Remove any previously mirrored filing copies when the edit window closes, using a stored mirror path, and mirror only the redacted record copy.
   - Ruling, 2026-09-19: Approved revised Batch 03: encrypt stored S-election forms and EIN letters including backup copies, keep them until the client deletes them, track deletion of controlled copies and retries, provide complete resumable backups, and do not clean up existing test copies.
-  - Fixed: batch 03 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 03 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fae579f41b46e94b55a78ff08dd69d053488ddb8, batch 03 revision 1, package 6ee881943907. This records implementation, not acceptance or publication.
 - **N1.12. [substantive]** — **implemented**
   - Registered agent renewal, notice and payment-link delivery — `webapp/server/renewals.ts:202`
   - Reads: `INSERT INTO ra_renewals (order_id, renewal_date, amount_cents, status, charge_due, notice_sent_at)
@@ -2478,7 +2786,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: notice_sent/link_sent and notice_sent_at represent a notice or payment link actually sent.
   - True: The row is committed at:201–206 BEFORE paymentLinkFor at:208 and sendMail at:220. A failed checkout creates a link_sent row without a link; later jobs skip the !row branch. A failed notice email is caught without retry, while the notice_sent row can proceed to automatic charging at:235–250. This is independent of prior194's45-day schedule.
   - Replace with: Persist a pending-notice state first. Create/reuse the checkout and await successful mail submission before marking notice_sent or link_sent and notice_sent_at. Retry pending failures idempotently and do not charge until the contractual notice timing has been satisfied.
-  - Fixed: batch 07 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B5-RENEWAL-OLD-EMAIL. [substantive]** — **implemented**
   - Registered-agent renewal/resignation notices after account email change — `webapp/server/renewals.ts:128`
   - Reads: await sendMail({to:o.contact_email,...mail});
@@ -2486,7 +2795,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Both portal confirmation2548 and adminoverride1034 update clients.email only. Renewal query104 loads orders.* and sends to original o.contact_email at128/147; paid receipt159–169 and ra-office70 also use ordercontactemail. A client changing email therefore leaves renewal/payment/resignation notices addressed to old inbox. No claim of observed production incident; runtime pending coordinator. Prior200 concerns invalidating pending email-change tokens, a different failure.
   - Proposed replacement (not approved): Resolve current clients.email through order.client_id for account notices, payment receipts and resignation copies; preserve original intake contact fields as historical records. Test both portalverified and adminoverride address changes before each notice path.
   - Rechecked by codex-root-independent: Root independently reopened renewals.ts94–176, email.ts187–200, portal2536–2554 and admin1025–1039. Account-change promise expressly includes notices while jobs/receipt read original order.contact_email. Historical intake should remain; resolve active client address for new notices. Distinct prior200 token invalidation.
-  - Fixed: batch 23 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 23 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 81a7290cc77d13c42685a57d9d37f5103cf6d4c4, batch 23 revision 1, package 878d45c6f898. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch28-runtime-B-late-cancellation-charged-without-saying-so. [substantive]** — **implemented**
   - Client portal → Registered agent service card → Cancel registered agent service (fewer than 30 days before the renewal date); the confirmation email 'Your registered agent cancellation request' — `webapp/server/email.ts:264`
   - Reads:       <p>We received your request to cancel registered agent service${llcName ? ` for <strong>${escapeHtml(llcName)}</strong>` : ""}.</p>
@@ -2494,7 +2804,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: Current cancellation email only acknowledges receipt, reports renewal date and repeats general RA_CANCELLATION; routes-portal.ts:2637 passes no timeliness result. renewals.ts:118-128 evaluates saved cancellation relative to each anniversary. A late request can permit this renewal then become timely for the following year. PortalDashboard.tsx:355-389 hides renewal receipt lines in the cancellation branch. This confirms the source mechanism and missing disclosure; no new charge executed.
   - Proposed replacement (not approved): Show a charged renewal even when cancellation exists. Give an explicit current renewal/cancellation result using approved policy. Do not state cancellation guarantees another full service year irrespective of replacement or other termination events.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current cancellation email only acknowledges receipt, reports renewal date and repeats general RA_CANCELLATION; routes-portal.ts:2637 passes no timeliness result. renewals.ts:118-128 evaluates saved cancellation relative to each anniversary. A late request can permit this renewal then become timely for the following year. PortalDashboard.tsx:355-389 hides renewal receipt lines in the cancellation branch. This confirms the source mechanism and missing disclosure; no new charge executed.
-  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 - **AUD-claude-reconciled-batch28-reader-5-late-notice-omits-amount. [wording]** — **implemented**
   - Registered agent renewal notice email, the version sent when the notice is late (billing hold) — the paragraph that replaces the fee sentence — `webapp/server/email.ts:110`
@@ -2503,7 +2814,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: email.ts:110 selects billingHold text without amount; :111–115 have amount only in other branches. Entire returned HTML :117–130 adds dates/cancellation/support but no fee. renewals:138 passes amount and billingHold:late. Terms:48 promises the amount even when the reminder is delayed.
   - Proposed replacement (not approved): Include the formatted renewal amount in the delayed-notice branch while keeping automatic billing on hold and retaining the payment/contact options.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. email.ts:110 selects billingHold text without amount; :111–115 have amount only in other branches. Entire returned HTML :117–130 adds dates/cancellation/support but no fee. renewals:138 passes amount and billingHold:late. Terms:48 promises the amount even when the reminder is delayed.
-  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 - **AUD-claude-reconciled-batch28-runtime-B-backup-rowcounts-count-deleted-documents. [housekeeping]** — **implemented** — housekeeping
   - The nightly backup job's report (/api/cron/db-backup log line and /api/admin/backups/run response) — `webapp/server/backup.ts:150`
@@ -2512,7 +2824,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: rowCounts is computed before document deletion filtering at157 and returned unchanged at164 after publishing the filtered snapshot. A deleted document therefore inflates the completed backup count. This is reporting mismatch, not proof of backup data loss. Historical runtime reports are corroborative; no current rerun claimed.
   - Proposed replacement (not approved): Calculate completed counts after the final filters. Keep pending-job counts separately labeled as provisional if they are returned before completion.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. rowCounts is computed before document deletion filtering at157 and returned unchanged at164 after publishing the filtered snapshot. A deleted document therefore inflates the completed backup count. This is reporting mismatch, not proof of backup data loss. Historical runtime reports are corroborative; no current rerun claimed.
-  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 - **AUD-claude-reconciled-batch33-reader-5-gift-card-branch-dead. [housekeeping]** — **implemented** — housekeeping
   - Registered agent renewal notice email — the no-card paragraph's prepaid-card wording — `webapp/server/email.ts:113`
@@ -2521,7 +2834,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The only caller, renewals.ts:126, passes `giftCard:false` unconditionally, so the first branch never prints; the giftCard parameter (:108) is dead since Batch 07 made a prepaid card refuse the purchase (ra-checkout.ts:56-64) and Batch 20 removed the gift-card email (prior 220). A card_status of 'gift_card' (renewals.ts:86) can no longer reach a formed order with our service.
   - Proposed replacement (not approved): Drop the parameter: in email.ts:108 remove `giftCard: boolean;`, at :113 print `No eligible card is on file,` and in renewals.ts:126 remove `giftCard:false,`.
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-codex-release-review-2026-09-22-RR-01. [substantive]** — **implemented**
   - Release review: RR-01 — `webapp/server/backup.ts:23`
   - Reads: export const BACKUP_TABLES = [
@@ -2529,29 +2843,34 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The table list omits staged_documents and renewal_card_attempts; the offline backup/empty-database restore probe loses both rows and leaves the cleanup object. See sealed recovery-backup.log and recovery-restore.log.
   - Proposed replacement (not approved): Include both workflow tables in the consistent snapshot; validate recoverable card requests before restoration; preserve cleanup paths and retry identity; reject incomplete older dumps and restart incomplete old jobs from a fresh consistent snapshot.
   - Rechecked by Codex release reviewer: Reopened at frozen c91b101 and reproduced offline in the sealed release review; not an independent second model review.
-  - Fixed: batch 35 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 35 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 1aa316bf63254673db2ac5370a76573e518aeaec, batch 35 revision 1, package 2d75b55e1df6. This records implementation, not acceptance or publication.
 
-## Agreements and guidance — 122 open of 125
+## Agreements and guidance — 127 open of 130
 
 - **229. [A80]** — **implemented**
   - Manager-managed forms (4), Indemnification: "an act exceeding the authority conferred by Section 5.4"; 5.4 is the approval list, 5.3 the authority. Replace: "an act taken without the approval Section 5.4 requires" (both places).
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 4 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 4 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **230. [A81]** — **implemented**
   - All eight forms: "Effective Date" defined, never used; signature page "effective as of the date(s) set forth below". Amendment likewise. Replace: "executed this Agreement as of the Effective Date"; amendment "as of the date stated above".
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 9 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 9 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **231. [A82]** — **implemented**
   - Four multi-member forms, Tax Matters: "No member … all members" uncapitalised. Replace: "No Member … all Members."
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 4 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 4 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **232. [A83]** — **optional — open**
   - Two manager-managed single-owner forms, Amendments (b): circular. Replace: "(b) no amendment may impose new obligations on the Manager without the Manager's written consent."
   - Codex (disputed): The actual sentence is “(b) any amendment changing the rights or obligations of the Manager may not impose new obligations on the Manager without the Manager's written consent.” (single:256; single-s:289). It is redundant, not circular: changing rights does not itself require consent, whereas imposing new obligations does. No contradictory or indeterminate rule follows.
   - Outcome: Redundant, not circular; the shorter sentence is a concision edit.
+  - Ruling, 2026-09-20: Batch 16 item 4: Reject. Keep as is.
 - **233. [A84]** — **dropped** — waits on Adam's ruling
   - Manager-managed forms 3.1: "the Members and the Manager shall adopt a Series Exhibit" but the Manager signs alone. Ruling needed.
   - Codex (disputed): §3.1 requires the Members and Manager to adopt a Series Exhibit, not to sign that exhibit separately. Every Member signs the entire Agreement incorporating its exhibits; the Manager also signs. For later series, templates-new-series.md:21 expressly adopts the attached exhibit and all Members sign. A manager-only exhibit signature therefore does not prove lack of member adoption.
@@ -2565,41 +2884,50 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 - **235. [A86]** — **implemented**
   - Colophons omit s. 711.50; two single-owner S forms list Code sections, six do not. Replace: list 711.50; Code sections in all or none.
   - **Codex rejected the proposed replacement:** Adding 711.50 is correct. “All or none” is not a complete replacement; choose one convention and enumerate the Code sections actually cited in each form.
-  - Previous fix: 18 r2, commit ; 8 assertion(s) retained. Replacement attempt: 34 r1, work order 37ee730a48c64f58385e96780ecdd8f8ef9a7e1b9e85692578ff136f85cf27c6.
-  - Fixed: batch 34 revision 1, commit , by Codex; protected by 8 assertion(s).
+  - Previous fix: 18 r2, release commit not recorded; 8 assertion(s) retained. Replacement attempt: 34 r1, work order 37ee730a48c64f58385e96780ecdd8f8ef9a7e1b9e85692578ff136f85cf27c6.
+  - Implemented protections: batch 34 revision 1, release commit not recorded, by Codex; protected by 8 assertion(s).
+  - Implementation evidence: commit c91b101b9652a14906270d1422f8cc771f71e706, batch 34 revision 1, package d58da0289ab7. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
   - 2026-09-22 superseded by approved replacement: prior fix 18 r2 at ; approved work order 37ee730a48c64f58385e96780ecdd8f8ef9a7e1b9e85692578ff136f85cf27c6
 - **236. [A87]** — **open**
   - Four multi-member forms say "single class" twice (2.13 and 4.1). Replace: keep 4.1.
+  - Ruling, 2026-09-20: Batch 16 item 5: Reject. Keep as is.
 - **237. [A88]** — **implemented**
   - Instructions s. 1 "Series LLC User's Manual". Replace: "Owner's Manual".
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **238. [A89]** — **implemented**
   - Instructions s. 3: Administrative Member "no authority to decide anything"; 5.8 lets a Majority in Interest confer authority. Replace as proposed.
   - **Codex rejected the proposed replacement:** “Replace as proposed” supplies no replacement. Use: “The Administrative Member handles ministerial tasks and has any additional authority this Agreement or a Majority in Interest confers.”
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **239. [A90]** — **implemented**
   - Instructions and Manual: capital call "a majority of owners" (Majority in Interest); borrowing limit "written" consent (consent). Replace both.
   - **Codex rejected the proposed replacement:** Use “Members holding more than 50% of the Percentage Interests” for capital calls and “the consent of all Members” for borrowing; retain written notice of a capital call, which §6.2 actually requires.
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 6 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 6 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **240. [A91]** — **implemented** — waits on Adam's ruling
   - Manual s. 6 step 3: unanimous consent "a rule your operating agreement cannot change"; 605.2107(1)(i) excepts the manner of approving establishment (repo statute notes). Ruling needed from the statute.
   - **Codex rejected the proposed replacement:** The finding asks for a ruling rather than providing replacement text. The concrete replacement in item249 is correct.
   - Ruling, 2026-09-20: Batch 15 approved: distinguish the statutory default from the agreement rule. Florida permits a different approval rule; Section 3.1 of these agreements retains unanimous consent to establish a protected series. Correct the Manual and matching portal explanation.
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **241. [A92]** — **implemented**
   - Manual s. 24: "your operating agreement … require[s] current contact information". Replace as proposed.
   - **Codex rejected the proposed replacement:** “Replace as proposed” is incomplete. Say “Keep your contact information current so notices reach you.” Do not invent an operating-agreement covenant.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **242. [A93]** — **implemented**
   - Manual s. 28 Example 1 "($75 total)" for three series. Replace: "($25 state fee each)" or "$150 through us".
   - **Codex rejected the proposed replacement:** “($25 state fee each)” is correct. “$150 through us” is wrong for the first three included in a formation package; clarify whether the example describes initial or later designations.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Ruling, 2026-09-20: Batch 11 review item 17: "17.  Just state our fee.  Add a $50 series.  No need to mention state fees". Use "add a $50 series per property" and state Maria's first three are included in the service package; do not add a state-fee breakdown to those examples.
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **243. [A94]** — **optional — open**
@@ -2608,24 +2936,28 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Outcome: A citation to s. 605.2602 alone is not false; the longer citation matches the ledger's preference.
 - **244. [A95]** — **implemented**
   - Manual map Article 8 row "never your personal name" overstates 8.4. Replace: mention the documented nominee arrangement.
-  - Fixed: batch 17 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 17 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **245. [A96]** — **implemented**
   - Manual s. 3 "at the end of Article 8 … makes … it works". Replace: "in Article 8 … make … they work" (twice).
   - **Codex rejected the proposed replacement:** Fix location and plural agreement. Also remove the separate absolute promise that no asset can ever be non-associated (new finding in this report); grammatical correction alone leaves that error.
-  - Fixed: batch 17 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 17 revision 2, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **246. [A97]** — **implemented**
   - Manual colophon omits twelve cited sections. Replace: rebuild; add the Manual to the ledger's colophon check.
   - Codex (disputed): The actual Manual colophon at :536 includes the entire “605.2101–605.2802” range. Thus 605.2107, 605.2302, 605.2304 and 605.2402 are already included, contrary to four of the alleged twelve omissions. The missing individually named provisions are 605.0302, 605.04074, 605.0410, 605.0602, 605.0714, 605.1103, former212.031 and220.02.
   - **Codex rejected the proposed replacement:** Reconcile eight omitted individual citations, distinguish the repealed historical citation, and define whether ranges satisfy the colophon convention; do not report twelve absent sections.
   - Corrected after Codex's review: The colophon's range 605.2101-605.2802 already covers four of the twelve. Eight are missing: 605.0302, 605.04074, 605.0410, 605.0602, 605.0714, 605.1103, former 212.031, 220.02.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **247. [A98]** — **implemented**
   - Manual s. 5 "s. 6.1 of your agreement" (statute abbreviation); README "five" masters; two double blank lines. Replace: "§6.1"; "eight"; single blanks.
   - **Codex rejected the proposed replacement:** The citation and eight corrections are sound. Track whitespace separately as housekeeping; the item mixes reader-visible wording with source-only whitespace.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **248. [B148]** — **implemented** — same defect as 12
   - Owner's Manual, cover page (title-page block) — `docs/owners-manual.md:15`
@@ -2633,7 +2965,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The statute the manual is written for is called the 'Florida Uniform Protected Series Act'.
   - True: s. 605.2101, Florida Statutes, opened on Online Sunshine: 'Short title.—Sections 605.2101-605.2802 may be cited as the “Uniform Protected Series Provisions.”' The chapter itself is the Florida Revised Limited Liability Company Act. (The prior audit's A41 raised the same name on the Home page; the Manual's cover is in this bucket.)
   - Replace with: 10|Written for the Uniform Protected Series Provisions of the Florida Revised Limited Liability Company Act
-  - Fixed: batch 17 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 17 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **249. [B149]** — **implemented** — same defect as 240
   - Owner's Manual, s. 6 'How a Florida Protected Series LLC Is Formed', Step 3 — Consent (the ruling A91 asked for, answered by the statute) — `docs/owners-manual.md:103`
@@ -2641,7 +2974,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The unanimous-consent rule for establishing a series is non-variable under s. 605.2107.
   - True: s. 605.2107(1)(i), opened on Online Sunshine: an operating agreement may not vary the effect of 'Section 605.2201, except to vary the manner in which a series limited liability company approves establishing a protected series'. The approval rule is exactly the part an agreement MAY change. Unanimity binds these clients because Section 3.1 of every form requires it (templates-oa-multi.md:92), which is what the series consent itself recites (templates-new-series.md:11: 'Section 3.1 of the Agreement requires that consent').
   - Replace with: **Step 3 — Consent.** Establishing a protected series requires the affirmative vote or consent of **all members** of the company (s. 605.2201(1)). The statute lets an operating agreement choose a different approval rule (s. 605.2107(1)(i)); yours does not — Section 3.1 of your agreement keeps unanimity. In a single-member company this is trivial — your consent is everyone's consent. In a multi-member company, plan for it: one holdout member can block a new series.
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **250. [B150]** — **implemented**
   - Owner's Manual, s. 7 'The choices you made' — The borrowing limit — `docs/owners-manual.md:138`
@@ -2649,7 +2983,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: Guarantees, like debt, need the owners' consent only above the dollar figure.
   - True: templates-oa-multi.md:180 (5.4(f)) and templates-oa-member.md:186 (5.5(f)): 'incur … indebtedness in excess of $[THRESHOLD] in a single transaction or series of related transactions, or guarantee the obligation of any person (…) — the consent of **all Members**'. The threshold qualifies indebtedness only; every guarantee, of any amount, needs the consent of all Members, and the consent is not 'written' (A90).
   - Replace with: **The borrowing limit (§5.4 / §5.5).** The multi-member forms ask for a dollar figure: above it, no debt may be incurred without the consent of every owner — and no guarantee of anyone's obligation, of any amount, may be given without that consent. There is no default — you chose the number, and it is printed in your agreement. Set it where a borrowing would be big enough that you would want to be asked first.
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **251. [B151]** — **optional — open**
   - Every operating agreement, Article 5, s. 5.2 'Management of Each Protected Series' (eight forms); the member-managed single-member Series Exhibit 'Managed by' row; the series consent's same row; Owner's Manual Article 5 map row — `webapp/server/templates-oa-multi.md:164`
@@ -2665,7 +3000,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The filing that dissolves a protected series is a 'statement of dissolution'.
   - True: s. 605.2502(2), opened on Online Sunshine: 'the company may deliver to the department for filing its articles of protected series dissolution'; s. 605.2502(3): after winding up, 'a statement of designation cancellation'. The Manual uses the statutory name (owners-manual.md:353 'articles of protected series dissolution', :402 'File the **articles of protected series dissolution**'); the agreements do not (multi.md:42 and every form's 1.9 'statements of dissolution'; s.md:176, member.md:182, member-s.md:182 same as here). Two names for one filing.
   - Replace with: (d) merge the Company as permitted by the Act — the consent of **all Members**; or file articles of protected series dissolution or a statement of designation cancellation for a Protected Series — the approval required by Section 14.1;
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 12 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 12 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **253. [B153]** — **implemented**
@@ -2674,7 +3010,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: Every member may register a beneficiary.
   - True: templates-oa-multi.md:154 (4.11): 'A Member who is an individual may designate any person or entity as a beneficiary. … Members who hold a Membership Interest jointly as tenants in common may not designate a TOD beneficiary.' s. 711.502, opened on Online Sunshine: 'Only individuals whose registration of a security shows sole ownership by one individual or multiple ownership by two or more with right of survivorship, rather than as tenants in common, may obtain registration in beneficiary form.' The Instructions say so (oa-instructions.md:65); the Manual says 'each member'.
   - Replace with: **Death — the TOD designation.** Every form of the agreement lets a member who is an individual (not a company or trust, and not co-owners holding as tenants in common) register a transfer-on-death beneficiary — anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule — on Exhibit A, using Florida's registration-in-beneficiary-form statute (ss. 711.50–711.512).
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **254. [B154]** — **implemented** — same defect as 242
   - Owner's Manual, s. 4 'Why use a series LLC' — Use it for — `docs/owners-manual.md:72`
@@ -2682,7 +3019,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: A new series costs $25.
   - True: docs/facts.md:19: 'Price of an additional series — value: $50 — $25 to prepare and the $25 state filing fee'; the Manual's own lines 403, 521 and 523 say '$50 through us'. $25 is the state fee alone (the same slip A93 flagged at line 425).
   - Replace with: **Use it for:** multiple rental properties; a portfolio you are growing (add a series per property — $50 through us, $25 of it the state fee — instead of a $125+ LLC per property); separating a risky operating business from valuable equipment; or separating brands or projects.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **255. [B155]** — **implemented**
@@ -2691,7 +3029,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: Nothing wrong in substance; the section symbol is the Manual's mark for agreement sections ('§5.4', '§8.4', '§10.6') and here is used for a statute.
   - True: Two styles for one kind of citation: 's. 605.2404(4)' at line 66 but '§605.2404(4)' at 160, '§605.2301(5)' at 165, '§605.2404' at 235, 389 and 413; every other statute cite in the manual uses 's.' / 'ss.'. A98 flagged the converse ('s. 6.1 of your agreement').
   - Replace with: Get the name right and the record makes itself; get it wrong and you are proving association the hard way, out of ledgers, with the burden on you (s. 605.2404(4)). — and the same change at lines 165, 235, 389 and 413.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **256. [B156]** — **implemented**
   - Owner's Manual, s. 7 map table, Article 8 row — `docs/owners-manual.md:130`
@@ -2700,10 +3039,12 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: templates-oa-multi.md:250-260: 8.5 'Standing Association Rules; Savings Provisions' is followed by 8.6 'Movement of an Asset Between Protected Series', which closes the Article (same in all eight forms). A third instance of A96's 'at the end of Article 8'; the 'never your personal name' half is A95.
   - Replace with: | **Article 8** | The recordkeeping covenants (this manual's Section 14 is its field guide), the standing association rules in §8.5, and the holding rule (§8.4): every asset is held in the name of the silo that owns it, or through a nominee arrangement documented in the records — never simply in your personal name |
   - Part "article8-location" — implemented: "the standing association rules that close the Article": §8.5 does not close Article 8 — the same misstatement A96 (245) records. — same defect as 245
-  - Fixed (article8-location): batch 17 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (article8-location): batch 17 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
   - Part "nominee" — implemented: "never your personal name" overstates §8.4; the documented nominee arrangement — the same overstatement A95 (244) records. — same defect as 244
-  - Fixed (nominee): batch 17 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections (nominee): batch 17 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
   - Former part "all" (retired by 001-part-level-links, now article8-location, nominee): The whole finding.
 - **257. [B157]** — **optional — implemented**
@@ -2714,14 +3055,16 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: The protected series is established when its Protected Series Designation takes effect (ss. 605.2201(3) and 605.0207, Florida Statutes).
   - Codex (disputed): The actual sentence, “The protected series is established when its Protected Series Designation takes effect under s. 605.0207, Florida Statutes,” tracks 2026 §605.2201(3) verbatim in substance. It says the designation takes effect under0207, not that0207 is the series-establishment section. The finding admits the sentence is true.
   - Outcome: True as written; adding s. 605.2201(3) is a supplemental citation.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **258. [B158]** — **implemented** — related: 118
   - Series consent and Series Exhibit — the Asset Schedule heading, compared with the agreement's — `webapp/server/new-series.ts:107`
   - Reads: s = s.split("PS-[N]").join(`PS-${input.seriesNumber}`);
   - Claims: The consent's asset schedule is headed 'ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-4'.
   - True: The agreement's asset schedule is headed with the series' filed name as well: oa.ts:673-676 renders `## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-${n} (${ser.name})`. A client detaching the two schedules for a bank gets one that names the series and one that does not.
   - Replace with: In templates-new-series.md:55 head the schedule '## ASSET SCHEDULE — ATTACHMENT TO SERIES EXHIBIT PS-[N] ([SERIES NAME])' so the same fill produces the agreement's heading.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **259. [B167]** — **implemented** — same defect as 120 (title)
   - Series consent — the document's title in the portal (the file behind A52) — `webapp/server/new-series.ts:134`
@@ -2729,7 +3072,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The stored document is titled 'New Protected Series — …'.
   - True: The document's own heading is 'UNANIMOUS WRITTEN CONSENT OF THE MEMBERS … ESTABLISHING A NEW PROTECTED SERIES' with a 'SERIES EXHIBIT' (templates-new-series.md:1-5, 33); the prior audit's A52 (portal bucket) asked for 'Consent & Series Exhibit — [series]'. The title is set here, so the fix lives in this file.
   - Replace with: return { markdown: s, title: `Consent & Series Exhibit — ${input.seriesName}` };
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **260. [B159]** — **implemented** — housekeeping
   - Series consent assembler — comment about the contribution cell (the code behind A48) — `webapp/server/new-series.ts:112`
   - Reads: // An empty contribution prints a dash, as the agreement's own Series   // Exhibit does (15 Sep 2026).
@@ -2738,7 +3082,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "None"); with the comment 'An empty contribution prints None, as the agreement's Series Exhibit does (routes-portal.ts, oa-capital.ts).'
   - Codex (housekeeping-only): new-series.ts:112–113 inaccurately says its dash matches the agreement; computeCapital:124 supplies None to the agreement. The identified comment itself is invisible to clients.
   - **Codex rejected the proposed replacement:** Changing the comment alone is housekeeping. The proposed code change also changes the delivered contribution cell and belongs to the already-reported A48 defect; do not count it as a new housekeeping-only client change.
-  - Fixed: batch 14 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 14 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 47fc704e377fd73242e6ae0cbcdb9deb7db672b0, batch 14 revision 1, package d65741062e07. This records implementation, not acceptance or publication.
 - **261. [B160]** — **implemented** — housekeeping
   - docs/README.md — 'Masters → Word output' inventory table — `docs/README.md:25`
   - Reads: | Master (edit this) | Word output, in `docs/word/` and Dropbox |
@@ -2747,7 +3092,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: Add a row: | `webapp/server/templates-new-series.md` | FPSLLC Written Consent Establishing a New Protected Series - FORM.docx | — and generate that Word output, or record in the README that the consent is portal-only with no Word twin and why.
   - Codex (housekeeping-only): README:25–39 omits the consent master, although templates-new-series.md and its generator exist. This concerns source documentation, not changed client wording. The statement that it is the twelfth master is inaccurate: the table already lists12 deliverables, so consent would be13.
   - **Codex rejected the proposed replacement:** Add the consent to the source inventory; explicitly decide/document its Word-output status. The report cannot require an unverified Word deliverable to be generated during this read-only audit.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **262. [B161]** — **implemented** — housekeeping
   - Operating agreement assembler — the Amended & Restated recital and title — `webapp/server/oa.ts:534`
@@ -2758,7 +3104,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): oa.ts:534 does compose the restatement recital, contrary to its local source-text rule, but the proposed “ten masters” is wrong: there are eight operating-agreement masters. Moreover single-s:20 and member-single-s:20 already have RecitalD; inserting anotherD as proposed creates duplicate lettering.
   - **Codex rejected the proposed replacement:** Move the variant-specific recital to all eight OA masters and useE in the two single-member S forms, D in the other six. Moving otherwise identical text is housekeeping; duplicateD in delivered restatements is separately reported as new.
   - Corrected after Codex's review: There are eight agreement masters, not ten, and the two single-owner S forms already have a Recital D (N2.06). Use markers in all eight, lettered E in those two.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 9 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 9 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **263. [B162]** — **implemented** — housekeeping
@@ -2770,7 +3117,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): oa.ts:740 checks only draft-footer leakage, so the hardening observation is true. But the proposed final regex also matches legitimate client text such as “[ACME]” and “[TITLE]” inserted into names or asset descriptions; applied after substitution it would reject valid input. statement.ts:65 checks slots but :45 removes comments, rather than refusing every leftover comment as claimed.
   - **Codex rejected the proposed replacement:** Validate template placeholders and markers before inserting client text, or track known template slots explicitly. Do not use an unrestricted uppercase-bracket scan on the completed document.
   - Corrected after Codex's review: An unrestricted bracket scan after substitution would refuse client text such as '[ACME]'. Check the template's slots before client text goes in.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **264. [B163]** — **dropped** — housekeeping
   - S corporation election package — instruction sheet, cover letter and continuation sheet — `webapp/server/s-election.ts:181`
@@ -2788,7 +3136,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The masters' appointment slot is '[MANAGER NAMES]' (templates-oa-multi.md:162, single.md:144); '[MANAGER NAME]' is only the signature-block slot (multi.md:407). A reader of the Word form looks for a blank that is spelled differently.
   - Replace with: **[MANAGER NAMES]** (manager-managed forms only) — the manager or managers.
   - **Codex rejected the proposed replacement:** Explain both: “[MANAGER NAMES] — the initial manager or managers in the appointment; [MANAGER NAME] — the signer in each manager signature block.”
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **266. [B165]** — **implemented** — housekeeping
   - Order Summary PDF (office only) — 'Items ordered' and 'Optional documents' sections — `webapp/server/order-summary.ts:122`
@@ -2796,7 +3145,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The EIN item is labelled 'Federal EIN service' here and 'Federal EIN' at line 220 in the same document.
   - True: Two wordings for one fact in one PDF (lines 122 and 220 read the same field).
   - Replace with: Use 'Federal EIN service' in both places.
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **267. [B166]** — **implemented** — housekeeping
   - Manager-managed single-member S corporation agreement, between s. 7.2 and Article 8 — `webapp/server/templates-oa-single-s.md:192`
   - Reads: (line 191 blank, line 192 blank — two consecutive blank lines between s. 7.2's last sentence 'Each distribution shall be recorded in the records maintained under Article 8, identifying its source.' on line 190 and the '---' rule before Article 8 on line 193)
@@ -2804,7 +3154,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: templates-oa-single.md:185-186 and the other six forms carry a single blank line before the '---' rule; this file alone has two.
   - Replace with: Delete line 192.
   - Codex (housekeeping-only): single-s:191–192 contains the two source blank lines. oa.ts:738 collapses three or more newlines, and pdf-render.ts:63–65 ignores blank lines, so deleting one changes no delivered reader text.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **N2.01. [wording]** — **implemented**
   - Every operating agreement, Formation (§1.2) and definition of Act (§2.1) — webapp/server/templates-oa-multi.md:28 — `webapp/server/templates-oa-multi.md:28`
@@ -2812,7 +3163,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The governing chapter is named the Florida Revised Uniform Limited Liability Company Act.
   - True: 2026 §605.0101 names it Florida Revised Limited Liability Company Act (https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/0605.html). All eight masters repeat the extra Uniform in §§1.2 and2.1. This is distinct from prior248's protected-series-provisions title.
   - Replace with: **1.2 Formation; Status as Protected Series LLC.** The Company is a limited liability company organized under the Florida Revised Limited Liability Company Act, Chapter 605, Florida Statutes (the "Act"). Upon the filing of its first Protected Series Designation with the Department, the Company is, and shall be identified in its records and dealings as, a *protected series limited liability company* governed by the Act, including ss. 605.2101–605.2802 (the "Protected Series Provisions"). If at any time no Protected Series of the Company is in existence, the Company shall continue as a Florida limited liability company governed by this Agreement (excluding the provisions specific to Protected Series) until a new Protected Series Designation is filed.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 16 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 16 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.02. [substantive]** — **open** — waits on Adam's ruling
@@ -2821,6 +3173,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: Membership does not make an owner an agent, even in the member-managed form.
   - True: The same master §5.4 (:166) says each Member is an agent; member-s repeats both clauses at136/166. Section605.04074(1) governs members acting as agents in a member-managed company. The manager-managed sentence was carried into the member-managed forms.
   - Replace with: **4.5 Limited Liability; Agency.** No Member shall be personally liable for any debt, obligation, or liability of the Company or of any Protected Series, whether arising in contract, tort, or otherwise, solely by reason of being a Member. A Member's authority to act for the Company or a Protected Series is governed by Section 5.4 and the Act.
+  - Ruling, 2026-09-20: Batch 16 item 9: Rejected. Leave as is.
 - **N2.03. [substantive]** — **implemented** — waits on Adam's ruling
   - All four member-managed agreements, Management (§5.1), compared with Management of Each Protected Series (§5.2) — webapp/server/templates-oa-member.md:160 — `webapp/server/templates-oa-member.md:160`
   - Reads: **5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager, and no person shall be designated or hold out as a manager of the Company or of any Protected Series.
@@ -2828,7 +3181,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The next section expressly designates the Members as Protected Series Managers (member/member-s:162; member-single:138; member-single-s:144). §5.1 in those same four forms prohibits the title it immediately confers.
   - Replace with: **5.1 Member-Managed.** The Company is **member-managed** as provided in its Articles of Organization and this Agreement. The management and conduct of the activities and affairs of the Company are vested in the Members. There is no manager of the Company; the Members serve as Protected Series Managers as provided in Section 5.2.
   - Ruling, 2026-09-20: Batch 16 item 10 approved: distinguish company management from protected-series managers; retain who manages.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 7 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 7 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.04. [substantive]** — **open** — waits on Adam's ruling
@@ -2851,7 +3205,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 
   - All distributions by the Company to its Members in winding up shall be made in proportion to Percentage Interests, so that every Membership Interest confers identical rights to liquidation proceeds. Distributions by a Protected Series are made solely to the Company under Section 14.2.
   - Ruling, 2026-09-20: Batch 16 item 11 approved: series distributions go solely to the Company; Company distributions to Members remain pro rata.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 4 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 4 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.06. [wording]** — **implemented**
@@ -2860,7 +3215,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The new supersession recital is always RecitalD.
   - True: Both single-s and member-single-s masters already have RecitalD at line20; oa.ts:534 unconditionally inserts anotherD immediately before NOW, THEREFORE. The other six masters end atC. Prior262 objects to text location but does not identify this delivered duplicate lettering.
   - Replace with: E. This Agreement amends, restates, and supersedes in its entirety [PRIOR AGREEMENT], which shall be of no further force or effect from the Effective Date.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.07. [substantive]** — **implemented** — waits on Adam's ruling
@@ -2871,10 +3227,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: **Second, your agreement's standing association rules make the mothership the default bucket.** Those rules help determine where assets belong, but the company must still keep the identifying, acquisition, and transfer records the statute requires. An asset can remain non-associated when those records are missing. Keep the mothership asset-light and document every asset; do not rely on the default rule to cure a missing record.
   - Ruling, 2026-09-20: Batch 17 review item 10 approved: explain that standing association rules work alongside required records and missing records can leave an asset non-associated; keep the agreement's allocation rules unchanged.
   - Ruling, 2026-09-22: Batch 31 review item 5: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
-  - Previous fix: 17 r2, commit ; 3 assertion(s) retained. Replacement attempt: 31 r1, work order 07bb828991e40a2256e2d60c66b6665f7d66a648df99323fd68398ae7b90ea6e.
-  - Previous fix: 17 r2, commit ; 3 assertion(s) retained. Replacement attempt: 31 r2, work order 348d7c5ed1a04e35163636afcd0522a59d4fdd15954371d1b155c0a0248b9bba.
-  - Previous fix: 17 r2, commit ; 3 assertion(s) retained. Replacement attempt: 31 r3, work order 8ffe5afded047ab6e35f54949b26b88352b5173ebc3f12f31f2305e2068fe853.
-  - Fixed: batch 31 revision 3, commit , by Codex; protected by 7 assertion(s).
+  - Previous fix: 17 r2, release commit not recorded; 3 assertion(s) retained. Replacement attempt: 31 r1, work order 07bb828991e40a2256e2d60c66b6665f7d66a648df99323fd68398ae7b90ea6e.
+  - Previous fix: 17 r2, release commit not recorded; 3 assertion(s) retained. Replacement attempt: 31 r2, work order 348d7c5ed1a04e35163636afcd0522a59d4fdd15954371d1b155c0a0248b9bba.
+  - Previous fix: 17 r2, release commit not recorded; 3 assertion(s) retained. Replacement attempt: 31 r3, work order 8ffe5afded047ab6e35f54949b26b88352b5173ebc3f12f31f2305e2068fe853.
+  - Implemented protections: batch 31 revision 3, release commit not recorded, by Codex; protected by 7 assertion(s).
+  - Implementation evidence: commit 4754c5116dcc2a0105acd4a0adede646d3c6f41a, batch 31 revision 3, package aaeabc755635. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
   - 2026-09-22 superseded by approved replacement: prior fix 17 r2 at ; approved work order 07bb828991e40a2256e2d60c66b6665f7d66a648df99323fd68398ae7b90ea6e
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
@@ -2890,7 +3247,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 
   - **The company's EIN and W-9.** Obtain the EIN needed for the company's banking and applicable tax filings. For income-tax reporting, a disregarded company generally uses its tax owner's TIN on Form W-9; a company taxed as a partnership or corporation uses its own EIN.
   - Ruling, 2026-09-20: Batch 12: Adam approved the proposed fix and then said Go. Approved scope: Correct only W-9 taxpayer identity and separate it from account/contract naming. Exact wording: and an EIN identifies the company for those purposes. **A W-9 identifies the taxpayer.** For a disregarded entity, use the tax owner's name and taxpayer identification number as the W-9 instructions require, and identify the disregarded entity on line 2. / **A counterparty requires an EIN for its records** — a lender, title company, insurer, or property manager. Distinguish that request from a W-9: a W-9 identifies the tax owner under the form's instructions. That tax identification is different from the series' name on its contracts and bank accounts.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.09. [substantive]** — **implemented** — waits on Adam's ruling
@@ -2901,10 +3259,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: - **Reinstatement, if you let it lapse:** $100 plus every missed year's annual report fee. Administrative dissolution limits the company and its series to winding up; it does not automatically erase their liability shields. Keep the required separate records and resolve the lapse promptly.
   - Ruling, 2026-09-20: Batch 17 review item 11 approved: administrative dissolution restricts activity to winding up but does not automatically remove liability protections; retain the reinstatement fees.
   - Ruling, 2026-09-22: Batch 31 review item 10: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
-  - Previous fix: 17 r2, commit ; 2 assertion(s) retained. Replacement attempt: 31 r1, work order 07bb828991e40a2256e2d60c66b6665f7d66a648df99323fd68398ae7b90ea6e.
-  - Previous fix: 17 r2, commit ; 2 assertion(s) retained. Replacement attempt: 31 r2, work order 348d7c5ed1a04e35163636afcd0522a59d4fdd15954371d1b155c0a0248b9bba.
-  - Previous fix: 17 r2, commit ; 2 assertion(s) retained. Replacement attempt: 31 r3, work order 8ffe5afded047ab6e35f54949b26b88352b5173ebc3f12f31f2305e2068fe853.
-  - Fixed: batch 31 revision 3, commit , by Codex; protected by 7 assertion(s).
+  - Previous fix: 17 r2, release commit not recorded; 2 assertion(s) retained. Replacement attempt: 31 r1, work order 07bb828991e40a2256e2d60c66b6665f7d66a648df99323fd68398ae7b90ea6e.
+  - Previous fix: 17 r2, release commit not recorded; 2 assertion(s) retained. Replacement attempt: 31 r2, work order 348d7c5ed1a04e35163636afcd0522a59d4fdd15954371d1b155c0a0248b9bba.
+  - Previous fix: 17 r2, release commit not recorded; 2 assertion(s) retained. Replacement attempt: 31 r3, work order 8ffe5afded047ab6e35f54949b26b88352b5173ebc3f12f31f2305e2068fe853.
+  - Implemented protections: batch 31 revision 3, release commit not recorded, by Codex; protected by 7 assertion(s).
+  - Implementation evidence: commit 4754c5116dcc2a0105acd4a0adede646d3c6f41a, batch 31 revision 3, package aaeabc755635. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
   - 2026-09-22 superseded by approved replacement: prior fix 17 r2 at ; approved work order 07bb828991e40a2256e2d60c66b6665f7d66a648df99323fd68398ae7b90ea6e
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
@@ -2920,7 +3279,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Corrected after Codex's review: Verified: s. 201.02 (70 cents) and s. 201.031 (surtax, none on a single-family residence). NOT verified by Claude: Miami-Dade's 60-cent base rate (the Revenue Department page did not render).
   - Ruling, 2026-09-20: Batch 17 review item 12 approved: distinguish Miami-Dade documentary stamp rates and surtax exception; state the example in terms of taxable consideration and the outside-Miami-Dade rate.
   - Ruling, 2026-09-20: Batch 17 revision 2: Adam rejected revision 1 and authorized the prepared shorter documentary-stamp-tax paragraph to correct portal-PDF pagination. Exact approved text is in revisions/r2.json. All other approved changes and rejected units remain unchanged.
-  - Fixed: batch 17 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 17 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **N2.11. [substantive]** — **implemented** — waits on Adam's ruling
   - Owner's Manual, Keeping the Money Separate, personal funds — docs/owners-manual.md:211 — `docs/owners-manual.md:211`
@@ -2929,7 +3289,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: All masters permit documented Member loans (multi:214 §6.5; single §6.4); expense reimbursement is also expressly permitted in management compensation. Calling contributions/distributions the only two ways contradicts those authorized flows.
   - Replace with: - Document every transfer between you and the structure: capital contributions, distributions, loans and repayments, and legitimate expense reimbursements. Identify the owner and the specific company or series involved, and use its proper account.
   - Ruling, 2026-09-20: Batch 17 review item 13 approved: include documented loans, repayments and legitimate expense reimbursements alongside contributions and distributions.
-  - Fixed: batch 17 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 17 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **N2.12. [substantive]** — **implemented** — waits on Adam's ruling
   - Owner's Manual, Maintaining the Agreement (§7), adding a second owner — docs/owners-manual.md:147 — `docs/owners-manual.md:147`
@@ -2938,7 +3299,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The Manual covers both disregarded and S corporation single-member forms. A second eligible shareholder does not by itself end an existing S election; IRS instructions say it remains effective until terminated or revoked. https://www.irs.gov/instructions/i2553, End of Election; https://www.irs.gov/businesses/small-businesses-self-employed/single-member-limited-liability-companies
   - Replace with: 3. **When you add a second owner to a single-member company, change agreements.** Your agreement does not require it — nothing in it does — but the single-member form is built for one owner: it has no voting rules, no capital-call machinery, no transfer restrictions among owners, and none of the multi-owner bankruptcy armor, and a disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner is admitted. Move to the multi-member form at the same time, not later. (The portal does this for you: add the new owner in the operating agreement questionnaire, and the regenerated agreement is built on the multi-owner form automatically.)
   - Ruling, 2026-09-20: Batch 12: Adam approved the proposed fix and then said Go. Approved scope: Adding a second eligible owner does not itself terminate an existing S election; retain the agreement recommendation. Exact wording: . A disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner joins.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.13. [substantive]** — **implemented** — waits on Adam's ruling
@@ -2948,7 +3310,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The masters expressly support entity owners (oa.ts:680–691); the IRS says an LLC owned by a corporation or partnership reports as part of that owner's return. Form1040 applies to an individual owner, not every permitted owner. https://www.irs.gov/businesses/small-businesses-self-employed/single-member-limited-liability-companies
   - Replace with: | One owner, no election | No separate federal income-tax return. Activity appears on the tax owner's return; for an individual, usually Schedule C, E, or F of Form 1040 or 1040-SR. Entity owners use the applicable return for that entity. |
   - Ruling, 2026-09-20: Batch 12: Adam approved the proposed fix and then said Go. Approved scope: Correct both universal Form 1040 statements to include company and trust tax owners. Exact wording: No separate federal income-tax return for the disregarded LLC. Its activity is reported through its tax owner. An individual generally uses the applicable schedules of Form 1040 or 1040-SR; other owners use their applicable reporting rules. / (where the company itself is disregarded, its activity is reported through its tax owner; an individual generally uses the applicable schedules of Form 1040 or 1040-SR, while other owners use their applicable reporting rules)
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.14. [substantive]** — **open** — waits on Adam's ruling
@@ -2959,6 +3322,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: 2. **Uneven distributions.** Your agreement requires pro-rata distributions. Correct any departure with your CPA: unequal payments have tax consequences and may breach the agreement, but do not by themselves end S status when the governing provisions preserve identical distribution and liquidation rights.
   - 
   - **Three issues to review with your CPA:**
+  - Ruling, 2026-09-20: Batch 12 review item 12: Adam rejected the proposed uneven-distributions explanation and heading changes and directed that the existing wording stay unchanged.
 - **N2.15. [wording]** — **implemented** — waits on Adam's ruling
   - Owner's Manual, What Actually Breaks the Shield (§21) — docs/owners-manual.md:362 — `docs/owners-manual.md:362`
   - Reads: The conduct that loses these fights, ranked by frequency:
@@ -2966,7 +3330,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Neither this paragraph nor the source materials supplies cases, a dataset, counts or a method establishing the ordering. The legal examples can stand without an unsupported empirical ranking.
   - Replace with: Conduct that can undermine the shields:
   - Ruling, 2026-09-20: Batch 17 review item 14 approved: remove the unsupported frequency ranking while retaining the conduct list.
-  - Fixed: batch 17 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 17 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit a500e3c5f4e85e89e7b5b8664004cae01f619c53, batch 17 revision 2, package fdc0aedbc619. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: PDF pagination correction; proceed with prepared revision 2
 - **N2.16. [substantive]** — **implemented**
   - S corporation election package, record copy, deadline notice — webapp/server/s-election.ts:204 — `webapp/server/s-election.ts:204`
@@ -2974,7 +3339,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The IRS deadline has already passed whenever the package becomes a record copy.
   - True: The record copy is triggered14days after package creation (routes-portal.ts:517,548–630), not by the election deadline. A package created shortly after formation becomes a record copy long before the usual2months15days deadline. s-election.ts:314 computes the deadline independently.
   - Replace with: The IRS deadline for this election is ${fmtDateLong(deadlineIso)}. If that date has passed, discuss late-election relief with your tax professional.
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **N2.17. [substantive]** — **implemented**
   - S corporation election package, EIN not yet available notice — webapp/server/s-election.ts:184 — `webapp/server/s-election.ts:184`
   - Reads:     : `**Your EIN was not yet available when this package was prepared.** Write it in item A on page 1 (and the box at the top of page 2) before filing — the IRS will not process the form without it.`;
@@ -2982,7 +3348,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: IRS Form2553 instructions, ItemA, expressly provide for Applied For plus the EIN application date if the EIN has not arrived when due. The generator itself prints Applied For (:80–85) but omits its date. https://www.irs.gov/instructions/i2553
   - Replace with: **Your EIN was not yet available when this package was prepared.** If it arrives before filing, enter it in item A and at the top of page 2. If it has not arrived by the filing deadline, follow the IRS instruction to enter “Applied For” and the date the EIN application was made; do not miss the deadline solely while waiting for the number.
   - Ruling, 2026-09-20: Batch 13 item 10: never tell clients to enter Applied For. Require an issued EIN on the Form 2553 filing package.
-  - Fixed: batch 13 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 13 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 810ee613b34783965ca185dd6bd12d718bd1ca69, batch 13 revision 1, package 859e2bf35fed. This records implementation, not acceptance or publication.
 - **N2.18. [wording]** — **open** — waits on Adam's ruling
   - S corporation election package, record-copy warning — webapp/server/s-election.ts:194 — `webapp/server/s-election.ts:194`
   - Reads: **An election filed with incomplete Social Security numbers is invalid.** Do not sign or mail this copy. It is here so you keep a record of what was prepared for ${d.llcName} — the election to be taxed as an S corporation effective ${fmtDateLong(d.effectiveDate)}, prepared with ${d.ein ? `EIN **${fmtEin(d.ein)}**` : "no EIN on file"}.
@@ -2998,7 +3365,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: out.push(line(`Manager ${i + 1}`, `${name}; ${addr({ address1: mm.streetAddress1 ?? mm.address1, address2: mm.streetAddress2 ?? mm.address2, city: mm.city, state: mm.state, zip: mm.zip })}`));
   - 
   - out.push(line(`Member ${i + 1}`, `${name}; ${addr({ address1: mm.address1, address2: mm.address2, city: mm.city, state: mm.state, zip: mm.zip })}${pct}`));
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **N2.20. [substantive]** — **implemented**
   - Generated agreements, amendments, consents and office summaries, non-Latin names and text — webapp/server/pdf-render.ts:39 — `webapp/server/pdf-render.ts:39`
@@ -3006,7 +3374,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The original names and legal text are preserved in the PDF.
   - True: The sanitizer replaces every character outside its WinAnsi subset with ?. A valid input name such as 王明 becomes??; input schemas accept Unicode. manual-pdf.ts:44 uses the same lossy fallback. This changes legal names, not merely font appearance. The immediate replacement refuses a corrupt PDF; full Unicode font support is the better final rendering capability.
   - Replace with: .replace(/[^\x20-\x7E\xA0-\xFF–—•]/g, () => { throw new Error("This document contains characters the current PDF font cannot display. The document was not generated; contact us so the names and text can be preserved correctly."); });
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **N2.21. [substantive]** — **implemented**
   - Operating agreement, Exhibit A contribution and owner tables — webapp/server/oa.ts:577 — `webapp/server/oa.ts:577`
@@ -3029,7 +3398,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: Client-entered data is a table-cell value, not document markup.
   - True: Owner names, addresses and asset descriptions are inserted raw at578–581 and616–619. pdf-render.ts:78 splits every vertical bar into a new column. Thus an asset description containing | changes the number and positions of cells; new-series.ts only sanitizes special terms, not its contribution. A newline similarly ends a table row. Escaping pipes alone is insufficient: the renderer must decode escaped or encoded delimiters and split only structural pipes.
   - Replace with: Encode client table-cell text before inserting it into Markdown, and decode it only after the renderer has identified the structural cells. Preserve vertical bars and line breaks inside their original cell. Apply the same encoding and decoding to the series-consent contribution cell.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
 - **N2.22. [substantive]** — **implemented** — waits on Adam's ruling
   - Professional LLC operating agreement, Transfer on Death (§4.6), family transfers/admission and purpose — webapp/server/templates-oa-single.md:134 — `webapp/server/templates-oa-single.md:134`
@@ -3038,7 +3408,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: oa.ts:389–397 changes only professional cover/preamble/recital; it leaves the ordinary admission and transfer clauses unchanged. 2026 §§621.09(2),621.11(2) restrict membership/transfers to eligible licensed individuals or professional entities;621.08 also limits the business purpose despite the ordinary §1.4 any-lawful-business wording. Entirechapter opened: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0621/0621.html
   - Replace with: For a professional limited liability company, every transfer and admission under this Agreement, including a transfer on death, is subject to Chapter 621, Florida Statutes. A proposed recipient may be admitted only if eligible under s. 621.09(2), and no transfer may violate s. 621.11(2). The Company's business is limited as s. 621.08 requires, notwithstanding the general-purpose wording of Section 1.4.
   - Ruling, 2026-09-20: Batch 16 item 13 approved: professional-only Chapter 621 purpose, transfer, admission and TOD eligibility restrictions; retain permitted investments and cumulative S-corporation eligibility.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 19 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 19 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.23. [housekeeping]** — **implemented** — housekeeping
@@ -3047,7 +3418,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: The template has six distinct slots.
   - True: The master uses seven distinct placeholders: COMPANY NAME, DOCUMENT NUMBER, SIGNATURE, SIGNER NAME, SIGNER TITLE, DATE and EDITION. statement.ts fills all seven correctly.
   - Replace with:  * carries every word; this fills its seven slots and nothing else.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **N2.24. [housekeeping]** — **implemented** — housekeeping
   - PDF generator, encryption source comment — webapp/server/pdf-render.ts:636 — `webapp/server/pdf-render.ts:636`
   - Reads:       // The library's writer encrypts STREAMS only, never strings, so any Info
@@ -3061,7 +3433,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Claims: Encrypted documents carry no Info metadata dictionary.
   - True: The later implementation at654 calls setMeta and655 encryptStrings; setMeta545–550 writes title/author/subject/producer/date. The older comment says the opposite of the code below it.
   - Replace with: // Metadata strings are encrypted with the other indirect-object strings below, so the encrypted PDF can retain its Info dictionary.
-  - Fixed: batch 20 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
 - **N2.25. [substantive]** — **implemented** — waits on Adam's ruling
   - Operating Agreement Instructions, optional deadlock provision (§5(c)) — docs/oa-instructions.md:63 — `docs/oa-instructions.md:63`
   - Reads: **(c) Deadlock Buy-Sell ("Shotgun") — §13.2.** For companies that can split 50/50 (two equal owners, or two equal factions), a deadlock otherwise has no exit short of a lawsuit to dissolve the company. The shotgun works like cutting a cake: after a 60-day deadlock, either substantial owner may name a single price for the whole company; the *other* side then chooses whether to buy or sell at that price. Naming the price honestly is self-enforcing — name it too low and you get bought out cheap; too high and you overpay. **Caution:** the mechanism favors the owner with more cash, since the poorer side may be forced to sell even at a fair price. To omit it, replace the text of §13.2 with "[Reserved.]". Omit it if ownership is not evenly split (a majority can always outvote a deadlock) or if the owners' finances are badly mismatched.
@@ -3069,7 +3442,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: All four multi-member masters define deadlock as failure to obtain the vote required for the submitted matter (§13.2(a)). Borrowing above the threshold and guarantees (§5.4(f)/§5.5(f)) require unanimity, so a 60/40 company can deadlock even though one owner holds a majority; both owners also meet the 25% threshold. Section13.2(e), however, excludes matters requiring all Members’ consent when the Act expressly permits withholding consent. Unequal ownership does not eliminate deadlock, but the shotgun does not cover every unanimous-consent matter.
   - Replace with: **(c) Deadlock Buy-Sell ("Shotgun") — §13.2.** Consider this provision whenever a decision covered by Section 13.2 can produce a deadlock, including equal ownership and contractual unanimous-vote requirements such as major borrowing. Section 13.2(e) excludes certain matters for which the Act expressly permits a Member to withhold consent. After the contractual 60-day deadlock period, a Member holding at least 25% may offer a single valuation; the other Members then choose to buy or sell on the terms in Section 13.2. The mechanism can favor an owner with greater access to cash. If you omit it, replace Section 13.2 with "[Reserved.]". Unequal ownership does not eliminate deadlock on decisions requiring unanimity.
   - Ruling, 2026-09-20: Batch 15 approved, including Adam's clarification: a 60% owner cannot override unanimous approval, so unequal ownership can still deadlock. Correct Instructions, Manual and portal help; preserve Section 13.2's covered matters, exclusions, written-notice period and 25% initiating threshold. No agreement-clause change.
-  - Fixed: batch 15 revision 2, commit , by Codex; protected by 7 assertion(s).
+  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 7 assertion(s).
+  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
 - **N2.26. [wording]** — **implemented** — waits on Adam's ruling
   - Owner’s Manual, federal beneficial ownership reporting (§20) and source colophon — docs/owners-manual.md:358 — `docs/owners-manual.md:358`
@@ -3079,7 +3453,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: The Corporate Transparency Act briefly required most small LLCs to file beneficial ownership reports with FinCEN. **As of this edition, U.S.-formed companies are exempt:** FinCEN’s final rule, effective August 14, 2026, retained the exemption introduced by its March 2025 interim final rule. A Florida series LLC formed in Florida currently files no federal beneficial ownership report, and its owners do not report beneficial ownership information for that company.
   - Corrected after Codex's review: Verified: FinCEN's page says the rule is final (alert updated 11 Aug 2026). NOT verified by Claude: the effective date of 14 Aug 2026.
   - Ruling, 2026-09-20: Batch 12: Adam approved the proposed fix and then said Go. Approved scope: Update the FinCEN rule and source reference to the verified final rule; no Florida filing change. Exact wording: FinCEN’s final rule, effective August 14, 2026, retained the exemption for U.S.-formed companies. A Florida LLC formed in Florida does not file a federal beneficial ownership report under that rule, and its owners do not submit one for that company. / FinCEN final rule (effective Aug. 14, 2026; fincen.gov/boi)
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 3 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **N2.27. [substantive]** — **implemented** — waits on Adam's ruling
@@ -3089,7 +3464,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The actual opinion distinguishes management from economic interests: the court held the trustee could not assume the management interest but affirmed the sale of the debtors’ 50% economic interest. See 484 B.R.874,880–881, https://gassmanlaw.com/wp-content/uploads/2013/04/In_Re_Sodestrom.pdf . The same overbroad sentence appears in templates-oa-member.md:300, templates-oa-s.md:312 and templates-oa-member-s.md:314; Manual:383 likewise says “interest” without the management qualification. Section365(c)(1) is conditional on applicable law excusing the other party’s performance and lack of consent; it does not create a blanket bar to sale of economic rights. Statutory text opened at https://usc-cdn.house.gov/view.xhtml?req=granuleid%3AUSC-prelim-title11-section365&num=0&edition=prelim .
   - Replace with: **11.2 Personal Service Agreement; Assumption and Assignment.** The managerial and governance duties under this Agreement are personal to those who owe them. The parties intend that, to the extent applicable law and 11 U.S.C. §365(c)(1) permit, a trustee may not assume or assign a debtor Member’s management rights without the required consent of the other Members. This does not prohibit a transfer of economic rights merely because management rights cannot be transferred. In re Soderstrom, 484 B.R.874 (M.D. Fla. 2013), upheld the sale of the debtor-members’ economic interest while preventing assumption and sale of their management interest.
   - Ruling, 2026-09-20: Batch 16 item 14: Use this exact paragraph and update the manual and instructions: The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. § 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member’s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate’s interest in a Member’s transferable (economic) interest to the extent permitted by applicable law.
-  - Fixed: batch 27 revision 3, commit , by Codex; protected by 7 assertion(s).
+  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 7 assertion(s).
+  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
 - **AUD-post-batches-2026-09-20-4a344e2-B1-N05. [housekeeping]** — **implemented** — housekeeping
@@ -3099,7 +3475,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: accept.ts supports --part and batch.ts:38–40 copies a ruling with its part intact, but unmetWaits:664 never reads r.part. batch.ts:77 uses unmetWaits to allow authorization. A pure in-memory fixture with independent partsa/b both awaiting ruling:example clears both waits after recording “Only part a approved” with part:a. This is a synthetic resolver reproduction, not evidence of an actual unapproved release.
   - Proposed replacement (not approved): Resolve a ruling against the specific waiting item and part, including canonical target scope. An item-wide ruling may satisfy its covered parts; a part-scoped ruling must satisfy only that part and its exact linked sightings. Preserve unrelated waits in authorization and the rulings queue.
   - Rechecked by codex-reader-5: Read ledger-lib canonical resolver/mainOf627–648 and unmetWaits657–664 plus batch ruling copy/authorize path. Independent probe adds canonical sightings of both parts: part-a-only decision clears unrelated main-b and alias-b waits as well; item-wide ruling properly clears all. This is a wait-resolution scope defect, not proof of actual unauthorized acceptance/release. Rule strings currently name item only, so repair must define explicit scope for cross-item dependencies instead of assuming identically named parts cover them. Real ledger currently has no demonstrated effected unrelated part; source/probe establish latent flaw.
-  - Fixed: batch 21 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 21 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 53327cf5220b8c2c07208c13d90f46cc76534993, batch 21 revision 1, package 865dcfb12d40. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B2-04. [housekeeping]** — **implemented** — housekeeping
   - Audit inventory, deciding which live product controls must be read — docs/audit/audit-session.ts:35 — `docs/audit/audit-session.ts:35`
   - Reads:   const exclusions=[[/^webapp\/src\/components\/ui\//,"stock UI widgets"],[/\.test\.tsx?$/,"test file"],[/^webapp\/server\/e2e\.ts$/,"check suite"],[/^docs\/(coverage-605|event-map|event-map-text-review|oa-map|dependency-audit|db-restore)\.md$/,"gate output or operations note"]] as const;
@@ -3107,7 +3484,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: input.tsx:3–13,31–38 and textarea.tsx:3–13,30–36 contain custom English-business-text checks, setCustomValidity and reader-visible warnings added for Batch18. Both were independently read whole as supporting files (45 and42 lines), but neither enters the manifest because of this unconditional exclusion. inventory.ts:28 repeats it. The coverage gate can pass without assigning these live business validation controls.
   - Proposed replacement (not approved): Include customized UI components, at minimum webapp/src/components/ui/input.tsx and webapp/src/components/ui/textarea.tsx, in both audit inventories. Exclude only verified unchanged stock widgets; changes that add product wording or behavior must enter the next frozen manifest.
   - Rechecked by codex-reader-5: Read both customized UI input/textarea files and audit-session inventory35 plus supplement42–45; ui exclusion is unconditional and supplement does not add these files. inventory28 repeats exclusion. Their business English checks, validity messages and alerts are plainly product behavior. Proposed inclusion correct; existing generated manifest must remain immutable and report additional read coverage separately.
-  - Fixed: batch 21 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 21 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 53327cf5220b8c2c07208c13d90f46cc76534993, batch 21 revision 1, package 865dcfb12d40. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B2-05. [housekeeping]** — **implemented** — housekeeping
   - Behavioral review, starting the supposedly isolated test backend — webapp/scripts/behavioral.ts:780 — `webapp/scripts/behavioral.ts:780`
   - Reads:       if (r.status === 200) break;
@@ -3115,7 +3493,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: API_PORT is selected from500 local ports at44. After spawning the offline child at769–776, the health loop accepts any status200 without inspecting the offline signal or checking whether that child exited. A pre-existing server on the chosen port can answer while the new child fails to bind; subsequent requests are then sent to the pre-existing server. The health contract and collision reproduction require independent root verification before treating this as a tested exploit. No live server was contacted by this reader.
   - Proposed replacement (not approved): Require the spawned child to remain running and the health response to affirm offline mode and the expected isolated run/database identity before any mutation. Refuse startup on a port collision or an unverified health response.
   - Rechecked by codex-reader-5: Read behavioral44/769–785 and real health route routes-payments260–269. Random chosen port can collide; poll accepts any200. Health only returns ordering/database/ok and exposes neither offline mode nor runidentity. Root must retain that distinction: the proposed identity signal does not exist yet and requires adding one. No actual collision/network effects reproduced by this reviewer; static race credible and remedy correct.
-  - Fixed: batch 21 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 21 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 53327cf5220b8c2c07208c13d90f46cc76534993, batch 21 revision 1, package 865dcfb12d40. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B3-04. [housekeeping]** — **implemented** — housekeeping
   - Document consistency checker, explanation of what its reference check verifies. — `docs/docs-consistency.py:18`
   - Reads: ("§4.6 in the single-member form"). Where a reference names a form, that form is
@@ -3124,7 +3503,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: docs/docs-consistency.py:108–113 deliberately resolves against every master and accepts any match; the whole file has no form-specific selector. This establishes an inaccurate check-coverage claim, not a current bad document reference.
   - Proposed replacement (not approved): Form-specific references are not resolved against the named form by this script. It accepts a section found in any master; a reviewer must check that it exists in the particular form named by the guidance.
   - Rechecked by codex-reader-5: Read docs-consistency docstring and reference loop99–118. It always builds pool=list(by_form), with no text-to-specific-form resolver, contrary to stated claim. Documentation replacement accurately limits the checker; no bad reference is inferred.
-  - Fixed: batch 21 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 21 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 53327cf5220b8c2c07208c13d90f46cc76534993, batch 21 revision 1, package 865dcfb12d40. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-WORD-EXHIBIT-TABLE-ROWS. [substantive]** — **implemented**
   - Tracked Word agreement → Exhibit A, rendered Manager-Managed S Corporation p25 — `docs/md-to-docx.py:399`
   - Reads: while i < len(lines) and lines[i].strip().startswith("|"):
@@ -3132,7 +3512,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The converter strips HTML control comments at339 but leaves their standalone lines empty. The table loop stops at the blank left by repeat:member before the first data row (templates-oa-s.md441); the remaining data/total lines fall through as ordinary paragraphs. The tracked Word render p25 shows four header-only grids and raw |...| data rows for members, assets, series allocation and TOD. These are editable Word drafting outputs per docs/README.md1–40; ordinary unfilled placeholders are intentional but the lost table structure is not. This is not a claim about generated client PDFs. Compared ledger original descriptions:261 concerned inventory,265 manager placeholder; no existing prior describes this Word table conversion defect.
   - Proposed replacement (not approved): Keep intended blank-form data/total rows within their Word tables when removing template-control comment lines, and verify all agreement exhibits by rendering existing outputs. Preserve visible drafting choices and avoid silently selecting a client variant.
   - Rechecked by codex-coordinator: Reopened converter table loop and paragraph fallthrough; visually inspected retained Word Manager S pages24,25,26. Page25 confirms four header-only grids and literal pipe rows; pages24/26 confirm visible [[indent]] labels. These are editable Word outputs, not a claim of PDF defects. Compared prior261/265 and full prior descriptions.
-  - Fixed: batch 25 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 25 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit b5eb58497f8e6f79aa847b224cc0b797bf7c8e29, batch 25 revision 1, package 045c7e87717c. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-WORD-INDENT-CONTROL-LEAK. [wording]** — **implemented**
   - Tracked Word legal forms → entity signature blocks, e.g. Manager-Managed S Corporation pp24,26 — `docs/md-to-docx.py:471`
   - Reads: stripped,
@@ -3140,7 +3521,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The converter recognizes pagebreak/left/contents controls but has no indent control handling; literal [[indent]] is passed into paragraph output. ManagerS pp24/26 visibly print six tokens before printed-name/title fields. OOXML comparisons show literal indent text in all10 legal Word outputs (4or6 in agreements/amendment,2 in Statement); Instructions/Manual unaffected. This is separate from expected company/name blanks and does not assert client PDF leakage. Original ledger descriptions searched for Word/docx/indent/table/control issues; no matching prior found.
   - Proposed replacement (not approved): Consume [[indent]] as paragraph formatting in Word generation so signature labels are indented and the control token does not print; render all affected signature blocks to verify.
   - Rechecked by codex-coordinator: Reopened converter table loop and paragraph fallthrough; visually inspected retained Word Manager S pages24,25,26. Page25 confirms four header-only grids and literal pipe rows; pages24/26 confirm visible [[indent]] labels. These are editable Word outputs, not a claim of PDF defects. Compared prior261/265 and full prior descriptions.
-  - Fixed: batch 25 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 25 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit b5eb58497f8e6f79aa847b224cc0b797bf7c8e29, batch 25 revision 1, package 045c7e87717c. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B5-E2E-ISOLATION-FAILOPEN. [housekeeping]** — **implemented** — housekeeping
   - E2E external-service isolation preflight — `webapp/server/e2e.ts:180`
   - Reads: const externals = (summary?.data?.externals ?? {}) as Record<string, boolean>;
@@ -3148,7 +3530,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: JSON/network errors become null and missing externals becomes {}; active is empty and execution continues. Pure extracted-guard probe confirms null/data={} summaries CONTINUED while a live flag REFUSED. Subsequent checks accumulate failures rather than stopping before mutations. Does not establish an actual external write during this audit. Full prior ledger searched for env-summary/isolation; no same mechanism found.
   - Proposed replacement (not approved): Require successful response and a complete recognized externals schema before proceeding in default mode; abort on unavailable/malformed summary. Keep explicitly authorized integration-test override separate. Add refusal cases for missing/failed/malformed summary.
   - Rechecked by codex-root-independent: Root independently reopened e2e.ts170–215 and extracted-guard evidence. Null/missing schema gives empty active list and proceeds to state mutations. Later check() failures do not stop preflight. Independent from behavioral random-port collision; preserve separate explicitly authorized integration mode.
-  - Fixed: batch 21 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 21 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 53327cf5220b8c2c07208c13d90f46cc76534993, batch 21 revision 1, package 865dcfb12d40. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B4-RESTORE-S-ELECTION-SECRET-STATE. [substantive]** — **implemented**
   - Restore an unfinished S-election awaiting the EIN; then Office supplies the issued EIN — `webapp/server/restore.ts:22`
   - Reads: else if(row.type==='ein'&&row.status==='in_progress')row.status='awaiting_info';
@@ -3156,7 +3539,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: backup.ts128 and restore.ts20 clear every service_orders.ein_secret. The actual empty-target probe restored EIN as awaiting_info but S-election as in_progress with null secret. A valid unfulfilled pending-EIN S-election has einPending/shareholders but no documentId or purgedAt (routes-portal.ts2401–2404). When the EIN arrives, routes-admin.ts1399–1404 skips rows without secret and sends recovery email only if documentId or purgedAt exists. Thus this normal pending case is skipped without package or recovery notice, while the portal still says it is waiting for the EIN. Re-entering via Edit saved details remains possible; not claimed permanently unrecoverable. Fresh restore followed by actual registered Hono EIN-fulfill handler with valid synthetic PDF returned200, rebuiltSElections0, unchanged S-election in_progress/einPending true/secret null/no documentId and unchanged email_log count1→1. Ordinary EIN notice explicitly disabled; recovery notice has no such toggle. This proves the skipped carry/recovery-notice branch locally, with all external fetches blocked. Prior223 is specifically omission of email_log/ra_renewals and is now fixed;179 is backup coverage/status. N1.01 intentionally excludes transient secrets and should not be reversed. No prior identified for restoring pending S-election operational state.
   - Proposed replacement (not approved): On restore, mark unfinished pending-EIN S-elections as requiring taxpayer-number re-entry and communicate that requirement; also make the EIN-arrival missing-secret branch notify/flag this state even when no package has ever been built. Keep transient secrets excluded from backups.
   - Rechecked by codex-coordinator: Reopened entire restore.ts and carryEinIntoSElections missing-secret branch, then read the retained actual Hono response and before/after service/email records. Only EIN is reset to awaiting_info; S-election remains in_progress without secret, package or notification. Compared223 omitted-table scope and N1.01 intentional secret exclusions. The repair must preserve exclusion and request re-entry; no claim of irreversible loss of all client information.
-  - Fixed: batch 23 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 23 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 81a7290cc77d13c42685a57d9d37f5103cf6d4c4, batch 23 revision 1, package 878d45c6f898. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-ROOT-NOTES-NOTICE-REVIEW. [housekeeping]** — **implemented** — housekeeping
   - Internal statutory reference notes, deemed notice of manager-managed status — `webapp/server/chapter-605-notes.md:198`
   - Reads: - **s. 605.0103(4)** — a non-member is deemed to know of a limitation on
@@ -3169,7 +3553,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The2026 statute605.0103(4)(b)4 makes the original articles declaration notice without a90-day wait; its90-day proviso applies when a declaration is added or changed by amendment or amendment and restatement. The grouped90-day summary incorrectly extends that proviso to original articles. Independently opened and read official2026 source.
   - Proposed replacement (not approved): - **s. 605.0103(4)** — A non-member is deemed to know a limitation on authority to transfer real property as provided in s. 605.0302(7). Dissolution, termination, and the listed entity transactions give deemed notice 90 days after the specified filings become effective. A manager-managed declaration in the original articles gives deemed notice under subsection (4)(b)4. If added or changed by amendment or amendment and restatement, notice of the addition or change may not become effective until 90 days after the effective date of that filing. An articles provision limiting authority to transfer real property does not give notice unless recorded in the real property records.
   - Rechecked by codex-reader-6: Independent review of parent-discovered candidate: actual2026 Online Sunshine605.0103 in new Safari tab shows original-articles clause followed by amendment-specific90-day proviso. Exact current note197–202 read; priorledger/findings and rulings searched for0103,notice,originalarticles,manager-managed timing. No matching prior;217concerns indemnification and218appraisal.
-  - Fixed: batch 26 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 26 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0, batch 26 revision 1, package 56d24b97e90b. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-ROOT-NOTES-DISTRIBUTION-REVIEW. [housekeeping]** — **implemented** — housekeeping
   - Internal statutory reference notes, liability for improper distributions — `webapp/server/chapter-605-notes.md:384`
   - Reads: s. 605.0406 — consenting members/managers personally
@@ -3178,7 +3563,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The2026 statute605.0406(1) requires both consent to a605.0405-violating distribution and failure to comply with605.04091. It applies to members of member-managed companies and managers of manager-managed companies, subject to subsection2express delegation/relief. Subsection3separately addresses knowing recipients. The two-year limitation is correctly summarized. The omitted conjunctive condition changes a liability rule, rather than merely omitting a secondary example.
   - Proposed replacement (not approved): s. 605.0406 — A member of a member-managed LLC or manager of a manager-managed LLC who consents to a distribution violating s. 605.0405 and, in consenting, fails to comply with s. 605.04091 is personally liable to the company for the excess, subject to the express allocation-of-authority exception in subsection (2). A knowing recipient is separately liable under subsection (3) for the excess received. An action under this section is barred unless begun within 2 years after the distribution.
   - Rechecked by codex-reader-6: Independent review of parent lead: actual2026 Online Sunshine605.0406(1)-(5) read in Safari. Theand clause explicitly adds04091failure;2delegation and3knowingrecipients are separate. Prior217mentions0406only as a nonindemnifiable category under0105, not this liability trigger; no matching finding/ruling located.
-  - Fixed: batch 26 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 26 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0, batch 26 revision 1, package 56d24b97e90b. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B6-02. [housekeeping]** — **implemented** — housekeeping
   - Agreement structural audit gate, article and section sequence — `docs/structure.py:112`
   - Reads:     by_article = defaultdict(set)
@@ -3188,7 +3574,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The implementation groups minor section numbers into sets and article numbers into a sorted set, so it proves existence/uniqueness, not document order or ownership under the current heading. An offline probe swapped complete7.1 and7.2 provisions in the multi-member source, keeping contents and cross-references intact; check() returned[] just as for the unchanged baseline. The promised out-of-order defect is missed.
   - Proposed replacement (not approved): Inspect article headings and numbered provisions in original source order. Enforce consecutive article/section sequence and require every provision to belong to the immediately governing article, preserving explicitly supported letter suffixes. Add a mutation probe swapping complete adjacent sections and another swapping article blocks, and require the gate to reject them.
   - Rechecked by codex-reader-5: structure.py:103 sorts article set;112–121 groups section minors by set and asks only whether article number occurs anywhere. Source order and governing heading are not enforced. Independently loaded actual check and swapped complete7.1/7.2 in a separate copy; baseline[] and swapped[] both passed, mutationChanged true (evidence/b5-review-b46-probes.json). Searched all prior finding texts for structure.py/order gate and found no duplicate.
-  - Fixed: batch 21 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 21 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 53327cf5220b8c2c07208c13d90f46cc76534993, batch 21 revision 1, package 865dcfb12d40. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B6-03. [housekeeping]** — **implemented** — housekeeping
   - Event-map audit command documentation — `docs/event-map.py:22`
   - Reads: Then two reports, which do not fail:
@@ -3202,7 +3589,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: main at181-186 emits orphaned provisions and immediately returns1 whenever any exists. The current command therefore fails on unreached substantive provisions, contrary to the file-level usage description. This is documentation drift, not an argument to weaken the gate.
   - Proposed replacement (not approved): Update the docstring to say unreached provisions outside the documented definition exclusions fail the gate and must be mapped or removed; describe any raw coverage/gaps output separately as informational. Preserve current enforcement.
   - Rechecked by codex-reader-5: event-map.py:22–28 states the two reports do not fail, while main181–186 returns1 for any orphaned provision. Independent call to actual main with controlled check result returned1. Usage-doc drift only; preserve stronger enforcement. No duplicate event-map.py finding in all prior finding texts.
-  - Fixed: batch 21 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 21 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 53327cf5220b8c2c07208c13d90f46cc76534993, batch 21 revision 1, package 865dcfb12d40. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B5-MANUAL-TABLE-HEADER-PAGINATION. [wording]** — **implemented**
   - Site-generated Owner's Manual tables, physical pages8–9 and15–16 (printed6–7 and13–14) — `webapp/server/manual-pdf.ts:335`
   - Reads: need(rowH);
@@ -3210,7 +3598,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Actual renderManualPdf of the frozen docs/owners-manual.md produces37pages. Physical page8 ends with only the OA-choice table column headings, with all choices onpage9; page15 ends with only Step/What to do headings, rows onpage16. Both next pages lack repeated headers. The renderer measures and reserves each table row independently at330–335. Enlarged individual pages8/15 confirm the four-up observation. All text remains readable; the issue is pagination and association of headers with data, not missing substantive text.
   - Proposed replacement (not approved): Before placing a new table, reserve its measured header plus first data row together. Repeat headers on continuation pages when a table spans pages, preserving row integrity. Re-render the actual manual and inspect all pages to ensure no new stranded headings or near-empty pages.
   - Rechecked by codex-coordinator: Reopened actual frozen renderer source and inspected native pages independently: consent1/2 shows first signature rule separated from Casey name/date; manual8/9 and15/16 show stranded headers and headerless continuation. These are reproduced layout issues, not legal invalidity. Compared original ledger findings including230 and earlier heading/tail fixes; no same defect found. Corrected consent source line to372.
-  - Fixed: batch 25 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 25 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit b5eb58497f8e6f79aa847b224cc0b797bf7c8e29, batch 25 revision 1, package 045c7e87717c. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B7-CLIENT-TEXT-AS-SLOT. [substantive]** — **implemented**
   - Client portal amendment generation and office Statement of Authorized Representative generation for a company name containing an uppercase bracketed phrase — `webapp/server/oa-amendment.ts:141`
   - Reads: const leftover = (s.match(/\[[A-Z][A-Z ()/.']*\]/g) ?? []).filter((x) => !(am.mode === "typed" && x === "[AMENDMENT TEXT]"));
@@ -3218,7 +3607,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The company name is already inserted raw at oa-amendment.ts:98–99, and statement.ts:50 inserts it raw before its same-pattern guard at65–66. Actual orderFormSchema accepts the name [ALPHA] with a matching [ALPHA], LLC, PS A series and englishTextError returns null. Actual assembleOa succeeds for [ALPHA], LLC, but the actual amendment and statement assemblers independently throw unfilled slot(s): [ALPHA]. Amendment route1761 catches this as500 GENERATION_FAILED; issueStatement routes-admin427–434 passes the stored order name directly. These documents can fail for input the application accepts. This is pure-assembler/input-schema reproduction with statically verified route reachability, not observed production failure or a claim that this example name is available at Sunbiz.
   - Proposed replacement (not approved): Protect all client data before interpolation in the amendment and statement assemblers, validate only template markers, and enable corresponding renderer decoding so original client text prints literally. Preserve typed-amendment paragraph behavior. Verify company and signer values with bracketed phrases in both documents, and verify a genuinely unresolved template slot still fails. Do not ban otherwise accepted punctuation merely to avoid the guard.
   - Rechecked by codex-reader-5: Independently reopened both full assembler files, document-text.ts, validation schema ranges, source call sites, prior263 andN2.21, and executed actual orderFormSchema/englishTextError/assembleOa/assembleAmendment/assembleStatement. Source and reproduction agree; see evidence/b5-bracket-independent-probe.json.
-  - Fixed: batch 25 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 25 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit b5eb58497f8e6f79aa847b224cc0b797bf7c8e29, batch 25 revision 1, package 045c7e87717c. This records implementation, not acceptance or publication.
 - **AUD-post-batches-2026-09-20-4a344e2-B5-CONSENT-SIGNATURE-PAGINATION. [substantive]** — **implemented**
   - Generated new-series consent, member signature block, pages1–2 — `webapp/server/pdf-render.ts:372`
   - Reads: need(lineH);
@@ -3226,7 +3616,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Actual assembleNewSeries/renderMarkdownPdf with retained ordinary two-member/two-manager inputs produces four pages. Casey Audit signature rule is at page1 bottom; Casey name and Date line start page2. Renderer recognizes signature line at356 but reserves only one line at373, so it can break before the name. new-series.ts87–101 emits rule/name/date separately. All pages were visually inspected and pages1/2 enlarged. This is a layout/usability defect, not a claim that an executed consent is legally invalid.
   - Proposed replacement (not approved): Reserve the full measured signature unit before drawing its first rule, including wrapped name and optional date and entity By/name/title variants. Break before the unit if it will not fit. Preserve owner-approved tight signature spacing. Verify this exact normal fixture plus long-name and entity blocks; do not add an unconditional blank signature page.
   - Rechecked by codex-coordinator: Reopened actual frozen renderer source and inspected native pages independently: consent1/2 shows first signature rule separated from Casey name/date; manual8/9 and15/16 show stranded headers and headerless continuation. These are reproduced layout issues, not legal invalidity. Compared original ledger findings including230 and earlier heading/tail fixes; no same defect found. Corrected consent source line to372.
-  - Fixed: batch 25 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 25 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit b5eb58497f8e6f79aa847b224cc0b797bf7c8e29, batch 25 revision 1, package 045c7e87717c. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch28-runtime-B-restore-aborts-when-journal-lost. [substantive]** — **implemented**
   - Office → Reference Library → Database backups, and docs/db-restore.md 'Restore into an empty database': recovering after the Blob store is lost — `webapp/server/restore.ts:28`
   - Reads:   if(!data||!f.sha||hashBytes(isEncrypted(data)?unseal(data):data)!==f.sha)throw new Error(`Backup file missing or changed: ${f.path}`);
@@ -3234,7 +3625,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: Current deletionJournal reads only deletions/ object keys (document-retention.ts:7-9); deletions write object storage17 then DB23 and remove mirror file36. Restore reads current journal15, skips its keys30, and requires every other mirror file32. Contrary to the absolute historical description, backup.ts:21-35 DOES snapshot document_deletions. But an older snapshot cannot contain later deletions; no independent post-snapshot tombstone mirror is present. With lost Blob journal and a post-snapshot completed mirror deletion, required file verification aborts before row insertion. If its mirror removal was still pending, absent tombstone information can allow restoration. Source mechanism remains; historical runtime not rerun.
   - Proposed replacement (not approved): Durably mirror every deletion decision independently of file deletion, and consult that journal even when the old file is still available. Require a trustworthy complete journal before recovery; reconcile snapshot plus later records and verify deleted documents stay unavailable. Merely checking .deleted when a file is missing fails the pending-deletion case.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current deletionJournal reads only deletions/ object keys (document-retention.ts:7-9); deletions write object storage17 then DB23 and remove mirror file36. Restore reads current journal15, skips its keys30, and requires every other mirror file32. Contrary to the absolute historical description, backup.ts:21-35 DOES snapshot document_deletions. But an older snapshot cannot contain later deletions; no independent post-snapshot tombstone mirror is present. With lost Blob journal and a post-snapshot completed mirror deletion, required file verification aborts before row insertion. If its mirror removal was still pending, absent tombstone information can allow restoration. Source mechanism remains; historical runtime not rerun.
-  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 - **AUD-claude-reconciled-batch28-reader-5-office-nonpayment-resignation. [substantive]** — **implemented**
   - Office, order detail, 'Registered-agent appointment and cancellation' panel — recording 'Resignation submitted' for a client whose renewal was never paid (Terms 9(e) and 10(f) resignation for nonpayment) — `webapp/server/ra-office.ts:45`
@@ -3243,7 +3635,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Current cross-review: Current submitted branch requires ra_resignation_due. renewals.ts:124 sets it only in the timely-cancellation path; declined nonpayment does not set it. filed/mailed/copy require prior submission at ra-office.ts:47-59, so the office cannot record these actual events for an otherwise permitted nonpayment resignation. Terms9(e)/10(f) still describe such resignations. Current source corroborates historical reproduction; no current route rerun.
   - Proposed replacement (not approved): Allow the office to record an actual resignation with a documented Terms ground, required event dates and existing chronology safeguards. Do not gate every actual resignation on a timely-cancellation schedule. Separately resolve any automatic scheduling or fee rule.
   - Rechecked by Codex reconciliation of Claude second-read evidence: Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current submitted branch requires ra_resignation_due. renewals.ts:124 sets it only in the timely-cancellation path; declined nonpayment does not set it. filed/mailed/copy require prior submission at ra-office.ts:47-59, so the office cannot record these actual events for an otherwise permitted nonpayment resignation. Terms9(e)/10(f) still describe such resignations. Current source corroborates historical reproduction; no current route rerun.
-  - Fixed: batch 28 revision 2, commit , by Codex Astra; protected by 1 assertion(s).
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
 - **AUD-claude-reconciled-batch31-compare-A-instructions-handle-taxes-differently. [wording]** — **implemented** — waits on Adam's ruling
   - Operating Agreement Instructions §2 'Which Agreement to Use', last paragraph — `docs/oa-instructions.md:33`
@@ -3253,7 +3646,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): If you start with the single-member form and later add an owner, adopt the multi-member form at that time — the two forms handle voting and creditor protection differently (and, unless the company has elected S corporation status, taxes as well), and the single-member form is not built for two owners.
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 6: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
-  - Fixed: batch 31 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 31 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 4754c5116dcc2a0105acd4a0adede646d3c6f41a, batch 31 revision 3, package aaeabc755635. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 - **AUD-claude-reconciled-batch31-compare-A-manual-nothing-left-to-add. [wording]** — **implemented** — waits on Adam's ruling
@@ -3264,7 +3658,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): | **Article 10** | **In the multi-member forms:** transfers — family transfers permitted, everything else needs consent, transferees get money rights only, plus the charging-order and involuntary-transfer armor (Section 23). **In the single-owner forms:** admission of an additional member. Those forms have no transfer article, because Chapter 605 already makes a transfer permissible, gives a transferee distributions and nothing else, and binds a transferee who never signs; the S corporation versions add only the eligible-shareholder restriction in Section 9.3 |
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 7: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
-  - Fixed: batch 31 revision 3, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 31 revision 3, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 4754c5116dcc2a0105acd4a0adede646d3c6f41a, batch 31 revision 3, package aaeabc755635. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 - **AUD-claude-reconciled-batch31-render-oa-4-1-percentages-vs-fractions. [wording]** — **implemented** — waits on Adam's ruling
@@ -3275,7 +3670,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): In all four masters: 'Membership interests are of a single class and are expressed as percentages or fractions of the whole, as set forth on Exhibit A; no certificates shall be issued unless …' (keep the rest of the sentence as each master has it).
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 8: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
-  - Fixed: batch 31 revision 3, commit , by Codex; protected by 8 assertion(s).
+  - Implemented protections: batch 31 revision 3, release commit not recorded, by Codex; protected by 8 assertion(s).
+  - Implementation evidence: commit 4754c5116dcc2a0105acd4a0adede646d3c6f41a, batch 31 revision 3, package aaeabc755635. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 - **AUD-claude-reconciled-batch31-statutes-0302-series-property. [wording]** — **implemented** — waits on Adam's ruling
@@ -3286,7 +3682,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): In each master, after 'held in the name of the Company or of a Protected Series,' add: 'and, as to real property held in the name of a Protected Series, may cause that Protected Series to file its own statement of authority under s. 605.0302 as applied by s. 605.2108(3), Florida Statutes,' (Adam to confirm the drafting).
   - Rechecked by Codex, reopened at 9efcb29c4571efc3ddce69c8612f439569c455cf: Current wording reopened before Batch31. Reconciliation and original evidence retained in batches/31/evidence/reconciled-source.json; Adam rejected items 1, 2, 4 and approved 3, 5–10. The work order, not this historical proposed replacement, determines approved scope.
   - Ruling, 2026-09-22: Batch 31 review item 9: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections.
-  - Fixed: batch 31 revision 3, commit , by Codex; protected by 16 assertion(s).
+  - Implemented protections: batch 31 revision 3, release commit not recorded, by Codex; protected by 16 assertion(s).
+  - Implementation evidence: commit 4754c5116dcc2a0105acd4a0adede646d3c6f41a, batch 31 revision 3, package aaeabc755635. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
 - **AUD-claude-reconciled-batch32-render-word-alternatives-glued. [substantive]** — **implemented**
@@ -3296,7 +3693,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The comments are the markers that separate alternative wordings, so the Word documents print BOTH alternatives back to back with no space or note between them, and the [[indent]] token is printed verbatim. Read off the .docx text (evidence/render/word/*.docx.txt) and the rendered pages: the amendment (page 1) reads 'by the undersigned sole member (the "Member")the undersigned members (each a "Member" and collectively the "Members"), and is acknowledged by the undersigned ManagerManagers.', 'the undersigned hashave executed', 'the datedate(s)', 'MEMBER:MEMBERS:', 'ACKNOWLEDGED AND AGREED BY MANAGER:ACKNOWLEDGED AND AGREED BY MANAGERS:'; every manager-managed agreement reads 'The initial Manager is [MANAGER NAMES].The initial Managers are [MANAGER NAMES].' (s. 5.1) and 'Adopted effective [DATE] by the Company, acting through its Manager:Adopted effective [DATE] by the Company, acting through its Managers:'; the Statement form prints item 5 twice in a row ('…chapter 605, Florida Statutes.All ownership of the Company rests with its members, and all authority … rests with its manager or managers…'); and '[[indent]][PRINTED NAME]' / '[[indent]][TITLE]' appear in every entity signature block. The repeat-marker table rows of Exhibit A also print as literal pipe text ('| [MEMBER NAME] as [HOLDING] | [MEMBER ADDRESS] | …') under a one-row header table. The zip of each .docx confirms the text (unzip -p … word/document.xml). A reviewer or client reading the Word master cannot tell where one alternative ends and the other begins.
   - Proposed replacement (not approved): In md-to-docx.py, before stripping comments, resolve the markers the way the generator does for a blank master: render `<!-- one:X -->A<!-- /one --><!-- many:X -->B<!-- /many -->` as 'A [or: B]' (or on two lines with a bracketed note), render `<!-- if:X -->…<!-- /if -->` blocks with a bracketed '[if X:]' lead-in, drop the `[[indent]]` token (indent the paragraph instead), and treat the lines inside `<!-- repeat -->` blocks as table rows so they join the table above them.
   - Rechecked by Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a: Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim.
-  - Fixed: batch 32 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 32 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 3a72f468f54a1ca96de23ddf5587f327fda09e32, batch 32 revision 2, package 1e540a10031a. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing authorization to advance revisions: declare the existing API assertion update for the approved exact contribution fractions.
 - **AUD-claude-reconciled-batch32-render-2553-address-split. [substantive]** — **implemented**
   - Client portal, S corporation election package — IRS Form 2553 page 1 (Name and address block) and the cover letter letterhead — `webapp/server/s-election.ts:97`
@@ -3309,7 +3707,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The principal address handed to the package comes from oaSeed (routes-portal.ts:99–101), which joins it as address1, address2, 'City, ST', zip — the city and state are ONE comma part and the zip another, so the last two parts are 'FL' and '33139'. On the generated Form 2553 (evidence/render/pdf-s-election-package.pdf page 4, image pages/pdf-s-election-package/p-4.png; same on pdf-s-election-package-nine page 4) the street line reads '100 Ocean Drive, Suite 400, Miami' and the city line reads 'FL, 33139' — the city is on the wrong line and the IRS's city box has no city. The cover letters (page 3 of both packages) show the same split: '100 Ocean Drive, Suite 400, Miami' over 'FL, 33139'.
   - Proposed replacement (not approved): Split on the last THREE comma parts when the third-from-last is a city and the second-from-last is a two-letter state: `const parts = addr.split(",").map((s) => s.trim()).filter(Boolean); if (parts.length >= 3 && /^[A-Z]{2}$/.test(parts[parts.length - 2])) return { street: parts.slice(0, -3).join(", "), cityStateZip: `${parts[parts.length - 3]}, ${parts[parts.length - 2]} ${parts[parts.length - 1]}` };` — or pass the structured principalOfficeAddress (address1, address2, city, state, zip) from the order payload instead of a joined string.
   - Rechecked by Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a: Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim.
-  - Fixed: batch 32 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 32 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 3a72f468f54a1ca96de23ddf5587f327fda09e32, batch 32 revision 2, package 1e540a10031a. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing authorization to advance revisions: declare the existing API assertion update for the approved exact contribution fractions.
 - **AUD-claude-reconciled-batch32-render-manual-double-page-numbers. [substantive]** — **implemented**
   - Client portal, Reference Library, the Owner's Manual PDF the client downloads — every body page's footer — `webapp/server/pdf-render.ts:535`
@@ -3321,7 +3720,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: manual-pdf.ts:388–404 already draws 'Page n of 35' at x = PAGE_W − MARGIN − w, y = 40 on every body page (numbered from the first body page, cover and contents unnumbered), and stampFooters then draws 'Page N of 37' (numbered from the cover) at the same position. In the downloaded manual (evidence/render/pdf-owners-manual.pdf, pages 3–37) the two numbers overprint: pdftotext of page 3 reads 'Page / Page31 of / of 37 / 35', and the images show a smeared footer on every body page. The CONTENTS page (manual's own numbering: 'HOW TO USE THIS MANUAL … 1') no longer matches the only legible number, 'of 37'. Page images: evidence/render/pages/pdf-owners-manual/p-03.png … p-37.png.
   - Proposed replacement (not approved): In stampExistingPdf, do not draw a page number when the document already carries its own: either pass a flag from the library route (the manual renders its own footer) so stampFooters draws only the copyright line for that document, or, in stampFooters, skip the `Page N of total` draw when `opts.title` is the manual's title. Simplest: `export async function stampExistingPdf(opts: { bytes; watermark; title; pageNumbers?: boolean })` and in stampFooters `if (pageNumbers !== false) p.drawText(pn, …)`; the library download passes `pageNumbers: false`.
   - Rechecked by Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a: Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim.
-  - Fixed: batch 32 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 32 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 3a72f468f54a1ca96de23ddf5587f327fda09e32, batch 32 revision 2, package 1e540a10031a. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing authorization to advance revisions: declare the existing API assertion update for the approved exact contribution fractions.
 - **AUD-claude-reconciled-batch32-render-capital-equal-couple-wording. [wording]** — **implemented**
   - Operating agreement questionnaire → generated agreement, Exhibit A, 'Contributed assets' table, 'Contributed by' column, when a married couple (one ownership unit) and another owner contribute an asset equally — `webapp/server/oa-capital.ts:82`
@@ -3330,7 +3730,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: A couple's unit name is 'Sam Ortiz and Riley Ortiz'; joinNames of two units yields 'Sam Ortiz and Riley Ortiz and Casey Member, Jr., equally' (evidence/render/pdf-5-ordinary.pdf page 20 and pdf-6-ordinary.pdf page 21; text in pdf-5-ordinary.txt), which reads as three people contributing a third each, while the computation (and the 'Initial contribution to the Company' column: $660,003 for the couple, $629,997 for Casey) is one half per unit. The shares-mode wording on the next row, 'Sam Ortiz and Riley Ortiz (66.67%) and Casey Member, Jr. (33.33%)', is unambiguous.
   - Proposed replacement (not approved): Print each unit's share in equal mode whenever there is more than one unit: replace line 82 with `: joinNames(unitNames.map((n) => `${n} (${Number((100 / units).toFixed(2))}%)`))` so the row reads 'Sam Ortiz and Riley Ortiz (50%) and Casey Member, Jr. (50%)'.
   - Rechecked by Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a: Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim.
-  - Fixed: batch 32 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 32 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 3a72f468f54a1ca96de23ddf5587f327fda09e32, batch 32 revision 2, package 1e540a10031a. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing authorization to advance revisions: declare the existing API assertion update for the approved exact contribution fractions.
 - **AUD-claude-reconciled-batch32-render-wrap-line-starts-with-punctuation. [wording]** — **implemented**
   - Statement of Authorized Representative PDF, opening paragraph, third line (and any paragraph where a bold name ends exactly at the right margin) — `webapp/server/pdf-render.ts:153`
@@ -3339,7 +3740,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The wrapper splits every segment on whitespace, so a segment that begins with punctuation (', a Florida limited liability company' after the bold company name) yields a first 'word' of ','; when the bold name fills the line, that ',' is wrapped to the next line and the Statement reads 'Render Statement Members, LLC' / ', a Florida limited liability company (the "Company")' (evidence/render/pdf-statement.pdf page 1; image pages/pdf-statement/p-1.png; text pdf-statement.txt line 5). The manager-managed copy happened to fit ('Render Statement Managers,' / 'LLC, a Florida…').
   - Proposed replacement (not approved): Never break before a token that is only punctuation: in wrapSegs, when `word` matches /^[,.;:)]+$/ append it to the current line even if it overflows (or merge it with the previous word before measuring): `if (curW + w > width && cur.length > 0 && word.trim() !== "" && !/^[,.;:)]+$/.test(word)) {`.
   - Rechecked by Codex at 4754c5116dcc2a0105acd4a0adede646d3c6f41a: Surviving defect reopened; Adam approved all five proposals with Go. Approve all. Batch32 scope excludes already-fixed subparts and retains historical report verbatim.
-  - Fixed: batch 32 revision 2, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 32 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 3a72f468f54a1ca96de23ddf5587f327fda09e32, batch 32 revision 2, package 1e540a10031a. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing authorization to advance revisions: declare the existing API assertion update for the approved exact contribution fractions.
 - **AUD-claude-reconciled-batch33-reader-2-walk-accepts-retired-submit-label. [housekeeping]** — **implemented** — housekeeping
   - The browser walk, the final button click in every run (and the refused-signature click at :721) — `webapp/scripts/behavioral.ts:741`
@@ -3348,7 +3750,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The regex still accepts 'Submit intake', the label prior item 77 retired (FloridaLLCFormationForm.tsx:739 now reads 'Continue to payment'). The walk would therefore pass unchanged if the old label came back; only batch09-walk.ts:28 asserts the exact new label.
   - Proposed replacement (not approved): await page.locator("main button").filter({ hasText: /^Continue to payment$/ }).first().click();  (same at :721)
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch33-reader-2-walk-placeholder-cannot-fail. [housekeeping]** — **implemented** — housekeeping
   - The browser walk, run A's back-walk block — `webapp/scripts/behavioral.ts:687`
   - Reads: expect((await page.locator("#client-first-name").inputValue().catch(() => "").then((v) => v)) !== "GONE", `${run.key}: placeholder`, null);
@@ -3356,7 +3759,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The first-name box can never hold the literal string "GONE", so the expectation is always true; it adds one passing check to the count (checks++ at :131) without testing anything. The intended check — that the typed name survives the back-walk — is not made here (the forward replay at :689-690 relies on validation passing, not on the value).
   - Proposed replacement (not approved): expect((await page.locator("#client-first-name").inputValue()) === "Casey", `${run.key}: back-walk keeps the client's typed first name`, await page.locator("#client-first-name").inputValue());
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch33-runtime-B-walk-label-year-from-formation. [housekeeping]** — **implemented** — housekeeping
   - Behavioral walk, the renewal-date assertion on the portal's agent card — `webapp/scripts/behavioral.ts:1035`
   - Reads:         expect(new RegExp(`renews on [A-Z][a-z]+ \\d{1,2}, ${nextYear}`).test(dash) && !/renews annually/.test(dash), "renewal: the portal's agent card names the renewal date a year from formation", dash.match(/registered agent service is active[^.]*\./)?.[0]);
@@ -3364,7 +3768,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Terms 9(c) and ra-office.ts:37 set it a year from the recorded appointment; the walk records the appointment as today (behavioral.ts:998) and forms the company the same day, so the label cannot distinguish the two rules and describes the wrong one. Runtime: appointment 2024-02-29 → renewal 2025-02-28 → after the charge 2026-02-28 (renewal-cancel-and-replacement.md step 1).
   - Proposed replacement (not approved): "renewal: the portal's agent card names the renewal date a year from the recorded appointment"
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch33-reader-5-e2e-stale-renewal-comments. [housekeeping]** — **implemented** — housekeeping
   - Server check suite — the comments introducing the registered-agent renewal section — `webapp/server/e2e.ts:3764`
   - Reads: // The registered-agent renewal date is set at formation for a client who
@@ -3374,7 +3779,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - // records (Batch 07); it is shown to the client and named in the cancellation email.
   - … and at 3814: //      payment, the notice 60 days out, the charge 15 days out, a decline
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch33-reader-5-migration9-comment-renewal-date. [housekeeping]** — **implemented** — housekeeping
   - Server database migrations — the comment above migration 9 — `webapp/server/db.ts:420`
   - Reads: // record, and the registered-agent renewal date is stored when the company is
@@ -3384,7 +3790,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - // our appointment — the anniversary of the appointment date) so the portal and the
   - // cancellation email can show it.
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch33-reader-5-notes-agent-fee-sentence. [housekeeping]** — **implemented** — housekeeping
   - Chapter 605 reading notes, Administration section, the s. 605.2203(1) bullet — `webapp/server/chapter-605-notes.md:123`
   - Reads: One agent covers everything. Supports charging no
@@ -3394,7 +3801,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): One agent covers everything. Supports charging no
   -   separate per-series registered agent designation fee (the company's own $25 designation fee under s. 605.0213(7) still applies).
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch33-reader-5-pricing-comment-mailing-only. [housekeeping]** — **implemented** — housekeeping
   - Server pricing constants — the comment on S_ELECTION_WINDOW_DAYS — `webapp/server/pricing.ts:25`
   - Reads: election deadline for preparation, signing, and mailing. */
@@ -3402,7 +3810,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Batch 13's owner decision (facts.md:185) is 'Clients fax or mail Form 2553 themselves', and the package instructions and emails were changed to say 'faxing or mailing' (email.ts:385, :496, :513; prior 203). The comment still describes mailing only.
   - Proposed replacement (not approved): election deadline for preparation, signing, and faxing or mailing. */
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch33-statutes-0702-stale-note. [housekeeping]** — **implemented** — housekeeping
   - Internal reading notes (webapp/server/chapter-605-notes.md), s. 605.0702 entries — `webapp/server/chapter-605-notes.md:482`
   - Reads: and sale of interests." Our Article 13 buy-sell IS such a provision, but it
@@ -3410,7 +3819,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: At commit 4a344e2 all four multi-member masters carry s. 13.x(f): 'This Section is a deadlock sale provision within the meaning of s. 605.0702(2), Florida Statutes, providing for a purchase and sale of interests. Delivery of a Buy-Sell Offer under subsection (b) initiates this deadlock sale provision as of the date of delivery.' (templates-oa-member-s.md:346, templates-oa-member.md:332, templates-oa-multi.md:330, templates-oa-s.md:344). The note's 'drafting opportunity' has been taken; the note is stale. Evidence: evidence/statutes/605.0702-claims.md.
   - Proposed replacement (not approved): Replace lines 482-484 with: 'Our Article 13 buy-sell IS such a provision, and s. 13.x(f) of each multi-member master now says so and fixes the initiation date (delivery of the Buy-Sell Offer).' Replace line 546 with: '**Our Article 13 qualifies and says so (s. 13.x(f)).**'
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch33-reader-6-agent-signature-shadowed-messages. [housekeeping]** — **implemented** — housekeeping
   - Order form, Registered agent acceptance screen — the message for a blank acceptance name or blank electronic signature — `webapp/server/validation.ts:280`
   - Reads:       if (!(data.registeredAgentElectronicSignature ?? "").trim()) {
@@ -3420,7 +3830,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Line 276 has already added 'Your electronic signature must match the registered agent name exactly: <name>' on the same path for the blank value, and FloridaLLCFormationForm.tsx:476-477 keeps the first issue per field; the same holds for 'Name required' at :270 versus :275. In the browser stepValidation.ts:254-258 overwrites the required message with the match message. So the two 'required' sentences are never shown; the client sees the match sentence, which is correct but makes :269-270 and :280-282 dead.
   - Proposed replacement (not approved): Delete lines 280-282 (and 269-270), or guard the match checks with `else if` after the blank checks so each blank answers 'required' and each non-matching answer 'must match exactly'. Mirror the choice in stepValidation.ts:250-258.
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch33-reader-6-vercel-entry-bundle-comment. [housekeeping]** — **implemented** — housekeeping
   - Server, the Vercel function source header comment (no screen) — `webapp/server/vercel-entry.ts:1`
   - Reads: // Source for the Vercel function. `bun run build:api` bundles this (and every
@@ -3432,7 +3843,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - // dependency) into api/index.mjs — the deployed function is fully
   - // self-contained, so runtime dependency resolution can never fail.
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-claude-reconciled-batch33-reader-6-webhook-signature-compare. [housekeeping]** — **implemented** — housekeeping
   - Server, Square webhook signature check (no screen) — `webapp/server/square.ts:231`
   - Reads: return expected === opts.signatureHeader;
@@ -3440,7 +3852,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: It is, but with a plain string comparison: `expected === opts.signatureHeader` returns as soon as bytes differ, so the comparison time depends on how many leading characters match. Square's own guidance and node:crypto provide timingSafeEqual for HMAC checks. No functional failure today; hygiene.
   - Proposed replacement (not approved): const a = Buffer.from(expected); const b = Buffer.from(opts.signatureHeader); return a.length === b.length && timingSafeEqual(a, b);  (import { timingSafeEqual } from "node:crypto")
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
-  - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 33 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 455be76607d5f351dd9a0a80701f74af23683d1f, batch 33 revision 1, package 70883011e9fb. This records implementation, not acceptance or publication.
 - **AUD-claude-optional-batch34-compare-A-s-multi-title-omits-multiple-members. [housekeeping]** — **implemented** — housekeeping
   - Operating agreement, multi-member S forms, title and colophon (and Manual §7 table) — `webapp/server/templates-oa-member-s.md:6`
   - Reads: **(Member-Managed — S Corporation)**
@@ -3448,7 +3861,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Titles: master 1 '(Member-Managed — S Corporation)', master 6 '(Manager-Managed — S Corporation)', while master 4 says '(Member-Managed — Multiple Members / Partnership Taxation)' and masters 2/7 say '… Single Member / S Corporation'. Colophons (1:507, 6:521) likewise '(Member-Managed / S Corporation)'. The Manual's §7 table (docs/owners-manual.md:116-117) mirrors the current titles ('Manager-Managed, S Corporation' / 'Member-Managed, S Corporation'), so a change touches the Manual too. Severity: housekeeping. Other text: master 2 line 6: "**(Member-Managed — Single Member / S Corporation)**"
   - Proposed replacement (not approved): **(Member-Managed — Multiple Members / S Corporation)**  and in the colophon '(Member-Managed, Multiple Members / S Corporation)'; same for templates-oa-s.md:6 and :521 with 'Manager-Managed'; update docs/owners-manual.md:116-117 to match.
   - Rechecked by Codex at 455be76607d5f351dd9a0a80701f74af23683d1f: Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place.
-  - Fixed: batch 34 revision 1, commit , by Codex; protected by 6 assertion(s).
+  - Implemented protections: batch 34 revision 1, release commit not recorded, by Codex; protected by 6 assertion(s).
+  - Implementation evidence: commit c91b101b9652a14906270d1422f8cc771f71e706, batch 34 revision 1, package d58da0289ab7. This records implementation, not acceptance or publication.
 - **AUD-claude-optional-batch34-compare-B-manual-5-4-b-unqualified. [housekeeping]** — **implemented** — housekeeping
   - Owner's Manual, section 11, "Make it match your agreement" — read against the four manager-managed masters (templates-oa-multi.md, templates-oa-s.md, templates-oa-single-s.md, templates-oa-single.md) — `docs/owners-manual.md:204`
   - Reads: **Make it match your agreement.** If §5.4(b) requires a majority of ownership to encumber real property, say the same thing in the statement. A statement that contradicts your operating agreement creates the exact ambiguity you filed it to avoid — which is why your agreement provides that any statement you file must be consistent with it.
@@ -3456,7 +3870,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Only the member-managed multi-member form has that §5.4(b) (templates-oa-member.md:170: "(b) no Member acting alone has actual authority to sell, convey, mortgage, pledge, or otherwise encumber any interest in real property … without the consent of a Majority in Interest"), which line 188 of the Manual names correctly: "§5.4(b) in the member-managed multi-member forms". In the manager-managed multi-member forms §5.4(b) is the consent of a Majority in Interest to move an Associated Asset between silos (templates-oa-multi.md:172: "(b) **cause any Associated Asset to become an Associated Asset of the Company or of a different Protected Series** — the consent of a Majority in Interest;"), and in the manager-managed single-member forms §5.4(b) is the Member's consent to a statement of authority (templates-oa-single.md:154: "(b) file, amend, or cancel a statement of authority under s. 605.0302, Florida Statutes, or record a certified copy of one."). A manager-managed owner following line 204 looks up a different rule. The sentence's second half is true of every form (§5.8: "A statement so filed shall be consistent with this Agreement").
   - Proposed replacement (not approved): **Make it match your agreement.** If your agreement limits who may encumber real property — §5.4(b) in the member-managed multi-member form requires a majority of ownership — say the same thing in the statement. A statement that contradicts your operating agreement creates the exact ambiguity you filed it to avoid — which is why your agreement provides that any statement you file must be consistent with it.
   - Rechecked by Codex at 455be76607d5f351dd9a0a80701f74af23683d1f: Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place.
-  - Fixed: batch 34 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 34 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit c91b101b9652a14906270d1422f8cc771f71e706, batch 34 revision 1, package d58da0289ab7. This records implementation, not acceptance or publication.
 - **AUD-claude-optional-batch34-render-consent-signature-split. [housekeeping]** — **implemented** — housekeeping
   - Client portal, Add a series → the Unanimous Written Consent PDF, MEMBERS signature block (pages 1–2) — `webapp/server/pdf-render.ts:350`
   - Reads:       // Signature blocks (Adam, 9 Sep 2026): a line of underscores is a
@@ -3467,7 +3882,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Nothing keeps the consent's MEMBERS block together or on the signature page: with three owners the first signature line lands at the foot of page 1 and the other two on page 2, which then holds only two signature lines and an [INTENTIONALLY LEFT BLANK] notice (evidence/render/pdf-series-consent.pdf and pdf-series-consent-member.pdf, pages 1–2; images pages/pdf-series-consent/p-1.png, p-2.png). The agreements avoid this by forcing SIGNATURES onto a fresh page (oa.ts:726); the consent has no such break.
   - Proposed replacement (not approved): In new-series.ts, insert `[[pagebreak]]` before the **MEMBERS:** heading of the consent (as oa.ts does for SIGNATURES), or in pdf-render.ts treat a `**MEMBERS:**`/`**MEMBER:**` label as a lead-in that must be kept with at least one full signature block (rule + name + Date = 3 lines).
   - Rechecked by Codex at 455be76607d5f351dd9a0a80701f74af23683d1f: Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place.
-  - Fixed: batch 34 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 34 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit c91b101b9652a14906270d1422f8cc771f71e706, batch 34 revision 1, package d58da0289ab7. This records implementation, not acceptance or publication.
 - **AUD-claude-optional-batch34-render-oa-exhibit-a-tail-page. [housekeeping]** — **implemented** — housekeeping
   - Generated multi-member operating agreements — the page after Exhibit A's TOD table, before SERIES EXHIBIT PS-1 — `webapp/server/pdf-render.ts:271`
   - Reads:   const TAIL_MAX_LINES = 16;
@@ -3480,7 +3896,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: When the tail is Exhibit A's one or two closing sentences and they do not fit under the TOD table, the code starts a new page for them, and the forced break before the series exhibit follows at once, so the new page holds two lines and the [INTENTIONALLY LEFT BLANK] notice: evidence/render/pdf-1-ordinary.pdf page 22 and pdf-1-professional.pdf page 22 ('A designation is effective only…' / 'If no beneficiary is designated…'), pdf-4-ordinary.pdf page 21 and pdf-4-professional.pdf page 21 ('If no beneficiary is designated…'), pdf-6-professional.pdf page 21. The rule cures the case it was written for (s. 13.10 stranded) and produces the same stranding when the tail is short.
   - Proposed replacement (not approved): Only pull the tail forward when it will NOT fit on the current page AND the pull leaves the new page more than a third full; otherwise let the tail finish on the current page (it fits by definition when `y - tail >= MARGIN`) — i.e. change the condition at line 301 to `if (tail !== null && tail > 0 && y - tail < MARGIN && tail > TEXT_H / 3)`; a two-line tail then stays under the table, which always has room for two lines or the table row itself would have broken.
   - Rechecked by Codex at 455be76607d5f351dd9a0a80701f74af23683d1f: Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place.
-  - Fixed: batch 34 revision 1, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 34 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit c91b101b9652a14906270d1422f8cc771f71e706, batch 34 revision 1, package d58da0289ab7. This records implementation, not acceptance or publication.
 - **AUD-codex-release-review-2026-09-22-RR-02. [housekeeping]** — **implemented** — housekeeping
   - Release review: RR-02 — `docs/audit/ledger-lib.ts:480`
   - Reads: let cursor = bp.fix;
@@ -3488,7 +3905,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The real ba8b8a6..c91b101 range refuses eight legitimate replacements because initial assignment and implementation are not replayed. See sealed publication-range-guard.log and local-transition-probe.log.
   - Proposed replacement (not approved): Replay the initial ordinary lifecycle from retained work orders and ordered events before replacements, preserving exact prior assertions, approvals, rejection and ownership checks.
   - Rechecked by Codex release reviewer: Reopened at frozen c91b101 and reproduced offline in the sealed release review; not an independent second model review.
-  - Fixed: batch 35 revision 1, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 35 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 1aa316bf63254673db2ac5370a76573e518aeaec, batch 35 revision 1, package 2d75b55e1df6. This records implementation, not acceptance or publication.
 - **AUD-claude-release-group-a-2026-09-23-item-2. [substantive]** — **implemented**
   - Office order summary: quote the consent the client actually gave — `webapp/server/order-summary.ts:35`
   - Reads:   { field: "registeredAgentSeriesAgreementAcknowledgment", text: AGENT_SERIES_AGREEMENT },
@@ -3496,7 +3914,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Adam already chose self-agent or our service for new formations, and Batch 29 approved preserving the personal acceptance. No new consent language is needed. Source reconciliation: RR-AGENT-2
   - Proposed replacement (not approved): Select the same existing consent constant using the same form path and agent choice as the screen. Preserve the version distinction for older records; do not rewrite historical attestations by guessing what an old client saw. Exact wording: I agree to serve as registered agent for the company and each of its protected series, including every protected series in this order.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -3507,7 +3926,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Preserves the existing Email the client choice and legal-mail behavior. It does not authorize new marketing or automatic reminders. Source reconciliation: RR-DATA-03
   - Proposed replacement (not approved): Record requested notices and their outcomes for ordinary uploads and the formation-package notification. Give the office a retry for the existing document or package, with the appropriate email template. Keep unchecked optional notifications unsent. This is more than widening the legal-mail query: formation notices also need an explicit, nonduplicating identity.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -3518,7 +3938,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Preserves complete, resumable backups and the existing distinction between provisional and final totals. Source reconciliation: RR-DATA-04
   - Proposed replacement (not approved): Log the provisional counts with an explicit unfinished label; log final counts only for a completed backup. Do not put provisional numbers into a field downstream readers treat as final.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -3529,7 +3950,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Batch 31 already approved percentages or fractions in the masters; Manual line 142 already explains the same choice. Source reconciliation: RR-DOCS-02
   - Proposed replacement (not approved): Replace only the map’s description of membership interests; carry the change through generated outputs. Exact wording: membership interests as percentages or fractions of the whole
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 2 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -3540,7 +3962,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Batch 32 approved italic, bracketed drafting annotations. This supplies their missing style definition. Source reconciliation: RR-DOCS-04
   - Proposed replacement (not approved): Define the existing DraftingChoice character style with the intended italic appearance, keeping every legal word and current direct formatting. Verify the actual XML and rendered appearance; do not claim Microsoft Word behavior from LibreOffice alone.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -3551,7 +3974,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Batch 32’s drafting choices and legal text stay intact. These are editable-master annotations, not new legal terms. Source reconciliation: RR-DOCS-05
   - Proposed replacement (not approved): Preserve Exhibit A capitalization and normalize boundaries around drafting annotations without deleting punctuation belonging to an optional clause. Preserve all alternatives and their removal behavior. Do not blindly adopt the suggested suppress-space rule if it glues labels to words.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -3562,7 +3986,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: No new intake restriction or foreign-character policy is introduced. Source reconciliation: RR-DOCS-07
   - Proposed replacement (not approved): Split an over-wide token across lines only when it cannot fit as a whole, preserving all characters and formatting. Keep existing accepted name-length limits.
   - Rechecked by Codex source reconciliation of Claude release review: Source windows in release-reconciliation-2026-09-22/SOURCE-EVIDENCE.md. Runtime reproduction remains part of this batch, not claimed by intake.
-  - Fixed: batch 37 revision 4, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 37 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 404669b878756fdbc562aee89c61b6810057484a, batch 37 revision 4, package 91b2fd1a24c8. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
@@ -3573,7 +3998,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Batch 32 approved separation of alternatives; this strengthens proof of that existing requirement. Sources: RR-DOCS-03
   - Proposed replacement (not approved): Compare paragraph-aware text with whitespace collapsed, not erased, and add boundary assertions for drafting labels. Evaluate Claude’s supplied checker rather than adopting it unchecked. Preserve both existing content checks and all legal alternatives.
   - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
-  - Fixed: batch 38 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 38 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fd77a1c19e47e25245db4992050d353514432c86, batch 38 revision 2, package 0990f2c76ec5. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization.
 - **AUD-claude-release-group-b-2026-09-23-item-16. [housekeeping]** — **implemented** — housekeeping
   - Document provenance test: use the contribution wording clients receive — `webapp/server/provenance.ts:106`
@@ -3582,7 +4008,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Batch 32 already approved exact fractions and explicitly identified joint ownership. Sources: RR-DOCS-09
   - Proposed replacement (not approved): Generate representative contributed-by cells through the real capital formatter, with tightly scoped normalization for those cells. Avoid a broad expression that could hide unrelated text changes.
   - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
-  - Fixed: batch 38 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 38 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fd77a1c19e47e25245db4992050d353514432c86, batch 38 revision 2, package 0990f2c76ec5. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization.
 - **AUD-claude-release-group-b-2026-09-23-item-17. [housekeeping]** — **implemented** — housekeeping
   - Browser checks: test a fresh site build — `webapp/scripts/behavioral.ts:781`
@@ -3591,7 +4018,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Tests must describe the candidate being reviewed; this introduces no customer behavior. Sources: RR-EV-02-behavioral-serves-stale-dist
   - Proposed replacement (not approved): Build the site before the standalone walk. Any reuse optimization must validate a complete build identity, not file modification times. Preserve the review runner’s exact build under test.
   - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
-  - Fixed: batch 38 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 38 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fd77a1c19e47e25245db4992050d353514432c86, batch 38 revision 2, package 0990f2c76ec5. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization.
 - **AUD-claude-release-group-b-2026-09-23-item-18. [housekeeping]** — **implemented** — housekeeping
   - Restore tests: prove incomplete deletion records stop a restore — `webapp/server/restore.ts:17`
@@ -3600,7 +4028,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Preserves Adam’s rule that restoring a backup must not bring deleted documents back. Sources: RR-EV-03-restore-journal-completeness-guard-untested
   - Proposed replacement (not approved): Add a case where the journal exists but omits one recorded deletion; assert refusal before restored files or database rows are written. The current Batch 28 and 35 sources were checked: the latter tests the newly backed-up workflow tables, not this incomplete-journal case.
   - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
-  - Fixed: batch 38 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 38 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fd77a1c19e47e25245db4992050d353514432c86, batch 38 revision 2, package 0990f2c76ec5. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization.
 - **AUD-claude-release-group-b-2026-09-23-item-19. [housekeeping]** — **implemented** — housekeeping
   - Repair tests: fail if a required current module is missing — `webapp/server/batch28-check.ts:90`
@@ -3609,7 +4038,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Old-code reproduction remains supported, but cannot silently reduce current checks. Sources: RR-EV-04-batch28-a09-capability-conditional-weak-branch
   - Proposed replacement (not approved): Permit baseline compatibility only through an explicit baseline mode, bound to the intended baseline. Normal candidate runs must fail on missing modules or exports.
   - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
-  - Fixed: batch 38 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 38 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fd77a1c19e47e25245db4992050d353514432c86, batch 38 revision 2, package 0990f2c76ec5. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization.
 - **AUD-claude-release-group-b-2026-09-23-item-20. [housekeeping]** — **implemented** — housekeeping
   - Portal renewal test: distinguish appointment date from formation date — `webapp/scripts/behavioral.ts:1016`
@@ -3618,7 +4048,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Adam already directed that the service year starts when the agent appointment takes effect. No policy decision is reopened. Sources: RR-EV-05-renewal-label-corrected-predicate-unchanged
   - Proposed replacement (not approved): Use distinct recorded appointment and formation dates and assert the exact displayed renewal date, including a separate leap-day case.
   - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
-  - Fixed: batch 38 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 38 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fd77a1c19e47e25245db4992050d353514432c86, batch 38 revision 2, package 0990f2c76ec5. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization.
 - **AUD-claude-release-group-b-2026-09-23-item-21. [housekeeping]** — **implemented** — housekeeping
   - Before-and-after evidence: retain the test source as well as its output — `webapp/scripts/batch34-check.ts:24`
@@ -3627,7 +4058,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: This repairs future evidence handling, not the historical record. Sources: RR-EV-06-fixture-name-correction-has-no-artefact
   - Proposed replacement (not approved): For future red/green evidence, retain and hash the exact check source and any changes to it. Keep the historical limitation explicitly stated; do not invent or relabel a missing old file.
   - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
-  - Fixed: batch 38 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 38 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fd77a1c19e47e25245db4992050d353514432c86, batch 38 revision 2, package 0990f2c76ec5. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization.
 - **AUD-claude-release-group-b-2026-09-23-item-22. [housekeeping]** — **implemented** — housekeeping
   - Before-and-after logs: identify the code actually tested — `webapp/scripts/batch34-check.ts:13`
@@ -3636,7 +4068,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: The normal packaged run already uses identities; this closes the separate reproduction evidence gap. Sources: RR-EV-07-red-green-runs-not-identity-bound
   - Proposed replacement (not approved): Reproduce the targeted comparison with explicit baseline/candidate identities, distinct run IDs and check-source hashes. Preserve the original logs as historical artifacts.
   - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
-  - Fixed: batch 38 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 38 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fd77a1c19e47e25245db4992050d353514432c86, batch 38 revision 2, package 0990f2c76ec5. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization.
 - **AUD-claude-release-group-b-2026-09-23-item-23. [housekeeping]** — **implemented** — housekeeping
   - Document checks: state and close the two formatting coverage gaps — `docs/format-check.py:191`
@@ -3645,7 +4078,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: This is a verification design choice, not a new legal drafting choice. Any new visual baseline will be labeled as an approved product baseline. Sources: RR-EV-09-two-word-forms-pagination-only
   - Proposed replacement (not approved): Confirm which originals exist; document any absence. Add explicit typography/layout checks for these authored forms and submit representative renders with the package. Do not silently treat the current output as an independent original baseline.
   - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
-  - Fixed: batch 38 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 38 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fd77a1c19e47e25245db4992050d353514432c86, batch 38 revision 2, package 0990f2c76ec5. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization.
 - **AUD-claude-release-group-b-2026-09-23-item-24. [housekeeping]** — **implemented** — housekeeping
   - Internal test label: use the already-approved inactive-name wording — `webapp/server/e2e.ts:3072`
@@ -3654,5 +4088,60 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: Batches 29/33 already approved the conservative hold and accurate labels. Sources: RR-PORTAL-07
   - Proposed replacement (not approved): Change the label to describe the conservative recently-inactive name hold, without making a broader statutory claim. Keep the predicate.
   - Rechecked by Codex reconciliation, owner approved Group B: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
-  - Fixed: batch 38 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - Implemented protections: batch 38 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit fd77a1c19e47e25245db4992050d353514432c86, batch 38 revision 2, package 0990f2c76ec5. This records implementation, not acceptance or publication.
   - 2026-09-23 rejected r1: Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization.
+- **AUD-claude-release-group-c-2026-09-23-item-25. [housekeeping]** — **implemented** — housekeeping
+  - Decision records: preserve the eleven existing rulings in the repository — `docs/audit/batches/27/batch.md:1`
+  - Reads: # Batch 27 — recover approved Batches 11, 12 and 16
+  - Claims: Eleven decisions are in the external ruling file but absent from the repository’s ruling entries. A future auditor can reopen matters you already settled.
+  - True: All eleven external records were reopened. Items: 8, 15, 22, 34, 38, 139, N2.14, 232, 236, N2.02 and 242. No repeat ruling is requested. Sources: RR-RECON-01-rulings-only-outside-the-repo
+  - Proposed replacement (not approved): Copy the exact authenticated records through the existing ruling mechanism; regenerate the list. Identify the ten retained decisions and the approved example wording without altering those choices or inventing new acceptance events.
+  - Rechecked by Codex reconciliation, owner approved Group C: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Implemented protections: batch 39 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
+  - 2026-09-23 rejected r1: Standing authorization for necessary revisions: extend declared test scope to reset new tracking metadata in synthetic control fixtures and run tracking tests in the mandatory control suite.
+- **AUD-claude-release-group-c-2026-09-23-item-26. [housekeeping]** — **implemented** — housekeeping
+  - Tracking display: distinguish protected retained wording from a repair — `docs/audit/ledger-print.ts:33`
+  - Reads:   out.push("A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.");
+  - Claims: Three items you rejected appear simply implemented because the work implemented assertions that protect the unchanged wording.
+  - True: Batch 31 rulings on deed wording, effective-date wording and the FAQ filing description remain binding. Sources: RR-RECON-02-ledger-says-implemented-for-what-adam-rejected
+  - Proposed replacement (not approved): Show an explicit owner-retained disposition alongside the existing technical lifecycle status. Preserve the assertions. Prefer a reviewed disposition annotation over adding a new lifecycle state throughout every gate.
+  - Rechecked by Codex reconciliation, owner approved Group C: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Implemented protections: batch 39 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
+  - 2026-09-23 rejected r1: Standing authorization for necessary revisions: extend declared test scope to reset new tracking metadata in synthetic control fixtures and run tracking tests in the mandatory control suite.
+- **AUD-claude-release-group-c-2026-09-23-item-27. [housekeeping]** — **implemented** — housekeeping
+  - Tracking history: attach verifiable implementation commits — `docs/audit/batch.ts:108`
+  - Reads:     part.status = "implemented";
+  - Claims: The generated list prints an empty commit for implemented fixes. The command intentionally fills that field only at release, so this is more than a forgotten value.
+  - True: Preserves the distinction between implemented, accepted and released. Sources: RR-RECON-03-ledger-records-no-implementing-commit
+  - Proposed replacement (not approved): Add append-only implementation receipts referencing the already-created commit, work-order hash and package. Display that separately from release. Verify ancestry and scope; do not try to store a commit’s own hash inside itself or rewrite old protected fix objects.
+  - Rechecked by Codex reconciliation, owner approved Group C: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Implemented protections: batch 39 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
+  - 2026-09-23 rejected r1: Standing authorization for necessary revisions: extend declared test scope to reset new tracking metadata in synthetic control fixtures and run tracking tests in the mandatory control suite.
+- **AUD-claude-release-group-c-2026-09-23-item-28. [housekeeping]** — **implemented** — housekeeping
+  - Audit history: retain the reason a proposed cleanup was rejected — `docs/audit/ledger.json:1`
+  - Reads: {
+  - Claims: One Claude finding about legacy fallback code was adjudicated outside the repository and never received an internal record.
+  - True: This records the cross-review’s decision; it does not approve the rejected cleanup or pretend Adam made a new ruling. Sources: RR-RECON-05-one-claude-record-has-no-record-in-the-candidate
+  - Proposed replacement (not approved): Import an informational adjudication with the original source ID and the existing reason the blanket removal was unsafe. Leave the fallback code intact. Use the checked intake/migration path, not a manual edit of the generated list.
+  - Rechecked by Codex reconciliation, owner approved Group C: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Implemented protections: batch 39 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
+  - 2026-09-23 rejected r1: Standing authorization for necessary revisions: extend declared test scope to reset new tracking metadata in synthetic control fixtures and run tracking tests in the mandatory control suite.
+- **AUD-claude-release-group-c-2026-09-23-item-29. [housekeeping]** — **implemented** — housekeeping
+  - Combined-release tracking: record which earlier batches shipped together — `docs/audit/batch.ts:118`
+  - Reads:   const { acc, why } = standingAcceptance(commit, b.id, b.revision);
+  - Claims: The current released command requires acceptance for a particular batch. A single combined release would otherwise leave earlier included batches looking unshipped.
+  - True: Adam chose publication together at the end. This is a control change requiring review, not permission to weaken the release gate. Sources: RR-REL-05
+  - Proposed replacement (not approved): Add a reviewed combined-release receipt that links the final accepted commit/package to the exact included batch revisions and active parts. Verify work-order hashes, preserved/superseded fixes and each batch’s required checks before inclusion; verify remote/deployment/document evidence after publication. Keep individual acceptance history truthful. Do not fabricate separate historical acceptances or require thirty sequential releases.
+  - Rechecked by Codex reconciliation, owner approved Group C: Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.
+  - Implemented protections: batch 39 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
+  - 2026-09-23 rejected r1: Standing authorization for necessary revisions: extend declared test scope to reset new tracking metadata in synthetic control fixtures and run tracking tests in the mandatory control suite.
+
+## Cross-review adjudications — informational, not repair tasks
+
+- **reader-6-oa-legacy-null-branches — disputed.** Two clauses query oa_generations, but the third at1757 queries documents.kind=amendment. Migration4 backfills oa_generations once and has no NOT NULL guarantee. Its scalar lookup leaves null when no paid order exists. Migration5 only backfills package documents, so it cannot establish that legacy NULL amendment rows are impossible. Source therefore does not support the claim that all three alternatives are dead. Proposed replacement: unsafe as a blanket cleanup. Source: Cross-review at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; original Claude run claude-post-batches-2026-09-20; RECONCILED.json finding 77. No code removal is approved; this is the cross-review's conclusion, not a new owner ruling.

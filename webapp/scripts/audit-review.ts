@@ -40,7 +40,7 @@ import { mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, symlin
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { randomBytes } from "node:crypto";
-import { ROOT, REVIEWS, MANDATORY_CHECKS, git, gitBytes, sha256, acceptances, standingAcceptance, resolvePackage, packageProblems, siteManifest, type BatchFile, type Ledger } from "../../docs/audit/ledger-lib";
+import { combinedManifest, combinedProblems, ROOT, REVIEWS, MANDATORY_CHECKS, git, gitBytes, sha256, acceptances, standingAcceptance, resolvePackage, packageProblems, siteManifest, type BatchFile, type Ledger } from "../../docs/audit/ledger-lib";
 import { snapshot } from "../../docs/audit/publish-docs";
 import { startIsolatedStack, buildSite, SANITIZED } from "./isolated-stack";
 
@@ -133,6 +133,7 @@ await run("lint", ["bun", "run", "lint"]);
 await run("unit", ["bun", "run", "test"]);
 await run("facts", ["bun", "run", "../docs/facts-check.ts"]);
 await run("ledger-controls", ["bun", "run", "../docs/audit/repair-check.ts"]);
+if (batch.requiredChecks.includes("tracking")) await run("tracking", ["bun", "run", "../docs/audit/tracking-check.ts"]);
 await run("guard", ["bun", "run", "../docs/audit/guard.ts"]);
 await run("documents", ["bash", "-c", DOC_GATES], { cwd: WT });
 if (!only || only.includes("server")) {
@@ -210,11 +211,18 @@ const docs = readdirSync(join(WT, "docs/word")).filter((f) => f.endsWith(".docx"
 const sourceErrors=packageSourceProblems(dir,sourceEvidence);
 writeFileSync(join(dir,'checks/source-evidence.json'),JSON.stringify({sourceEvidence,errors:sourceErrors},null,2));
 checks.push({name:'source-evidence',command:'verify exact retained sources and manifest hashes',cwd:'',exit:sourceErrors.length?1:0,skipped:false,log:join(dir,'checks/source-evidence.json'),seconds:0});
-const required = [...new Set([...MANDATORY_CHECKS, ...batch.requiredChecks, "source-evidence", ...(named.length ? ["red-before-fix"] : []), "checkout-unchanged"])];
+const combined = batch.requiredChecks.includes("combined-release") ? combinedManifest(live,commit) : undefined;
+const required = [...new Set([...MANDATORY_CHECKS, ...batch.requiredChecks, ...(combined?.batches.flatMap(b=>b.requiredChecks) ?? []), "source-evidence", ...(named.length ? ["red-before-fix"] : []), "checkout-unchanged"])];
 writeFileSync(join(dir, "diff.patch"), diff);
 writeFileSync(join(dir, "files.txt"), git(["diff", "--stat", "--no-renames", live, commit]));
 const site = only ? [] : siteManifest(join(dir, "site"));
-writeFileSync(join(dir, "package.json"), JSON.stringify({ batch: id, revision: batch.revision, base: live, commit, packageId, diffSha: sha256(diff), createdAt: new Date().toISOString(), runId, partial: only, required, checks, docs, site, sourceEvidence }, null, 2));
+if (combined) {
+  const probe = {batch:id,revision:batch.revision,base:live,commit,packageId,diffSha:sha256(diff),createdAt:new Date().toISOString(),runId,partial:only,required,checks:[...checks,{name:"combined-release",command:"verify complete included range",exit:0,skipped:false,log:""}],docs,site,sourceEvidence,combined};
+  const errors = combinedProblems(probe);
+  const log = join(dir,"checks/combined-release.json");writeFileSync(log,JSON.stringify({combined,errors},null,2));
+  checks.push({name:"combined-release",command:"reconstruct full batch range and verify every required check",cwd:WT,exit:errors.length?1:0,skipped:false,log,seconds:0});
+}
+writeFileSync(join(dir, "package.json"), JSON.stringify({ combined, batch: id, revision: batch.revision, base: live, commit, packageId, diffSha: sha256(diff), createdAt: new Date().toISOString(), runId, partial: only, required, checks, docs, site, sourceEvidence }, null, 2));
 const failed = required.filter((n) => checks.find((c) => c.name === n)?.exit !== 0);
 console.log(`\nreview package: ${dir}\npackage id: ${packageId}   commit: ${commit}`);
 if (only) console.log(`PARTIAL RUN (${only.join(", ")}): this package can never be accepted or released; it is for looking at those checks only.`);
