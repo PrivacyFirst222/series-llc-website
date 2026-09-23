@@ -479,9 +479,56 @@
               "batch": "28",
               "revision": 2,
               "note": "by Codex Astra"
+            },
+            {
+              "at": "2026-09-23T14:16:56.496Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 3,
+              "note": "prior fix 28 r2 at ; approved work order aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c"
+            },
+            {
+              "at": "2026-09-23T14:16:56.496Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T14:16:56.526Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 3,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:17:28.019Z",
+              "event": "rejected r3",
+              "batch": "40",
+              "revision": 3,
+              "note": "Preserve Privacy Policy date assertion; only Terms date changes in this batch."
+            },
+            {
+              "at": "2026-09-23T14:17:28.120Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 4,
+              "note": "prior fix 28 r2 at ; approved work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f"
+            },
+            {
+              "at": "2026-09-23T14:17:28.120Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-23T14:17:28.150Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 4,
+              "note": "by Codex"
             }
           ],
-          "batch": "28",
+          "batch": "40",
           "supersessions": [
             {
               "prior": {
@@ -530,18 +577,66 @@
               "batch": "28",
               "revision": 2,
               "hash": "262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b"
+            },
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/content/terms.md",
+                    "text": "Last updated: **September 21, 2026**"
+                  },
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/content/privacy.md",
+                    "text": "Last updated: **September 21, 2026**"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 3,
+              "hash": "aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c"
+            },
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/content/terms.md",
+                    "text": "Last updated: **September 21, 2026**"
+                  },
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/content/privacy.md",
+                    "text": "Last updated: **September 21, 2026**"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 4,
+              "hash": "04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f"
             }
           ],
           "fix": {
-            "batch": "28",
-            "revision": 2,
+            "batch": "40",
+            "revision": 4,
             "commit": "",
-            "doneBy": "Codex Astra",
+            "doneBy": "Codex",
             "assertions": [
               {
                 "kind": "present",
                 "file": "webapp/src/content/terms.md",
-                "text": "Last updated: **September 21, 2026**"
+                "text": "Last updated: **September 23, 2026**"
               },
               {
                 "kind": "present",
@@ -7229,9 +7324,103 @@
               "batch": "28",
               "revision": 2,
               "note": "by Codex Astra"
+            },
+            {
+              "at": "2026-09-23T14:13:16.646Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 1,
+              "note": "prior fix 28 r2 at ; approved work order f2c57a4231e6dd0e3e7e125dbfb253a0353399681e57835a0636631d95d13654"
+            },
+            {
+              "at": "2026-09-23T14:13:16.646Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T14:16:05.243Z",
+              "event": "rejected r1",
+              "batch": "40",
+              "revision": 1,
+              "note": "Declare new and revised test-only fixtures for before-fix replay; standing authority to revise batches."
+            },
+            {
+              "at": "2026-09-23T14:16:05.344Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 2,
+              "note": "prior fix 28 r2 at ; approved work order ba319e49c600c33e367a6ca47fa6ed3e2275ae1791392da580dd919642a9782b"
+            },
+            {
+              "at": "2026-09-23T14:16:05.344Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-23T14:16:05.376Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 2,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:16:56.394Z",
+              "event": "rejected r2",
+              "batch": "40",
+              "revision": 2,
+              "note": "Declare Terms version-date replacement and facts control; use literal mandatory test label required by guard."
+            },
+            {
+              "at": "2026-09-23T14:16:56.495Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 3,
+              "note": "prior fix 28 r2 at ; approved work order aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c"
+            },
+            {
+              "at": "2026-09-23T14:16:56.495Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T14:16:56.526Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 3,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:17:28.019Z",
+              "event": "rejected r3",
+              "batch": "40",
+              "revision": 3,
+              "note": "Preserve Privacy Policy date assertion; only Terms date changes in this batch."
+            },
+            {
+              "at": "2026-09-23T14:17:28.120Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 4,
+              "note": "prior fix 28 r2 at ; approved work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f"
+            },
+            {
+              "at": "2026-09-23T14:17:28.120Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-23T14:17:28.150Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 4,
+              "note": "by Codex"
             }
           ],
-          "batch": "28",
+          "batch": "40",
           "supersessions": [
             {
               "prior": {
@@ -7270,18 +7459,94 @@
               "batch": "28",
               "revision": 2,
               "hash": "262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b"
+            },
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "docs/facts.md",
+                    "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder scheduled 70 days before renewal; automatic charging held if sent less than 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts — `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md — `currently $99`\n- where: webapp/src/content/terms.md — `70 days before your renewal date`\n- where: webapp/src/content/terms.md — `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md — `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts — `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts — `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts — `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts — `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md — `add a $50 series per property`\n- where: docs/owners-manual.md — `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 1,
+              "hash": "f2c57a4231e6dd0e3e7e125dbfb253a0353399681e57835a0636631d95d13654"
+            },
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "docs/facts.md",
+                    "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder scheduled 70 days before renewal; automatic charging held if sent less than 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts — `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md — `currently $99`\n- where: webapp/src/content/terms.md — `70 days before your renewal date`\n- where: webapp/src/content/terms.md — `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md — `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts — `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts — `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts — `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts — `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md — `add a $50 series per property`\n- where: docs/owners-manual.md — `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 2,
+              "hash": "ba319e49c600c33e367a6ca47fa6ed3e2275ae1791392da580dd919642a9782b"
+            },
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "docs/facts.md",
+                    "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder scheduled 70 days before renewal; automatic charging held if sent less than 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts — `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md — `currently $99`\n- where: webapp/src/content/terms.md — `70 days before your renewal date`\n- where: webapp/src/content/terms.md — `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md — `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts — `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts — `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts — `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts — `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md — `add a $50 series per property`\n- where: docs/owners-manual.md — `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 3,
+              "hash": "aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c"
+            },
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "docs/facts.md",
+                    "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder scheduled 70 days before renewal; automatic charging held if sent less than 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts — `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md — `currently $99`\n- where: webapp/src/content/terms.md — `70 days before your renewal date`\n- where: webapp/src/content/terms.md — `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md — `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts — `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts — `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts — `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts — `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md — `add a $50 series per property`\n- where: docs/owners-manual.md — `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 4,
+              "hash": "04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f"
             }
           ],
           "fix": {
-            "batch": "28",
-            "revision": 2,
+            "batch": "40",
+            "revision": 4,
             "commit": "",
-            "doneBy": "Codex Astra",
+            "doneBy": "Codex",
             "assertions": [
               {
                 "kind": "present",
                 "file": "docs/facts.md",
-                "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder scheduled 70 days before renewal; automatic charging held if sent less than 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts — `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md — `currently $99`\n- where: webapp/src/content/terms.md — `70 days before your renewal date`\n- where: webapp/src/content/terms.md — `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md — `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts — `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts — `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts — `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts — `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md — `add a $50 series per property`\n- where: docs/owners-manual.md — `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
+                "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder scheduled 70 days before renewal; missing or late reminders do not block authorized renewal charging; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts — `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md — `currently $99`\n- where: webapp/src/content/terms.md — `70 days before your renewal date`\n- where: webapp/src/content/terms.md — `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md — `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md — `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts — `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts — `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts — `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts — `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx — `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md — `add a $50 series per property`\n- where: docs/owners-manual.md — `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
               }
             ]
           }
@@ -13521,9 +13786,103 @@
               "batch": "28",
               "revision": 2,
               "note": "by Codex Astra"
+            },
+            {
+              "at": "2026-09-23T14:13:16.646Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 1,
+              "note": "prior fix 28 r2 at ; approved work order f2c57a4231e6dd0e3e7e125dbfb253a0353399681e57835a0636631d95d13654"
+            },
+            {
+              "at": "2026-09-23T14:13:16.646Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T14:16:05.243Z",
+              "event": "rejected r1",
+              "batch": "40",
+              "revision": 1,
+              "note": "Declare new and revised test-only fixtures for before-fix replay; standing authority to revise batches."
+            },
+            {
+              "at": "2026-09-23T14:16:05.344Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 2,
+              "note": "prior fix 28 r2 at ; approved work order ba319e49c600c33e367a6ca47fa6ed3e2275ae1791392da580dd919642a9782b"
+            },
+            {
+              "at": "2026-09-23T14:16:05.344Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-23T14:16:05.376Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 2,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:16:56.394Z",
+              "event": "rejected r2",
+              "batch": "40",
+              "revision": 2,
+              "note": "Declare Terms version-date replacement and facts control; use literal mandatory test label required by guard."
+            },
+            {
+              "at": "2026-09-23T14:16:56.495Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 3,
+              "note": "prior fix 28 r2 at ; approved work order aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c"
+            },
+            {
+              "at": "2026-09-23T14:16:56.495Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T14:16:56.526Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 3,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:17:28.019Z",
+              "event": "rejected r3",
+              "batch": "40",
+              "revision": 3,
+              "note": "Preserve Privacy Policy date assertion; only Terms date changes in this batch."
+            },
+            {
+              "at": "2026-09-23T14:17:28.120Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 4,
+              "note": "prior fix 28 r2 at ; approved work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f"
+            },
+            {
+              "at": "2026-09-23T14:17:28.120Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-23T14:17:28.150Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 4,
+              "note": "by Codex"
             }
           ],
-          "batch": "28",
+          "batch": "40",
           "supersessions": [
             {
               "prior": {
@@ -13543,13 +13902,89 @@
               "batch": "28",
               "revision": 2,
               "hash": "262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b"
+            },
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "server",
+                    "label": "batch28 A06"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 1,
+              "hash": "f2c57a4231e6dd0e3e7e125dbfb253a0353399681e57835a0636631d95d13654"
+            },
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "server",
+                    "label": "batch28 A06"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 2,
+              "hash": "ba319e49c600c33e367a6ca47fa6ed3e2275ae1791392da580dd919642a9782b"
+            },
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "server",
+                    "label": "batch28 A06"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 3,
+              "hash": "aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c"
+            },
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "server",
+                    "label": "batch28 A06"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 4,
+              "hash": "04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f"
             }
           ],
           "fix": {
-            "batch": "28",
-            "revision": 2,
+            "batch": "40",
+            "revision": 4,
             "commit": "",
-            "doneBy": "Codex Astra",
+            "doneBy": "Codex",
             "assertions": [
               {
                 "kind": "check",
@@ -19787,19 +20222,191 @@
               "batch": "07",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:13:16.646Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 1,
+              "note": "prior fix 07 r1 at ; approved work order f2c57a4231e6dd0e3e7e125dbfb253a0353399681e57835a0636631d95d13654"
+            },
+            {
+              "at": "2026-09-23T14:13:16.646Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T14:16:05.243Z",
+              "event": "rejected r1",
+              "batch": "40",
+              "revision": 1,
+              "note": "Declare new and revised test-only fixtures for before-fix replay; standing authority to revise batches."
+            },
+            {
+              "at": "2026-09-23T14:16:05.344Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 2,
+              "note": "prior fix 07 r1 at ; approved work order ba319e49c600c33e367a6ca47fa6ed3e2275ae1791392da580dd919642a9782b"
+            },
+            {
+              "at": "2026-09-23T14:16:05.344Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-23T14:16:05.376Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 2,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:16:56.394Z",
+              "event": "rejected r2",
+              "batch": "40",
+              "revision": 2,
+              "note": "Declare Terms version-date replacement and facts control; use literal mandatory test label required by guard."
+            },
+            {
+              "at": "2026-09-23T14:16:56.495Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 3,
+              "note": "prior fix 07 r1 at ; approved work order aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c"
+            },
+            {
+              "at": "2026-09-23T14:16:56.495Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T14:16:56.526Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 3,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:17:28.019Z",
+              "event": "rejected r3",
+              "batch": "40",
+              "revision": 3,
+              "note": "Preserve Privacy Policy date assertion; only Terms date changes in this batch."
+            },
+            {
+              "at": "2026-09-23T14:17:28.120Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 4,
+              "note": "prior fix 07 r1 at ; approved work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f"
+            },
+            {
+              "at": "2026-09-23T14:17:28.120Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-23T14:17:28.150Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 4,
+              "note": "by Codex"
             }
           ],
-          "batch": "07",
+          "batch": "40",
+          "supersessions": [
+            {
+              "prior": {
+                "batch": "07",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "walk",
+                    "label": "batch07 N1.12: failed notices remain pending and block automatic charging"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 1,
+              "hash": "f2c57a4231e6dd0e3e7e125dbfb253a0353399681e57835a0636631d95d13654"
+            },
+            {
+              "prior": {
+                "batch": "07",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "walk",
+                    "label": "batch07 N1.12: failed notices remain pending and block automatic charging"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 2,
+              "hash": "ba319e49c600c33e367a6ca47fa6ed3e2275ae1791392da580dd919642a9782b"
+            },
+            {
+              "prior": {
+                "batch": "07",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "walk",
+                    "label": "batch07 N1.12: failed notices remain pending and block automatic charging"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 3,
+              "hash": "aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c"
+            },
+            {
+              "prior": {
+                "batch": "07",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "walk",
+                    "label": "batch07 N1.12: failed notices remain pending and block automatic charging"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 4,
+              "hash": "04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f"
+            }
+          ],
           "fix": {
-            "batch": "07",
-            "revision": 1,
+            "batch": "40",
+            "revision": 4,
             "commit": "",
             "doneBy": "Codex",
             "assertions": [
               {
                 "kind": "check",
                 "suite": "walk",
-                "label": "batch07 N1.12: failed notices remain pending and block automatic charging"
+                "label": "batch40 N1.12: failed notices remain unsent without blocking renewal charging"
               }
             ]
           }
@@ -26279,14 +26886,186 @@
               "batch": "28",
               "revision": 2,
               "note": "by Codex Astra"
+            },
+            {
+              "at": "2026-09-23T14:13:16.646Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 1,
+              "note": "prior fix 28 r2 at ; approved work order f2c57a4231e6dd0e3e7e125dbfb253a0353399681e57835a0636631d95d13654"
+            },
+            {
+              "at": "2026-09-23T14:13:16.646Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T14:16:05.243Z",
+              "event": "rejected r1",
+              "batch": "40",
+              "revision": 1,
+              "note": "Declare new and revised test-only fixtures for before-fix replay; standing authority to revise batches."
+            },
+            {
+              "at": "2026-09-23T14:16:05.345Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 2,
+              "note": "prior fix 28 r2 at ; approved work order ba319e49c600c33e367a6ca47fa6ed3e2275ae1791392da580dd919642a9782b"
+            },
+            {
+              "at": "2026-09-23T14:16:05.345Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-23T14:16:05.376Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 2,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:16:56.394Z",
+              "event": "rejected r2",
+              "batch": "40",
+              "revision": 2,
+              "note": "Declare Terms version-date replacement and facts control; use literal mandatory test label required by guard."
+            },
+            {
+              "at": "2026-09-23T14:16:56.495Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 3,
+              "note": "prior fix 28 r2 at ; approved work order aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c"
+            },
+            {
+              "at": "2026-09-23T14:16:56.496Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T14:16:56.526Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 3,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:17:28.019Z",
+              "event": "rejected r3",
+              "batch": "40",
+              "revision": 3,
+              "note": "Preserve Privacy Policy date assertion; only Terms date changes in this batch."
+            },
+            {
+              "at": "2026-09-23T14:17:28.120Z",
+              "event": "superseded by approved replacement",
+              "batch": "40",
+              "revision": 4,
+              "note": "prior fix 28 r2 at ; approved work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f"
+            },
+            {
+              "at": "2026-09-23T14:17:28.120Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-23T14:17:28.150Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 4,
+              "note": "by Codex"
             }
           ],
-          "batch": "28",
+          "batch": "40",
+          "supersessions": [
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "server",
+                    "label": "batch28 A06"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 1,
+              "hash": "f2c57a4231e6dd0e3e7e125dbfb253a0353399681e57835a0636631d95d13654"
+            },
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "server",
+                    "label": "batch28 A06"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 2,
+              "hash": "ba319e49c600c33e367a6ca47fa6ed3e2275ae1791392da580dd919642a9782b"
+            },
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "server",
+                    "label": "batch28 A06"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 3,
+              "hash": "aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c"
+            },
+            {
+              "prior": {
+                "batch": "28",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex Astra",
+                "assertions": [
+                  {
+                    "kind": "check",
+                    "suite": "server",
+                    "label": "batch28 A06"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "40",
+              "revision": 4,
+              "hash": "04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f"
+            }
+          ],
           "fix": {
-            "batch": "28",
-            "revision": 2,
+            "batch": "40",
+            "revision": 4,
             "commit": "",
-            "doneBy": "Codex Astra",
+            "doneBy": "Codex",
             "assertions": [
               {
                 "kind": "check",
@@ -32943,6 +33722,232 @@
           }
         }
       ]
+    },
+    {
+      "id": "AUD-claude-release-group-d-2026-09-23-item-30",
+      "tag": "wording",
+      "area": "Agreements and guidance",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-release-group-d-2026-09-23.json finding item-30",
+      "text": "Group D item-30 — `docs/owners-manual.md:198`\nReads: | **1. Prepare it** | Division of Corporations form **CR2E138, \"Statement of Authority.\"** It asks for the company's name exactly as the state has it, the principal office addresses, and the authority — or the limits on it — of members or managers, stated by name or by position. **Use the position, not the name.** People change; \"the Manager\" survives a change of personnel, and a name forces a refiling. |\nClaims: Company-only filing instructions do not distinguish the series that owns property.\nTrue: Release reconciliation items 30–31; Adam approved item 1 and revised item 2, then Go on 23 September 2026.\nProposed replacement (not approved): If you choose to file a statement of authority, identify the entity that holds the property. A statement concerning property held by the company identifies the company; a statement concerning property held by a protected series identifies that protected series. The company-form instructions below should not be used for a series filing without confirming the Division’s filing requirements for that series.\nRechecked by Codex source reconciliation: Current source read; statutory filing sources opened; owner billing instruction controls this policy change.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-23T14:13:13.665251+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-release-group-d-2026-09-23 at 09d1cd374b45a3a154b6abfecc11935b153defb7; audit 285856f188dc8b5a47c500fa1eae6078b17033d7dba2e8298c47fc54fb99a70c"
+            },
+            {
+              "at": "2026-09-23T14:13:16.646Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T14:16:05.243Z",
+              "event": "rejected r1",
+              "batch": "40",
+              "revision": 1,
+              "note": "Declare new and revised test-only fixtures for before-fix replay; standing authority to revise batches."
+            },
+            {
+              "at": "2026-09-23T14:16:05.344Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-23T14:16:05.376Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 2,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:16:56.394Z",
+              "event": "rejected r2",
+              "batch": "40",
+              "revision": 2,
+              "note": "Declare Terms version-date replacement and facts control; use literal mandatory test label required by guard."
+            },
+            {
+              "at": "2026-09-23T14:16:56.495Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T14:16:56.526Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 3,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:17:28.019Z",
+              "event": "rejected r3",
+              "batch": "40",
+              "revision": 3,
+              "note": "Preserve Privacy Policy date assertion; only Terms date changes in this batch."
+            },
+            {
+              "at": "2026-09-23T14:17:28.119Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-23T14:17:28.150Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 4,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "40",
+          "fix": {
+            "batch": "40",
+            "revision": 4,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "docs/owners-manual.md",
+                "text": "If you choose to file a statement of authority, identify the entity that holds the property. A statement concerning property held by the company identifies the company; a statement concerning property held by a protected series identifies that protected series. The company-form instructions below should not be used for a series filing without confirming the Division’s filing requirements for that series."
+              },
+              {
+                "kind": "document",
+                "master": "docs/owners-manual.md",
+                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                "masterPresent": [
+                  "If you choose to file a statement of authority, identify the entity that holds the property. A statement concerning property held by the company identifies the company; a statement concerning property held by a protected series identifies that protected series. The company-form instructions below should not be used for a series filing without confirming the Division’s filing requirements for that series."
+                ],
+                "wordPresent": [
+                  "If you choose to file a statement of authority, identify the entity that holds the property. A statement concerning property held by the company identifies the company; a statement concerning property held by a protected series identifies that protected series. The company-form instructions below should not be used for a series filing without confirming the Division’s filing requirements for that series."
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-d-2026-09-23-item-31",
+      "tag": "wording",
+      "area": "Public pages, Terms and Privacy",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/claude-release-group-d-2026-09-23.json finding item-31",
+      "text": "Group D item-31 — `webapp/src/content/terms.md:48`\nReads: **(d) Renewal reminder.** We schedule your renewal reminder 70 days before your renewal date. The reminder states the renewal date, the amount, the cancellation deadline, and how to cancel. Your obligation to give cancellation notice at least 30 days before renewal and provide replacement proof by the renewal date does not depend on receiving this reminder, and our failure to send it or your failure to receive it does not extend those deadlines. If we fail to send a reminder required by applicable law, we will not automatically renew or charge your card except as permitted by law.\nClaims: Prior reminder hold conflicts with Adam's revised billing policy.\nTrue: Release reconciliation items 30–31; Adam approved item 1 and revised item 2, then Go on 23 September 2026.\nProposed replacement (not approved): A missing or late renewal reminder does not postpone renewal, prevent us from charging your authorized payment method for the renewal fee, or extend your cancellation or replacement deadlines.\nRechecked by Codex source reconciliation: Current source read; statutory filing sources opened; owner billing instruction controls this policy change.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-23T14:13:13.665251+00:00",
+              "event": "recorded from verified audit",
+              "note": "claude-release-group-d-2026-09-23 at 09d1cd374b45a3a154b6abfecc11935b153defb7; audit 285856f188dc8b5a47c500fa1eae6078b17033d7dba2e8298c47fc54fb99a70c"
+            },
+            {
+              "at": "2026-09-23T14:13:16.646Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T14:16:05.243Z",
+              "event": "rejected r1",
+              "batch": "40",
+              "revision": 1,
+              "note": "Declare new and revised test-only fixtures for before-fix replay; standing authority to revise batches."
+            },
+            {
+              "at": "2026-09-23T14:16:05.344Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-23T14:16:05.376Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 2,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:16:56.394Z",
+              "event": "rejected r2",
+              "batch": "40",
+              "revision": 2,
+              "note": "Declare Terms version-date replacement and facts control; use literal mandatory test label required by guard."
+            },
+            {
+              "at": "2026-09-23T14:16:56.495Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T14:16:56.526Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 3,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T14:17:28.019Z",
+              "event": "rejected r3",
+              "batch": "40",
+              "revision": 3,
+              "note": "Preserve Privacy Policy date assertion; only Terms date changes in this batch."
+            },
+            {
+              "at": "2026-09-23T14:17:28.119Z",
+              "event": "assigned",
+              "batch": "40",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-23T14:17:28.150Z",
+              "event": "implemented",
+              "batch": "40",
+              "revision": 4,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "40",
+          "fix": {
+            "batch": "40",
+            "revision": 4,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/src/content/terms.md",
+                "text": "A missing or late renewal reminder does not postpone renewal, prevent us from charging your authorized payment method for the renewal fee, or extend your cancellation or replacement deadlines."
+              },
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch40 renewal reminders do not gate billing"
+              }
+            ]
+          }
+        }
+      ]
     }
   ],
   "rulings": [
@@ -34857,6 +35862,93 @@
           "event": "implemented"
         }
       ]
+    },
+    {
+      "id": "40",
+      "revision": 1,
+      "frozenHash": "f2c57a4231e6dd0e3e7e125dbfb253a0353399681e57835a0636631d95d13654",
+      "status": "rejected",
+      "model": "Codex",
+      "base": "09d1cd374b45a3a154b6abfecc11935b153defb7",
+      "history": [
+        {
+          "at": "2026-09-23T14:13:16.647Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-23T14:16:05.243Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-23T14:16 (Adam standing revision authorization): Declare new and revised test-only fixtures for before-fix replay; standing authority to revise batches."
+        }
+      ]
+    },
+    {
+      "id": "40",
+      "revision": 2,
+      "frozenHash": "ba319e49c600c33e367a6ca47fa6ed3e2275ae1791392da580dd919642a9782b",
+      "status": "rejected",
+      "model": "Codex",
+      "base": "09d1cd374b45a3a154b6abfecc11935b153defb7",
+      "history": [
+        {
+          "at": "2026-09-23T14:16:05.345Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-23T14:16:05.376Z",
+          "event": "implemented"
+        },
+        {
+          "at": "2026-09-23T14:16:56.394Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-23T14:16 (Adam standing revision authorization): Declare Terms version-date replacement and facts control; use literal mandatory test label required by guard."
+        }
+      ]
+    },
+    {
+      "id": "40",
+      "revision": 3,
+      "frozenHash": "aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c",
+      "status": "rejected",
+      "model": "Codex",
+      "base": "09d1cd374b45a3a154b6abfecc11935b153defb7",
+      "history": [
+        {
+          "at": "2026-09-23T14:16:56.496Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-23T14:16:56.526Z",
+          "event": "implemented"
+        },
+        {
+          "at": "2026-09-23T14:17:28.019Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-23T14:17 (Adam standing revision authorization): Preserve Privacy Policy date assertion; only Terms date changes in this batch."
+        }
+      ]
+    },
+    {
+      "id": "40",
+      "revision": 4,
+      "frozenHash": "04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "09d1cd374b45a3a154b6abfecc11935b153defb7",
+      "history": [
+        {
+          "at": "2026-09-23T14:17:28.120Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-23T14:17:28.150Z",
+          "event": "implemented"
+        }
+      ]
     }
   ],
   "auditImports": [
@@ -34911,6 +36003,10 @@
     {
       "path": "docs/audit/intakes/claude-release-group-c-2026-09-23.json",
       "sha": "8411e23dd63f27ee86cceef8ca826e0805f067b46908b1093bf9982b31ce3eb5"
+    },
+    {
+      "path": "docs/audit/intakes/claude-release-group-d-2026-09-23.json",
+      "sha": "ed8a6664a0463d974f5373fa6d3c84863dfb74ed19adb7df260b6a588442f7b3"
     }
   ],
   "auditAdjudications": [

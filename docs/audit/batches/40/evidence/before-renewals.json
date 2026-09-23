@@ -1,0 +1,101 @@
+{
+  "label": "batch40 renewal reminders do not gate billing",
+  "ok": false,
+  "detail": {
+    "rows": [
+      {
+        "label": "notice 70 days before renewal",
+        "ok": true,
+        "detail": {
+          "status": "charged",
+          "attempts": 1
+        }
+      },
+      {
+        "label": "notice 60 days before renewal",
+        "ok": true,
+        "detail": {
+          "status": "charged",
+          "attempts": 1
+        }
+      },
+      {
+        "label": "notice 59 days before renewal",
+        "ok": false,
+        "detail": {
+          "status": "notice_sent",
+          "attempts": 0
+        }
+      },
+      {
+        "label": "notice 15 days before renewal",
+        "ok": false,
+        "detail": {
+          "status": "notice_sent",
+          "attempts": 0
+        }
+      },
+      {
+        "label": "notice 5 days before renewal",
+        "ok": false,
+        "detail": {
+          "status": "notice_sent",
+          "attempts": 0
+        }
+      },
+      {
+        "label": "late catch-up email does not promise charging on a past date",
+        "ok": false,
+        "detail": {
+          "from": "MyFloridaSeriesLLC <onboarding@resend.dev>",
+          "to": [
+            "forty@example.test"
+          ],
+          "subject": "Your registered agent service renews on June 1, 2030",
+          "html": "\n<div style=\"font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1c2530;max-width:560px;margin:0 auto;padding:24px\">\n  <p style=\"font-weight:700;font-size:18px;margin:0 0 16px\">MyFloridaSeriesLLC</p>\n  \n      <p>Hi Forty,</p>\n      <p>Your registered agent service for <strong>Forty LLC</strong> renews on\n      <strong>June 1, 2030</strong>.</p>\n      <p>Your renewal notice was delayed. The renewal fee is <strong>$99</strong>. Automatic charging is on hold; please contact us to resolve the renewal. You may also pay now using <a href=\"http://localhost:8000/agent-checkout?kind=renewal&id=a5f70efa-1507-4aff-909e-5c7c799a1c26&token=lptLua42Xw9dy3XxZ9_asWfMSqjl4UMMyFqzzrO-xXY\">this payment link</a>.</p>\n      <p><strong>To cancel</strong>, give notice by <strong>May 2, 2030</strong> — in your client portal\n      (the Registered agent service card) or by email to support@myfloridaseriesllc.com. Florida law requires your LLC\n      to have a registered agent at all times, so you must also designate a successor agent with the Division of\n      Corporations and send us proof; the Terms of Service explain both steps.</p>\n      <p>Questions? Just reply to this email.</p>\n    \n  <p style=\"color:#8a8f98;font-size:12px;margin-top:28px\">MyFloridaSeriesLLC — support@myfloridaseriesllc.com</p>\n</div>"
+        }
+      },
+      {
+        "label": "70-day schedule preserved",
+        "ok": true
+      },
+      {
+        "label": "failed notice recorded, no early charge",
+        "ok": true
+      },
+      {
+        "label": "failed notice cannot block due renewal",
+        "ok": false
+      },
+      {
+        "label": "legacy notice hold no longer blocks",
+        "ok": false
+      },
+      {
+        "label": "no consent still prevents automatic charge",
+        "ok": true
+      },
+      {
+        "label": "no card still prevents automatic charge",
+        "ok": true
+      },
+      {
+        "label": "timely cancellation prevents renewal charge",
+        "ok": true
+      },
+      {
+        "label": "voluntary payment not charged again",
+        "ok": true
+      },
+      {
+        "label": "concurrent jobs keep one payment",
+        "ok": false
+      },
+      {
+        "label": "Terms preserve deadlines without notice charge restriction",
+        "ok": false
+      }
+    ],
+    "exit": 0
+  }
+}

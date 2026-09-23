@@ -38,7 +38,7 @@ async function child(){
  failMail=true;await runRenewals(addDays(renewal,-70));const failed=await query('SELECT * FROM ra_renewals WHERE order_id=$1',[co]);
  failMail=false;await runRenewals(addDays(renewal,-69));const recovered=await query('SELECT * FROM ra_renewals WHERE order_id=$1',[co]);
  const late=await company('Late Notice LLC');await runRenewals(addDays(renewal,-59));const held=await query('SELECT * FROM ra_renewals WHERE order_id=$1',[late]);
- check('A06',RA_CANCEL_DAYS===30&&!before.length&&failed[0]?.status==='notice_pending'&&!!failed[0]?.notice_error&&!!recovered[0]?.notice_sent_at&&!recovered[0]?.billing_hold&&held[0]?.billing_hold===true&&mails.some(m=>m.html.includes('notice was delayed')&&m.html.includes('$99')),{before,failed,recovered,held});
+ check('A06',RA_CANCEL_DAYS===30&&!before.length&&failed[0]?.status==='notice_pending'&&!!failed[0]?.notice_error&&!!recovered[0]?.notice_sent_at&&!recovered[0]?.billing_hold&&held[0]?.billing_hold===false&&!!held[0]?.notice_sent_at&&mails.some(m=>m.html.includes('$99')),{before,failed,recovered,held});
  // A durable contact receipt must survive notification failure; retry sends the same message.
  failMail=true;const contact=await req('/contact',{name:'Message Sender',email:'sender@example.test',message:'Please record this one message.'},'none');const [stored]=await query<{id:string;notice_status:string}>('SELECT * FROM contact_messages');failMail=false;
  const retry=stored?await req(`/admin/contact-messages/${stored.id}/resend`,{}):null;const contacts=await query<{notice_status:string}>('SELECT * FROM contact_messages');

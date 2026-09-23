@@ -99549,7 +99549,6 @@ init_env();
 
 // src/lib/agentBilling.ts
 var RA_NOTICE_DAYS = 70;
-var RA_MIN_NOTICE_DAYS = 60;
 var RA_CANCEL_DAYS = 30;
 var RA_CHARGE_DAYS = 15;
 var RA_RESIGNATION_CENTS = 9900;
@@ -99641,8 +99640,8 @@ function welcomeEmail(name, setPasswordUrl, isConversion = false, raService = tr
   };
 }
 function raRenewalNoticeEmail(opts) {
-  const how = opts.billingHold ? `<p>Your renewal notice was delayed. The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. Automatic charging is on hold; please contact us to resolve the renewal. You may also pay now using <a href="${opts.linkUrl}">this payment link</a>.</p>` : opts.last4 ? `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong> and will be charged to your card ending
-      <strong>${escapeHtml(opts.last4)}</strong> on <strong>${escapeHtml(opts.chargeDate)}</strong>. There is nothing you need to do.</p>` : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. No eligible card is on file,
+  const how = opts.last4 ? `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong> and will be charged to your card ending
+      <strong>${escapeHtml(opts.last4)}</strong> ${opts.chargeDue ? "now that the scheduled billing date has arrived" : `on <strong>${escapeHtml(opts.chargeDate)}</strong>`}. There is nothing you need to do.</p>` : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. No eligible card is on file,
       so please pay it by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below. Paying with a credit or debit
       card keeps that card for the following years, so the renewal is automatic from then on.</p>
       <p><a href="${opts.linkUrl ?? "#"}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the renewal</a></p>`;
@@ -101617,23 +101616,26 @@ async function runRenewals(today) {
     row = locked;
     try {
       const hasCard = o.card_status === "on_file" && !!o.square_card_id && !!o.square_customer_id && gaveConsent(o.payload);
-      if (row.status === "notice_pending") {
-        const link = await agentCheckoutLink("renewal", row.id);
-        const late2 = row.purpose === "renewal" && today > addDays(date2, -RA_MIN_NOTICE_DAYS);
-        const mail = row.purpose === "resignation" ? { subject: `Registered-agent resignation due \u2014 ${o.llc_name}`, html: `<p>Your timely cancellation has reached its renewal date without replacement proof. A $99 charge for state filing fees and processing is due. This does not purchase another service year. The office must submit the resignation; this notice does not confirm filing.</p><p><a href="${link}">Pay now</a></p>` } : raRenewalNoticeEmail({ name: o.contact_name, llcName: o.llc_name, renewalDate: longDate(date2), amount: raRenewalFeeWords(), last4: hasCard ? o.card_last4 : null, chargeDate: longDate(addDays(date2, -RA_CHARGE_DAYS)), cancelBy: longDate(addDays(date2, -RA_CANCEL_DAYS)), linkUrl: link, billingHold: late2 });
+      if (row.purpose === "renewal" && row.billing_hold) {
+        await db.query("UPDATE ra_renewals SET billing_hold=false WHERE id=$1", [row.id]);
+        row = { ...row, billing_hold: false };
+      }
+      if (!row.notice_sent_at) {
         try {
+          const link = await agentCheckoutLink("renewal", row.id);
+          const mail = row.purpose === "resignation" ? { subject: `Registered-agent resignation due \u2014 ${o.llc_name}`, html: `<p>Your timely cancellation has reached its renewal date without replacement proof. A $99 charge for state filing fees and processing is due. This does not purchase another service year. The office must submit the resignation; this notice does not confirm filing.</p><p><a href="${link}">Pay now</a></p>` } : raRenewalNoticeEmail({ name: o.contact_name, llcName: o.llc_name, renewalDate: longDate(date2), amount: raRenewalFeeWords(), last4: hasCard ? o.card_last4 : null, chargeDate: longDate(addDays(date2, -RA_CHARGE_DAYS)), cancelBy: longDate(addDays(date2, -RA_CANCEL_DAYS)), linkUrl: link, chargeDue: today >= isoOf(row.charge_due) });
           await sendMail({ to: await currentAgentNoticeEmail(db, o.id), ...mail });
-          await db.query("UPDATE ra_renewals SET status=$2,notice_sent_at=$3,billing_hold=$4,notice_error=NULL,link_url=$5 WHERE id=$1", [row.id, hasCard ? "notice_sent" : "link_sent", `${today}T12:00:00Z`, late2, link]);
+          const status = row.status === "notice_pending" ? hasCard ? "notice_sent" : "link_sent" : row.status;
+          await db.query("UPDATE ra_renewals SET status=$2,notice_sent_at=$3,notice_error=NULL,link_url=$4 WHERE id=$1", [row.id, status, `${today}T12:00:00Z`, link]);
           out.notices++;
-          row = { ...row, status: hasCard ? "notice_sent" : "link_sent", notice_sent_at: `${today}T12:00:00Z`, billing_hold: late2 };
+          row = { ...row, status, notice_sent_at: `${today}T12:00:00Z` };
         } catch (e) {
           await db.query("UPDATE ra_renewals SET notice_error=$2 WHERE id=$1", [row.id, String(e).slice(0, 300)]);
         }
-        if (row.purpose !== "resignation" || !row.notice_sent_at) continue;
       }
-      if (!row.notice_sent_at || row.billing_hold || !hasCard) continue;
+      if (!hasCard || row.purpose === "resignation" && (!row.notice_sent_at || row.billing_hold)) continue;
       const retry2 = row.status === "declined" && row.retries < 2 && !!row.retry_after && today >= isoOf(row.retry_after);
-      const first = row.status === "notice_sent" && today >= isoOf(row.charge_due);
+      const first = ["notice_pending", "notice_sent", "link_sent"].includes(row.status) && today >= isoOf(row.charge_due);
       const recover = row.status === "charging";
       if (!first && !retry2 && !recover) continue;
       await db.query("UPDATE ra_renewals SET status='charging' WHERE id=$1 AND status NOT IN ('charged','paid_by_link','cancelled')", [row.id]);
@@ -102241,7 +102243,9 @@ Your agreement forbids it among the owners \u2014 \xA75.4(b) in the member-manag
 - **Manager-managed \u2014 usually unnecessary.** Only the Manager can convey, and the members chose the Manager. It earns its keep if there is more than one manager, or if you want the Manager's own authority limited.
 - **Single-member and you are the Manager \u2014 skip it.** There is no one to limit.
 **File a limitation, not a grant.** Under s. 605.0302(7), where a certified copy containing a *limitation* on authority to transfer real property is recorded in the real property records, "all persons are deemed to know of the limitation." That is the entire point of the filing: a recorded limitation binds the world. A statement that mostly hands authority out does the opposite of what you filed it for \u2014 and worse. Under s. 605.0302(6), a recorded **grant** of authority to transfer real property is *conclusive in favor of a person who gives value in reliance on it without knowledge to the contrary*: the buyer keeps the building, and your only remedy is a claim against whoever signed. That is why your agreement requires every owner's consent before any statement of authority is filed, amended, cancelled, or recorded.
-If you decide to file, four steps:
+If you choose to file a statement of authority, identify the entity that holds the property. A statement concerning property held by the company identifies the company; a statement concerning property held by a protected series identifies that protected series. The company-form instructions below should not be used for a series filing without confirming the Division\u2019s filing requirements for that series.
+
+For a company filing, four steps:
 
 | **Step** | **What to do** |
 |---|---|
