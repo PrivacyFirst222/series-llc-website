@@ -26,3 +26,7 @@ Expects: every order remains reachable, with no completion inferred from unloade
 Implementation is isolated from the sealed Batch 35 package. This authorization does not publish anything or approve unrelated Claude review findings.
 
 Revision 1 was superseded under Adam's standing authorization for necessary revisions. Revision 2 adds docs/facts.md to the declared files so its old Complete-column assertions follow the approved new workflow. No requirement, product decision, or test was removed.
+
+Revision 3 declares the Batch05/10 controlled-response browser fixtures: add work_stage and board_order_id, move completion loading/error checks into Completed Orders, and assert the new count/pagination wording. All prior substantive date, service, error and record-access checks remain.
+
+Revision 4 includes the third nonempty controlled Office board fixture, Batch02, in that same API-shape update. Its assertions are unchanged. An inventory of all scripts mocking /api/admin/orders found no other nonempty board fixture.

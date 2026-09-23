@@ -1,6 +1,6 @@
 {
   "id": "36",
-  "revision": 4,
+  "revision": 3,
   "title": "Completed Orders tab and Post-Filing Items workflow",
   "model": "Codex",
   "base": "1aa316bf63254673db2ac5370a76573e518aeaec",
@@ -106,12 +106,6 @@
       "mode": "code",
       "control": true,
       "why": "Update controlled board response fixtures and navigation for the approved workflow while preserving date, fulfillment, error and pagination checks."
-    },
-    {
-      "path": "webapp/scripts/batch02-walk.ts",
-      "mode": "code",
-      "control": true,
-      "why": "Add queue/company fields to the existing controlled-response Office EIN fixture; all assertions unchanged."
     }
   ],
   "requiredChecks": [],

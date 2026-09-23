@@ -9,7 +9,7 @@ export async function batch05Walk(browser: Browser, web: string, check: Check) {
   let boardStatus = 'formed', servicesStatus = 200, holdServices: Promise<void> | undefined, releaseServices: (() => void) | undefined;
   let certStatus = 503, articlesCalls = 0, uploadCalls = 0, uploadBody = '', date = '2026-09-01';
   const baseOrder = { id: 'co5', client_id: 'client5', llc_name: 'Five Company LLC', contact_name: 'Five Client', contact_email: 'five@example.test', total_cents: 0, created_at: yesterday, paid_at: yesterday, filed_at: yesterday, formed_at: yesterday, series_count: 1 };
-  const baseService = { client_id: 'client5', formation_order_id: 'co5', llc_name: 'Five Company LLC', amount_cents: 9500, created_at: yesterday, paid_at: yesterday, fulfilled_at: null, has_secret: true, client_email: 'five@example.test', client_name: 'Five Client' };
+  const baseService = { client_id: 'client5', formation_order_id: 'co5', board_order_id: 'co5', llc_name: 'Five Company LLC', amount_cents: 9500, created_at: yesterday, paid_at: yesterday, fulfilled_at: null, has_secret: true, client_email: 'five@example.test', client_name: 'Five Client' };
   const service = (id: string, type: string, status = 'in_progress') => ({ ...baseService, id, type, status, details: { target: 'company', seriesName: 'Five Company LLC - PS A', responsibleName: 'Five Client', memberCount: 1, dateIncorporated: date, effectiveDate: date, officerName: 'Five Client', shareholders: [] } });
   let services = [service('ein5', 'ein'), service('sel5', 's-election'), service('series5', 'series'), service('ein6', 'ein', 'awaiting_info')];
   await guardedRoute(page, '**/api/**', async route => {
@@ -17,7 +17,15 @@ export async function batch05Walk(browser: Browser, web: string, check: Check) {
     const data = (value: unknown) => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ data: value }) });
     const fail = (message: string) => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: { code: 'FIXTURE', message } }) });
     if (p === '/api/admin/me') return data({ ok: true });
-    if (p === '/api/admin/orders') return data({ orders: [{ ...baseOrder, status: boardStatus }, { ...baseOrder, id: 'pending5', llc_name: 'Pending Company LLC', status: 'pending_payment', paid_at: null }], total: 210, shown: 2 });
+    if (p === '/api/admin/orders') {
+      const work_stage = boardStatus === 'filed' ? 'state' : boardStatus === 'paid' ? 'new' : services.length ? 'post-filing' : 'completed';
+      const completed = u.searchParams.get('view') === 'completed';
+      const orders = [
+        ...((work_stage === 'completed') === completed ? [{ ...baseOrder, status: boardStatus, work_stage }] : []),
+        ...(!completed ? [{ ...baseOrder, id: 'pending5', llc_name: 'Pending Company LLC', status: 'pending_payment', work_stage: 'pending', paid_at: null }] : []),
+      ];
+      return data({ orders, total: completed ? orders.length : 210, shown: orders.length, page: 1, pageSize: 50 });
+    }
     if (p === '/api/admin/services') { if (holdServices) await holdServices; return servicesStatus === 200 ? data(services) : fail('Services temporarily unavailable'); }
     if (p === '/api/admin/orders/co5') return data({ id: 'co5', clientId: 'client5', filingPath: 'NEW', llcName: 'Five Company LLC', status: boardStatus, contactName: 'Five Client', contactEmail: 'five@example.test', createdAt: yesterday, filedAt: yesterday, formedAt: boardStatus === 'formed' ? yesterday : null, groups: [], series: [{ name: 'Five Company LLC - PS A', covered: false }], copiedFields: {}, documents: [], services: [], alternateNames: [], hasArticles: false, articlesSignedByUs: false, certStatusPurchased: true, certifiedCopyPurchased: false, hasCertStatus: false, hasCertifiedCopy: false, documentNumber: '' });
     if (p.endsWith('/certificates')) return certStatus === 200 ? data({ notified: true }) : fail('Certificate storage unavailable — try again.');
@@ -33,20 +41,25 @@ export async function batch05Walk(browser: Browser, web: string, check: Check) {
     if (p === '/api/admin/library/owners-manual/regenerate') return data({ published: true, pages: 52, edition: 'Generated edition' });
     return data([]);
   });
-  const go = async () => { await page.goto(web + '/admin'); await page.getByRole('heading', { name: 'Complete', exact: true }).waitFor(); };
+  const go = async () => { await page.goto(web + '/admin'); await page.getByRole('heading', { name: 'Post-Filing Items', exact: true }).waitFor(); };
   const shot = async (name: string) => { if (process.env.SHOT_DIR) { mkdirSync(process.env.SHOT_DIR, { recursive: true }); await page.screenshot({ path: `${process.env.SHOT_DIR}/batch05-${name}.png`, fullPage: true, animations: 'disabled' }); } };
   const attempt = async (label: string, run: () => Promise<void>) => { try { await run(); } catch (e) { check(false, label, String(e)); } };
   const column = (name: string) => page.getByRole('heading', { name, exact: true }).locator('..').locator('..').locator('..');
   const pdf = { name: 'fixture.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 fixture\n%%EOF') };
   await attempt('batch05 N3.08: completion waits for service information', async () => {
-    holdServices = new Promise<void>(r => { releaseServices = r; }); await go(); await page.getByRole('button', { name: /Five Company LLC Five Client/ }).waitFor();
-    const loading = !(await column('Complete').innerText()).includes('Five Company LLC') && (await page.locator('body').innerText()).includes('Checking remaining service orders');
-    servicesStatus = 503; releaseServices!(); holdServices = undefined; await page.waitForTimeout(8000);
-    const failed = !(await column('Complete').innerText()).includes('Five Company LLC') && (await page.locator('body').innerText()).includes('We could not check the remaining service orders');
+    services = [];
+    holdServices = new Promise<void>(r => { releaseServices = r; }); await go();
+    await page.getByRole('tab', { name: 'Completed Orders', exact: true }).click();
+    await page.getByTestId('service-load-status').waitFor();
+    const loading = (await page.getByRole('button', { name: /Five Company LLC Five Client/ }).count()) === 0 && (await page.locator('body').innerText()).includes('Checking remaining service orders');
+    servicesStatus = 503; releaseServices!(); holdServices = undefined;
+    await page.getByTestId('service-load-status').getByRole('button', { name: 'Try again' }).waitFor({ timeout: 15000 });
+    const failed = (await page.getByRole('button', { name: /Five Company LLC Five Client/ }).count()) === 0 && (await page.locator('body').innerText()).includes('We could not check the remaining service orders');
     check(loading && failed, 'batch05 N3.08: completion waits for service information', { loading, failed, screen: await page.locator('main').innerText() }); await shot('service-load-failure');
-    servicesStatus = 200; services = []; const retry = page.getByTestId('service-load-status').getByRole('button', { name: 'Try again' });
-    if (await retry.isVisible()) await retry.click(); else await go(); await page.waitForTimeout(300);
-    check((await column('Complete').innerText()).includes('Five Company LLC'), 'batch05 completion is shown after a successful empty service list');
+    servicesStatus = 200;
+    await page.getByTestId('service-load-status').getByRole('button', { name: 'Try again' }).click();
+    await page.getByRole('button', { name: /Five Company LLC Five Client/ }).waitFor();
+    check((await column('Completed Orders').innerText()).includes('Five Company LLC'), 'batch05 completion is shown after a successful empty service list');
     services = [service('ein5', 'ein'), service('sel5', 's-election'), service('series5', 'series'), service('ein6', 'ein', 'awaiting_info')];
   });
   await attempt('batch05 176: certificate errors appear beside certificates', async () => {
@@ -72,8 +85,8 @@ export async function batch05Walk(browser: Browser, web: string, check: Check) {
     check(value === '', 'batch05 178:typed-ein-survives: abandoned EIN drafts are cleared', { value });
   });
   await attempt('batch05 181: board wording matches counts search and status', async () => {
-    await go(); await page.getByLabel('Search by LLC name, client name, or email').fill('Five'); await page.waitForTimeout(350); const board = await page.locator('main').innerText(); await page.getByRole('button', { name: /^EIN.*Waiting/ }).click(); const detail = await page.getByRole('dialog').innerText();
-    check(board.includes('oldest 1 day —') && board.includes('newest matching orders of 210; narrow your search') && board.includes('Waiting for client details') && detail.includes('Waiting for client details'), 'batch05 181: board wording matches counts search and status', { board, detail });
+    await go(); await page.getByLabel('Search by LLC name, client name, or email').fill('Five'); await page.waitForTimeout(350); const board = await page.locator('main').innerText(); const nextEnabled = !(await page.getByRole('button', { name: 'Next', exact: true }).isDisabled()); await page.getByRole('button', { name: /^EIN.*Waiting/ }).click(); const detail = await page.getByRole('dialog').innerText();
+    check(board.includes('oldest 1 day —') && board.includes('Showing 1–2 of 210 active orders') && nextEnabled && board.includes('Waiting for client details') && detail.includes('Waiting for client details'), 'batch05 181: board wording matches counts search and status', { board, detail });
   });
   await attempt('batch05 180: regeneration explains uploaded-manual replacement', async () => {
     await go(); await page.getByRole('tab', { name: 'Reference Library' }).click(); const text = await page.locator('main').innerText();

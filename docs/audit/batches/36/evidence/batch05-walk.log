@@ -1,0 +1,21 @@
+review server: process 25241, started by this command from /Users/adam/Documents/FLPSLLC Website Review/batch-36-implementation-2026-09-22/repo/webapp, owns port 50256; it reports offline = true and no live connections (database, square, blob, resend, dropbox, smarty, sunbiz all off); database: a throwaway folder
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+{"label":"batch05 N3.08: completion waits for service information","ok":true}
+{"label":"batch05 completion is shown after a successful empty service list","ok":true}
+{"label":"batch05 176: certificate errors appear beside certificates","ok":true}
+{"label":"batch05 certificate retry clears the correct error","ok":true}
+{"label":"batch05 177: Articles number validation matches the server","ok":true}
+{"label":"batch05 valid optional Articles number submits","ok":true}
+{"label":"batch05 178:s-election-date-row: corrected dates have neutral labels","ok":true}
+{"label":"batch05 178:series-uploaded-text: series instructions describe this upload","ok":true}
+{"label":"batch05 178:typed-ein-survives: abandoned EIN drafts are cleared","ok":true}
+{"label":"batch05 181: board wording matches counts search and status","ok":true}
+{"label":"batch05 180: regeneration explains uploaded-manual replacement","ok":true}
+{"label":"batch05 185: manual upload requires an edition","ok":true}
+{"label":"batch05 manual upload sends the trimmed explicit edition","ok":true}
+{"label":"batch05 173: account label reflects password state","ok":true}
+{"label":"batch05 174: email history describes provider acceptance and limit","ok":true}

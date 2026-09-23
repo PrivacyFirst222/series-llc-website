@@ -30165,7 +30165,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -30212,8 +30212,55 @@
               "batch": "36",
               "revision": 2,
               "note": "Declare updates to Batch05 and Batch10 browser fixtures for the approved queue API and Completed Orders navigation; preserve their substantive assertions."
+            },
+            {
+              "at": "2026-09-23T02:56:15.015Z",
+              "event": "assigned",
+              "batch": "36",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T02:56:15.038Z",
+              "event": "implemented",
+              "batch": "36",
+              "revision": 3,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T02:57:21.850Z",
+              "event": "rejected r3",
+              "batch": "36",
+              "revision": 3,
+              "note": "Include the third nonempty Office board fixture (Batch02) in the same queue-response update; no product behavior or prior assertion changed."
+            },
+            {
+              "at": "2026-09-23T02:57:21.919Z",
+              "event": "assigned",
+              "batch": "36",
+              "revision": 4
+            },
+            {
+              "at": "2026-09-23T02:57:21.943Z",
+              "event": "implemented",
+              "batch": "36",
+              "revision": 4,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "36",
+          "fix": {
+            "batch": "36",
+            "revision": 4,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch36 office workflow"
+              }
+            ]
+          }
         }
       ]
     }
@@ -31842,6 +31889,49 @@
           "at": "2026-09-23T02:56:14.954Z",
           "event": "rejected by Adam",
           "note": "Adam's record of 2026-09-23T02:56 (Adam standing authorization for necessary revisions within approved work): Declare updates to Batch05 and Batch10 browser fixtures for the approved queue API and Completed Orders navigation; preserve their substantive assertions."
+        }
+      ]
+    },
+    {
+      "id": "36",
+      "revision": 3,
+      "frozenHash": "1d7ca588192672b049d3cfd22306f8fbaa15bf6e4ceff7d789cf37eb49905c5b",
+      "status": "rejected",
+      "model": "Codex",
+      "base": "1aa316bf63254673db2ac5370a76573e518aeaec",
+      "history": [
+        {
+          "at": "2026-09-23T02:56:15.016Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-23T02:56:15.039Z",
+          "event": "implemented"
+        },
+        {
+          "at": "2026-09-23T02:57:21.850Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-23T02:57 (Adam standing authorization for necessary revisions within approved work): Include the third nonempty Office board fixture (Batch02) in the same queue-response update; no product behavior or prior assertion changed."
+        }
+      ]
+    },
+    {
+      "id": "36",
+      "revision": 4,
+      "frozenHash": "d371ead1834ecffabcd60d6c0c27b1802e9a9a4e453e4f963d79fd93a199f68a",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "1aa316bf63254673db2ac5370a76573e518aeaec",
+      "history": [
+        {
+          "at": "2026-09-23T02:57:21.920Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-23T02:57:21.943Z",
+          "event": "implemented"
         }
       ]
     }
