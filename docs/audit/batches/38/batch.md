@@ -137,3 +137,6 @@ Source webapp/server/e2e.ts:3072
 2. Sees the exact tested source and distinct run identities.
 3. Opens representative forms and mutation logs.
 Expects: correct output passes, each deliberately broken protection fails for its stated reason; historical missing evidence is not invented.
+
+## Revision 2
+The broader mandatory suite exposed two fixture-copy lists missing the new evidence module and an isolation fixture that assumed dist could be reused. Add the dependency to both copy lists and give the isolation fixture a real local build (source HTML, package and existing dependency link). Preserve all original offline-proof and stranger-process refusal assertions. Revision 1 is retained as rejected under Adam's standing authorization for necessary revisions; no product decision changed.

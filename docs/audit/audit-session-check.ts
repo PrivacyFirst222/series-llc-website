@@ -89,7 +89,7 @@ try{
   // Real intake and guard commands in a tiny synthetic Git repository. The
   // fixture evidence below is deliberately simulated, never a product audit.
   const fixture=join(temp,"intake-repo");mkdirSync(join(fixture,"docs/audit"),{recursive:true});mkdirSync(join(fixture,"webapp/server"),{recursive:true});mkdirSync(join(fixture,"webapp/src"),{recursive:true});
-  for(const name of ["audit-session-lib.ts","audit-session.ts","audit-import-lib.ts","audit-import.ts","ledger-lib.ts","ledger-print.ts","inventory.ts","inventory-policy.json","guard.ts","audit-reader.md"])copyFileSync(join(ROOT,"docs/audit",name),join(fixture,"docs/audit",name));
+  for(const name of ["audit-session-lib.ts","audit-session.ts","audit-import-lib.ts","audit-import.ts","ledger-lib.ts","evidence.ts","ledger-print.ts","inventory.ts","inventory-policy.json","guard.ts","audit-reader.md"])copyFileSync(join(ROOT,"docs/audit",name),join(fixture,"docs/audit",name));
   const env={...process.env,FPSLLC_BATCH:"",FPSLLC_HOME:join(temp,"owner"),GIT_AUTHOR_NAME:"audit fixture",GIT_AUTHOR_EMAIL:"fixture@example.invalid",GIT_COMMITTER_NAME:"audit fixture",GIT_COMMITTER_EMAIL:"fixture@example.invalid"};
   const cmd=(...args:string[])=>spawnSync(args[0],args.slice(1),{cwd:fixture,env,encoding:"utf8",maxBuffer:64*1024*1024});
   const must=(...args:string[])=>{const r=cmd(...args);if(r.status!==0)throw Error(r.stdout+r.stderr);return r.stdout.trim();};

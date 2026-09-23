@@ -3,7 +3,7 @@
  * never performed, and terminates the command. No live integration is contacted.
  * --repo allows the same probes to reproduce the pre-fix behavior in a checkout.
  */
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync, rmSync, symlinkSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { tmpdir } from "node:os";
 import { pathToFileURL } from "node:url";
@@ -50,6 +50,9 @@ function fixture(name: string, summary: unknown, status = 200, exitEarly = false
   const dir = join(temporary, name);
   mkdirSync(join(dir, "server"), { recursive: true });
   mkdirSync(join(dir, "dist"));
+  symlinkSync(join(webapp,"node_modules"),join(dir,"node_modules"));
+  writeFileSync(join(dir,"package.json"),'{"type":"module"}');
+  writeFileSync(join(dir,"index.html"),"<!doctype html><main>Fresh isolation fixture</main>");
   writeFileSync(join(dir, "dist/index.html"), "<!doctype html><main>Isolation fixture</main>");
   writeFileSync(join(dir, "server/dev.ts"), `
 import { writeFileSync, appendFileSync, existsSync } from "node:fs";
