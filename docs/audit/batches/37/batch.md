@@ -219,3 +219,7 @@ Expects: faithful records and no duplicate document from email retry.
 2. Checks exact fractions, label spacing and long names.
 3. Compares legal wording and layout with the prior version.
 Expects: approved presentation corrections with all alternatives and legal text retained.
+
+## Revision 2
+
+Under Adam's standing authorization for necessary revisions, revision 1 is rejected and revision 2 adds two declared test files. Batch02's office series classification must now be Disregarded entity under the approved rule. Batch10's date test now supplies a usable generated agreement, so it reaches the amendment form whose date it tests. All existing date comparisons remain unchanged. No additional product change is authorized.

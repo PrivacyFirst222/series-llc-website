@@ -30,7 +30,7 @@ export async function batch02Walk(browser:Browser,web:string,check:Check){
   const row=page.getByTestId('assistant-order').locator('li').filter({hasText:'Legal name'});await row.waitFor();const text=await row.innerText();
   check(text.includes(series),'batch02 N3.05: office EIN answers name the series applicant',text);
   const tax=await page.getByTestId('assistant-order').locator('li').filter({hasText:'Tax classification'}).innerText();
-  check(tax.includes('Confirm this series'),'batch02 office series tax treatment requires confirmation',tax);await screenshot('office-ein');
+  check(tax.includes('Disregarded entity')&&!tax.includes('S corporation'),'batch02 office series tax treatment is disregarded',tax);await screenshot('office-ein');
  }catch(e){check(false,'batch02 N3.05: office EIN answers name the series applicant',String(e));}
  try{
   const texts:string[]=[];for(const target of ['series','company']){portalTarget=target;await page.goto(`${web}/portal?company=co1`);await page.reload();await page.getByRole('button',{name:'Provide details securely',exact:true}).click();texts.push(await page.getByRole('dialog').innerText());await screenshot(`portal-ein-${target}`);}

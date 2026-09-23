@@ -40,6 +40,7 @@ export async function batch10Walk(browser:Browser,web:string,check:Check){
  if(path==='/api/portal/documents')return send([{id:'doc10',kind:'psd',title:'Protected Series Designation',seriesNames:['Ten Company LLC - PS 4'],created_at:'2026-09-19T12:00:00Z',size_bytes:20}]);
  if(path==='/api/portal/services')return send(services);
  if(path==='/api/portal/oa')return send({todayEastern:'2026-09-19',version:'single',multiOwner:false,memberManaged:false,rev:0,seed:{llcName:'Ten Company LLC',filingPath:'NEW',members:[{name:'Ten Owner',address:'1 Main St'}],series:[],principalAddress:'1 Main St',managerNames:[],managerEntities:[],managementStructure:'MANAGER_MANAGED'},answers:savedDate?{effectiveDate:savedDate}:{},generations:[{id:'g10',effective_date_iso:'2026-01-01',effective_date:'January 1, 2026',created_at:'2026-01-01T12:00:00Z',generation_number:1}]});
+ if(path==='/api/portal/oa/sources')return send([{id:'g10',company:'co10',number:1,effectiveDate:'January 1, 2026',effectiveDateIso:'2026-01-01',members:[{name:'Ten Owner'}],managers:[],sElection:false}]);
  if(path==='/api/portal/oa/answers')return send({ok:true,rev:1});
  if(path==='/api/admin/me')return send({ok:true});
  if(path==='/api/admin/orders')return send({orders:[{id:'co10',work_stage:'new',client_id:'c10',llc_name:'Ten Company LLC',contact_name:'Ten Owner',contact_email:'ten@example.test',status:'formed',created_at:'2025-09-18T12:00:00Z',formed_at:'2025-09-18T12:00:00Z',paid_at:'2025-09-18T12:00:00Z',total_cents:0,series_count:1}],total:1,shown:1,page:1,pageSize:50});
