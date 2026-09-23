@@ -1,3 +1,4 @@
+import { readOrderBoard, SERVICE_COMPANY_SQL } from "./admin-board";
 import { notifyContact, notifyLegalMail } from './office-notifications';
 import { addYears, isoOf as agentIso } from "./renewals";
 import { recoveryDetails, notifyTaxpayerNumbersRequired } from "./s-election-recovery";
@@ -168,40 +169,19 @@ app.get("/admin/orders", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
-  // Optional search: name or email, case-insensitive. Truncation is never
-  // silent — the response always says how many exist versus how many were
-  // returned, and the search reaches everything the list cannot show.
-  const qRaw = (c.req.query("q") ?? "").trim().slice(0, 100);
-  const where = qRaw ? `WHERE o.llc_name ILIKE $1 OR o.contact_email ILIKE $1 OR o.contact_name ILIKE $1` : "";
-  const params = qRaw ? [`%${qRaw}%`] : [];
-  // Fields displayed by the board. Outstanding service work is loaded by
-  // the separate service-orders query before a card can count as complete.
-  const rows = await db.query(
-    `SELECT o.id, o.client_id, o.contact_name, o.contact_email, o.package, o.llc_name,
-            o.status, o.service_fee_cents, o.state_fees_cents,
-            o.created_at, o.formed_at,
-            COALESCE(jsonb_array_length(o.payload->'series'), 0) AS series_count,
-            COALESCE((o.payload->'optionalDocuments'->>'certificateOfStatus')::boolean, false) AS cert_status_purchased,
-            COALESCE((o.payload->'optionalDocuments'->>'certifiedCopy')::boolean, false) AS certified_copy_purchased,
-            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certificate-of-status' AND COALESCE(d.meta->>'source', 'card') <> 'portal') AS cert_status_uploaded,
-            EXISTS (SELECT 1 FROM documents d WHERE d.order_id = o.id AND d.kind = 'certified-copy' AND COALESCE(d.meta->>'source', 'card') <> 'portal') AS certified_copy_uploaded,
-            (o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service
-       FROM orders o
-      ${where}
-      ORDER BY o.created_at DESC LIMIT 200`,
-    params,
-  );
-  const total = await db.query<{ c: string }>(
-    `SELECT count(*) AS c FROM orders o ${where}`,
-    params,
-  );
-  return c.json({ data: { orders: rows, total: Number(total[0].c), shown: rows.length } });
+  const q = (c.req.query("q") ?? "").trim().slice(0, 100);
+  const view = c.req.query("view") ?? "all";
+  const page = Number(c.req.query("page") ?? 1);
+  if (!["all", "active", "completed"].includes(view) || !Number.isSafeInteger(page) || page < 1 || page > 1_000_000) {
+    return c.json(err("Invalid order view or page.", "BAD_REQUEST"), 400);
+  }
+  return c.json({ data: await readOrderBoard(db, q, view as "all" | "active" | "completed", page) });
 });
 
 /** The board's own words for a status, for messages the office reads. */
-const BOARD_LABEL: Record<string, string> = { pending_payment: "Pending payment", paid: "New Orders", filed: "With The State", formed: "Complete" };
+const BOARD_LABEL: Record<string, string> = { pending_payment: "Pending payment", paid: "New Orders", filed: "With The State", formed: "Formed" };
 /** Where a refusal says the order is (15 Sep 2026): a formed order sits in
- *  the With The State column while work is owed, so "in Complete" could be
+ *  Post-Filing Items while work is owed, so "in Complete" could be
  *  false; the day it was formed is always true. */
 function whereItIs(o: { status: string; formed_at?: string | null }): string {
   if (o.status === "formed" && o.formed_at) return `this order was formed on ${new Date(o.formed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" })}.`;
@@ -260,7 +240,7 @@ app.post("/admin/orders/:id/unfiled", async (c) => {
   ]);
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   if (rows[0].status !== "filed") {
-    return c.json(err("Only a filing awaiting the State’s decision can be moved back. A formed company may still appear in With The State because other work is owed.", "BAD_STATE"), 400);
+    return c.json(err("Only a filing awaiting the State’s decision can be moved back. A formed company with work still owed appears in Post-Filing Items or New Orders.", "BAD_STATE"), 400);
   }
   // A Division rejection means refiling, usually under the alternate name:
   // every copied-field tick is cleared so the re-copy starts honest, and the
@@ -1066,14 +1046,22 @@ app.get("/admin/services", async (c) => {
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const db = await getDb();
   await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
+  const requestedOrders = c.req.query("orders");
+  const orderIds = requestedOrders?.split(",").filter(Boolean);
+  if (orderIds && (!orderIds.length || orderIds.length > 200 || orderIds.some((id) => !z.string().uuid().safeParse(id).success))) {
+    return c.json(err("Invalid company list.", "BAD_REQUEST"), 400);
+  }
   const rows = await db.query(
     `SELECT so.id, so.type, so.status, so.llc_name, so.details, so.amount_cents,
             so.client_id, so.formation_order_id,
+            ${SERVICE_COMPANY_SQL} AS board_order_id,
             so.created_at, so.paid_at, so.fulfilled_at,
             (so.ein_secret IS NOT NULL) AS has_secret,
             cl.email AS client_email, cl.name AS client_name
      FROM service_orders so JOIN clients cl ON cl.id = so.client_id
+     ${orderIds ? `WHERE (${SERVICE_COMPANY_SQL})::text = ANY($1::text[])` : ""}
      ORDER BY so.created_at DESC`,
+    orderIds ? [orderIds] : [],
   );
   return c.json({ data: rows });
 });

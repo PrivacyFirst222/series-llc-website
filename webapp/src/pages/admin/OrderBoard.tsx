@@ -12,6 +12,7 @@ import {
 import { boughtAfterFormation, serviceIsOpen, serviceLabel } from "./serviceOrders.helpers";
 
 export interface BoardOrder {
+  work_stage: "pending" | "new" | "state" | "post-filing" | "completed" | "other";
   id: string;
   client_id: string | null;
   contact_name: string;
@@ -208,9 +209,11 @@ interface BoardData {
   orders: BoardOrder[];
   total: number;
   shown: number;
+  page: number;
+  pageSize: number;
 }
 
-export default function OrderBoard({ enabled }: { enabled: boolean }) {
+export default function OrderBoard({ enabled, view = "active" }: { enabled: boolean; view?: "active" | "completed" }) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [openId, setOpenId] = useState<string | null>(null);
@@ -218,19 +221,20 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
   const [viewing, setViewing] = useState<AdminServiceOrder | null>(null);
   const [search, setSearch] = useState("");
   const q = search.trim();
+  const [page, setPage] = useState(1);
 
   const ordersQuery = useQuery({
-    queryKey: ["admin", "orders", q],
-    queryFn: () =>
-      api.get<BoardData>(`/api/admin/orders${q ? `?q=${encodeURIComponent(q)}` : ""}`),
+    queryKey: ["admin", "orders", view, q, page],
+    queryFn: () => api.get<BoardData>(`/api/admin/orders?view=${view}&page=${page}&q=${encodeURIComponent(q)}`),
     enabled,
-    placeholderData: (prev) => prev,
   });
-
+  const orderIds = (ordersQuery.data?.orders ?? []).map((o) => o.id).join(",");
   const servicesQuery = useQuery({
-    queryKey: ["admin-services"],
-    queryFn: () => api.get<AdminServiceOrder[]>("/api/admin/services"),
-    enabled,
+    queryKey: ["admin-services", "board", orderIds],
+    queryFn: () => orderIds
+      ? api.get<(AdminServiceOrder & { board_order_id: string })[]>(`/api/admin/services?orders=${encodeURIComponent(orderIds)}`)
+      : Promise.resolve([]),
+    enabled: enabled && ordersQuery.isSuccess,
   });
 
   const markFiled = useMutation({
@@ -248,18 +252,14 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
   const total = ordersQuery.data?.total ?? 0;
   const shown = ordersQuery.data?.shown ?? 0;
 
-  // Attach each service order to a company card: by formation_order_id when
-  // the order was bought with the formation, otherwise (portal purchases) to
-  // the client's newest visible formation. Abandoned service checkouts and
-  // cancellations don't appear on cards.
-  const newestByClient = new Map<string, string>();
-  for (const o of orders) {
-    if (o.client_id && !newestByClient.has(o.client_id)) newestByClient.set(o.client_id, o.id);
-  }
+  const currentPage = ordersQuery.data?.page ?? page;
+  const pageSize = ordersQuery.data?.pageSize ?? 50;
+  const pages = Math.max(1, Math.ceil(total / pageSize));
+  // Server-resolved company association stays consistent across search/pages.
   const byOrder = new Map<string, AdminServiceOrder[]>();
   for (const s of servicesQuery.data ?? []) {
     if (s.status === "pending_payment" || s.status === "cancelled") continue;
-    const target = s.formation_order_id ?? newestByClient.get(s.client_id);
+    const target = s.board_order_id;
     if (!target) continue;
     const list = byOrder.get(target);
     if (list) list.push(s);
@@ -267,52 +267,28 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
   }
   const servicesFor = (id: string) => byOrder.get(id) ?? [];
 
-  const pending = orders.filter((o) => o.status === "pending_payment");
-  const isNew = orders.filter((o) => o.status === "paid");
-  // Complete means COMPLETE (Adam, 30 Aug 2026): the Articles are back, every
-  // purchased certificate is uploaded, and no service order is open. A formed
-  // order still owing any of that stays in column two — and a later portal
-  // purchase pulls a Complete card straight back there.
-  const certOwed = (o: BoardOrder) =>
-    (o.cert_status_purchased && !o.cert_status_uploaded) ||
-    (o.certified_copy_purchased && !o.certified_copy_uploaded);
-  const everythingDone = (o: BoardOrder) =>
-    servicesQuery.isSuccess && o.status === "formed" && !certOwed(o) && !servicesFor(o.id).some(serviceIsOpen);
-  // A formed company whose client bought something AFTER formation is NEW
-  // WORK: it goes back to the first column with a green outline (Adam,
-  // 31 Aug 2026). Open intake add-ons do not count (5 Sep 2026): a formed
-  // order still owing its intake EIN, S election, or certificates is
-  // formation work and stays in column two.
-  const newWork = orders.filter(
-    (o) => o.status === "formed" && servicesFor(o.id).some((s) => boughtAfterFormation(s, o.formed_at)),
-  );
-  const withState = orders.filter(
-    (o) => o.status === "filed" || (o.status === "formed" && !everythingDone(o) && !newWork.includes(o)),
-  );
-  const done = orders.filter(everythingDone);
+  const pending = orders.filter((o) => o.work_stage === "pending");
+  const isNew = orders.filter((o) => o.work_stage === "new");
+  const withState = orders.filter((o) => o.work_stage === "state");
+  const postFiling = orders.filter((o) => o.work_stage === "post-filing");
+  const done = servicesQuery.isSuccess ? orders.filter((o) => o.work_stage === "completed") : [];
   const oldestPending = pending.reduce<number>((m, o) => Math.max(m, ageInDays(o.created_at)), 0);
 
   return (
     <>
-      {/* The list caps at 200 rows, so the count and the search reach what the
-          board cannot show. The count is always stated — truncation is never
-          silent. */}
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <input
           type="search"
           aria-label="Search by LLC name, client name, or email"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           placeholder="Search by LLC name, client name, or email"
           className="w-full max-w-sm rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-trust/60"
         />
         {ordersQuery.data ? (
           <span className="text-sm text-muted-foreground">
-            {shown < total
-              ? q ? `Showing the ${shown} newest matching orders of ${total}; narrow your search to find another order.` : `Showing the ${shown} most recent of ${total} orders — search to reach the rest`
-              : q
-                ? `${total} ${total === 1 ? "order matches" : "orders match"}`
-                : `${total} ${total === 1 ? "order" : "orders"}`}
+            {total ? `Showing ${(currentPage - 1) * pageSize + 1}–${(currentPage - 1) * pageSize + shown} of ${total} ${view === "completed" ? "completed" : "active"} orders` : `No ${view === "completed" ? "completed" : "active"} orders${q ? " match your search" : ""}`}
+
           </span>
         ) : null}
       </div>
@@ -355,32 +331,25 @@ export default function OrderBoard({ enabled }: { enabled: boolean }) {
         </div>
       ) : null}
 
-      <div className="mt-4 flex flex-col gap-4 xl:flex-row">
-        <Column
-          title="New Orders"
-          hint="Paid, not yet filed — green: new order from an existing client"
-          orders={[...newWork, ...isNew]}
-          servicesFor={servicesFor}
-          onOpen={setOpenId}
-          onFulfill={setViewing}
-        />
-        <Column
-          title="With The State"
-          hint="Filed, or formed with work still owed"
-          orders={withState}
-          servicesFor={servicesFor}
-          onOpen={setOpenId}
-          onFulfill={setViewing}
-        />
-        <Column
-          title="Complete"
-          hint={servicesQuery.isSuccess ? "Everything delivered — documents and services" : "Completion has not been checked"}
-          orders={done}
-          servicesFor={servicesFor}
-          onOpen={setOpenId}
-          onFulfill={setViewing}
-        />
-      </div>
+      {ordersQuery.isPending ? <p className="mt-4 text-sm" role="status">Loading orders…</p> : null}
+      {ordersQuery.isSuccess && (view === "active" || servicesQuery.isSuccess) ? (
+        <div className="mt-4 flex flex-col gap-4 xl:flex-row">
+          {view === "completed" ? (
+            <Column title="Completed Orders" hint="Everything delivered — documents and services" orders={done} servicesFor={servicesFor} onOpen={setOpenId} onFulfill={setViewing} />
+          ) : <>
+            <Column title="New Orders" hint="Paid, not yet filed — green: new order from an existing client" orders={isNew} servicesFor={servicesFor} onOpen={setOpenId} onFulfill={setViewing} />
+            <Column title="With The State" hint="Awaiting filed Articles or Series Designations" orders={withState} servicesFor={servicesFor} onOpen={setOpenId} onFulfill={setViewing} />
+            <Column title="Post-Filing Items" hint="Filings complete — documents or services still owed" orders={postFiling} servicesFor={servicesFor} onOpen={setOpenId} onFulfill={setViewing} />
+          </>}
+        </div>
+      ) : null}
+      {ordersQuery.isSuccess && pages > 1 ? (
+        <nav aria-label="Order pages" className="mt-4 flex items-center justify-center gap-3">
+          <Button variant="outline" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>Previous</Button>
+          <span className="text-sm">Page {currentPage} of {pages}</span>
+          <Button variant="outline" disabled={currentPage >= pages} onClick={() => setPage(currentPage + 1)}>Next</Button>
+        </nav>
+      ) : null}
 
       {!servicesQuery.isSuccess ? (
         <div className="mt-3 text-sm" role="status" data-testid="service-load-status">

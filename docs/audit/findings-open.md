@@ -2,7 +2,7 @@
 
 GENERATED from docs/audit/ledger.json by `bun run docs/audit/ledger-print.ts list`. Do not edit: the commit step refuses a copy that differs from the ledger. The auditors' original files are unchanged under docs/audit/sources/ and docs/audit/runs/.
 
-419 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 85 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 407.
+420 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 86 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 408.
 
 A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.
 For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-session.ts. The historical coverage-check.ts alone does not establish complete prior-item reconciliation. Audit completion does not approve repairs or publication.
@@ -1846,7 +1846,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
   - Fixed: batch 33 revision 1, commit , by Codex; protected by 1 assertion(s).
 
-## Office — 34 open of 34
+## Office — 35 open of 35
 
 - **171. [A68]** — **implemented** — related: 184
   - Registered Agent Clients Card column (mine): no permission on the order shows "—", no amber. Replace: "no card — no permission on the order", amber.
@@ -2089,6 +2089,15 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Delete lines 1054-1058 and the `ein_pending: boolean;` field at ServiceOrdersSection.tsx:54; or, if wanted, scope it: `(so.type = 's-election' AND EXISTS (SELECT 1 FROM service_orders e WHERE e.client_id = so.client_id AND e.formation_order_id = so.formation_order_id AND e.type = 'ein' AND COALESCE(e.details->>'target','company') = 'company' AND e.status NOT IN ('fulfilled', 'cancelled'))) AS ein_pending,`
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
   - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).
+- **AUD-owner-office-board-2026-09-22-completed-orders. [wording]** — **implemented**
+  - Office: Formations & Service Orders board and new Completed Orders tab — `webapp/src/pages/admin/OrderBoard.tsx:376`
+  - Reads: title="Complete"
+  - Claims: Completed history is displayed in the active-work board; formed orders with unfinished services are mixed into With The State.
+  - True: Owner requested a separate Completed Orders tab and Post-Filing Items third column, then approved the proposed placement, automatic movement, searchable pagination and returning purchases with Go. Implement this.
+  - Proposed replacement (not approved): Show New Orders, With The State and Post-Filing Items on the active board; put fully delivered orders in searchable, paginated Completed Orders; new purchases return as green New Orders.
+  - Rechecked by Codex source comparison with owner-approved feature request: This is a new owner-requested workflow, not an independently discovered audit defect. Compared OrderBoard.tsx and routes-admin.ts at 1aa316b.
+  - Fixed: batch 36 revision 2, commit , by Codex; protected by 1 assertion(s).
+  - 2026-09-23 rejected r1: Declare the fact-ledger update required by Adam's approved Completed Orders tab and Post-Filing Items column.
 
 ## Emails and jobs — 42 open of 43
 

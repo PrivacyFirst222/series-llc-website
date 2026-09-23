@@ -679,11 +679,16 @@ export default function AdminDashboard() {
           <TabsTrigger value="formations">Formations &amp; Service Orders</TabsTrigger>
           <TabsTrigger value="library">Reference Library</TabsTrigger>
           <TabsTrigger value="ra-clients">Registered Agent Clients</TabsTrigger>
-          <TabsTrigger value="clients">Clients</TabsTrigger><TabsTrigger value="contacts">Contact messages</TabsTrigger>
+          <TabsTrigger value="clients">Clients</TabsTrigger>
+          <TabsTrigger value="completed">Completed Orders</TabsTrigger><TabsTrigger value="contacts">Contact messages</TabsTrigger>
         </TabsList>
 
         <TabsContent value="formations">
           <OrderBoard enabled={authQuery.isSuccess} />
+        </TabsContent>
+
+        <TabsContent value="completed">
+          <OrderBoard enabled={authQuery.isSuccess} view="completed" />
         </TabsContent>
 
         <TabsContent value="contacts"><h2 className="font-display text-xl">Contact messages</h2><NoticeList /></TabsContent><TabsContent value="library">

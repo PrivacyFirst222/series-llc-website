@@ -30151,6 +30151,78 @@
           }
         }
       ]
+    },
+    {
+      "id": "AUD-owner-office-board-2026-09-22-completed-orders",
+      "tag": "wording",
+      "area": "Office",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/owner-office-board-2026-09-22.json finding completed-orders",
+      "text": "Office: Formations & Service Orders board and new Completed Orders tab — `webapp/src/pages/admin/OrderBoard.tsx:376`\nReads: title=\"Complete\"\nClaims: Completed history is displayed in the active-work board; formed orders with unfinished services are mixed into With The State.\nTrue: Owner requested a separate Completed Orders tab and Post-Filing Items third column, then approved the proposed placement, automatic movement, searchable pagination and returning purchases with Go. Implement this.\nProposed replacement (not approved): Show New Orders, With The State and Post-Filing Items on the active board; put fully delivered orders in searchable, paginated Completed Orders; new purchases return as green New Orders.\nRechecked by Codex source comparison with owner-approved feature request: This is a new owner-requested workflow, not an independently discovered audit defect. Compared OrderBoard.tsx and routes-admin.ts at 1aa316b.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-09-23T02:22:05.995914+00:00",
+              "event": "recorded from verified audit",
+              "note": "owner-office-board-2026-09-22 at 1aa316bf63254673db2ac5370a76573e518aeaec; audit be800479398c94e1819854a23cf030d89b652b74cfcb52be23bf267265109936"
+            },
+            {
+              "at": "2026-09-23T02:22:06.107Z",
+              "event": "assigned",
+              "batch": "36",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-23T02:32:15.515Z",
+              "event": "implemented",
+              "batch": "36",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T02:33:44.385Z",
+              "event": "rejected r1",
+              "batch": "36",
+              "revision": 1,
+              "note": "Declare the fact-ledger update required by Adam's approved Completed Orders tab and Post-Filing Items column."
+            },
+            {
+              "at": "2026-09-23T02:33:44.444Z",
+              "event": "assigned",
+              "batch": "36",
+              "revision": 2
+            },
+            {
+              "at": "2026-09-23T02:33:44.468Z",
+              "event": "implemented",
+              "batch": "36",
+              "revision": 2,
+              "note": "by Codex"
+            }
+          ],
+          "batch": "36",
+          "fix": {
+            "batch": "36",
+            "revision": 2,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch36 office workflow"
+              }
+            ]
+          }
+        }
+      ]
     }
   ],
   "rulings": [
@@ -31731,6 +31803,49 @@
           "event": "implemented"
         }
       ]
+    },
+    {
+      "id": "36",
+      "revision": 1,
+      "frozenHash": "cd803daf8bf6074cdf98f1837ec7b08cfa4b29d73490a9e3d79e5707f549780f",
+      "status": "rejected",
+      "model": "Codex",
+      "base": "1aa316bf63254673db2ac5370a76573e518aeaec",
+      "history": [
+        {
+          "at": "2026-09-23T02:22:06.107Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-23T02:32:15.515Z",
+          "event": "implemented"
+        },
+        {
+          "at": "2026-09-23T02:33:44.385Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-23T02:33 (Adam standing authorization for necessary revisions within approved work): Declare the fact-ledger update required by Adam's approved Completed Orders tab and Post-Filing Items column."
+        }
+      ]
+    },
+    {
+      "id": "36",
+      "revision": 2,
+      "frozenHash": "aaeb4e0e1c17c9fb37fef95f2b51c6bc6433d9e42d650cf0fd45717b5af98b1f",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "1aa316bf63254673db2ac5370a76573e518aeaec",
+      "history": [
+        {
+          "at": "2026-09-23T02:33:44.444Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-23T02:33:44.468Z",
+          "event": "implemented"
+        }
+      ]
     }
   ],
   "auditImports": [
@@ -31769,6 +31884,10 @@
     {
       "path": "docs/audit/intakes/codex-release-review-2026-09-22.json",
       "sha": "04a2284e8653c388f56f8b7f2957dc6caa92b8e94b3cd3a189defb093ba971bc"
+    },
+    {
+      "path": "docs/audit/intakes/owner-office-board-2026-09-22.json",
+      "sha": "b97c67fd3e51030da3a18e111c351017217369224c827db8180a6cf84612f2b7"
     }
   ]
 }

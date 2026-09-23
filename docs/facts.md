@@ -90,12 +90,15 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - retired: `single statutory channel provided in s. 605.2604`
 
 ### The board's column names
-- value: `New Orders · With The State · Complete`
+- value: `New Orders · With The State · Post-Filing Items`; fully delivered orders appear in the `Completed Orders` tab (Adam, 22 September 2026).
 - where: webapp/src/pages/admin/OrderBoard.tsx — `"New Orders"`
 - where: webapp/src/pages/admin/OrderBoard.tsx — `"With The State"`
-- where: webapp/src/pages/admin/OrderBoard.tsx — `"Complete"`
-- where: webapp/server/routes-admin.ts — `formed: "Complete"`
-- retired: `formed: "Formed"`
+- where: webapp/src/pages/admin/OrderBoard.tsx — `"Post-Filing Items"`
+- where: webapp/src/pages/admin/OrderBoard.tsx — `"Completed Orders"`
+- where: webapp/src/pages/admin/AdminDashboard.tsx — `<TabsTrigger value="completed">Completed Orders</TabsTrigger>`
+- where: webapp/server/routes-admin.ts — `formed: "Formed"`
+- retired: `title="Complete"` in webapp/src/pages/admin/OrderBoard.tsx
+- retired: `formed: "Complete"` in webapp/server/routes-admin.ts
 
 ### The edition label on every generated document
 - value: `First Edition — August 2026`
