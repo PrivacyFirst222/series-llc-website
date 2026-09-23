@@ -223,3 +223,7 @@ Expects: approved presentation corrections with all alternatives and legal text 
 ## Revision 2
 
 Under Adam's standing authorization for necessary revisions, revision 1 is rejected and revision 2 adds two declared test files. Batch02's office series classification must now be Disregarded entity under the approved rule. Batch10's date test now supplies a usable generated agreement, so it reaches the amendment form whose date it tests. All existing date comparisons remain unchanged. No additional product change is authorized.
+
+## Revision 3
+
+The full revision-2 browser command passed all 1,312 browser checks, then failed its subsequent Word-preservation gate because the approved Manual sentence had no exact replacement assertion. Revision 3 adds that assertion to item 6 and uses replace mode for the Manual. The approved text and all product bytes are unchanged. The existing preservation check remains intact.

@@ -30277,7 +30277,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -30324,8 +30324,35 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              }
+            ]
+          }
         }
       ]
     },
@@ -30342,7 +30369,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -30389,8 +30416,35 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              }
+            ]
+          }
         }
       ]
     },
@@ -30407,7 +30461,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -30454,8 +30508,35 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              }
+            ]
+          }
         }
       ]
     },
@@ -30472,7 +30553,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -30519,8 +30600,35 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              }
+            ]
+          }
         }
       ]
     },
@@ -30537,7 +30645,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -30584,8 +30692,35 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              }
+            ]
+          }
         }
       ]
     },
@@ -30602,7 +30737,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -30649,8 +30784,42 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              },
+              {
+                "kind": "replace",
+                "file": "docs/owners-manual.md",
+                "before": "membership interests as simple percentages",
+                "after": "membership interests as percentages or fractions of the whole",
+                "count": 1
+              }
+            ]
+          }
         }
       ]
     },
@@ -30667,7 +30836,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -30714,8 +30883,35 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              }
+            ]
+          }
         }
       ]
     },
@@ -30732,7 +30928,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -30779,8 +30975,35 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              }
+            ]
+          }
         }
       ]
     },
@@ -30797,7 +31020,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -30844,8 +31067,35 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              }
+            ]
+          }
         }
       ]
     },
@@ -30862,7 +31112,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -30909,8 +31159,35 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              }
+            ]
+          }
         }
       ]
     },
@@ -30927,7 +31204,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -30974,8 +31251,35 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              }
+            ]
+          }
         }
       ]
     },
@@ -30992,7 +31296,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -31039,8 +31343,35 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              }
+            ]
+          }
         }
       ]
     },
@@ -31057,7 +31388,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -31104,8 +31435,35 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              }
+            ]
+          }
         }
       ]
     },
@@ -31122,7 +31480,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "open",
+          "status": "implemented",
           "waitsOn": [],
           "history": [
             {
@@ -31169,8 +31527,35 @@
               "batch": "37",
               "revision": 2,
               "note": "Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+            },
+            {
+              "at": "2026-09-23T10:35:32.056Z",
+              "event": "assigned",
+              "batch": "37",
+              "revision": 3
+            },
+            {
+              "at": "2026-09-23T10:35:32.080Z",
+              "event": "implemented",
+              "batch": "37",
+              "revision": 3,
+              "note": "by Codex"
             }
-          ]
+          ],
+          "batch": "37",
+          "fix": {
+            "batch": "37",
+            "revision": 3,
+            "commit": "",
+            "doneBy": "Codex",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "batch37 approved corrections"
+              }
+            ]
+          }
         }
       ]
     }
@@ -32890,6 +33275,25 @@
           "at": "2026-09-23T10:34:24.542Z",
           "event": "rejected by Adam",
           "note": "Adam's record of 2026-09-23T10:34 (Adam standing authorization for necessary revisions within approved work): Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate."
+        }
+      ]
+    },
+    {
+      "id": "37",
+      "revision": 3,
+      "frozenHash": "d22a3cfd1e0873d3f27e875f25788c6d09c7fe0f0b284a2debd32e64e32be1e7",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "3ff5edd95c196550019e3bb7595eff70d843b41f",
+      "history": [
+        {
+          "at": "2026-09-23T10:35:32.057Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-23T10:35:32.080Z",
+          "event": "implemented"
         }
       ]
     }
