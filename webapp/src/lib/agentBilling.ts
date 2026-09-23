@@ -1,5 +1,6 @@
 /** Adam's approved policy, shared by intake, portal, office and emails. */
 export const RA_NOTICE_DAYS = 70;
+export const RA_MIN_NOTICE_DAYS = 60;
 export const RA_CANCEL_DAYS = 30;
 export const RA_CHARGE_DAYS = 15;
 export const RA_RESIGNATION_CENTS = 9900;

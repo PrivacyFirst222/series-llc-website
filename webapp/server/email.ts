@@ -102,14 +102,14 @@ export function welcomeEmail(name: string, setPasswordUrl: string, isConversion 
 /* ------------------- registered agent renewal (16 Sep 2026) ------------------- */
 
 /** The notice the Terms promise (9(d)): the date, the amount, the
- *  cancellation deadline, and how to cancel — scheduled 70 days before the date; delivery does not gate renewal billing. */
+ *  cancellation deadline, and how to cancel — scheduled 70 days before the date; automatic billing held if fewer than 60 days remain. */
 export function raRenewalNoticeEmail(opts: {
   name: string; llcName: string; renewalDate: string; amount: string; last4: string | null;
-  chargeDate: string; cancelBy: string; linkUrl: string | null; chargeDue?: boolean;
+  chargeDate: string; cancelBy: string; linkUrl: string | null; billingHold?: boolean;
 }): { subject: string; html: string } {
-  const how = opts.last4
+  const how = opts.billingHold ? `<p>Your renewal notice was delayed. The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. Automatic charging is on hold; please contact us to resolve the renewal. You may also pay now using <a href="${opts.linkUrl}">this payment link</a>.</p>` : opts.last4
     ? `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong> and will be charged to your card ending
-      <strong>${escapeHtml(opts.last4)}</strong> ${opts.chargeDue ? 'now that the scheduled billing date has arrived' : `on <strong>${escapeHtml(opts.chargeDate)}</strong>`}. There is nothing you need to do.</p>`
+      <strong>${escapeHtml(opts.last4)}</strong> on <strong>${escapeHtml(opts.chargeDate)}</strong>. There is nothing you need to do.</p>`
     : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. No eligible card is on file,
       so please pay it by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below. Paying with a credit or debit
       card keeps that card for the following years, so the renewal is automatic from then on.</p>

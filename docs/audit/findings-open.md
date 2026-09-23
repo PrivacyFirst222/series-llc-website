@@ -41,8 +41,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Previous fix: 28 r2, release commit not recorded; 2 assertion(s) retained. Replacement attempt: 40 r3, work order aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c.
   - Previous fix: 28 r2, release commit not recorded; 2 assertion(s) retained. Replacement attempt: 40 r4, work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f.
   - Previous fix: 28 r2, release commit not recorded; 2 assertion(s) retained. Replacement attempt: 40 r5, work order f0d5dd81c188489c7a049de3669a163ddf6821f18c2a4cb97dbbf8bbeff67d81.
-  - Implemented protections: batch 40 revision 5, release commit not recorded, by Codex; protected by 2 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 2 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
   - 2026-09-22 superseded by approved replacement: prior fix 27 r3 at ; approved work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57
@@ -53,6 +53,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 superseded by approved replacement: prior fix 28 r2 at ; approved work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f
   - 2026-09-23 rejected r4: Standing authorization for necessary revisions: the browser caller still expects the retired reminder-hold test; declare and update that caller before final review.
   - 2026-09-23 superseded by approved replacement: prior fix 28 r2 at ; approved work order f0d5dd81c188489c7a049de3669a163ddf6821f18c2a4cb97dbbf8bbeff67d81
+  - 2026-09-23 rejected r5: Standing revision authorization: declare exact approved Manual replacement so document preservation check can verify it.
 - **6. [A35]** — **dropped** — waits on Adam's ruling
   - Benefits "Side by side": "One state filing covers 10 series". Each series is its own filing. Ruling needed (a Benefits row was ruled correct on 15 Sep).
   - Codex (disputed): Benefits.tsx still contains "One state filing covers 10 series", but rulings.md expressly protects the Benefits Side by side row. The user prohibits flagging ruled wording.
@@ -495,19 +496,18 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Rechecked by Codex at 455be76607d5f351dd9a0a80701f74af23683d1f: Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place.
   - Implemented protections: batch 34 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
   - Implementation evidence: commit c91b101b9652a14906270d1422f8cc771f71e706, batch 34 revision 1, package d58da0289ab7. This records implementation, not acceptance or publication.
-- **AUD-claude-release-group-d-2026-09-23-item-31. [wording]** — **implemented**
+- **AUD-claude-release-group-d-2026-09-23-item-31. [wording]** — **open**
   - Group D item-31 — `webapp/src/content/terms.md:48`
   - Reads: **(d) Renewal reminder.** We schedule your renewal reminder 70 days before your renewal date. The reminder states the renewal date, the amount, the cancellation deadline, and how to cancel. Your obligation to give cancellation notice at least 30 days before renewal and provide replacement proof by the renewal date does not depend on receiving this reminder, and our failure to send it or your failure to receive it does not extend those deadlines. If we fail to send a reminder required by applicable law, we will not automatically renew or charge your card except as permitted by law.
   - Claims: Prior reminder hold conflicts with Adam's revised billing policy.
   - True: Release reconciliation items 30–31; Adam approved item 1 and revised item 2, then Go on 23 September 2026.
   - Proposed replacement (not approved): A missing or late renewal reminder does not postpone renewal, prevent us from charging your authorized payment method for the renewal fee, or extend your cancellation or replacement deadlines.
   - Rechecked by Codex source reconciliation: Current source read; statutory filing sources opened; owner billing instruction controls this policy change.
-  - Implemented protections: batch 40 revision 5, release commit not recorded, by Codex; protected by 2 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Declare new and revised test-only fixtures for before-fix replay; standing authority to revise batches.
   - 2026-09-23 rejected r2: Declare Terms version-date replacement and facts control; use literal mandatory test label required by guard.
   - 2026-09-23 rejected r3: Preserve Privacy Policy date assertion; only Terms date changes in this batch.
   - 2026-09-23 rejected r4: Standing authorization for necessary revisions: the browser caller still expects the retired reminder-hold test; declare and update that caller before final review.
+  - 2026-09-23 rejected r5: Standing revision authorization: declare exact approved Manual replacement so document preservation check can verify it.
 
 ## Order form and payment — 88 open of 90
 
@@ -968,8 +968,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Previous fix (fact-ledger): 28 r2, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 40 r3, work order aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c.
   - Previous fix (fact-ledger): 28 r2, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 40 r4, work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f.
   - Previous fix (fact-ledger): 28 r2, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 40 r5, work order f0d5dd81c188489c7a049de3669a163ddf6821f18c2a4cb97dbbf8bbeff67d81.
-  - Implemented protections (fact-ledger): batch 40 revision 5, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
+  - Implemented protections (fact-ledger): batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
   - 2026-09-22 superseded by approved replacement: prior fix 27 r3 at ; approved work order 1fdb66696d095f5167689279a08cccca690993e32a707650a68214c8ed13fc57
@@ -984,6 +984,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 superseded by approved replacement: prior fix 28 r2 at ; approved work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f
   - 2026-09-23 rejected r4: Standing authorization for necessary revisions: the browser caller still expects the retired reminder-hold test; declare and update that caller before final review.
   - 2026-09-23 superseded by approved replacement: prior fix 28 r2 at ; approved work order f0d5dd81c188489c7a049de3669a163ddf6821f18c2a4cb97dbbf8bbeff67d81
+  - 2026-09-23 rejected r5: Standing revision authorization: declare exact approved Manual replacement so document preservation check can verify it.
 - **101. [B18]** — **implemented** — housekeeping
   - Order form, the payload built at submit (conversion branch) — `webapp/src/components/forms/florida-llc/buildPayload.ts:29`
   - Reads: ? { desiredName: "", designator: "", finalName, alternateNames: [], exactNameOnly: false }
@@ -2495,8 +2496,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Previous fix: 28 r2, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 40 r3, work order aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c.
   - Previous fix: 28 r2, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 40 r4, work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f.
   - Previous fix: 28 r2, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 40 r5, work order f0d5dd81c188489c7a049de3669a163ddf6821f18c2a4cb97dbbf8bbeff67d81.
-  - Implemented protections: batch 40 revision 5, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 superseded by approved replacement: prior fix 07 r1 at ; approved work order 262de36dcb1a3127ed43d28b424eff265c09ff3d06aee027818c6792f1d1ef0b
   - 2026-09-23 superseded by approved replacement: prior fix 28 r2 at ; approved work order f2c57a4231e6dd0e3e7e125dbfb253a0353399681e57835a0636631d95d13654
   - 2026-09-23 rejected r1: Declare new and revised test-only fixtures for before-fix replay; standing authority to revise batches.
@@ -2507,6 +2508,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 superseded by approved replacement: prior fix 28 r2 at ; approved work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f
   - 2026-09-23 rejected r4: Standing authorization for necessary revisions: the browser caller still expects the retired reminder-hold test; declare and update that caller before final review.
   - 2026-09-23 superseded by approved replacement: prior fix 28 r2 at ; approved work order f0d5dd81c188489c7a049de3669a163ddf6821f18c2a4cb97dbbf8bbeff67d81
+  - 2026-09-23 rejected r5: Standing revision authorization: declare exact approved Manual replacement so document preservation check can verify it.
 - **195. [A4]** — **implemented**
   - Renewal retry (mine). The retry reuses idempotency key `ren-<id>-1`; Square returns the first decline; the email promises a retry. Replace: store the attempt count on every decline; retry key numbered 2.
   - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
@@ -2840,8 +2842,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Previous fix: 07 r1, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 40 r3, work order aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c.
   - Previous fix: 07 r1, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 40 r4, work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f.
   - Previous fix: 07 r1, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 40 r5, work order f0d5dd81c188489c7a049de3669a163ddf6821f18c2a4cb97dbbf8bbeff67d81.
-  - Implemented protections: batch 40 revision 5, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
+  - Implemented protections: batch 07 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation evidence: commit 32eb7738d86ac9fc2eb26f82eadefd3533dabac4, batch 07 revision 1, package 703e4f04fd88. This records implementation, not acceptance or publication.
   - 2026-09-23 superseded by approved replacement: prior fix 07 r1 at ; approved work order f2c57a4231e6dd0e3e7e125dbfb253a0353399681e57835a0636631d95d13654
   - 2026-09-23 rejected r1: Declare new and revised test-only fixtures for before-fix replay; standing authority to revise batches.
   - 2026-09-23 superseded by approved replacement: prior fix 07 r1 at ; approved work order ba319e49c600c33e367a6ca47fa6ed3e2275ae1791392da580dd919642a9782b
@@ -2851,6 +2853,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 superseded by approved replacement: prior fix 07 r1 at ; approved work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f
   - 2026-09-23 rejected r4: Standing authorization for necessary revisions: the browser caller still expects the retired reminder-hold test; declare and update that caller before final review.
   - 2026-09-23 superseded by approved replacement: prior fix 07 r1 at ; approved work order f0d5dd81c188489c7a049de3669a163ddf6821f18c2a4cb97dbbf8bbeff67d81
+  - 2026-09-23 rejected r5: Standing revision authorization: declare exact approved Manual replacement so document preservation check can verify it.
 - **AUD-post-batches-2026-09-20-4a344e2-B5-RENEWAL-OLD-EMAIL. [substantive]** — **implemented**
   - Registered-agent renewal/resignation notices after account email change — `webapp/server/renewals.ts:128`
   - Reads: await sendMail({to:o.contact_email,...mail});
@@ -2882,8 +2885,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Previous fix: 28 r2, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 40 r3, work order aaeb81e44ff19d62c8b4949b90e045cb3aaf88e8558bd4a8411fb8fecaff211c.
   - Previous fix: 28 r2, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 40 r4, work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f.
   - Previous fix: 28 r2, release commit not recorded; 1 assertion(s) retained. Replacement attempt: 40 r5, work order f0d5dd81c188489c7a049de3669a163ddf6821f18c2a4cb97dbbf8bbeff67d81.
-  - Implemented protections: batch 40 revision 5, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
+  - Implemented protections: batch 28 revision 2, release commit not recorded, by Codex Astra; protected by 1 assertion(s).
+  - Implementation evidence: commit 3f178aaad17e9440f1cf6001c66bb32635061fcb, batch 28 revision 2, package fca2c4ed466f. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Revise the work order to cover the prior timing checks for the already-approved 70-day reminder schedule.
   - 2026-09-23 superseded by approved replacement: prior fix 28 r2 at ; approved work order f2c57a4231e6dd0e3e7e125dbfb253a0353399681e57835a0636631d95d13654
   - 2026-09-23 rejected r1: Declare new and revised test-only fixtures for before-fix replay; standing authority to revise batches.
@@ -2894,6 +2897,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 superseded by approved replacement: prior fix 28 r2 at ; approved work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f
   - 2026-09-23 rejected r4: Standing authorization for necessary revisions: the browser caller still expects the retired reminder-hold test; declare and update that caller before final review.
   - 2026-09-23 superseded by approved replacement: prior fix 28 r2 at ; approved work order f0d5dd81c188489c7a049de3669a163ddf6821f18c2a4cb97dbbf8bbeff67d81
+  - 2026-09-23 rejected r5: Standing revision authorization: declare exact approved Manual replacement so document preservation check can verify it.
 - **AUD-claude-reconciled-batch28-runtime-B-backup-rowcounts-count-deleted-documents. [housekeeping]** — **implemented** — housekeeping
   - The nightly backup job's report (/api/cron/db-backup log line and /api/admin/backups/run response) — `webapp/server/backup.ts:150`
   - Reads:   const rowCounts=Object.fromEntries(BACKUP_TABLES.map(t=>[t,job!.dump.tables[t].length]));
@@ -4218,19 +4222,18 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Implemented protections: batch 39 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
   - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Standing authorization for necessary revisions: extend declared test scope to reset new tracking metadata in synthetic control fixtures and run tracking tests in the mandatory control suite.
-- **AUD-claude-release-group-d-2026-09-23-item-30. [wording]** — **implemented**
+- **AUD-claude-release-group-d-2026-09-23-item-30. [wording]** — **open**
   - Group D item-30 — `docs/owners-manual.md:198`
   - Reads: | **1. Prepare it** | Division of Corporations form **CR2E138, "Statement of Authority."** It asks for the company's name exactly as the state has it, the principal office addresses, and the authority — or the limits on it — of members or managers, stated by name or by position. **Use the position, not the name.** People change; "the Manager" survives a change of personnel, and a name forces a refiling. |
   - Claims: Company-only filing instructions do not distinguish the series that owns property.
   - True: Release reconciliation items 30–31; Adam approved item 1 and revised item 2, then Go on 23 September 2026.
   - Proposed replacement (not approved): If you choose to file a statement of authority, identify the entity that holds the property. A statement concerning property held by the company identifies the company; a statement concerning property held by a protected series identifies that protected series. The company-form instructions below should not be used for a series filing without confirming the Division’s filing requirements for that series.
   - Rechecked by Codex source reconciliation: Current source read; statutory filing sources opened; owner billing instruction controls this policy change.
-  - Implemented protections: batch 40 revision 5, release commit not recorded, by Codex; protected by 2 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Declare new and revised test-only fixtures for before-fix replay; standing authority to revise batches.
   - 2026-09-23 rejected r2: Declare Terms version-date replacement and facts control; use literal mandatory test label required by guard.
   - 2026-09-23 rejected r3: Preserve Privacy Policy date assertion; only Terms date changes in this batch.
   - 2026-09-23 rejected r4: Standing authorization for necessary revisions: the browser caller still expects the retired reminder-hold test; declare and update that caller before final review.
+  - 2026-09-23 rejected r5: Standing revision authorization: declare exact approved Manual replacement so document preservation check can verify it.
 
 ## Cross-review adjudications — informational, not repair tasks
 
