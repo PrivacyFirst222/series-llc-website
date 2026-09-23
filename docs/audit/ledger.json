@@ -30277,7 +30277,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30337,22 +30337,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30369,7 +30362,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30429,22 +30422,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30461,7 +30447,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30521,22 +30507,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30553,7 +30532,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30613,22 +30592,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30645,7 +30617,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30705,22 +30677,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30737,7 +30702,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30797,29 +30762,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              },
-              {
-                "kind": "replace",
-                "file": "docs/owners-manual.md",
-                "before": "membership interests as simple percentages",
-                "after": "membership interests as percentages or fractions of the whole",
-                "count": 1
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30836,7 +30787,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30896,22 +30847,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -30928,7 +30872,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30988,22 +30932,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -31020,7 +30957,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -31080,22 +31017,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -31112,7 +31042,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -31172,22 +31102,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -31204,7 +31127,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -31264,22 +31187,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -31296,7 +31212,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -31356,22 +31272,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -31388,7 +31297,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -31448,22 +31357,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -31480,7 +31382,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -31540,22 +31442,15 @@
               "batch": "37",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T10:37:38.488Z",
+              "event": "rejected r3",
+              "batch": "37",
+              "revision": 3,
+              "note": "Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
             }
-          ],
-          "batch": "37",
-          "fix": {
-            "batch": "37",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch37 approved corrections"
-              }
-            ]
-          }
+          ]
         }
       ]
     }
@@ -33282,7 +33177,7 @@
       "id": "37",
       "revision": 3,
       "frozenHash": "d22a3cfd1e0873d3f27e875f25788c6d09c7fe0f0b284a2debd32e64e32be1e7",
-      "status": "implemented",
+      "status": "rejected",
       "model": "Codex",
       "base": "3ff5edd95c196550019e3bb7595eff70d843b41f",
       "history": [
@@ -33294,6 +33189,11 @@
         {
           "at": "2026-09-23T10:35:32.080Z",
           "event": "implemented"
+        },
+        {
+          "at": "2026-09-23T10:37:38.488Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-23T10:37 (Adam standing authorization for necessary revisions within approved work): Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion."
         }
       ]
     }
