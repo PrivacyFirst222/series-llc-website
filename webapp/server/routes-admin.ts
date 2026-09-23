@@ -889,7 +889,7 @@ app.get("/admin/clients", async (c) => {
   type AgentCard = { llc_name: string; resignation_submitted: unknown; replaced_at: unknown; ended_date: unknown; renewal_date: unknown; cancellation_requested_at: unknown; balances: Balance[]; [key: string]: unknown };
   const day = (value: unknown): string | null => value ? value instanceof Date ? value.toISOString().slice(0, 10) : String(value).slice(0, 10) : null;
   const today = easternDateIso();
-  const dateWords = (value: unknown): string => new Date(day(value)! + 'T12:00:00Z').toLocaleDateString('en-US', {timeZone:'UTC',month:'long',day:'numeric',year:'numeric'});
+  const dateWords = (value: unknown, month: 'long' | 'short' = 'long'): string => new Date(day(value)! + 'T12:00:00Z').toLocaleDateString('en-US', {timeZone:'UTC',month,day:'numeric',year:'numeric'});
   for (const row of rows) {
     const cards = ((row.ra_cards as AgentCard[] | null) ?? []).map(card => ({
       ...card,
@@ -906,7 +906,7 @@ app.get("/admin/clients", async (c) => {
       if (card.replaced_at) return `${card.llc_name} (Replacement registered agent verified. Our registered-agent appointment ${day(card.replaced_at)! <= today ? 'ended' : 'ends'} on ${dateWords(card.replaced_at)}.)`;
       if (card.ended_date && day(card.ended_date)! <= today) return `${card.llc_name} (Our registered-agent appointment ended on ${dateWords(card.ended_date)}.)`;
       if (card.resignation_submitted) return `${card.llc_name} (Resignation submitted ${dateWords(card.resignation_submitted)})`;
-      const facts = [card.renewal_date ? `renews ${dateWords(card.renewal_date)}` : '', card.cancellation_requested_at ? `cancellation requested ${dateWords(card.cancellation_requested_at)}` : ''].filter(Boolean);
+      const facts = [card.renewal_date ? `renews ${dateWords(card.renewal_date, 'short')}` : '', card.cancellation_requested_at ? `cancellation requested ${dateWords(card.cancellation_requested_at, 'short')}` : ''].filter(Boolean);
       return card.llc_name + (facts.length ? ` (${facts.join(' — ')})` : '');
     });
   }

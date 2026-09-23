@@ -74,7 +74,7 @@ async function uploadDev(path: string, data: Buffer): Promise<void> {
 export const hashBytes = (data: Buffer) => createHash('sha256').update(data).digest('hex');
 export interface BackupFile { storageKey: string; path: string; sha?: string; }
 export function documentMirrorPath(doc: {id: string; title: string; kind: string; llc_name?: string | null; email?: string | null; storage_key: string;mirror_path?:string|null}): string {
-  if(doc.kind==='articles'||doc.kind==='psd')return `/filing-revisions/${doc.id}-${hashBytes(Buffer.from(doc.storage_key))}.pdf`;
+  if(doc.kind==='articles'||doc.kind==='psd')return `/${safePathPart(doc.llc_name || doc.email || "unassigned")}/${doc.id}-${hashBytes(Buffer.from(doc.storage_key))}.pdf`;
   if(doc.storage_key.endsWith('.encrypted')&&doc.mirror_path)return doc.mirror_path;
   return `/${safePathPart(doc.llc_name || doc.email || "unassigned")}/${doc.id.slice(0,8)}-${safePathPart(doc.title || doc.kind)}.pdf${doc.storage_key.endsWith('.encrypted') ? '.encrypted' : ''}`;
 }

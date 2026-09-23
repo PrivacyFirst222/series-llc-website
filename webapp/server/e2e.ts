@@ -3841,7 +3841,8 @@ if (mint.status === 200) {
       const mails = ((await api("/api/dev/outbox")).body?.data ?? []) as { to: string; subject: string; html: string }[];
       const declined = mails.filter((m) => m.to === raEmail && /declined/i.test(m.subject)).at(-1);
       const flat = (declined?.html ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-      check("renewal: the decline email names the card, the deadline and carries a payment link, with no retry promised for a plain decline", !!declined && /card ending 1111/.test(flat) && /Pay the renewal/.test(flat) && !/try the card once more/.test(flat), flat.slice(0, 300));
+      const deadlineWords = new Date(`${renewalDate}T12:00:00Z`).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
+      check("renewal: the decline email names the card, the deadline and carries a payment link, with no retry promised for a plain decline", !!declined && /card ending 1111/.test(flat) && /Pay renewal now/.test(flat) && flat.includes(`Please pay by ${deadlineWords} to avoid delinquency.`) && !/try the card once more/.test(flat), flat.slice(0, 600));
     }
     // The next day: a plain decline is not retried.
     const noRetry = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -12)}`)).body?.data as { retried: number; declined: number } | undefined;

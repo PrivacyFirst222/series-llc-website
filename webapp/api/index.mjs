@@ -51341,7 +51341,7 @@ async function uploadDev(path, data) {
   await writeFile2(root2 + path, data);
 }
 function documentMirrorPath(doc) {
-  if (doc.kind === "articles" || doc.kind === "psd") return `/filing-revisions/${doc.id}-${hashBytes(Buffer.from(doc.storage_key))}.pdf`;
+  if (doc.kind === "articles" || doc.kind === "psd") return `/${safePathPart(doc.llc_name || doc.email || "unassigned")}/${doc.id}-${hashBytes(Buffer.from(doc.storage_key))}.pdf`;
   if (doc.storage_key.endsWith(".encrypted") && doc.mirror_path) return doc.mirror_path;
   return `/${safePathPart(doc.llc_name || doc.email || "unassigned")}/${doc.id.slice(0, 8)}-${safePathPart(doc.title || doc.kind)}.pdf${doc.storage_key.endsWith(".encrypted") ? ".encrypted" : ""}`;
 }
@@ -99826,6 +99826,7 @@ function raRenewalDeclinedEmail(opts) {
     html: wrap(`
       <p>Hi ${escapeHtml(opts.name || "there")},</p>
       <p>${opts.resignation ? `The resignation charge to your card ending ${escapeHtml(opts.last4)} for ${escapeHtml(opts.llcName)} was declined.` : `Your ${escapeHtml(opts.amount ?? "$99")} registered-agent renewal charge was declined. You may pay now using the same or a different eligible card.`}${opts.willRetry && opts.retryDate ? ` We will try the card once more on ${escapeHtml(opts.retryDate)}.` : ""}</p>
+      ${!opts.resignation && opts.last4 ? `<p>The charge was to your card ending <strong>${escapeHtml(opts.last4)}</strong> for registered agent service for <strong>${escapeHtml(opts.llcName)}</strong>.</p>` : ""}
       <p>You may pay now using the same or a different eligible card; there is no two-day waiting period. ${opts.resignation ? "This payment is for state filing fees and processing, not another service year." : `${opts.overdue ? "The renewal fee remains unpaid and is now overdue." : `Please pay by ${escapeHtml(opts.renewalDate)} to avoid delinquency.`} The card you use is saved for future annual renewals.`}</p>
       <p><a href="${opts.linkUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">${opts.resignation ? "Pay the resignation charge" : "Pay renewal now"}</a></p>
       ${opts.deadlinesHtml ?? ""}
@@ -113738,7 +113739,7 @@ function registerAdminRoutes(app2) {
     );
     const day = (value) => value ? value instanceof Date ? value.toISOString().slice(0, 10) : String(value).slice(0, 10) : null;
     const today = easternDateIso();
-    const dateWords = (value) => (/* @__PURE__ */ new Date(day(value) + "T12:00:00Z")).toLocaleDateString("en-US", { timeZone: "UTC", month: "long", day: "numeric", year: "numeric" });
+    const dateWords = (value, month = "long") => (/* @__PURE__ */ new Date(day(value) + "T12:00:00Z")).toLocaleDateString("en-US", { timeZone: "UTC", month, day: "numeric", year: "numeric" });
     for (const row of rows) {
       const cards = (row.ra_cards ?? []).map((card) => ({
         ...card,
@@ -113761,7 +113762,7 @@ function registerAdminRoutes(app2) {
         if (card.replaced_at) return `${card.llc_name} (Replacement registered agent verified. Our registered-agent appointment ${day(card.replaced_at) <= today ? "ended" : "ends"} on ${dateWords(card.replaced_at)}.)`;
         if (card.ended_date && day(card.ended_date) <= today) return `${card.llc_name} (Our registered-agent appointment ended on ${dateWords(card.ended_date)}.)`;
         if (card.resignation_submitted) return `${card.llc_name} (Resignation submitted ${dateWords(card.resignation_submitted)})`;
-        const facts = [card.renewal_date ? `renews ${dateWords(card.renewal_date)}` : "", card.cancellation_requested_at ? `cancellation requested ${dateWords(card.cancellation_requested_at)}` : ""].filter(Boolean);
+        const facts = [card.renewal_date ? `renews ${dateWords(card.renewal_date, "short")}` : "", card.cancellation_requested_at ? `cancellation requested ${dateWords(card.cancellation_requested_at, "short")}` : ""].filter(Boolean);
         return card.llc_name + (facts.length ? ` (${facts.join(" \u2014 ")})` : "");
       });
     }
