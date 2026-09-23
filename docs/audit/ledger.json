@@ -31852,7 +31852,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -31872,22 +31872,15 @@
               "batch": "38",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T11:44:28.982Z",
+              "event": "rejected r1",
+              "batch": "38",
+              "revision": 1,
+              "note": "Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization."
             }
-          ],
-          "batch": "38",
-          "fix": {
-            "batch": "38",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch38 verification controls"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -31904,7 +31897,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -31924,22 +31917,15 @@
               "batch": "38",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T11:44:28.982Z",
+              "event": "rejected r1",
+              "batch": "38",
+              "revision": 1,
+              "note": "Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization."
             }
-          ],
-          "batch": "38",
-          "fix": {
-            "batch": "38",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch38 verification controls"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -31956,7 +31942,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -31976,22 +31962,15 @@
               "batch": "38",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T11:44:28.982Z",
+              "event": "rejected r1",
+              "batch": "38",
+              "revision": 1,
+              "note": "Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization."
             }
-          ],
-          "batch": "38",
-          "fix": {
-            "batch": "38",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch38 verification controls"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -32008,7 +31987,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -32028,22 +32007,15 @@
               "batch": "38",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T11:44:28.982Z",
+              "event": "rejected r1",
+              "batch": "38",
+              "revision": 1,
+              "note": "Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization."
             }
-          ],
-          "batch": "38",
-          "fix": {
-            "batch": "38",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch38 verification controls"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -32060,7 +32032,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -32080,22 +32052,15 @@
               "batch": "38",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T11:44:28.982Z",
+              "event": "rejected r1",
+              "batch": "38",
+              "revision": 1,
+              "note": "Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization."
             }
-          ],
-          "batch": "38",
-          "fix": {
-            "batch": "38",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch38 verification controls"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -32112,7 +32077,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -32132,22 +32097,15 @@
               "batch": "38",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T11:44:28.982Z",
+              "event": "rejected r1",
+              "batch": "38",
+              "revision": 1,
+              "note": "Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization."
             }
-          ],
-          "batch": "38",
-          "fix": {
-            "batch": "38",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch38 verification controls"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -32164,7 +32122,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -32184,22 +32142,15 @@
               "batch": "38",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T11:44:28.982Z",
+              "event": "rejected r1",
+              "batch": "38",
+              "revision": 1,
+              "note": "Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization."
             }
-          ],
-          "batch": "38",
-          "fix": {
-            "batch": "38",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch38 verification controls"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -32216,7 +32167,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -32236,22 +32187,15 @@
               "batch": "38",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T11:44:28.982Z",
+              "event": "rejected r1",
+              "batch": "38",
+              "revision": 1,
+              "note": "Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization."
             }
-          ],
-          "batch": "38",
-          "fix": {
-            "batch": "38",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch38 verification controls"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -32268,7 +32212,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -32288,22 +32232,15 @@
               "batch": "38",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T11:44:28.982Z",
+              "event": "rejected r1",
+              "batch": "38",
+              "revision": 1,
+              "note": "Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization."
             }
-          ],
-          "batch": "38",
-          "fix": {
-            "batch": "38",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch38 verification controls"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -32320,7 +32257,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -32340,22 +32277,15 @@
               "batch": "38",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T11:44:28.982Z",
+              "event": "rejected r1",
+              "batch": "38",
+              "revision": 1,
+              "note": "Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization."
             }
-          ],
-          "batch": "38",
-          "fix": {
-            "batch": "38",
-            "revision": 1,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch38 verification controls"
-              }
-            ]
-          }
+          ]
         }
       ]
     }
@@ -34125,7 +34055,7 @@
       "id": "38",
       "revision": 1,
       "frozenHash": "59a519ff6c32b37430a7dc1b1f9313318638f8e695f81ed77b65af12489bdaf8",
-      "status": "implemented",
+      "status": "rejected",
       "model": "Codex",
       "base": "404669b878756fdbc562aee89c61b6810057484a",
       "history": [
@@ -34137,6 +34067,11 @@
         {
           "at": "2026-09-23T11:38:35.470Z",
           "event": "implemented"
+        },
+        {
+          "at": "2026-09-23T11:44:28.982Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-23T11:44 (Adam standing authorization for necessary revisions within approved work): Revision 2 completes Group B fixture dependencies and fresh-build isolation setup under Adam standing revision authorization."
         }
       ]
     }
