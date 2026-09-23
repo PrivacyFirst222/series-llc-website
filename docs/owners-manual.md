@@ -191,7 +191,9 @@ Your agreement forbids it among the owners — §5.4(b) in the member-managed mu
 - **Manager-managed — usually unnecessary.** Only the Manager can convey, and the members chose the Manager. It earns its keep if there is more than one manager, or if you want the Manager's own authority limited.
 - **Single-member and you are the Manager — skip it.** There is no one to limit.
 **File a limitation, not a grant.** Under s. 605.0302(7), where a certified copy containing a *limitation* on authority to transfer real property is recorded in the real property records, "all persons are deemed to know of the limitation." That is the entire point of the filing: a recorded limitation binds the world. A statement that mostly hands authority out does the opposite of what you filed it for — and worse. Under s. 605.0302(6), a recorded **grant** of authority to transfer real property is *conclusive in favor of a person who gives value in reliance on it without knowledge to the contrary*: the buyer keeps the building, and your only remedy is a claim against whoever signed. That is why your agreement requires every owner's consent before any statement of authority is filed, amended, cancelled, or recorded.
-If you decide to file, four steps:
+If you choose to file a statement of authority, identify the entity that holds the property. A statement concerning property held by the company identifies the company; a statement concerning property held by a protected series identifies that protected series. The company-form instructions below should not be used for a series filing without confirming the Division’s filing requirements for that series.
+
+For a company filing, four steps:
 
 | **Step** | **What to do** |
 |---|---|

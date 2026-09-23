@@ -43,10 +43,8 @@ interface AdminClient {
 const cardWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
   c.card_status === "on_file" ? `${c.card_brand ? c.card_brand.charAt(0) + c.card_brand.slice(1).toLowerCase() : "card"} ${c.card_last4 ?? ""}`.trim()
   : cardStatusWords(c.card_status,c.card_note);
-const renewalWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
-  c.billing_hold ? "Automatic charge held — notice sent late; client may pay voluntarily"
-  : c.notice_error ? "Notice failed — automatic charge held; next job retries notice"
-  : !c.last_status ? "—"
+const renewalStatusWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
+  !c.last_status ? "—"
   : c.last_status === "charged" ? `charged ${c.last_date ?? ""}`
   : c.last_status === "paid_by_link" ? `paid by link ${c.last_date ?? ""}`
   : c.last_status === "declined" ? `declined ${c.last_date ?? ""}`
@@ -54,8 +52,10 @@ const renewalWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =
   : c.last_status === "link_sent" ? `link sent for ${c.last_date ?? ""}`
   : c.last_status === "cancelled" ? `cancelled ${c.last_date ?? ""}`
   : c.last_status;
-/** A row that needs a hand: a decline, or a company with no card to charge. */
-const raNeedsHand = (cl: AdminClient): boolean => (cl.ra_cards ?? []).some((c) => c.billing_hold || c.notice_error || c.last_status === "declined" || c.last_status === "notice_pending" || c.card_status !== "on_file" || Boolean(c.resignation_due && !c.resignation_submitted));
+const renewalWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
+  renewalStatusWords(c) + (c.notice_error ? " — notice failed" : "");
+/** A row that needs a hand: a notice failure, decline, or missing card. */
+const raNeedsHand = (cl: AdminClient): boolean => (cl.ra_cards ?? []).some((c) => c.notice_error || c.last_status === "declined" || c.last_status === "notice_pending" || c.card_status !== "on_file" || Boolean(c.resignation_due && !c.resignation_submitted));
 
 interface EmailRow {
   id: string;

@@ -8,7 +8,7 @@ import {
 import { RA_RENEWAL_FEE_CENTS } from "./pricing";
 import { disableCard, saveCardFromPayment, type CardSimulation } from "./square";
 import { agentCheckoutLink, payAgentTarget } from "./ra-checkout";
-import { RA_NOTICE_DAYS, RA_MIN_NOTICE_DAYS, RA_CANCEL_DAYS, RA_CHARGE_DAYS, RA_RESIGNATION_CENTS } from "../src/lib/agentBilling";
+import { RA_NOTICE_DAYS, RA_CANCEL_DAYS, RA_CHARGE_DAYS, RA_RESIGNATION_CENTS } from "../src/lib/agentBilling";
 import { easternDateIso } from "./datetime";
 
 /** How the money is written everywhere the client reads it. */
@@ -107,8 +107,8 @@ export async function saveRenewalCard(db: Db, order: PaidOrderRow, paymentId: st
   return true;
 }
 
-/* The daily job records work actually done. A pending/late notice cannot
- * authorize an automatic charge. A resignation task is not a filed resignation. */
+/* The daily job records work actually done. Renewal reminders do not gate
+ * authorized billing. A resignation task is not a filed resignation. */
 interface RenewalOrder {id:string;contact_name:string;contact_email:string;llc_name:string;ra_appointment_date:unknown;ra_renewal_date:unknown;ra_cancellation_requested_at:unknown;ra_replaced_at:unknown;ra_proof_received_at:unknown;ra_resignation_due:unknown;ra_ended_date:unknown;square_customer_id:string|null;square_card_id:string|null;card_last4:string|null;card_status:string|null;payload:unknown}
 interface RenewalRow {id:string;order_id:string;renewal_date:unknown;amount_cents:number;status:string;purpose:string;charge_due:unknown;retry_after:unknown;retries:number;notice_sent_at:unknown;billing_hold:boolean;lock_until:unknown;link_url:string|null}
 export async function runRenewals(today:string):Promise<{notices:number;charged:number;declined:number;cancelled:number;retried:number}> {
@@ -132,20 +132,27 @@ export async function runRenewals(today:string):Promise<{notices:number;charged:
   if(!locked)continue; row=locked;
   try {
    const hasCard=o.card_status==='on_file'&&!!o.square_card_id&&!!o.square_customer_id&&gaveConsent(o.payload);
-   if(row.status==='notice_pending') {
-    const link=await agentCheckoutLink('renewal',row.id);
-    const late=row.purpose==='renewal'&&today>addDays(date,-RA_MIN_NOTICE_DAYS);
-    const mail=row.purpose==='resignation'?{subject:`Registered-agent resignation due — ${o.llc_name}`,html:`<p>Your timely cancellation has reached its renewal date without replacement proof. A $99 charge for state filing fees and processing is due. This does not purchase another service year. The office must submit the resignation; this notice does not confirm filing.</p><p><a href="${link}">Pay now</a></p>`}:raRenewalNoticeEmail({name:o.contact_name,llcName:o.llc_name,renewalDate:longDate(date),amount:raRenewalFeeWords(),last4:hasCard?o.card_last4:null,chargeDate:longDate(addDays(date,-RA_CHARGE_DAYS)),cancelBy:longDate(addDays(date,-RA_CANCEL_DAYS)),linkUrl:link,billingHold:late});
-    try {
-     await sendMail({to:await currentAgentNoticeEmail(db,o.id),...mail});
-     await db.query("UPDATE ra_renewals SET status=$2,notice_sent_at=$3,billing_hold=$4,notice_error=NULL,link_url=$5 WHERE id=$1",[row.id,hasCard?'notice_sent':'link_sent',`${today}T12:00:00Z`,late,link]);out.notices++;
-     row={...row,status:hasCard?'notice_sent':'link_sent',notice_sent_at:`${today}T12:00:00Z`,billing_hold:late};
-    }catch(e){await db.query('UPDATE ra_renewals SET notice_error=$2 WHERE id=$1',[row.id,String(e).slice(0,300)]);}
-    if(row.purpose!=='resignation'||!row.notice_sent_at)continue;
+   // Retire old notice-only holds without altering payment or cancellation rules.
+   if(row.purpose==='renewal'&&row.billing_hold){
+    await db.query('UPDATE ra_renewals SET billing_hold=false WHERE id=$1',[row.id]);
+    row={...row,billing_hold:false};
    }
-   if(!row.notice_sent_at||row.billing_hold||!hasCard)continue;
+   if(!row.notice_sent_at) {
+    try {
+     const link=await agentCheckoutLink('renewal',row.id);
+     const mail=row.purpose==='resignation'?{subject:`Registered-agent resignation due — ${o.llc_name}`,html:`<p>Your timely cancellation has reached its renewal date without replacement proof. A $99 charge for state filing fees and processing is due. This does not purchase another service year. The office must submit the resignation; this notice does not confirm filing.</p><p><a href="${link}">Pay now</a></p>`}:raRenewalNoticeEmail({name:o.contact_name,llcName:o.llc_name,renewalDate:longDate(date),amount:raRenewalFeeWords(),last4:hasCard?o.card_last4:null,chargeDate:longDate(addDays(date,-RA_CHARGE_DAYS)),cancelBy:longDate(addDays(date,-RA_CANCEL_DAYS)),linkUrl:link,chargeDue:today>=isoOf(row.charge_due)!});
+     await sendMail({to:await currentAgentNoticeEmail(db,o.id),...mail});
+     // Sending a retry notice must not reset a declined/charging payment state.
+     const status=row.status==='notice_pending'?(hasCard?'notice_sent':'link_sent'):row.status;
+     await db.query("UPDATE ra_renewals SET status=$2,notice_sent_at=$3,notice_error=NULL,link_url=$4 WHERE id=$1",[row.id,status,`${today}T12:00:00Z`,link]);out.notices++;
+     row={...row,status,notice_sent_at:`${today}T12:00:00Z`};
+    }catch(e){await db.query('UPDATE ra_renewals SET notice_error=$2 WHERE id=$1',[row.id,String(e).slice(0,300)]);}
+   }
+   // The owner's revised policy applies to annual renewals. Keep the separate
+   // resignation workflow unchanged, including its actual-notice prerequisite.
+   if(!hasCard||(row.purpose==='resignation'&&(!row.notice_sent_at||row.billing_hold)))continue;
    const retry=row.status==='declined'&&row.retries<2&&!!row.retry_after&&today>=isoOf(row.retry_after)!;
-   const first=row.status==='notice_sent'&&today>=isoOf(row.charge_due)!;
+   const first=['notice_pending','notice_sent','link_sent'].includes(row.status)&&today>=isoOf(row.charge_due)!;
    const recover=row.status==='charging';
    if(!first&&!retry&&!recover)continue;
    await db.query("UPDATE ra_renewals SET status='charging' WHERE id=$1 AND status NOT IN ('charged','paid_by_link','cancelled')",[row.id]);
