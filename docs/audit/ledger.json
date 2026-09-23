@@ -30165,7 +30165,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -30205,22 +30205,15 @@
               "batch": "36",
               "revision": 2,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-23T02:56:14.954Z",
+              "event": "rejected r2",
+              "batch": "36",
+              "revision": 2,
+              "note": "Declare updates to Batch05 and Batch10 browser fixtures for the approved queue API and Completed Orders navigation; preserve their substantive assertions."
             }
-          ],
-          "batch": "36",
-          "fix": {
-            "batch": "36",
-            "revision": 2,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch36 office workflow"
-              }
-            ]
-          }
+          ]
         }
       ]
     }
@@ -31832,7 +31825,7 @@
       "id": "36",
       "revision": 2,
       "frozenHash": "aaeb4e0e1c17c9fb37fef95f2b51c6bc6433d9e42d650cf0fd45717b5af98b1f",
-      "status": "implemented",
+      "status": "rejected",
       "model": "Codex",
       "base": "1aa316bf63254673db2ac5370a76573e518aeaec",
       "history": [
@@ -31844,6 +31837,11 @@
         {
           "at": "2026-09-23T02:33:44.468Z",
           "event": "implemented"
+        },
+        {
+          "at": "2026-09-23T02:56:14.954Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-23T02:56 (Adam standing authorization for necessary revisions within approved work): Declare updates to Batch05 and Batch10 browser fixtures for the approved queue API and Completed Orders navigation; preserve their substantive assertions."
         }
       ]
     }

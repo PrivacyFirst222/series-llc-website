@@ -2089,15 +2089,15 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): Delete lines 1054-1058 and the `ein_pending: boolean;` field at ServiceOrdersSection.tsx:54; or, if wanted, scope it: `(so.type = 's-election' AND EXISTS (SELECT 1 FROM service_orders e WHERE e.client_id = so.client_id AND e.formation_order_id = so.formation_order_id AND e.type = 'ein' AND COALESCE(e.details->>'target','company') = 'company' AND e.status NOT IN ('fulfilled', 'cancelled'))) AS ein_pending,`
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
   - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).
-- **AUD-owner-office-board-2026-09-22-completed-orders. [wording]** — **implemented**
+- **AUD-owner-office-board-2026-09-22-completed-orders. [wording]** — **open**
   - Office: Formations & Service Orders board and new Completed Orders tab — `webapp/src/pages/admin/OrderBoard.tsx:376`
   - Reads: title="Complete"
   - Claims: Completed history is displayed in the active-work board; formed orders with unfinished services are mixed into With The State.
   - True: Owner requested a separate Completed Orders tab and Post-Filing Items third column, then approved the proposed placement, automatic movement, searchable pagination and returning purchases with Go. Implement this.
   - Proposed replacement (not approved): Show New Orders, With The State and Post-Filing Items on the active board; put fully delivered orders in searchable, paginated Completed Orders; new purchases return as green New Orders.
   - Rechecked by Codex source comparison with owner-approved feature request: This is a new owner-requested workflow, not an independently discovered audit defect. Compared OrderBoard.tsx and routes-admin.ts at 1aa316b.
-  - Fixed: batch 36 revision 2, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-23 rejected r1: Declare the fact-ledger update required by Adam's approved Completed Orders tab and Post-Filing Items column.
+  - 2026-09-23 rejected r2: Declare updates to Batch05 and Batch10 browser fixtures for the approved queue API and Completed Orders navigation; preserve their substantive assertions.
 
 ## Emails and jobs — 42 open of 43
 
