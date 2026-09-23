@@ -867,7 +867,7 @@ app.get("/admin/clients", async (c) => {
                 'balances', (SELECT COALESCE(jsonb_agg(jsonb_build_object(
                   'id',r.id,'purpose',r.purpose,
                   'status',r.status,'amount_cents',r.amount_cents,'date',r.renewal_date,'charged_at',r.charged_at,'link_url',r.link_url,
-                  'reconcilingPayment',EXISTS(SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed')),
+                  'reconcilingPayment',r.status NOT IN ('charged','paid_by_link','cancelled') AND EXISTS(SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed')),
                   'notice_error',COALESCE(r.correspondence->>'error',r.notice_error)
                 ) ORDER BY r.renewal_date DESC),'[]'::jsonb) FROM ra_renewals r WHERE r.order_id=o.id),
                 'billing_hold', (SELECT r.billing_hold FROM ra_renewals r WHERE r.order_id=o.id ORDER BY r.renewal_date DESC LIMIT 1),

@@ -108589,7 +108589,7 @@ function registerPortalRoutes(app2) {
             ra_renewal_date, COALESCE(ra_cancellation_renewal_date,ra_renewal_date) AS cancellation_date, ra_cancellation_requested_at, ra_appointment_date,ra_resignation_due,ra_resignation_submitted,ra_resignation_filed,ra_replaced_at,ra_ended_date,card_note,
             card_status, card_last4, card_brand,
             -- The renewals, newest first (16 Sep 2026).
-            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', r.id, 'reconcilingPayment',EXISTS(SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed')), 'purpose',r.purpose,'linkUrl',r.link_url,'date', r.renewal_date, 'amountCents', r.amount_cents, 'status', r.status, 'chargedAt', r.charged_at) ORDER BY r.renewal_date DESC), '[]'::jsonb)
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', r.id, 'reconcilingPayment',r.status NOT IN ('charged','paid_by_link','cancelled') AND EXISTS(SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed')), 'purpose',r.purpose,'linkUrl',r.link_url,'date', r.renewal_date, 'amountCents', r.amount_cents, 'status', r.status, 'chargedAt', r.charged_at) ORDER BY r.renewal_date DESC), '[]'::jsonb)
                FROM ra_renewals r WHERE r.order_id = orders.id) AS renewals
        FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL
       ORDER BY paid_at DESC NULLS LAST`,
@@ -110746,7 +110746,7 @@ function registerPaymentRoutes(app2) {
 // server/ra-checkout.ts
 async function target(kind, id) {
   const db = await getDb();
-  return (await db.query(kind === "order" ? `SELECT id,id AS order_id,status,total_cents AS amount,contact_email AS email,contact_name AS name,llc_name,payload,checkout_token FROM orders WHERE id=$1` : `SELECT r.id,r.order_id,r.status,r.amount_cents AS amount,o.contact_email AS email,o.contact_name AS name,o.llc_name,o.payload,r.checkout_token,r.purpose,r.renewal_date,EXISTS(SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed')) AS "reconcilingPayment",o.ra_resignation_submitted,o.ra_replaced_at,o.ra_ended_date,o.ra_cancellation_requested_at FROM ra_renewals r JOIN orders o ON o.id=r.order_id WHERE r.id=$1`, [id]))[0];
+  return (await db.query(kind === "order" ? `SELECT id,id AS order_id,status,total_cents AS amount,contact_email AS email,contact_name AS name,llc_name,payload,checkout_token FROM orders WHERE id=$1` : `SELECT r.id,r.order_id,r.status,r.amount_cents AS amount,o.contact_email AS email,o.contact_name AS name,o.llc_name,o.payload,r.checkout_token,r.purpose,r.renewal_date,(r.status NOT IN ('charged','paid_by_link','cancelled') AND EXISTS(SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed'))) AS "reconcilingPayment",o.ra_resignation_submitted,o.ra_replaced_at,o.ra_ended_date,o.ra_cancellation_requested_at FROM ra_renewals r JOIN orders o ON o.id=r.order_id WHERE r.id=$1`, [id]))[0];
 }
 async function agentCheckoutLink(kind, id) {
   const db = await getDb(), table = kind === "order" ? "orders" : "ra_renewals";
@@ -113718,7 +113718,7 @@ function registerAdminRoutes(app2) {
                 'balances', (SELECT COALESCE(jsonb_agg(jsonb_build_object(
                   'id',r.id,'purpose',r.purpose,
                   'status',r.status,'amount_cents',r.amount_cents,'date',r.renewal_date,'charged_at',r.charged_at,'link_url',r.link_url,
-                  'reconcilingPayment',EXISTS(SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed')),
+                  'reconcilingPayment',r.status NOT IN ('charged','paid_by_link','cancelled') AND EXISTS(SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed')),
                   'notice_error',COALESCE(r.correspondence->>'error',r.notice_error)
                 ) ORDER BY r.renewal_date DESC),'[]'::jsonb) FROM ra_renewals r WHERE r.order_id=o.id),
                 'billing_hold', (SELECT r.billing_hold FROM ra_renewals r WHERE r.order_id=o.id ORDER BY r.renewal_date DESC LIMIT 1),
