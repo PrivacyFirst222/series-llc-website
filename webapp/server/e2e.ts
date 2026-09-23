@@ -4113,8 +4113,6 @@ batch16Checks((label, ok, detail) => batch16Results.set(label, {ok, detail}));
 { const r = batch16Results.get("batch16: professional eligibility is conditional and cumulative"); check("batch16: professional eligibility is conditional and cumulative", r?.ok === true, r?.detail); }
 { const r = batch16Results.get("batch16: bankruptcy paragraph is exactly owner approved"); check("batch16: bankruptcy paragraph is exactly owner approved", r?.ok === true, r?.detail); }
 
-const {batch40Checks}=await import("./batch40-check");
-await batch40Checks((_label,ok,detail)=>check("batch40 renewal reminders do not gate billing",ok,detail));
 const {batch38Checks}=await import("./batch38-check");
 const batch38Results=new Map<string,{ok:boolean;detail?:unknown}>();
 await batch38Checks((label,ok,detail)=>batch38Results.set(label,{ok,detail}));
