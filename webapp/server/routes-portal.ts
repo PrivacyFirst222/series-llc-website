@@ -959,10 +959,10 @@ app.get("/portal/companies", async (c) => {
   const db = await getDb();
   // The registered agent facts belong to the company (15 Sep 2026: the
   // card showed one company's service under every tab).
-  const rows = await db.query<{ id: string; llc_name: string; formed_at: string | null; filing_path: string | null; ra_service: boolean; ra_renewal_date: unknown; cancellation_date?:unknown; ra_cancellation_requested_at: string | null; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note:string|null; ra_appointment_date:unknown;ra_resignation_due:unknown;ra_resignation_submitted:unknown;ra_ended_date:unknown; renewals: unknown }>(
+  const rows = await db.query<{ id: string; llc_name: string; formed_at: string | null; filing_path: string | null; ra_service: boolean; ra_renewal_date: unknown; cancellation_date?:unknown; ra_cancellation_requested_at: string | null; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note:string|null; ra_appointment_date:unknown;ra_resignation_due:unknown;ra_resignation_submitted:unknown;ra_resignation_filed:unknown;ra_ended_date:unknown; renewals: unknown }>(
     `SELECT id, llc_name, formed_at, payload->>'filingPath' AS filing_path,
             (payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
-            ra_renewal_date, COALESCE(ra_cancellation_renewal_date,ra_renewal_date) AS cancellation_date, ra_cancellation_requested_at, ra_appointment_date,ra_resignation_due,ra_resignation_submitted,ra_ended_date,card_note,
+            ra_renewal_date, COALESCE(ra_cancellation_renewal_date,ra_renewal_date) AS cancellation_date, ra_cancellation_requested_at, ra_appointment_date,ra_resignation_due,ra_resignation_submitted,ra_resignation_filed,ra_ended_date,card_note,
             card_status, card_last4, card_brand,
             -- The renewals, newest first (16 Sep 2026).
             (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', r.id, 'purpose',r.purpose,'linkUrl',r.link_url,'date', r.renewal_date, 'amountCents', r.amount_cents, 'status', r.status, 'chargedAt', r.charged_at) ORDER BY r.renewal_date DESC), '[]'::jsonb)
@@ -979,6 +979,7 @@ app.get("/portal/companies", async (c) => {
     raAppointmentDate:r.ra_appointment_date?isoDate(r.ra_appointment_date):null,
     raResignationDue:r.ra_resignation_due?isoDate(r.ra_resignation_due):null,
     raResignationSubmitted:r.ra_resignation_submitted?isoDate(r.ra_resignation_submitted):null,
+    raResignationFiled:r.ra_resignation_filed?isoDate(r.ra_resignation_filed):null,
     raEndedDate:r.ra_ended_date?isoDate(r.ra_ended_date):null,
     cardNote:r.card_note,
     raRenewalDate: r.ra_renewal_date ? isoDate(r.ra_renewal_date) : null,
@@ -1109,6 +1110,9 @@ app.get("/portal/oa", async (c) => {
  *  answers." (14 Sep 2026: a wrong shape used to answer "Invalid request" or
  *  Zod's "Expected array, received string"). */
 function answersProblem(error: z.ZodError): string {
+  if (error.issues.some(issue => issue.code === "too_big" && issue.path.length === 1 && issue.path[0] === "members")) {
+    return `The operating agreement supports up to ${MAX_OA_OWNERS} owners. Remove an owner before saving.`;
+  }
   const first = error.issues[0];
   return first?.code === "custom" && first.message ? first.message : "Please check your answers.";
 }

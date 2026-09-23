@@ -386,7 +386,7 @@ def drafting_choices(md):
             else:
                 if subject not in labels:
                     raise ValueError("Unlabelled drafting condition: " + subject)
-                label = "If " + labels[subject].lower()
+                label = "If " + labels[subject][0].lower() + labels[subject][1:]
             raw = md[start.end():end.start()]
             body = render(start.end(), end.start())
             table = md[md.rfind("\n", 0, start.start()) + 1:start.start()].lstrip().startswith("|")
@@ -395,9 +395,17 @@ def drafting_choices(md):
             block = not table and ("\n" in raw or len(re.sub(r"<!--.*?-->", "", raw, flags=re.S)) > 100)
             if block:
                 out.append("\n\n" + annotation("[" + label + ":]") + "\n" + body.strip() +
-                           "\n" + annotation("[End " + label.lower() + ".]") + "\n\n")
+                           "\n" + annotation("[End " + label[0].lower() + label[1:] + ".]") + "\n\n")
             else:
-                out.append(" " + annotation("[" + label + ": ") + body.strip() + annotation("]") + ("" if md[end.end():end.end()+1] in ".,;:!?" else " "))
+                # Spaces separate annotations, but must not change the optional clause.
+                # Attach leading punctuation to the label boundary without an extra gap.
+                preceding = "".join(out)
+                leading = "" if not preceding or preceding[-1].isspace() else " "
+                clause = body.strip()
+                label_gap = "" if clause[:1] in ",;:.!?" else " "
+                following = md[end.end():end.end()+1]
+                trailing = "" if not following or following.isspace() or following in ".,;:!?" else " "
+                out.append(leading + annotation("[" + label + ":" + label_gap) + clause + annotation("]") + trailing)
             cursor = end.end()
         return "".join(out)
     return render(0, len(md))
@@ -645,6 +653,8 @@ def styles_xml(P):
         "</w:pPr></w:pPrDefault></w:docDefaults>"
         '<w:style w:type="paragraph" w:default="1" w:styleId="Normal">'
         '<w:name w:val="Normal"/></w:style>'
+        '<w:style w:type="character" w:styleId="DraftingChoice"><w:name w:val="Drafting Choice"/>'
+        '<w:rPr><w:i/></w:rPr></w:style>'
         + heads
         + '<w:style w:type="paragraph" w:styleId="ListBullet"><w:name w:val="List Bullet"/>'
         '<w:basedOn w:val="Normal"/><w:pPr><w:keepLines/>'

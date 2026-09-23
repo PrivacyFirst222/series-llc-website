@@ -318,6 +318,7 @@ interface CompanyInfo {
   raAppointmentDate?:string|null;
   raResignationDue?:string|null;
   raResignationSubmitted?:string|null;
+  raResignationFiled?:string|null;
   raEndedDate?:string|null;
   cardNote?:string|null;
   raCancellationRequestedAt: string | null;
@@ -358,7 +359,13 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
         <span className="ml-auto text-xs text-muted-foreground" data-testid="ra-card-company">{company.llcName}</span>
       </div>
       <div className="px-5 py-4">
-        {requestedAt ? (
+        {company.raResignationSubmitted ? (
+          <p role="status" className="text-sm">
+            Resignation submitted {formatDate(company.raResignationSubmitted)}. {company.raResignationFiled ? `Filed by the state ${formatDate(company.raResignationFiled)}. ` : "State filing has not yet been recorded. "}{company.raEndedDate
+              ? `Appointment end date: ${formatDate(company.raEndedDate)}.`
+              : "We will display the appointment end date when it is recorded."}
+          </p>
+        ) : requestedAt ? (
           <div className="flex gap-2.5 rounded-lg border border-amber-300/60 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">
             <Clock className="mt-0.5 h-4 w-4 shrink-0" />
             <div>
@@ -426,7 +433,7 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
                 </p>
               ))}
 <UpdateRenewalCard key={company.orderId} company={company.orderId}/></div>
-        {company.raResignationDue ? <p className="mt-3">{company.raResignationSubmitted ? `Resignation submitted ${formatDate(company.raResignationSubmitted)}.` : `Resignation due ${formatDate(company.raResignationDue)}; submission has not yet been recorded.`} {company.raEndedDate ? `Appointment ends ${formatDate(company.raEndedDate)}.` : ""}</p> : null}
+        {!company.raResignationSubmitted && company.raResignationDue ? <p className="mt-3">{`Resignation due ${formatDate(company.raResignationDue)}; submission has not yet been recorded.`} {company.raEndedDate ? `Appointment ends ${formatDate(company.raEndedDate)}.` : ""}</p> : null}
         {(company.renewals ?? []).filter(r=>r.linkUrl && !["charged","paid_by_link","cancelled"].includes(r.status)).map(r=><p key={r.date} className="mt-3"><a className="underline text-trust" href={r.linkUrl!}>Pay {r.purpose === "resignation" ? "resignation charge" : "renewal"} now / use another card</a></p>)}
         {cancelMutation.isError ? (
           <p className="mt-2 text-xs text-destructive">

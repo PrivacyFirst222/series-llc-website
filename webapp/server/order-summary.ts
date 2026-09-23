@@ -1,4 +1,4 @@
-import { AGENT_RESIDENCY, AGENT_EXISTING_RECORD, AGENT_ACCEPTANCE, AGENT_SERIES_AGREEMENT, AGENT_FORM_VERSION, conversionAuthority } from "../src/components/forms/florida-llc/registeredAgent";
+import { AGENT_RESIDENCY, AGENT_EXISTING_RECORD, AGENT_ACCEPTANCE, AGENT_SERIES_AGREEMENT, AGENT_PERSONAL_SERIES_AGREEMENT, AGENT_FORM_VERSION, conversionAuthority } from "../src/components/forms/florida-llc/registeredAgent";
 import { selectedParty } from "../src/lib/partyIdentity";
 /**
  * The Order Summary (Adam, 10 Sep 2026): one PDF per order, written when the
@@ -32,7 +32,7 @@ export const ACKNOWLEDGMENTS: { field: string; text: string | ((p: SubmissionPay
   { field: "registeredAgentPhysicalAddressAcknowledgment", text: "I confirm this is my physical street address in Florida and not a P.O. Box.", when: (p) => p.metadata?.formVersion !== AGENT_FORM_VERSION },
   { field: "registeredAgentResidencyAcknowledgment", text: AGENT_RESIDENCY },
   { field: "registeredAgentExistingRecordAcknowledgment", text: AGENT_EXISTING_RECORD },
-  { field: "registeredAgentSeriesAgreementAcknowledgment", text: AGENT_SERIES_AGREEMENT },
+  { field: "registeredAgentSeriesAgreementAcknowledgment", text: (p) => p.metadata?.formVersion === AGENT_FORM_VERSION && p.filingPath !== "CONVERT" && p.registeredAgent?.choice === "SELF" ? AGENT_PERSONAL_SERIES_AGREEMENT : AGENT_SERIES_AGREEMENT },
   { field: "registeredAgentAcceptanceCheckbox", text: (p) => p.metadata?.formVersion === AGENT_FORM_VERSION ? AGENT_ACCEPTANCE : "I accept the appointment and acknowledge the obligations of serving as registered agent for this Florida LLC." },
   { field: "registeredAgentSignatureAuthorizationCheckbox", text: "I certify that I am signing for myself as the registered agent." },
   { field: "articlesSignerAppointed", text: "I appoint MyFloridaSeriesLLC as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete." },

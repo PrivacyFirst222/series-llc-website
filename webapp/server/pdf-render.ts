@@ -167,6 +167,17 @@ export function wrapSegs(f: Fonts, segs: Seg[], width: number, size: number): Se
       cur = []; curW = 0;
     }
     if (whitespace && cur.length === 0) continue;
+    if (!whitespace && w > width) {
+      for (const seg of group) for (const character of Array.from(seg.text)) {
+        const cw = drawnWidth(fontFor(f, seg), character, size);
+        if (cur.length && curW + cw > width) { lines.push(cur); cur = []; curW = 0; }
+        const last = cur.at(-1);
+        if (last && last.bold === seg.bold && last.italic === seg.italic) last.text += character;
+        else cur.push({ ...seg, text: character });
+        curW += cw;
+      }
+      continue;
+    }
     for (const seg of group) {
       const last = cur.at(-1);
       if (last && last.bold === seg.bold && last.italic === seg.italic) last.text += seg.text;

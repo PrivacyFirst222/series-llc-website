@@ -1,5 +1,5 @@
 import { readOrderBoard, SERVICE_COMPANY_SQL } from "./admin-board";
-import { notifyContact, notifyLegalMail } from './office-notifications';
+import { notifyContact, notifyDocument } from './office-notifications';
 import { addYears, isoOf as agentIso } from "./renewals";
 import { recoveryDetails, notifyTaxpayerNumbersRequired } from "./s-election-recovery";
 import { associateLegacyServices, serviceCompanyId } from "./company-scope";
@@ -25,7 +25,7 @@ import { decryptSecret } from "./crypto";
 import { createSession, rateLimit, clientIp } from "./auth";
 
 import { deleteFile, putFile, readFileStream } from "./storage";
-import { sendMail, newDocumentEmail, emailChangedEmail, serviceFulfilledClientEmail, llcFormedEmail, sElectionEinAddedEmail, sElectionEinArrivedLateEmail } from "./email";
+import { sendMail, emailChangedEmail, serviceFulfilledClientEmail, sElectionEinAddedEmail, sElectionEinArrivedLateEmail } from "./email";
 import { einDigits, fmtEinDisplay, isValidEin } from "../src/lib/ein";
 import { filingGroups, seriesNames, AR_SIGNER } from "./filing";
 import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, requireAdmin } from "./shared";
@@ -528,26 +528,23 @@ app.post("/admin/orders/:id/certificates", async (c) => {
   }
   if (files.length === 0) return c.json(err("Choose a certificate file to upload.", "INVALID_INPUT"), 400);
   const uploaded: string[] = [];
+  const uploadedIds: string[] = [];
   for (const cf of files) {
     // Another copy, dated; earlier copies stay until the office deletes
     // them (Adam, 15 Sep 2026).
     const stored = await putFile(cf.file.name, await cf.file.arrayBuffer(), cf.file.type || "application/pdf");
-    await db.query(
+    const inserted = await db.query<{id:string}>(
       `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, '{"source":"card"}'::jsonb)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, '{"source":"card"}'::jsonb) RETURNING id`,
       [o.client_id, o.id, cf.kind, cf.title, stored.storageKey, cf.file.type || "application/pdf", stored.sizeBytes],
     );
     uploaded.push(cf.kind);
+    uploadedIds.push(inserted[0].id);
   }
-  // The card says whether the client was emailed, from what happened (15 Sep 2026).
   let notified = false;
   if (notify) {
-    const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [o.client_id]);
-    if (clients[0]) {
-      const mail = newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
-      try { await sendMail({ to: clients[0].email, ...mail }); notified = true; }
-      catch (e) { console.error("[admin] certificate email failed:", e); }
-    }
+    await db.query("UPDATE documents SET meta=meta || '{\"noticeKind\":\"document\"}'::jsonb,notice_status='pending' WHERE id=$1",[uploadedIds[0]]);
+    notified = await notifyDocument(uploadedIds[0]);
   }
   return c.json({ data: { uploaded, notified } });
 });
@@ -806,51 +803,11 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
     raService ? [o.id, agentAppointment ? addYears(agentIso(agentAppointment)!,1) : null] : [o.id],
   );
 
-  const clients = await db.query<{ email: string; name: string }>(
-    "SELECT email, name FROM clients WHERE id = $1",
-    [o.client_id],
-  );
-  let notified = false;
-  if (clients.length > 0) {
-    // What else the email may truthfully mention: certificates now in the
-    // portal, and EIN / S election ORDERS still to be completed.
-    const certDocs = await db.query<{ kind: string }>(
-      "SELECT kind FROM documents WHERE order_id = $1 AND kind IN ('certificate-of-status', 'certified-copy')",
-      [o.id],
-    );
-    await associateLegacyServices(o.client_id);
-    const openSvc = await db.query<{ type: "ein" | "s-election"; status: "awaiting_info" | "in_progress"; details: unknown }>(
-      `SELECT type, status, details FROM service_orders WHERE client_id = $1 AND formation_order_id = $2
-        AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')`,
-      [o.client_id, o.id],
-    );
-    // The Statement, when we signed, is posted in the same step and named
-    // with the rest (15 Sep 2026: the email said "two things").
-    const hasStatement = (await db.query<{ id: string }>("SELECT id FROM documents WHERE order_id = $1 AND kind = 'statement' LIMIT 1", [o.id])).length > 0;
-    const mail = llcFormedEmail({
-      clientName: clients[0].name,
-      llcName: o.llc_name,
-      isConversion,
-      seriesNames: required,
-      otherDocuments: [
-        ...(hasStatement ? ["Statement of Authorized Representative"] : []),
-        ...(certDocs.some((d) => d.kind === "certificate-of-status") ? ["Certificate of Status"] : []),
-        ...(certDocs.some((d) => d.kind === "certified-copy") ? ["Certified Copy of the Articles"] : []),
-      ],
-      outstandingServices: openSvc.map((r) => {
-        const details = (typeof r.details === "string" ? JSON.parse(r.details) : r.details) as { target?: string; seriesName?: string } | null;
-        return { type: r.type, status: r.status, ...(r.type === "ein" && details?.target === "series" && details.seriesName ? { seriesName: details.seriesName } : {}) };
-      }),
-      portalUrl: `${env.PUBLIC_BASE_URL}/portal`,
-    });
-    notified = await sendMail({ to: clients[0].email, ...mail }).then(
-      () => true,
-      (e) => {
-        console.error("[admin] formed email failed:", e);
-        return false;
-      },
-    );
-  }
+  // Persist the requested notice on one delivered document before attempting email.
+  // A retry uses the same document and the company's current formation state.
+  const noticeDocument = newRows[0];
+  await db.query("UPDATE documents SET meta=meta || '{\"noticeKind\":\"formation\"}'::jsonb,notice_status='pending' WHERE id=$1",[noticeDocument]);
+  const notified = await notifyDocument(noticeDocument);
   return c.json({ data: { ok: true, notified, documents: files.length } });
   } finally {
     // Release the replacement claim on every path — success, compensation,
@@ -879,7 +836,7 @@ app.post('/admin/contact-messages/:id/resend', async c=>{
 });
 app.post('/admin/documents/:id/resend-notice', async c=>{
  if(!await requireAdmin(c))return c.json(err('Not signed in','UNAUTHENTICATED'),401);
- return c.json({data:{notified:await notifyLegalMail(c.req.param('id'))}});
+ return c.json({data:{notified:await notifyDocument(c.req.param('id'))}});
 });
 
 app.get("/admin/clients", async (c) => {
@@ -1559,24 +1516,12 @@ app.post("/admin/documents", async (c) => {
 
   const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
   const rows = await db.query<{ id: string }>(
-    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-     VALUES ($1, $7, $2, $3, $4, $5, $6, $8::jsonb) RETURNING id`,
-    [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, orderId, JSON.stringify(kind === "legal_mail" ? { receivedOn } : {})],
+    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta, notice_status)
+     VALUES ($1, $7, $2, $3, $4, $5, $6, $8::jsonb, $9) RETURNING id`,
+    [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, orderId, JSON.stringify({...(kind === "legal_mail" ? {receivedOn} : {}),...(notify ? {noticeKind:"document"} : {})}), notify ? "pending" : null],
   );
 
-  let notified = false;
-  if (kind === "legal_mail") {
-    notified = await notifyLegalMail(rows[0].id).catch(()=>false);
-  } else if (notify) {
-    const mail = newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
-    notified = await sendMail({ to: clients[0].email, ...mail }).then(
-      () => true,
-      (e) => {
-        console.error("[admin] document alert email failed:", e);
-        return false;
-      },
-    );
-  }
+  const notified = notify ? await notifyDocument(rows[0].id) : false;
   return c.json({ data: { id: rows[0].id, notified } });
 });
 }

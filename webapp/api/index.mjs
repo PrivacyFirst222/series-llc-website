@@ -93648,6 +93648,21 @@ function wrapSegs(f, segs, width, size) {
       curW = 0;
     }
     if (whitespace && cur.length === 0) continue;
+    if (!whitespace && w > width) {
+      for (const seg of group) for (const character of Array.from(seg.text)) {
+        const cw = drawnWidth(fontFor(f, seg), character, size);
+        if (cur.length && curW + cw > width) {
+          lines.push(cur);
+          cur = [];
+          curW = 0;
+        }
+        const last2 = cur.at(-1);
+        if (last2 && last2.bold === seg.bold && last2.italic === seg.italic) last2.text += character;
+        else cur.push({ ...seg, text: character });
+        curW += cw;
+      }
+      continue;
+    }
     for (const seg of group) {
       const last2 = cur.at(-1);
       if (last2 && last2.bold === seg.bold && last2.italic === seg.italic) last2.text += seg.text;
@@ -99924,18 +99939,466 @@ function sElectionEinArrivedLateEmail(opts) {
   };
 }
 
+// src/lib/calendar.ts
+var EASTERN_ZONE = "America/New_York";
+function easternToday(now = /* @__PURE__ */ new Date()) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: EASTERN_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+}
+function validCalendarDate(iso) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso) || iso.slice(0, 4) === "0000") return false;
+  const d2 = /* @__PURE__ */ new Date(`${iso}T12:00:00Z`);
+  return Number.isFinite(d2.getTime()) && d2.toISOString().slice(0, 10) === iso;
+}
+function shiftCalendarDay(iso, days) {
+  const d2 = /* @__PURE__ */ new Date(`${iso}T12:00:00Z`);
+  d2.setUTCDate(d2.getUTCDate() + days);
+  return d2.toISOString().slice(0, 10);
+}
+function weekday(iso) {
+  return (/* @__PURE__ */ new Date(`${iso}T12:00:00Z`)).getUTCDay();
+}
+function nthMonday(year, month, n) {
+  const first = `${year}-${month}-01`;
+  return shiftCalendarDay(first, (8 - weekday(first)) % 7 + 7 * (n - 1));
+}
+function isBankingDay(iso) {
+  if (!validCalendarDate(iso) || [0, 6].includes(weekday(iso))) return false;
+  const y = iso.slice(0, 4);
+  const fixed = ["01-01", "06-19", "07-04", "11-11", "12-25"].map((md) => `${y}-${md}`);
+  const memorial = shiftCalendarDay(`${y}-05-31`, -((weekday(`${y}-05-31`) + 6) % 7));
+  const thanksgiving = shiftCalendarDay(`${y}-11-01`, (11 - weekday(`${y}-11-01`)) % 7 + 21);
+  const holidays = [...fixed.flatMap((d2) => weekday(d2) === 0 ? [d2, shiftCalendarDay(d2, 1)] : [d2]), nthMonday(y, "01", 3), nthMonday(y, "02", 3), memorial, nthMonday(y, "09", 1), nthMonday(y, "10", 2), thanksgiving];
+  return !holidays.includes(iso);
+}
+function shiftBankingDays(iso, count) {
+  let d2 = iso;
+  for (let moved = 0; moved < Math.abs(count); ) {
+    d2 = shiftCalendarDay(d2, count < 0 ? -1 : 1);
+    if (isBankingDay(d2)) moved++;
+  }
+  return d2;
+}
+function effectiveDateRange(filingDay) {
+  if (!validCalendarDate(filingDay)) throw new Error("Invalid filing date.");
+  return { earliest: shiftBankingDays(filingDay, -5), latest: shiftCalendarDay(filingDay, 90) };
+}
+function closestEffectiveDate(requested, filingDay) {
+  if (!validCalendarDate(requested)) throw new Error("Invalid requested effective date.");
+  const { earliest, latest } = effectiveDateRange(filingDay);
+  return requested < earliest ? earliest : requested > latest ? latest : requested;
+}
+
+// src/lib/partyIdentity.ts
+function selectedParty(party) {
+  const kind = party.memberType ?? party.personOrEntity;
+  if (kind === "ENTITY") return { ...party, firstName: "", lastName: "", suffix: "", fullName: "", fullLegalName: "" };
+  if (kind === "INDIVIDUAL") return { ...party, entityName: "", businessEntityName: "" };
+  return { ...party };
+}
+
+// server/filing.ts
+var oneLine = (a2) => !a2 ? "" : [a2.address1, a2.address2, [a2.city, a2.state].filter(Boolean).join(", "), a2.zip].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(", ");
+var addrFields = (prefix, a2) => !a2 ? [] : [
+  { key: `${prefix}Street`, label: "Street address", value: (a2.address1 ?? "").trim() },
+  { key: `${prefix}Suite`, label: "Suite, Apt. #, etc.", value: (a2.address2 ?? "").trim() },
+  { key: `${prefix}City`, label: "City", value: (a2.city ?? "").trim() },
+  { key: `${prefix}State`, label: "State", value: (a2.state ?? "").trim() },
+  { key: `${prefix}Zip`, label: "Zip code", value: (a2.zip ?? "").trim() }
+];
+var personName = (m2) => {
+  const last2 = (m2?.lastName ?? "").trim();
+  const suffix = (m2?.suffix ?? "").trim().replace(/^,\s*/, "");
+  return {
+    first: (m2?.firstName ?? "").trim(),
+    last: last2 && suffix ? `${last2}, ${suffix}` : last2,
+    legacy: (m2?.fullLegalName ?? m2?.fullName ?? m2?.name ?? "").trim()
+  };
+};
+var personAddr = (m2) => ({
+  address1: m2?.streetAddress1 ?? m2?.address1,
+  address2: m2?.streetAddress2 ?? m2?.address2,
+  city: m2?.city,
+  state: m2?.state,
+  zip: m2?.zip
+});
+var sameAddr = (a2, b2) => oneLine(a2) !== "" && oneLine(a2) === oneLine(b2);
+var MANAGEMENT_LABEL = {
+  MEMBER_MANAGED: "Member-managed",
+  MANAGER_MANAGED: "Manager-managed"
+};
+var MGMT_PROVISION = {
+  MANAGER_MANAGED: "Pursuant to Florida Statutes Section 605.0407, the company is or will be manager-managed."
+};
+var RA_SERVICE_SIGNER = "Caitlin Kirwan";
+var AR_SIGNER = { name: "Caitlin Kirwan", title: "Manager", company: "FLORIDA PROTECTED SERIES, LLC - PS 1" };
+function raFields(ra) {
+  const raIsBusiness = (ra.businessEntityName ?? "").trim() !== "";
+  const raName = personName(ra);
+  return [
+    {
+      key: "raChoice",
+      label: "Agent",
+      value: ra.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent"
+    },
+    ...raIsBusiness ? [
+      {
+        key: "raBusiness",
+        label: "Business to serve as RA",
+        value: (ra.businessEntityName ?? "").trim()
+      }
+    ] : raName.last ? [
+      { key: "raLast", label: "RA last name", value: raName.last },
+      { key: "raFirst", label: "RA first name", value: raName.first }
+    ] : [
+      {
+        key: "raFull",
+        label: "RA full name (legacy order \u2014 split manually)",
+        value: raName.legacy
+      }
+    ],
+    ...addrFields("ra", ra.address),
+    {
+      key: "raSignature",
+      label: "Registered Agent Signature (must be an individual's name)",
+      // Our service signs through a person (Adam, 14 Sep 2026: "Caitlin
+      // Kirwan"); a client's own agent signs as they typed.
+      value: ra.choice === "SERVICE" ? RA_SERVICE_SIGNER : ra.acceptance?.electronicSignature ?? ra.acceptance?.acceptanceName ?? ""
+    }
+  ];
+}
+function conversionGroups(p2) {
+  const ra = p2.registeredAgent ?? {};
+  const series = p2.series ?? [];
+  const groups = [
+    {
+      title: "Filing information",
+      fields: [
+        {
+          key: "filingPath",
+          label: "Filing",
+          value: "Protected Series Designations for an existing Florida LLC \u2014 filed online at the Division, $25 each; no Articles filing fee. If the company appoints us as its registered agent, file a separate Statement of Change with a $25 state fee.",
+          statement: true,
+          block: true
+        },
+        { key: "existingName", label: "Existing entity name", value: p2.existingLlcName ?? "" },
+        { key: "sunbizDoc", label: "Existing document number", value: p2.sunbizDocumentNumber ?? "" },
+        {
+          key: "certStatus",
+          label: "Certificate of Status ($5.00)",
+          value: p2.optionalDocuments?.certificateOfStatus ? "Yes \u2014 add it to the designation filing (client paid for it)" : "No \u2014 leave unticked"
+        },
+        {
+          key: "certifiedCopy",
+          label: "Certified Copy ($30.00)",
+          value: p2.optionalDocuments?.certifiedCopy ? "Yes \u2014 order a certified copy of the company's Articles on file (client paid for it)" : "No \u2014 not ordered"
+        }
+      ]
+    },
+    {
+      title: `Protected Series Designations \u2014 file online, $25 each (${series.length})`,
+      fields: series.map((s, i) => ({
+        key: `series${i}`,
+        label: `Series ${i + 1}`,
+        value: s.name ?? ""
+      }))
+    }
+  ];
+  groups.push({
+    title: "Correspondence name and e-mail",
+    fields: [
+      { key: "corrName", label: "Name", value: p2.correspondence?.name ?? "" },
+      { key: "corrEmail", label: "E-mail address (entered twice)", value: p2.correspondence?.email ?? "" }
+    ]
+  });
+  if (ra.choice === "SERVICE") {
+    groups.push({ title: "Change of registered agent ($25) \u2014 Statement of Change", fields: raFields(ra) });
+  }
+  return groups.map((g) => ({ ...g, fields: g.fields.filter((f) => f.value !== "") })).filter((g) => g.fields.length > 0);
+}
+function filingGroups(payload, filingDay = easternToday()) {
+  const p2 = structuredClone(payload ?? {});
+  if (p2.management?.managersOrAuthorizedRepresentatives) p2.management.managersOrAuthorizedRepresentatives = p2.management.managersOrAuthorizedRepresentatives.map(selectedParty);
+  if (p2.members?.memberList) p2.members.memberList = p2.members.memberList.map(selectedParty);
+  if (p2.filingPath === "CONVERT") return conversionGroups(p2);
+  const ra = p2.registeredAgent ?? {};
+  const mgmt = p2.management ?? {};
+  const cert = p2.certifications ?? {};
+  const membersInfo = p2.members ?? {};
+  const groups = [];
+  groups.push({
+    title: "Filing information",
+    fields: [
+      {
+        key: "filingPath",
+        label: "Filing",
+        value: "New Florida LLC",
+        statement: true
+      },
+      {
+        key: "effectiveDate",
+        label: "Effective date",
+        value: p2.effectiveDate?.option === "SPECIFIC" ? validCalendarDate(p2.effectiveDate?.requestedEffectiveDate ?? "") ? closestEffectiveDate(p2.effectiveDate.requestedEffectiveDate, filingDay) : "Invalid requested date \u2014 do not file" : "Leave blank \u2014 effective on the date of filing",
+        // A requested date is a VALUE to enter on Sunbiz and keeps its copy
+        // button; the leave-blank default is only advice.
+        statement: p2.effectiveDate?.option !== "SPECIFIC"
+      },
+      ...p2.effectiveDate?.option === "SPECIFIC" ? [{ key: "effectiveDateCalculation", label: "Effective-date calculation", value: `Requested: ${p2.effectiveDate.requestedEffectiveDate}. Closest permitted date calculated for filing on ${filingDay} (Eastern). Refresh if filing on another day. Exact effective date is not guaranteed.`, statement: true, block: true }] : [],
+      { key: "filingFee", label: "Required filing fee", value: "$125.00", statement: true },
+      {
+        key: "certStatus",
+        label: "Certificate of Status ($5.00)",
+        value: p2.optionalDocuments?.certificateOfStatus ? "Yes \u2014 tick the box (client paid for it)" : "No \u2014 leave unticked"
+      },
+      {
+        key: "certifiedCopy",
+        label: "Certified Copy ($30.00)",
+        value: p2.optionalDocuments?.certifiedCopy ? "Yes \u2014 tick the box (client paid for it)" : "No \u2014 leave unticked"
+      }
+    ]
+  });
+  const alternates = (p2.llcName?.alternateNames ?? []).filter(
+    (n) => (n ?? "").trim() !== ""
+  );
+  groups.push({
+    title: "Company name",
+    fields: [
+      { key: "llcName", label: "Limited Liability Company Name", value: p2.llcName?.finalName ?? "" },
+      ...alternates.map((n, i) => ({
+        key: `altName${i + 1}`,
+        label: `Alternate name ${i + 1} (if the first choice is unavailable)`,
+        value: n.trim()
+      })),
+      ...p2.llcName?.exactNameOnly ? [
+        {
+          key: "exactNameOnly",
+          label: "If the name is unavailable",
+          value: "Client wants this EXACT name only \u2014 email the client before filing anything else",
+          block: true
+        }
+      ] : []
+    ]
+  });
+  groups.push({
+    title: "Principal place of business",
+    fields: addrFields("principal", p2.principalOfficeAddress)
+  });
+  groups.push({
+    title: "Mailing address",
+    fields: sameAddr(p2.mailingAddress, p2.principalOfficeAddress) ? [
+      {
+        key: "mailingSame",
+        label: "Mailing address",
+        value: 'Same as principal \u2014 tick "Mailing address same as principal address"'
+      }
+    ] : addrFields("mailing", p2.mailingAddress)
+  });
+  groups.push({ title: "Registered agent", fields: raFields(ra) });
+  const provisions = [];
+  if (mgmt.includeManagementStatementInArticles && mgmt.structure && MGMT_PROVISION[mgmt.structure]) {
+    provisions.push(MGMT_PROVISION[mgmt.structure]);
+  }
+  const purposeText = (p2.purpose?.businessPurposeText ?? "").trim();
+  if ((p2.purpose?.purposeType === "SPECIFIC" || p2.purpose?.purposeType === "PROFESSIONAL") && purposeText) {
+    provisions.push(purposeText);
+  }
+  groups.push({
+    title: "Any Other Provisions (optional box, 240 characters)",
+    fields: provisions.length === 0 ? [
+      {
+        key: "otherProvisions",
+        label: "Other provisions",
+        value: "Leave blank \u2014 the client chose a general purpose and no statement"
+      }
+    ] : [
+      ...provisions.map((text, i) => ({
+        key: `provision${i}`,
+        label: i === 0 && provisions.length > 1 ? "Paste both, this first" : "Paste into the box",
+        value: text,
+        block: true
+      })),
+      // The box takes 240 characters; say so before the paste fails.
+      ...provisions.join("\n\n").length > 240 ? [{ key: "provisionLength", label: "Length", value: `${provisions.join("\n\n").length} characters \u2014 over the Division's 240-character limit; shorten before pasting`, block: true }] : []
+    ]
+  });
+  groups.push({
+    title: "Correspondence name and e-mail",
+    fields: [
+      { key: "corrName", label: "Name", value: p2.correspondence?.name ?? "" },
+      { key: "corrEmail", label: "E-mail address (entered twice)", value: p2.correspondence?.email ?? "" },
+      // Not a Sunbiz field: where the client asked us to send paper.
+      ...p2.correspondence?.address?.address1 ? [{ key: "corrMailing", label: "Mailing address for paper correspondence (ours, not Sunbiz's)", value: [p2.correspondence.address.address1, p2.correspondence.address.address2, `${p2.correspondence.address.city}, ${p2.correspondence.address.state} ${p2.correspondence.address.zip}`].filter(Boolean).join(", ") }] : []
+    ]
+  });
+  groups.push({
+    title: "Electronic signature (member or authorized representative)",
+    fields: [
+      {
+        key: "signedBy",
+        label: "Articles signed by",
+        value: cert.articlesSignedBy === "SERVICE" ? "Our service, as authorized representative" : "The client's authorized representative"
+      },
+      {
+        key: "arName",
+        label: "Authorized representative",
+        value: cert.articlesSignedBy === "SERVICE" ? `${AR_SIGNER.name} \u2014 ${AR_SIGNER.title}, ${AR_SIGNER.company}` : [cert.authorizedRepresentativeName, cert.authorizedRepresentativeTitle].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(" \u2014 ")
+      },
+      {
+        key: "arSignature",
+        label: "Electronic Signature (type exactly)",
+        value: cert.articlesSignedBy === "SERVICE" ? AR_SIGNER.name : (cert.authorizedRepresentativeSignature ?? "").trim()
+      }
+    ]
+  });
+  const personFields = [
+    {
+      key: "structure",
+      label: "Management structure",
+      value: (mgmt.structure ? MANAGEMENT_LABEL[mgmt.structure] : void 0) ?? mgmt.structure ?? ""
+    }
+  ];
+  const people = mgmt.managersOrAuthorizedRepresentatives ?? [];
+  let slot = 0;
+  for (const m2 of people) {
+    const role = m2.role ?? "MGR";
+    if (role === "AR") {
+      personFields.push({
+        key: `person${slot}Ar`,
+        label: "Authorized representative",
+        // An individual is first/last/suffix, an entity its name — the same
+        // builder the manager rows use (13 Sep 2026: an individual printed
+        // with no name at all).
+        value: `${([personName(m2).first, personName(m2).last].filter(Boolean).join(" ") || personName(m2).legacy || m2.businessEntityName || "").trim()} \u2014 signs only, do NOT list in this section`,
+        block: true
+      });
+      slot++;
+      continue;
+    }
+    const entityName = (m2.businessEntityName ?? "").trim();
+    const isEntity = entityName !== "";
+    const nm = personName(m2);
+    personFields.push({ key: `person${slot}Title`, label: `Person ${slot + 1} \u2014 Title`, value: role });
+    if (isEntity) {
+      personFields.push({
+        key: `person${slot}Entity`,
+        label: `Person ${slot + 1} \u2014 Entity name`,
+        value: entityName
+      });
+    } else if (nm.last) {
+      personFields.push(
+        { key: `person${slot}Last`, label: `Person ${slot + 1} \u2014 Last name`, value: nm.last },
+        { key: `person${slot}First`, label: `Person ${slot + 1} \u2014 First name`, value: nm.first }
+      );
+    } else {
+      personFields.push({
+        key: `person${slot}Full`,
+        label: `Person ${slot + 1} \u2014 Full name (legacy order \u2014 split manually)`,
+        value: nm.legacy
+      });
+    }
+    personFields.push(...addrFields(`person${slot}`, personAddr(m2)));
+    slot++;
+  }
+  const memberList = membersInfo.memberList ?? [];
+  if (mgmt.structure === "MEMBER_MANAGED") {
+    for (const m2 of memberList) {
+      const entityName = (m2.entityName ?? m2.businessEntityName ?? "").trim();
+      const isEntity = entityName !== "" && (m2.memberType === "ENTITY" || !!(m2.businessEntityName ?? "").trim());
+      const nm = personName(m2);
+      personFields.push({ key: `person${slot}Title`, label: `Person ${slot + 1} \u2014 Title`, value: "AMBR" });
+      if (isEntity) {
+        personFields.push({
+          key: `person${slot}Entity`,
+          label: `Person ${slot + 1} \u2014 Entity name`,
+          value: entityName
+        });
+      } else if (nm.last) {
+        personFields.push(
+          { key: `person${slot}Last`, label: `Person ${slot + 1} \u2014 Last name`, value: nm.last },
+          { key: `person${slot}First`, label: `Person ${slot + 1} \u2014 First name`, value: nm.first }
+        );
+      } else {
+        personFields.push({
+          key: `person${slot}Full`,
+          label: `Person ${slot + 1} \u2014 Full name (legacy order \u2014 split manually)`,
+          value: nm.legacy
+        });
+      }
+      personFields.push(...addrFields(`person${slot}`, personAddr(m2)));
+      slot++;
+    }
+  }
+  groups.push({ title: "Persons authorized to manage (MGR / AMBR)", fields: personFields });
+  const series = p2.series ?? [];
+  groups.push({
+    title: `Protected series \u2014 filed separately after the Articles ($25 designation each) (${series.length})`,
+    series: true,
+    fields: series.map((s, i) => ({
+      key: `series${i}`,
+      label: `Series ${i + 1}`,
+      value: s.name ?? ""
+    }))
+  });
+  return groups.map((g) => ({ ...g, fields: g.fields.filter((f) => f.value !== "") })).filter((g) => g.fields.length > 0);
+}
+function seriesNames(payload) {
+  const series = payload?.series ?? [];
+  return series.map((s) => (s?.name ?? "").trim()).filter(Boolean);
+}
+
+// server/company-scope.ts
+init_db();
+async function associateLegacyServices(clientId) {
+  const db = await getDb();
+  await db.query(`UPDATE service_orders s SET formation_order_id = o.id
+    FROM orders o WHERE s.client_id = $1 AND s.formation_order_id IS NULL
+      AND o.client_id = s.client_id AND o.paid_at IS NOT NULL
+      AND lower(trim(o.llc_name)) = lower(trim(s.llc_name))
+      AND (SELECT count(*) FROM orders other WHERE other.client_id = s.client_id
+        AND other.paid_at IS NOT NULL AND lower(trim(other.llc_name)) = lower(trim(s.llc_name))) = 1`, [clientId]);
+}
+async function serviceCompanyId(serviceId, clientId) {
+  await associateLegacyServices(clientId);
+  const db = await getDb();
+  const rows = await db.query(`SELECT o.id FROM service_orders s JOIN orders o
+    ON o.id = s.formation_order_id AND o.client_id = s.client_id
+    WHERE s.id = $1 AND s.client_id = $2 AND o.paid_at IS NOT NULL`, [serviceId, clientId]);
+  return rows[0]?.id ?? null;
+}
+
 // server/office-notifications.ts
 var fmtDate = (s) => s ? (/* @__PURE__ */ new Date(s + "T12:00:00Z")).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }) : "date not recorded";
 var escape = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-async function notifyLegalMail(id) {
+async function notifyDocument(id) {
   const db = await getDb();
   const [d2] = await db.query(`WITH locked AS (
  UPDATE documents SET notice_status='sending',notice_lock_until=now()+interval '2 minutes'
- WHERE id=$1 AND kind='legal_mail' AND deleted_at IS NULL AND (notice_lock_until IS NULL OR notice_lock_until<now()) RETURNING *)
+ WHERE id=$1 AND (kind='legal_mail' OR meta->>'noticeKind' IN ('document','formation')) AND deleted_at IS NULL AND (notice_lock_until IS NULL OR notice_lock_until<now()) RETURNING *)
  SELECT locked.*,c.name,c.email FROM locked JOIN clients c ON c.id=locked.client_id`, [id]);
   if (!d2) return false;
   try {
-    await sendMail({ to: d2.email, ...legalMailEmail({ clientName: d2.name, title: d2.title, receivedOn: fmtDate(d2.meta?.receivedOn || ""), portalUrl: env.PUBLIC_BASE_URL + "/portal" }) });
+    const portalUrl = env.PUBLIC_BASE_URL + "/portal";
+    let mail = d2.kind === "legal_mail" ? legalMailEmail({ clientName: d2.name, title: d2.title, receivedOn: fmtDate(d2.meta?.receivedOn || ""), portalUrl }) : newDocumentEmail(portalUrl);
+    if (d2.meta?.noticeKind === "formation") {
+      const [order2] = await db.query("SELECT llc_name,payload FROM orders WHERE id=$1 AND client_id=$2", [d2.order_id, d2.client_id]);
+      if (!order2) throw new Error("Formation order is unavailable");
+      const payload = typeof order2.payload === "string" ? JSON.parse(order2.payload) : order2.payload;
+      const docs = await db.query("SELECT kind FROM documents WHERE order_id=$1 AND deleted_at IS NULL", [d2.order_id]);
+      await associateLegacyServices(d2.client_id);
+      const services = await db.query("SELECT type,status,details FROM service_orders WHERE client_id=$1 AND formation_order_id=$2 AND type IN ('ein','s-election') AND status IN ('awaiting_info','in_progress')", [d2.client_id, d2.order_id]);
+      mail = llcFormedEmail({
+        clientName: d2.name,
+        llcName: order2.llc_name,
+        isConversion: payload?.filingPath === "CONVERT",
+        seriesNames: seriesNames(payload),
+        portalUrl,
+        otherDocuments: [...docs.some((x2) => x2.kind === "statement") ? ["Statement of Authorized Representative"] : [], ...docs.some((x2) => x2.kind === "certificate-of-status") ? ["Certificate of Status"] : [], ...docs.some((x2) => x2.kind === "certified-copy") ? ["Certified Copy of the Articles"] : []],
+        outstandingServices: services.map((s) => {
+          const detail = typeof s.details === "string" ? JSON.parse(s.details) : s.details;
+          return { type: s.type, status: s.status, ...s.type === "ein" && detail?.target === "series" && detail.seriesName ? { seriesName: detail.seriesName } : {} };
+        })
+      });
+    }
+    await sendMail({ to: d2.email, ...mail });
     await db.query("UPDATE documents SET notice_status='sent',notice_sent_at=now(),notice_error=NULL,notice_recipient=$2,notice_lock_until=NULL WHERE id=$1", [id, d2.email]);
     return true;
   } catch (e) {
@@ -99994,55 +100457,6 @@ var ARTICLES = /* @__PURE__ */ new Set(["THE", "A", "AN"]);
 function normalizeEntityName(name) {
   const tokens = name.toUpperCase().replace(/&/g, " AND ").replace(/['\u2019]/g, "").replace(/[^A-Z0-9 ]+/g, " ").split(/\s+/).filter(Boolean).filter((t) => !SUFFIXES.has(t) && !ARTICLES.has(t) && t !== "AND").map((t) => t.length > 3 && t.endsWith("S") ? t.slice(0, -1) : t);
   return tokens.join(" ");
-}
-
-// src/lib/calendar.ts
-var EASTERN_ZONE = "America/New_York";
-function easternToday(now = /* @__PURE__ */ new Date()) {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: EASTERN_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
-}
-function validCalendarDate(iso) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso) || iso.slice(0, 4) === "0000") return false;
-  const d2 = /* @__PURE__ */ new Date(`${iso}T12:00:00Z`);
-  return Number.isFinite(d2.getTime()) && d2.toISOString().slice(0, 10) === iso;
-}
-function shiftCalendarDay(iso, days) {
-  const d2 = /* @__PURE__ */ new Date(`${iso}T12:00:00Z`);
-  d2.setUTCDate(d2.getUTCDate() + days);
-  return d2.toISOString().slice(0, 10);
-}
-function weekday(iso) {
-  return (/* @__PURE__ */ new Date(`${iso}T12:00:00Z`)).getUTCDay();
-}
-function nthMonday(year, month, n) {
-  const first = `${year}-${month}-01`;
-  return shiftCalendarDay(first, (8 - weekday(first)) % 7 + 7 * (n - 1));
-}
-function isBankingDay(iso) {
-  if (!validCalendarDate(iso) || [0, 6].includes(weekday(iso))) return false;
-  const y = iso.slice(0, 4);
-  const fixed = ["01-01", "06-19", "07-04", "11-11", "12-25"].map((md) => `${y}-${md}`);
-  const memorial = shiftCalendarDay(`${y}-05-31`, -((weekday(`${y}-05-31`) + 6) % 7));
-  const thanksgiving = shiftCalendarDay(`${y}-11-01`, (11 - weekday(`${y}-11-01`)) % 7 + 21);
-  const holidays = [...fixed.flatMap((d2) => weekday(d2) === 0 ? [d2, shiftCalendarDay(d2, 1)] : [d2]), nthMonday(y, "01", 3), nthMonday(y, "02", 3), memorial, nthMonday(y, "09", 1), nthMonday(y, "10", 2), thanksgiving];
-  return !holidays.includes(iso);
-}
-function shiftBankingDays(iso, count) {
-  let d2 = iso;
-  for (let moved = 0; moved < Math.abs(count); ) {
-    d2 = shiftCalendarDay(d2, count < 0 ? -1 : 1);
-    if (isBankingDay(d2)) moved++;
-  }
-  return d2;
-}
-function effectiveDateRange(filingDay) {
-  if (!validCalendarDate(filingDay)) throw new Error("Invalid filing date.");
-  return { earliest: shiftBankingDays(filingDay, -5), latest: shiftCalendarDay(filingDay, 90) };
-}
-function closestEffectiveDate(requested, filingDay) {
-  if (!validCalendarDate(requested)) throw new Error("Invalid requested effective date.");
-  const { earliest, latest } = effectiveDateRange(filingDay);
-  return requested < earliest ? earliest : requested > latest ? latest : requested;
 }
 
 // src/components/forms/florida-llc/addressValidation.ts
@@ -100372,6 +100786,7 @@ var AGENT_RESIDENCY = "I live in Florida, and the Florida street address entered
 var AGENT_EXISTING_RECORD = "This is the registered agent, and the Florida street address, that the Division has on file for my LLC. This order does not change it.";
 var AGENT_ACCEPTANCE = "I accept the appointment as registered agent for this Florida LLC, and I am familiar with and accept the obligations of that position.";
 var AGENT_SERIES_AGREEMENT = "I confirm that the company\u2019s registered agent has agreed to serve as registered agent for the company and each of its protected series, including every protected series in this order.";
+var AGENT_PERSONAL_SERIES_AGREEMENT = "I agree to serve as registered agent for the company and each of its protected series, including every protected series in this order.";
 function personalAgentMatches(data) {
   return data.registeredAgentType === "INDIVIDUAL" && registeredAgentName(data).toLowerCase() === fullPersonName(data.clientFirstName, data.clientLastName, data.clientSuffix).toLowerCase();
 }
@@ -100758,14 +101173,6 @@ var orderFormSchema = external_exports.preprocess((raw2) => {
   }
   return raw2;
 }, extendedFormSchema);
-
-// src/lib/partyIdentity.ts
-function selectedParty(party) {
-  const kind = party.memberType ?? party.personOrEntity;
-  if (kind === "ENTITY") return { ...party, firstName: "", lastName: "", suffix: "", fullName: "", fullLegalName: "" };
-  if (kind === "INDIVIDUAL") return { ...party, entityName: "", businessEntityName: "" };
-  return { ...party };
-}
 
 // src/components/forms/florida-llc/buildPayload.ts
 function selectedFormData(source) {
@@ -101766,7 +102173,7 @@ All eight share the same skeleton through Article 9. From there the multi-owner 
 | **Article 1** | The company: name, principal office, registered agent, and the rule that an asset belongs to a series only through the records Article 8 requires |
 | **Article 2** | The defined terms \u2014 Associated Asset, Protected Series, Series Exhibit, Majority in Interest, and the rest |
 | **Article 3** | The series engine: how series are established (unanimous consent under Section 3.1, retaining the statutory default), their legal status, the liability shields in both directions, and the rule that Series Exhibits control series-specific terms |
-| **Article 4** | The owners: membership interests as simple percentages, the rule that no owner holds any series directly, voting (multi-owner), the transfer-on-death designation (Section 23), and \u2014 in the multi-owner forms \u2014 the member duties that power the bankruptcy protections |
+| **Article 4** | The owners: membership interests as percentages or fractions of the whole, the rule that no owner holds any series directly, voting (multi-owner), the transfer-on-death designation (Section 23), and \u2014 in the multi-owner forms \u2014 the member duties that power the bankruptcy protections |
 | **Article 5** | Management. In the **manager-managed** forms, the Manager runs the company and every series. In the **member-managed** forms there is no separate company manager: the owners run the company by majority of ownership and \u2014 as s. 605.2107(1)(n) permits \u2014 are themselves named each series' protected-series managers (with one owner, that is you), and one owner may be designated **Administrative Member** to handle filings, records, and returns (a paperwork role with any additional authority expressly granted by the agreement or by owners holding a Majority in Interest). Every multi-owner form lists the big decisions that need an owner vote \u2014 including **moving any asset between silos** |
 | **Articles 6\u20137** | Money: contributions (always made *to a specific silo* and recorded), capital accounts (multi-member partnership forms only; contribution records elsewhere), distributions \u2014 always **from a series' own assets, and by a series only to the company that owns it** |
 | **Article 8** | The recordkeeping covenants (this manual's Section 14 is its field guide) and the standing association rules in Section 8.5 \u2014 and the holding rule (\xA78.4): hold assets in the owning company's or series' name, or through a properly documented nominee arrangement under Section 8.4 \u2014 not simply in your personal name |
@@ -102221,26 +102628,6 @@ async function publish(force) {
 // server/routes-portal.ts
 init_document_retention();
 init_storage();
-
-// server/company-scope.ts
-init_db();
-async function associateLegacyServices(clientId) {
-  const db = await getDb();
-  await db.query(`UPDATE service_orders s SET formation_order_id = o.id
-    FROM orders o WHERE s.client_id = $1 AND s.formation_order_id IS NULL
-      AND o.client_id = s.client_id AND o.paid_at IS NOT NULL
-      AND lower(trim(o.llc_name)) = lower(trim(s.llc_name))
-      AND (SELECT count(*) FROM orders other WHERE other.client_id = s.client_id
-        AND other.paid_at IS NOT NULL AND lower(trim(other.llc_name)) = lower(trim(s.llc_name))) = 1`, [clientId]);
-}
-async function serviceCompanyId(serviceId, clientId) {
-  await associateLegacyServices(clientId);
-  const db = await getDb();
-  const rows = await db.query(`SELECT o.id FROM service_orders s JOIN orders o
-    ON o.id = s.formation_order_id AND o.client_id = s.client_id
-    WHERE s.id = $1 AND s.client_id = $2 AND o.paid_at IS NOT NULL`, [serviceId, clientId]);
-  return rows[0]?.id ?? null;
-}
 
 // src/lib/oaContributors.ts
 function contributorUnits(owners, couples) {
@@ -107293,357 +107680,6 @@ function assembleAmendment(oa, am) {
 // server/routes-portal.ts
 init_pdf_render();
 init_storage();
-
-// server/filing.ts
-var oneLine = (a2) => !a2 ? "" : [a2.address1, a2.address2, [a2.city, a2.state].filter(Boolean).join(", "), a2.zip].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(", ");
-var addrFields = (prefix, a2) => !a2 ? [] : [
-  { key: `${prefix}Street`, label: "Street address", value: (a2.address1 ?? "").trim() },
-  { key: `${prefix}Suite`, label: "Suite, Apt. #, etc.", value: (a2.address2 ?? "").trim() },
-  { key: `${prefix}City`, label: "City", value: (a2.city ?? "").trim() },
-  { key: `${prefix}State`, label: "State", value: (a2.state ?? "").trim() },
-  { key: `${prefix}Zip`, label: "Zip code", value: (a2.zip ?? "").trim() }
-];
-var personName = (m2) => {
-  const last2 = (m2?.lastName ?? "").trim();
-  const suffix = (m2?.suffix ?? "").trim().replace(/^,\s*/, "");
-  return {
-    first: (m2?.firstName ?? "").trim(),
-    last: last2 && suffix ? `${last2}, ${suffix}` : last2,
-    legacy: (m2?.fullLegalName ?? m2?.fullName ?? m2?.name ?? "").trim()
-  };
-};
-var personAddr = (m2) => ({
-  address1: m2?.streetAddress1 ?? m2?.address1,
-  address2: m2?.streetAddress2 ?? m2?.address2,
-  city: m2?.city,
-  state: m2?.state,
-  zip: m2?.zip
-});
-var sameAddr = (a2, b2) => oneLine(a2) !== "" && oneLine(a2) === oneLine(b2);
-var MANAGEMENT_LABEL = {
-  MEMBER_MANAGED: "Member-managed",
-  MANAGER_MANAGED: "Manager-managed"
-};
-var MGMT_PROVISION = {
-  MANAGER_MANAGED: "Pursuant to Florida Statutes Section 605.0407, the company is or will be manager-managed."
-};
-var RA_SERVICE_SIGNER = "Caitlin Kirwan";
-var AR_SIGNER = { name: "Caitlin Kirwan", title: "Manager", company: "FLORIDA PROTECTED SERIES, LLC - PS 1" };
-function raFields(ra) {
-  const raIsBusiness = (ra.businessEntityName ?? "").trim() !== "";
-  const raName = personName(ra);
-  return [
-    {
-      key: "raChoice",
-      label: "Agent",
-      value: ra.choice === "SERVICE" ? "Our registered agent service" : "Client's own agent"
-    },
-    ...raIsBusiness ? [
-      {
-        key: "raBusiness",
-        label: "Business to serve as RA",
-        value: (ra.businessEntityName ?? "").trim()
-      }
-    ] : raName.last ? [
-      { key: "raLast", label: "RA last name", value: raName.last },
-      { key: "raFirst", label: "RA first name", value: raName.first }
-    ] : [
-      {
-        key: "raFull",
-        label: "RA full name (legacy order \u2014 split manually)",
-        value: raName.legacy
-      }
-    ],
-    ...addrFields("ra", ra.address),
-    {
-      key: "raSignature",
-      label: "Registered Agent Signature (must be an individual's name)",
-      // Our service signs through a person (Adam, 14 Sep 2026: "Caitlin
-      // Kirwan"); a client's own agent signs as they typed.
-      value: ra.choice === "SERVICE" ? RA_SERVICE_SIGNER : ra.acceptance?.electronicSignature ?? ra.acceptance?.acceptanceName ?? ""
-    }
-  ];
-}
-function conversionGroups(p2) {
-  const ra = p2.registeredAgent ?? {};
-  const series = p2.series ?? [];
-  const groups = [
-    {
-      title: "Filing information",
-      fields: [
-        {
-          key: "filingPath",
-          label: "Filing",
-          value: "Protected Series Designations for an existing Florida LLC \u2014 filed online at the Division, $25 each; no Articles filing fee. If the company appoints us as its registered agent, file a separate Statement of Change with a $25 state fee.",
-          statement: true,
-          block: true
-        },
-        { key: "existingName", label: "Existing entity name", value: p2.existingLlcName ?? "" },
-        { key: "sunbizDoc", label: "Existing document number", value: p2.sunbizDocumentNumber ?? "" },
-        {
-          key: "certStatus",
-          label: "Certificate of Status ($5.00)",
-          value: p2.optionalDocuments?.certificateOfStatus ? "Yes \u2014 add it to the designation filing (client paid for it)" : "No \u2014 leave unticked"
-        },
-        {
-          key: "certifiedCopy",
-          label: "Certified Copy ($30.00)",
-          value: p2.optionalDocuments?.certifiedCopy ? "Yes \u2014 order a certified copy of the company's Articles on file (client paid for it)" : "No \u2014 not ordered"
-        }
-      ]
-    },
-    {
-      title: `Protected Series Designations \u2014 file online, $25 each (${series.length})`,
-      fields: series.map((s, i) => ({
-        key: `series${i}`,
-        label: `Series ${i + 1}`,
-        value: s.name ?? ""
-      }))
-    }
-  ];
-  groups.push({
-    title: "Correspondence name and e-mail",
-    fields: [
-      { key: "corrName", label: "Name", value: p2.correspondence?.name ?? "" },
-      { key: "corrEmail", label: "E-mail address (entered twice)", value: p2.correspondence?.email ?? "" }
-    ]
-  });
-  if (ra.choice === "SERVICE") {
-    groups.push({ title: "Change of registered agent ($25) \u2014 Statement of Change", fields: raFields(ra) });
-  }
-  return groups.map((g) => ({ ...g, fields: g.fields.filter((f) => f.value !== "") })).filter((g) => g.fields.length > 0);
-}
-function filingGroups(payload, filingDay = easternToday()) {
-  const p2 = structuredClone(payload ?? {});
-  if (p2.management?.managersOrAuthorizedRepresentatives) p2.management.managersOrAuthorizedRepresentatives = p2.management.managersOrAuthorizedRepresentatives.map(selectedParty);
-  if (p2.members?.memberList) p2.members.memberList = p2.members.memberList.map(selectedParty);
-  if (p2.filingPath === "CONVERT") return conversionGroups(p2);
-  const ra = p2.registeredAgent ?? {};
-  const mgmt = p2.management ?? {};
-  const cert = p2.certifications ?? {};
-  const membersInfo = p2.members ?? {};
-  const groups = [];
-  groups.push({
-    title: "Filing information",
-    fields: [
-      {
-        key: "filingPath",
-        label: "Filing",
-        value: "New Florida LLC",
-        statement: true
-      },
-      {
-        key: "effectiveDate",
-        label: "Effective date",
-        value: p2.effectiveDate?.option === "SPECIFIC" ? validCalendarDate(p2.effectiveDate?.requestedEffectiveDate ?? "") ? closestEffectiveDate(p2.effectiveDate.requestedEffectiveDate, filingDay) : "Invalid requested date \u2014 do not file" : "Leave blank \u2014 effective on the date of filing",
-        // A requested date is a VALUE to enter on Sunbiz and keeps its copy
-        // button; the leave-blank default is only advice.
-        statement: p2.effectiveDate?.option !== "SPECIFIC"
-      },
-      ...p2.effectiveDate?.option === "SPECIFIC" ? [{ key: "effectiveDateCalculation", label: "Effective-date calculation", value: `Requested: ${p2.effectiveDate.requestedEffectiveDate}. Closest permitted date calculated for filing on ${filingDay} (Eastern). Refresh if filing on another day. Exact effective date is not guaranteed.`, statement: true, block: true }] : [],
-      { key: "filingFee", label: "Required filing fee", value: "$125.00", statement: true },
-      {
-        key: "certStatus",
-        label: "Certificate of Status ($5.00)",
-        value: p2.optionalDocuments?.certificateOfStatus ? "Yes \u2014 tick the box (client paid for it)" : "No \u2014 leave unticked"
-      },
-      {
-        key: "certifiedCopy",
-        label: "Certified Copy ($30.00)",
-        value: p2.optionalDocuments?.certifiedCopy ? "Yes \u2014 tick the box (client paid for it)" : "No \u2014 leave unticked"
-      }
-    ]
-  });
-  const alternates = (p2.llcName?.alternateNames ?? []).filter(
-    (n) => (n ?? "").trim() !== ""
-  );
-  groups.push({
-    title: "Company name",
-    fields: [
-      { key: "llcName", label: "Limited Liability Company Name", value: p2.llcName?.finalName ?? "" },
-      ...alternates.map((n, i) => ({
-        key: `altName${i + 1}`,
-        label: `Alternate name ${i + 1} (if the first choice is unavailable)`,
-        value: n.trim()
-      })),
-      ...p2.llcName?.exactNameOnly ? [
-        {
-          key: "exactNameOnly",
-          label: "If the name is unavailable",
-          value: "Client wants this EXACT name only \u2014 email the client before filing anything else",
-          block: true
-        }
-      ] : []
-    ]
-  });
-  groups.push({
-    title: "Principal place of business",
-    fields: addrFields("principal", p2.principalOfficeAddress)
-  });
-  groups.push({
-    title: "Mailing address",
-    fields: sameAddr(p2.mailingAddress, p2.principalOfficeAddress) ? [
-      {
-        key: "mailingSame",
-        label: "Mailing address",
-        value: 'Same as principal \u2014 tick "Mailing address same as principal address"'
-      }
-    ] : addrFields("mailing", p2.mailingAddress)
-  });
-  groups.push({ title: "Registered agent", fields: raFields(ra) });
-  const provisions = [];
-  if (mgmt.includeManagementStatementInArticles && mgmt.structure && MGMT_PROVISION[mgmt.structure]) {
-    provisions.push(MGMT_PROVISION[mgmt.structure]);
-  }
-  const purposeText = (p2.purpose?.businessPurposeText ?? "").trim();
-  if ((p2.purpose?.purposeType === "SPECIFIC" || p2.purpose?.purposeType === "PROFESSIONAL") && purposeText) {
-    provisions.push(purposeText);
-  }
-  groups.push({
-    title: "Any Other Provisions (optional box, 240 characters)",
-    fields: provisions.length === 0 ? [
-      {
-        key: "otherProvisions",
-        label: "Other provisions",
-        value: "Leave blank \u2014 the client chose a general purpose and no statement"
-      }
-    ] : [
-      ...provisions.map((text, i) => ({
-        key: `provision${i}`,
-        label: i === 0 && provisions.length > 1 ? "Paste both, this first" : "Paste into the box",
-        value: text,
-        block: true
-      })),
-      // The box takes 240 characters; say so before the paste fails.
-      ...provisions.join("\n\n").length > 240 ? [{ key: "provisionLength", label: "Length", value: `${provisions.join("\n\n").length} characters \u2014 over the Division's 240-character limit; shorten before pasting`, block: true }] : []
-    ]
-  });
-  groups.push({
-    title: "Correspondence name and e-mail",
-    fields: [
-      { key: "corrName", label: "Name", value: p2.correspondence?.name ?? "" },
-      { key: "corrEmail", label: "E-mail address (entered twice)", value: p2.correspondence?.email ?? "" },
-      // Not a Sunbiz field: where the client asked us to send paper.
-      ...p2.correspondence?.address?.address1 ? [{ key: "corrMailing", label: "Mailing address for paper correspondence (ours, not Sunbiz's)", value: [p2.correspondence.address.address1, p2.correspondence.address.address2, `${p2.correspondence.address.city}, ${p2.correspondence.address.state} ${p2.correspondence.address.zip}`].filter(Boolean).join(", ") }] : []
-    ]
-  });
-  groups.push({
-    title: "Electronic signature (member or authorized representative)",
-    fields: [
-      {
-        key: "signedBy",
-        label: "Articles signed by",
-        value: cert.articlesSignedBy === "SERVICE" ? "Our service, as authorized representative" : "The client's authorized representative"
-      },
-      {
-        key: "arName",
-        label: "Authorized representative",
-        value: cert.articlesSignedBy === "SERVICE" ? `${AR_SIGNER.name} \u2014 ${AR_SIGNER.title}, ${AR_SIGNER.company}` : [cert.authorizedRepresentativeName, cert.authorizedRepresentativeTitle].map((x2) => (x2 ?? "").trim()).filter(Boolean).join(" \u2014 ")
-      },
-      {
-        key: "arSignature",
-        label: "Electronic Signature (type exactly)",
-        value: cert.articlesSignedBy === "SERVICE" ? AR_SIGNER.name : (cert.authorizedRepresentativeSignature ?? "").trim()
-      }
-    ]
-  });
-  const personFields = [
-    {
-      key: "structure",
-      label: "Management structure",
-      value: (mgmt.structure ? MANAGEMENT_LABEL[mgmt.structure] : void 0) ?? mgmt.structure ?? ""
-    }
-  ];
-  const people = mgmt.managersOrAuthorizedRepresentatives ?? [];
-  let slot = 0;
-  for (const m2 of people) {
-    const role = m2.role ?? "MGR";
-    if (role === "AR") {
-      personFields.push({
-        key: `person${slot}Ar`,
-        label: "Authorized representative",
-        // An individual is first/last/suffix, an entity its name — the same
-        // builder the manager rows use (13 Sep 2026: an individual printed
-        // with no name at all).
-        value: `${([personName(m2).first, personName(m2).last].filter(Boolean).join(" ") || personName(m2).legacy || m2.businessEntityName || "").trim()} \u2014 signs only, do NOT list in this section`,
-        block: true
-      });
-      slot++;
-      continue;
-    }
-    const entityName = (m2.businessEntityName ?? "").trim();
-    const isEntity = entityName !== "";
-    const nm = personName(m2);
-    personFields.push({ key: `person${slot}Title`, label: `Person ${slot + 1} \u2014 Title`, value: role });
-    if (isEntity) {
-      personFields.push({
-        key: `person${slot}Entity`,
-        label: `Person ${slot + 1} \u2014 Entity name`,
-        value: entityName
-      });
-    } else if (nm.last) {
-      personFields.push(
-        { key: `person${slot}Last`, label: `Person ${slot + 1} \u2014 Last name`, value: nm.last },
-        { key: `person${slot}First`, label: `Person ${slot + 1} \u2014 First name`, value: nm.first }
-      );
-    } else {
-      personFields.push({
-        key: `person${slot}Full`,
-        label: `Person ${slot + 1} \u2014 Full name (legacy order \u2014 split manually)`,
-        value: nm.legacy
-      });
-    }
-    personFields.push(...addrFields(`person${slot}`, personAddr(m2)));
-    slot++;
-  }
-  const memberList = membersInfo.memberList ?? [];
-  if (mgmt.structure === "MEMBER_MANAGED") {
-    for (const m2 of memberList) {
-      const entityName = (m2.entityName ?? m2.businessEntityName ?? "").trim();
-      const isEntity = entityName !== "" && (m2.memberType === "ENTITY" || !!(m2.businessEntityName ?? "").trim());
-      const nm = personName(m2);
-      personFields.push({ key: `person${slot}Title`, label: `Person ${slot + 1} \u2014 Title`, value: "AMBR" });
-      if (isEntity) {
-        personFields.push({
-          key: `person${slot}Entity`,
-          label: `Person ${slot + 1} \u2014 Entity name`,
-          value: entityName
-        });
-      } else if (nm.last) {
-        personFields.push(
-          { key: `person${slot}Last`, label: `Person ${slot + 1} \u2014 Last name`, value: nm.last },
-          { key: `person${slot}First`, label: `Person ${slot + 1} \u2014 First name`, value: nm.first }
-        );
-      } else {
-        personFields.push({
-          key: `person${slot}Full`,
-          label: `Person ${slot + 1} \u2014 Full name (legacy order \u2014 split manually)`,
-          value: nm.legacy
-        });
-      }
-      personFields.push(...addrFields(`person${slot}`, personAddr(m2)));
-      slot++;
-    }
-  }
-  groups.push({ title: "Persons authorized to manage (MGR / AMBR)", fields: personFields });
-  const series = p2.series ?? [];
-  groups.push({
-    title: `Protected series \u2014 filed separately after the Articles ($25 designation each) (${series.length})`,
-    series: true,
-    fields: series.map((s, i) => ({
-      key: `series${i}`,
-      label: `Series ${i + 1}`,
-      value: s.name ?? ""
-    }))
-  });
-  return groups.map((g) => ({ ...g, fields: g.fields.filter((f) => f.value !== "") })).filter((g) => g.fields.length > 0);
-}
-function seriesNames(payload) {
-  const series = payload?.series ?? [];
-  return series.map((s) => (s?.name ?? "").trim()).filter(Boolean);
-}
-
-// server/routes-portal.ts
 var loginSchema = external_exports.object({ email: external_exports.string().email(), password: external_exports.string().min(1) });
 async function oaSeed(clientId, orderId) {
   const db = await getDb();
@@ -108289,7 +108325,7 @@ function registerPortalRoutes(app2) {
     const rows = await db.query(
       `SELECT id, llc_name, formed_at, payload->>'filingPath' AS filing_path,
             (payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
-            ra_renewal_date, COALESCE(ra_cancellation_renewal_date,ra_renewal_date) AS cancellation_date, ra_cancellation_requested_at, ra_appointment_date,ra_resignation_due,ra_resignation_submitted,ra_ended_date,card_note,
+            ra_renewal_date, COALESCE(ra_cancellation_renewal_date,ra_renewal_date) AS cancellation_date, ra_cancellation_requested_at, ra_appointment_date,ra_resignation_due,ra_resignation_submitted,ra_resignation_filed,ra_ended_date,card_note,
             card_status, card_last4, card_brand,
             -- The renewals, newest first (16 Sep 2026).
             (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', r.id, 'purpose',r.purpose,'linkUrl',r.link_url,'date', r.renewal_date, 'amountCents', r.amount_cents, 'status', r.status, 'chargedAt', r.charged_at) ORDER BY r.renewal_date DESC), '[]'::jsonb)
@@ -108306,6 +108342,7 @@ function registerPortalRoutes(app2) {
       raAppointmentDate: r.ra_appointment_date ? isoDate(r.ra_appointment_date) : null,
       raResignationDue: r.ra_resignation_due ? isoDate(r.ra_resignation_due) : null,
       raResignationSubmitted: r.ra_resignation_submitted ? isoDate(r.ra_resignation_submitted) : null,
+      raResignationFiled: r.ra_resignation_filed ? isoDate(r.ra_resignation_filed) : null,
       raEndedDate: r.ra_ended_date ? isoDate(r.ra_ended_date) : null,
       cardNote: r.card_note,
       raRenewalDate: r.ra_renewal_date ? isoDate(r.ra_renewal_date) : null,
@@ -108410,6 +108447,9 @@ function registerPortalRoutes(app2) {
     });
   });
   function answersProblem(error2) {
+    if (error2.issues.some((issue) => issue.code === "too_big" && issue.path.length === 1 && issue.path[0] === "members")) {
+      return `The operating agreement supports up to ${MAX_OA_OWNERS} owners. Remove an owner before saving.`;
+    }
     const first = error2.issues[0];
     return first?.code === "custom" && first.message ? first.message : "Please check your answers.";
   }
@@ -109712,7 +109752,7 @@ var ACKNOWLEDGMENTS = [
   { field: "registeredAgentPhysicalAddressAcknowledgment", text: "I confirm this is my physical street address in Florida and not a P.O. Box.", when: (p2) => p2.metadata?.formVersion !== AGENT_FORM_VERSION },
   { field: "registeredAgentResidencyAcknowledgment", text: AGENT_RESIDENCY },
   { field: "registeredAgentExistingRecordAcknowledgment", text: AGENT_EXISTING_RECORD },
-  { field: "registeredAgentSeriesAgreementAcknowledgment", text: AGENT_SERIES_AGREEMENT },
+  { field: "registeredAgentSeriesAgreementAcknowledgment", text: (p2) => p2.metadata?.formVersion === AGENT_FORM_VERSION && p2.filingPath !== "CONVERT" && p2.registeredAgent?.choice === "SELF" ? AGENT_PERSONAL_SERIES_AGREEMENT : AGENT_SERIES_AGREEMENT },
   { field: "registeredAgentAcceptanceCheckbox", text: (p2) => p2.metadata?.formVersion === AGENT_FORM_VERSION ? AGENT_ACCEPTANCE : "I accept the appointment and acknowledge the obligations of serving as registered agent for this Florida LLC." },
   { field: "registeredAgentSignatureAuthorizationCheckbox", text: "I certify that I am signing for myself as the registered agent." },
   { field: "articlesSignerAppointed", text: "I appoint MyFloridaSeriesLLC as my authorized representative to sign and file my Articles of Organization, and I certify that the information I have provided is true, accurate, and complete." },
@@ -113092,27 +113132,21 @@ function registerAdminRoutes(app2) {
     }
     if (files.length === 0) return c.json(err("Choose a certificate file to upload.", "INVALID_INPUT"), 400);
     const uploaded = [];
+    const uploadedIds = [];
     for (const cf of files) {
       const stored = await putFile(cf.file.name, await cf.file.arrayBuffer(), cf.file.type || "application/pdf");
-      await db.query(
+      const inserted = await db.query(
         `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, '{"source":"card"}'::jsonb)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, '{"source":"card"}'::jsonb) RETURNING id`,
         [o.client_id, o.id, cf.kind, cf.title, stored.storageKey, cf.file.type || "application/pdf", stored.sizeBytes]
       );
       uploaded.push(cf.kind);
+      uploadedIds.push(inserted[0].id);
     }
     let notified = false;
     if (notify) {
-      const clients = await db.query("SELECT email FROM clients WHERE id = $1", [o.client_id]);
-      if (clients[0]) {
-        const mail = newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
-        try {
-          await sendMail({ to: clients[0].email, ...mail });
-          notified = true;
-        } catch (e) {
-          console.error("[admin] certificate email failed:", e);
-        }
-      }
+      await db.query(`UPDATE documents SET meta=meta || '{"noticeKind":"document"}'::jsonb,notice_status='pending' WHERE id=$1`, [uploadedIds[0]]);
+      notified = await notifyDocument(uploadedIds[0]);
     }
     return c.json({ data: { uploaded, notified } });
   });
@@ -113312,47 +113346,9 @@ function registerAdminRoutes(app2) {
         raService ? "UPDATE orders SET status = 'formed', formed_at = COALESCE(formed_at,now()), ra_renewal_date = COALESCE(ra_renewal_date,$2::date) WHERE id = $1" : "UPDATE orders SET status = 'formed', formed_at = COALESCE(formed_at,now()) WHERE id = $1",
         raService ? [o.id, agentAppointment ? addYears(isoOf(agentAppointment), 1) : null] : [o.id]
       );
-      const clients = await db.query(
-        "SELECT email, name FROM clients WHERE id = $1",
-        [o.client_id]
-      );
-      let notified = false;
-      if (clients.length > 0) {
-        const certDocs = await db.query(
-          "SELECT kind FROM documents WHERE order_id = $1 AND kind IN ('certificate-of-status', 'certified-copy')",
-          [o.id]
-        );
-        await associateLegacyServices(o.client_id);
-        const openSvc = await db.query(
-          `SELECT type, status, details FROM service_orders WHERE client_id = $1 AND formation_order_id = $2
-        AND type IN ('ein', 's-election') AND status IN ('awaiting_info', 'in_progress')`,
-          [o.client_id, o.id]
-        );
-        const hasStatement = (await db.query("SELECT id FROM documents WHERE order_id = $1 AND kind = 'statement' LIMIT 1", [o.id])).length > 0;
-        const mail = llcFormedEmail({
-          clientName: clients[0].name,
-          llcName: o.llc_name,
-          isConversion,
-          seriesNames: required,
-          otherDocuments: [
-            ...hasStatement ? ["Statement of Authorized Representative"] : [],
-            ...certDocs.some((d2) => d2.kind === "certificate-of-status") ? ["Certificate of Status"] : [],
-            ...certDocs.some((d2) => d2.kind === "certified-copy") ? ["Certified Copy of the Articles"] : []
-          ],
-          outstandingServices: openSvc.map((r) => {
-            const details = typeof r.details === "string" ? JSON.parse(r.details) : r.details;
-            return { type: r.type, status: r.status, ...r.type === "ein" && details?.target === "series" && details.seriesName ? { seriesName: details.seriesName } : {} };
-          }),
-          portalUrl: `${env.PUBLIC_BASE_URL}/portal`
-        });
-        notified = await sendMail({ to: clients[0].email, ...mail }).then(
-          () => true,
-          (e) => {
-            console.error("[admin] formed email failed:", e);
-            return false;
-          }
-        );
-      }
+      const noticeDocument = newRows[0];
+      await db.query(`UPDATE documents SET meta=meta || '{"noticeKind":"formation"}'::jsonb,notice_status='pending' WHERE id=$1`, [noticeDocument]);
+      const notified = await notifyDocument(noticeDocument);
       return c.json({ data: { ok: true, notified, documents: files.length } });
     } finally {
       await db.query("UPDATE orders SET replacing_at = NULL WHERE id = $1", [o.id]).catch((e) => console.error("[formation] claim release failed:", e));
@@ -113373,7 +113369,7 @@ function registerAdminRoutes(app2) {
   });
   app2.post("/admin/documents/:id/resend-notice", async (c) => {
     if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    return c.json({ data: { notified: await notifyLegalMail(c.req.param("id")) } });
+    return c.json({ data: { notified: await notifyDocument(c.req.param("id")) } });
   });
   app2.get("/admin/clients", async (c) => {
     const admin = await requireAdmin(c);
@@ -113924,23 +113920,11 @@ function registerAdminRoutes(app2) {
     }
     const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
     const rows = await db.query(
-      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-     VALUES ($1, $7, $2, $3, $4, $5, $6, $8::jsonb) RETURNING id`,
-      [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, orderId, JSON.stringify(kind === "legal_mail" ? { receivedOn } : {})]
+      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta, notice_status)
+     VALUES ($1, $7, $2, $3, $4, $5, $6, $8::jsonb, $9) RETURNING id`,
+      [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, orderId, JSON.stringify({ ...kind === "legal_mail" ? { receivedOn } : {}, ...notify ? { noticeKind: "document" } : {} }), notify ? "pending" : null]
     );
-    let notified = false;
-    if (kind === "legal_mail") {
-      notified = await notifyLegalMail(rows[0].id).catch(() => false);
-    } else if (notify) {
-      const mail = newDocumentEmail(`${env.PUBLIC_BASE_URL}/portal`);
-      notified = await sendMail({ to: clients[0].email, ...mail }).then(
-        () => true,
-        (e) => {
-          console.error("[admin] document alert email failed:", e);
-          return false;
-        }
-      );
-    }
+    const notified = notify ? await notifyDocument(rows[0].id) : false;
     return c.json({ data: { id: rows[0].id, notified } });
   });
 }
@@ -114171,7 +114155,7 @@ function registerOpsRoutes(app2) {
     if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
     if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
     const result = await runDbBackup();
-    console.log(`[backup] ${result.key}: ${result.sizeBytes} bytes`, result.rowCounts);
+    console.log(`[backup] ${result.key}: ${result.sizeBytes} bytes \u2014 ${result.complete ? "complete" : "Backup in progress (provisional counts)"}`, result.complete ? result.rowCounts : result.provisionalRowCounts);
     return c.json({ data: result });
   });
   app2.get("/cron/file-mirror", async (c) => {

@@ -248,12 +248,12 @@ function NoticeList({clientId}:{clientId?:string}){
  const url=clientId?`/api/admin/clients/${clientId}/documents`:'/api/admin/contact-messages';
  const q=useQuery({queryKey:['office-notices',clientId||'contact'],queryFn:()=>api.get<NoticeRow[]>(url)});
  const resend=useMutation({mutationFn:(id:string)=>api.post<{notified:boolean}>(clientId?`/api/admin/documents/${id}/resend-notice`:`/api/admin/contact-messages/${id}/resend`,{}),onSuccess:r=>{setMessage(r.notified?'Email accepted by provider.':'Email was not sent. The record remains available for retry.');void q.refetch();},onError:(e:Error)=>setMessage(e.message)});
- const rows=(q.data||[]).filter(r=>!clientId||r.kind==='legal_mail');
- return <div className="space-y-3">{q.isPending?<p>Loading…</p>:q.isError?<p role="alert">Could not load notices. <Button onClick={()=>void q.refetch()}>Retry</Button></p>:!rows.length?<p>No {clientId?'legal-mail notices':'contact messages'}.</p>:rows.map(r=><article key={r.id} className="rounded border p-3"><h3>{r.title||`${r.name} — ${r.email}`}</h3>{r.message?<p className="whitespace-pre-wrap">{r.message}</p>:null}<p className="text-sm">Email: {r.notice_status==='sent'?`accepted by provider${r.notice_recipient?' for '+r.notice_recipient:''}`:r.notice_status==='failed'?'failed':r.notice_status==='sending'?'awaiting confirmation':'not recorded'}</p>{r.notice_error?<p className="text-destructive text-sm">{r.notice_error}</p>:null}<Button size="sm" variant="outline" disabled={resend.isPending} onClick={()=>resend.mutate(r.id)}>{clientId?'Resend notice':'Retry office notification'}</Button></article>)}{message?<p role="status">{message}</p>:null}</div>;
+ const rows=(q.data||[]).filter(r=>!clientId||r.kind==='legal_mail'||!!r.notice_status);
+ return <div className="space-y-3">{q.isPending?<p>Loading…</p>:q.isError?<p role="alert">Could not load notices. <Button onClick={()=>void q.refetch()}>Retry</Button></p>:!rows.length?<p>No {clientId?'document notices':'contact messages'}.</p>:rows.map(r=><article key={r.id} className="rounded border p-3"><h3>{r.title||`${r.name} — ${r.email}`}</h3>{r.message?<p className="whitespace-pre-wrap">{r.message}</p>:null}<p className="text-sm">Email: {r.notice_status==='sent'?`accepted by provider${r.notice_recipient?' for '+r.notice_recipient:''}`:r.notice_status==='failed'?'failed':r.notice_status==='sending'?'awaiting confirmation':'not recorded'}</p>{r.notice_error?<p className="text-destructive text-sm">{r.notice_error}</p>:null}<Button size="sm" variant="outline" disabled={resend.isPending} onClick={()=>resend.mutate(r.id)}>{clientId?'Resend notice':'Retry office notification'}</Button></article>)}{message?<p role="status">{message}</p>:null}</div>;
 }
 function LegalMailNotices({client}:{client:AdminClient}){
  const [open,setOpen]=useState(false);
- return <Dialog open={open} onOpenChange={setOpen}><DialogTrigger asChild><Button variant="outline" size="sm">Legal-mail notices</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>Legal-mail notices — {client.name||client.email}</DialogTitle><DialogDescription>Retry the notice for the existing document without uploading it again.</DialogDescription></DialogHeader><div className="max-h-[60vh] overflow-auto">{open?<NoticeList clientId={client.id}/>:null}</div></DialogContent></Dialog>;
+ return <Dialog open={open} onOpenChange={setOpen}><DialogTrigger asChild><Button variant="outline" size="sm">Document notices</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>Document notices — {client.name||client.email}</DialogTitle><DialogDescription>Retry the notice for the existing document without uploading it again.</DialogDescription></DialogHeader><div className="max-h-[60vh] overflow-auto">{open?<NoticeList clientId={client.id}/>:null}</div></DialogContent></Dialog>;
 }
 
 function UploadDialog({ client }: { client: AdminClient }) {
@@ -573,7 +573,7 @@ function ClientsTable({
               <tr key={cl.id} data-testid="client-row" className={variant === "ra" && raNeedsHand(cl) ? "bg-amber-50 dark:bg-amber-950/20" : undefined}>
                 <td className="px-3 py-3">
                   <span className="font-medium" data-testid="client-name">{displayName(cl)}</span>
-                  {variant !== "ra" && cl.ra_cancellation_requested_at ? (
+                  {variant !== "ra" && cl.ra_cancellation_requested_at && (cl.ra_llcs ?? []).some(name => name.includes("cancellation requested")) ? (
                     <span className="ml-2 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
                       {(cl.ra_llcs||[]).filter(name=>name.includes("cancellation requested")).join("; ")}
                     </span>

@@ -286,9 +286,12 @@ export function OrdersInProgress({
             <DialogDescription>
               We use this to complete IRS Form 2553 for {detailsFor?.llc_name}. You sign the
               finished form and fax or mail it to the IRS yourself — we file nothing. This form is
-              transmitted over your secure portal session; Social Security numbers are encrypted,
-              and the questionnaire numbers are removed after the fourteen-day editing window.
-              Your completed document stays encrypted in Your documents until you choose to delete it.
+              transmitted over your secure portal session. Social Security numbers are encrypted.
+              Our scheduled cleanup removes them from the questionnaire after the fourteen-day editing
+              window following delivery. If your package has not been delivered, our scheduled cleanup
+              removes them after 90 days without an update to this questionnaire. Your other answers
+              remain available, but you must re-enter the numbers securely before we can complete the
+              package. Your completed document stays encrypted in Your documents until you choose to delete it.
             </DialogDescription>
           </DialogHeader>
           {detailsFor ? (

@@ -214,7 +214,12 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
                 ) : null}
               </>
             ) : viewing.type === "s-election" ? (
-              <>
+              detailQuery.isError ? (
+                <div role="alert" className="space-y-2">
+                  <p className="text-destructive">We couldn’t load the S-election details. Please try again.</p>
+                  <Button type="button" variant="outline" size="sm" disabled={detailQuery.isFetching} onClick={() => void detailQuery.refetch()}>Retry</Button>
+                </div>
+              ) : detailQuery.isPending ? <p>Loading S-election details…</p> : <>
                 <div>
                   <span className="text-muted-foreground">EIN:</span>{" "}
                   {detailQuery.data?.details.einPending
@@ -337,7 +342,7 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
                         ["Legal structure", "Limited Liability Company (LLC)"],
                         ["Number of members", String(d.memberCount ?? "—")],
                         // What the client was promised on the tile and the form (14 Sep 2026).
-                        ["Tax classification", viewing.details.target === "series" ? "Confirm this series’ intended tax treatment before applying." : detailQuery.data?.sElectionPaid ? "S corporation (Form 2553 package for this company)" : Number(d.memberCount) > 1 ? "Partnership" : "Disregarded entity"],
+                        ["Tax classification", viewing.details.target === "series" ? "Disregarded entity" : detailQuery.data?.sElectionPaid ? "S corporation (Form 2553 package for this company)" : Number(d.memberCount) > 1 ? "Partnership" : "Disregarded entity"],
                         ["Closing month of accounting year", "December"],
                         ["State located", "Florida"],
                         ["Reason for applying", d.reason ?? "Started a new business"],

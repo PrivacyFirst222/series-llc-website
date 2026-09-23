@@ -56,6 +56,12 @@ export default function AmendAgreement() {
     enabled: meQuery.isSuccess,
     retry: false,
   });
+  const sourcesQuery = useQuery({
+    queryKey: ["agreement-sources", company ?? null],
+    queryFn: () => api.get<AgreementSource[]>(`/api/portal/oa/sources${company ? `?company=${encodeURIComponent(company)}` : ""}`),
+    enabled: meQuery.isSuccess && oaQuery.isSuccess,
+    retry: false,
+  });
   const data = oaQuery.data;
 
   const amend = useMutation({
@@ -122,10 +128,12 @@ export default function AmendAgreement() {
         <h1 className="display mt-2 text-3xl">Amendment to Operating Agreement</h1>
         <p className="mt-2 text-sm text-muted-foreground">{data.seed.llcName}</p>
 
-        {!data.generations.length ? (
+        {sourcesQuery.isError ? (
+          <AgreementLoadError error={sourcesQuery.error} retry={() => { void sourcesQuery.refetch(); }} />
+        ) : sourcesQuery.isPending ? <p>Loading agreements…</p> : !sourcesQuery.data?.length ? (
           <div className="mt-6 rounded-2xl border border-border bg-card p-5">
             <p className="text-sm">
-              No generated agreement is available for this company. This form cannot amend an outside agreement or an older copy not associated with this company.
+              No usable operating agreement is available for this company. Go to the operating agreement questionnaire to create one before using this amendment form.
             </p>
             <Button asChild className="mt-4 rounded-full">
               <Link to={`/portal/agreement${cq}`}>Go to the operating agreement</Link>

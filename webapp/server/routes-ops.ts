@@ -316,7 +316,7 @@ app.get("/cron/db-backup", async (c) => {
   if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
   if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
   const result = await runDbBackup();
-  console.log(`[backup] ${result.key}: ${result.sizeBytes} bytes`, result.rowCounts);
+  console.log(`[backup] ${result.key}: ${result.sizeBytes} bytes — ${result.complete ? "complete" : "Backup in progress (provisional counts)"}`, result.complete ? result.rowCounts : result.provisionalRowCounts);
   return c.json({ data: result });
 });
 
