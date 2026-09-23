@@ -4,10 +4,10 @@ import { agentCheckoutLink } from './ra-checkout';
 import { addDays, addYears, isoOf, longDate, currentAgentNoticeEmail, gaveConsent } from './renewals';
 import { obligationPurpose, type AgentObligation } from './agent-obligations';
 import { easternDateIso } from './datetime';
-interface Correspondence {kind?:string;event?:string;pending?:boolean;error?:string|null;sentAt?:string}
+interface Correspondence {declinedCardLast4?:string|null;kind?:string;event?:string;pending?:boolean;error?:string|null;sentAt?:string}
 interface Row extends AgentObligation {id:string;order_id:string;amount_cents:number;status:string;contact_name:string;llc_name:string;card_last4:string|null;card_status:string|null;square_card_id:string|null;payload:unknown;notice_sent_at:unknown;charge_due:unknown;retry_after:unknown;retries:number;ra_appointment_date:unknown;correspondence:Correspondence}
-export async function queueAgentCorrespondence(db:Db,id:string,kind:'decline'|'receipt'):Promise<void>{
- await db.query("UPDATE ra_renewals SET correspondence=jsonb_build_object('kind',$2::text,'event',gen_random_uuid()::text,'pending',true) WHERE id=$1",[id,kind]);
+export async function queueAgentCorrespondence(db:Db,id:string,kind:'decline'|'receipt',declinedCardLast4?:string|null):Promise<void>{
+ await db.query("UPDATE ra_renewals SET correspondence=jsonb_build_object('kind',$2::text,'event',gen_random_uuid()::text,'pending',true,'declinedCardLast4',$3::text) WHERE id=$1",[id,kind,declinedCardLast4??null]);
 }
 /** Links are part of the obligation, never a side effect of successful email. */
 export async function ensureAgentPaymentLink(db:Db,id:string):Promise<string>{
@@ -35,7 +35,7 @@ export async function deliverAgentCorrespondence(id:string,today=easternDateIso(
   }else if(purpose==='service_fee')mail={subject:`Outstanding registered-agent service fees — ${r.llc_name}`,html:`<p>Outstanding registered-agent service fees of ${amount} remain due for ${escape(r.llc_name)}. This payment settles outstanding registered-agent service fees. It does not renew service or change the recorded resignation or appointment end date.</p><p><a href="${link}">Pay outstanding service fees</a></p>`};
   else if(r.status==='declined'){
    const retry=isoOf(r.retry_after),willRetry=!!retry&&retry>=today&&r.retries<2;
-   mail=raRenewalDeclinedEmail({name:r.contact_name,llcName:r.llc_name,last4:r.card_last4??'',renewalDate:longDate(date),amount,linkUrl:link,willRetry,retryDate:willRetry?longDate(retry!):null,resignation:purpose==='resignation',overdue:today>=date,deadlinesHtml:deadlines});
+   mail=raRenewalDeclinedEmail({name:r.contact_name,llcName:r.llc_name,last4:r.correspondence?.declinedCardLast4??'',renewalDate:longDate(date),amount,linkUrl:link,willRetry,retryDate:willRetry?longDate(retry!):null,resignation:purpose==='resignation',overdue:today>=date,deadlinesHtml:deadlines});
   }else if(purpose==='resignation')mail={subject:`Registered-agent resignation charge — ${r.llc_name}`,html:`<p>${r.ra_resignation_submitted?'We submitted our registered-agent resignation.':'Your timely cancellation has reached its renewal date without replacement proof. Submission has not yet been recorded.'} The $99 charge represents state fees and processing fees. It does not purchase another year of service. Any unpaid service fees remain due separately.</p><p><a href="${link}">Pay the resignation charge</a></p>`};
   else{mail=raRenewalNoticeEmail({name:r.contact_name,llcName:r.llc_name,renewalDate:longDate(date),amount,last4:r.card_status==='on_file'&&r.square_card_id&&gaveConsent(r.payload)?r.card_last4:null,chargeDate:longDate(addDays(date,-15)),cancelBy:longDate(cancelBy),linkUrl:link,chargeDue:today>=isoOf(r.charge_due)!,deadlinePassed,overdue:today>=date});}
   try{

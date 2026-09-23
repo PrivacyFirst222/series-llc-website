@@ -24,9 +24,9 @@ export async function agentCheckoutLink(kind:PaymentKind,id:string):Promise<stri
  const [saved]=await db.query<{checkout_token:string}>(`UPDATE ${table} SET checkout_token=COALESCE(checkout_token,$2) WHERE id=$1 RETURNING checkout_token`,[id,token]);
  return `${env.PUBLIC_BASE_URL}/agent-checkout?kind=${kind}&id=${id}&token=${saved.checkout_token}`;
 }
-interface Source { token?:string; cardId?:string; customerId?:string; automatic?:boolean; resumeOnly?:boolean }
+interface Source { token?:string; cardId?:string; customerId?:string; automatic?:boolean; cardLast4?:string|null; resumeOnly?:boolean }
 interface Attempt { id:string;source_token:string;status:string;square_payment_id:string|null;failure_code:string|null }
-export async function payAgentTarget(kind:PaymentKind,id:string,source:Source):Promise<{ok:boolean; code?:string; message?:string; paymentId?:string; automatic?:boolean}> {
+export async function payAgentTarget(kind:PaymentKind,id:string,source:Source):Promise<{ok:boolean; code?:string; message?:string; paymentId?:string; automatic?:boolean; declinedCardLast4?:string|null}> {
  if ((!env.OFFLINE && !env.SQUARE_ACCESS_TOKEN) || (env.isProd && env.OFFLINE)) return {ok:false,code:'UNAVAILABLE',message:'Card checkout is unavailable. Please contact support; no payment was taken.'};
  const db=await getDb();let t=await target(kind,id); if(!t)throw new Error('Payment target missing');
  if(kind==='order' && t.status!=='pending_payment') { await fulfillPaidOrder(id,null); return {ok:true}; }
@@ -85,7 +85,7 @@ export async function payAgentTarget(kind:PaymentKind,id:string,source:Source):P
   if(e instanceof SquareDecline) {
    await db.query("UPDATE ra_payment_attempts SET status='failed',failure_code=$2,source_token='' WHERE id=$1",[a.id,e.code]);
    await release();
-   return {ok:false,code:e.code,automatic:actual.automatic,message:e.code==='PREPAID_CARD'?RA_PREPAID_ERROR:e.code==='CARD_NOT_SAVED'?'Square could not save this card. We have not completed the purchase. Try another eligible card.':'Payment was declined. Try again now or use another card. Your issuer can explain the decline.'};
+   return {ok:false,code:e.code,automatic:actual.automatic,declinedCardLast4:actual.cardLast4&&/^\d{4}$/.test(actual.cardLast4)?actual.cardLast4:null,message:e.code==='PREPAID_CARD'?RA_PREPAID_ERROR:e.code==='CARD_NOT_SAVED'?'Square could not save this card. We have not completed the purchase. Try another eligible card.':'Payment was declined. Try again now or use another card. Your issuer can explain the decline.'};
   }
   console.error('[agent-payment] unresolved',e);
   return {ok:false,code:'UNRESOLVED',message:'We could not confirm the payment result. Retry to check this same payment; we will not start a second charge.'};

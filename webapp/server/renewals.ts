@@ -144,12 +144,12 @@ export async function runRenewals(today:string):Promise<{notices:number;charged:
    const recover=row.status==='charging';
    if(!first&&!retry&&!recover)continue;
    await db.query("UPDATE ra_renewals SET status='charging' WHERE id=$1 AND status NOT IN ('charged','paid_by_link','cancelled')",[row.id]);
-   const result=await payAgentTarget('renewal',row.id,{cardId:o.square_card_id!,customerId:o.square_customer_id!,automatic:true});
+   const result=await payAgentTarget('renewal',row.id,{cardId:o.square_card_id!,customerId:o.square_customer_id!,automatic:true,cardLast4:o.card_last4});
    if(result.ok){out.charged++;if(retry)out.retried++;}
    else if(result.code!=='UNRESOLVED'&&result.code!=='PROCESSING') {
     const attempt=row.retries+1,retryAfter=result.code==='INSUFFICIENT_FUNDS'&&attempt<2?addDays(today,2):null;
     await db.query("UPDATE ra_renewals SET status='declined',retries=$2,retry_after=$3,decline_code=$4 WHERE id=$1 AND status='charging'",[row.id,attempt,retryAfter,result.code]);
-    await ensureAgentPaymentLink(db,row.id);await queueAgentCorrespondence(db,row.id,'decline');await deliverAgentCorrespondence(row.id,today);out.declined++;if(retry)out.retried++;
+    await ensureAgentPaymentLink(db,row.id);await queueAgentCorrespondence(db,row.id,'decline',result.declinedCardLast4);await deliverAgentCorrespondence(row.id,today);out.declined++;if(retry)out.retried++;
    }
   } catch(e){console.error('[renewal] company needs attention',o.id,e);await db.query('UPDATE ra_renewals SET notice_error=$2 WHERE id=$1',[row.id,String(e).slice(0,300)]);}
   finally {await db.query('UPDATE ra_renewals SET lock_until=NULL WHERE id=$1',[row.id]);}

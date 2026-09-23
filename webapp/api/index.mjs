@@ -99825,7 +99825,7 @@ function raRenewalDeclinedEmail(opts) {
     subject: `Action needed: your registered agent ${opts.resignation ? "resignation" : "renewal"} charge was declined`,
     html: wrap(`
       <p>Hi ${escapeHtml(opts.name || "there")},</p>
-      <p>${opts.resignation ? `The resignation charge to your card ending ${escapeHtml(opts.last4)} for ${escapeHtml(opts.llcName)} was declined.` : `Your ${escapeHtml(opts.amount ?? "$99")} registered-agent renewal charge was declined. You may pay now using the same or a different eligible card.`}${opts.willRetry && opts.retryDate ? ` We will try the card once more on ${escapeHtml(opts.retryDate)}.` : ""}</p>
+      <p>${opts.resignation ? `The resignation charge${opts.last4 ? ` to your card ending ${escapeHtml(opts.last4)}` : ""} for ${escapeHtml(opts.llcName)} was declined.` : `Your ${escapeHtml(opts.amount ?? "$99")} registered-agent renewal charge was declined. You may pay now using the same or a different eligible card.`}${opts.willRetry && opts.retryDate ? ` We will try the card once more on ${escapeHtml(opts.retryDate)}.` : ""}</p>
       ${!opts.resignation && opts.last4 ? `<p>The charge was to your card ending <strong>${escapeHtml(opts.last4)}</strong> for registered agent service for <strong>${escapeHtml(opts.llcName)}</strong>.</p>` : ""}
       <p>You may pay now using the same or a different eligible card; there is no two-day waiting period. ${opts.resignation ? "This payment is for state filing fees and processing, not another service year." : `${opts.overdue ? "The renewal fee remains unpaid and is now overdue." : `Please pay by ${escapeHtml(opts.renewalDate)} to avoid delinquency.`} The card you use is saved for future annual renewals.`}</p>
       <p><a href="${opts.linkUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">${opts.resignation ? "Pay the resignation charge" : "Pay renewal now"}</a></p>
@@ -101692,8 +101692,8 @@ async function normalizeAgentObligations(db, orderId) {
 }
 
 // server/agent-correspondence.ts
-async function queueAgentCorrespondence(db, id, kind) {
-  await db.query("UPDATE ra_renewals SET correspondence=jsonb_build_object('kind',$2::text,'event',gen_random_uuid()::text,'pending',true) WHERE id=$1", [id, kind]);
+async function queueAgentCorrespondence(db, id, kind, declinedCardLast4) {
+  await db.query("UPDATE ra_renewals SET correspondence=jsonb_build_object('kind',$2::text,'event',gen_random_uuid()::text,'pending',true,'declinedCardLast4',$3::text) WHERE id=$1", [id, kind, declinedCardLast4 ?? null]);
 }
 async function ensureAgentPaymentLink(db, id) {
   const link = await agentCheckoutLink("renewal", id);
@@ -101725,7 +101725,7 @@ async function deliverAgentCorrespondence(id, today = easternDateIso()) {
     } else if (purpose === "service_fee") mail = { subject: `Outstanding registered-agent service fees \u2014 ${r.llc_name}`, html: `<p>Outstanding registered-agent service fees of ${amount} remain due for ${escape2(r.llc_name)}. This payment settles outstanding registered-agent service fees. It does not renew service or change the recorded resignation or appointment end date.</p><p><a href="${link}">Pay outstanding service fees</a></p>` };
     else if (r.status === "declined") {
       const retry2 = isoOf(r.retry_after), willRetry = !!retry2 && retry2 >= today && r.retries < 2;
-      mail = raRenewalDeclinedEmail({ name: r.contact_name, llcName: r.llc_name, last4: r.card_last4 ?? "", renewalDate: longDate(date2), amount, linkUrl: link, willRetry, retryDate: willRetry ? longDate(retry2) : null, resignation: purpose === "resignation", overdue: today >= date2, deadlinesHtml: deadlines });
+      mail = raRenewalDeclinedEmail({ name: r.contact_name, llcName: r.llc_name, last4: r.correspondence?.declinedCardLast4 ?? "", renewalDate: longDate(date2), amount, linkUrl: link, willRetry, retryDate: willRetry ? longDate(retry2) : null, resignation: purpose === "resignation", overdue: today >= date2, deadlinesHtml: deadlines });
     } else if (purpose === "resignation") mail = { subject: `Registered-agent resignation charge \u2014 ${r.llc_name}`, html: `<p>${r.ra_resignation_submitted ? "We submitted our registered-agent resignation." : "Your timely cancellation has reached its renewal date without replacement proof. Submission has not yet been recorded."} The $99 charge represents state fees and processing fees. It does not purchase another year of service. Any unpaid service fees remain due separately.</p><p><a href="${link}">Pay the resignation charge</a></p>` };
     else {
       mail = raRenewalNoticeEmail({ name: r.contact_name, llcName: r.llc_name, renewalDate: longDate(date2), amount, last4: r.card_status === "on_file" && r.square_card_id && gaveConsent(r.payload) ? r.card_last4 : null, chargeDate: longDate(addDays(date2, -15)), cancelBy: longDate(cancelBy), linkUrl: link, chargeDue: today >= isoOf(r.charge_due), deadlinePassed, overdue: today >= date2 });
@@ -101874,7 +101874,7 @@ async function runRenewals(today) {
       const recover = row.status === "charging";
       if (!first && !retry2 && !recover) continue;
       await db.query("UPDATE ra_renewals SET status='charging' WHERE id=$1 AND status NOT IN ('charged','paid_by_link','cancelled')", [row.id]);
-      const result = await payAgentTarget("renewal", row.id, { cardId: o.square_card_id, customerId: o.square_customer_id, automatic: true });
+      const result = await payAgentTarget("renewal", row.id, { cardId: o.square_card_id, customerId: o.square_customer_id, automatic: true, cardLast4: o.card_last4 });
       if (result.ok) {
         out.charged++;
         if (retry2) out.retried++;
@@ -101882,7 +101882,7 @@ async function runRenewals(today) {
         const attempt = row.retries + 1, retryAfter = result.code === "INSUFFICIENT_FUNDS" && attempt < 2 ? addDays(today, 2) : null;
         await db.query("UPDATE ra_renewals SET status='declined',retries=$2,retry_after=$3,decline_code=$4 WHERE id=$1 AND status='charging'", [row.id, attempt, retryAfter, result.code]);
         await ensureAgentPaymentLink(db, row.id);
-        await queueAgentCorrespondence(db, row.id, "decline");
+        await queueAgentCorrespondence(db, row.id, "decline", result.declinedCardLast4);
         await deliverAgentCorrespondence(row.id, today);
         out.declined++;
         if (retry2) out.retried++;
@@ -110852,7 +110852,7 @@ async function payAgentTarget(kind, id, source) {
     if (e instanceof SquareDecline) {
       await db.query("UPDATE ra_payment_attempts SET status='failed',failure_code=$2,source_token='' WHERE id=$1", [a2.id, e.code]);
       await release();
-      return { ok: false, code: e.code, automatic: actual.automatic, message: e.code === "PREPAID_CARD" ? RA_PREPAID_ERROR : e.code === "CARD_NOT_SAVED" ? "Square could not save this card. We have not completed the purchase. Try another eligible card." : "Payment was declined. Try again now or use another card. Your issuer can explain the decline." };
+      return { ok: false, code: e.code, automatic: actual.automatic, declinedCardLast4: actual.cardLast4 && /^\d{4}$/.test(actual.cardLast4) ? actual.cardLast4 : null, message: e.code === "PREPAID_CARD" ? RA_PREPAID_ERROR : e.code === "CARD_NOT_SAVED" ? "Square could not save this card. We have not completed the purchase. Try another eligible card." : "Payment was declined. Try again now or use another card. Your issuer can explain the decline." };
     }
     console.error("[agent-payment] unresolved", e);
     return { ok: false, code: "UNRESOLVED", message: "We could not confirm the payment result. Retry to check this same payment; we will not start a second charge." };
