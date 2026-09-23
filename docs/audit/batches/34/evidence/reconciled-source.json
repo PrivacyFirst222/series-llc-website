@@ -1,0 +1,304 @@
+[
+  {
+    "number": 30,
+    "key": "reader-1-terms-third-parties-omit-dropbox",
+    "disposition": "optional-editorial-or-layout",
+    "reviewTopic": "reader-1-terms-third-parties-omit-dropbox",
+    "original": {
+      "key": "reader-1-terms-third-parties-omit-dropbox",
+      "where": "Terms of Service page, section 20 \"Third-Party Services\", first sentence",
+      "file": "webapp/src/content/terms.md",
+      "line": 104,
+      "reads": "The Services incorporate third-party services, including payment processing (Square), hosting and storage (Vercel), database services (Neon), email delivery (Resend), and address data (Smarty). We are not responsible for third-party services and make no warranty regarding them. Links to third-party sites are provided for convenience only. Our use of information is described in our Privacy Policy.",
+      "claims": "That the third-party services the Services incorporate are Square, Vercel, Neon, Resend and Smarty.",
+      "truth": "The Privacy Policy on the next page (privacy.md:40) discloses a sixth provider, \"Dropbox (document backups)\", and the server mirrors every client file to Dropbox (backup.ts:6 imports mirrorFile from dropbox.ts; dropbox.ts:6-8 \"Verified client-file backup. Sensitive files are copied as ciphertext.\"). Section 20 disclaims responsibility for the third-party services it lists; the list omits the one that holds copies of the client's documents. Two lists for one fact.",
+      "replacement": "The Services incorporate third-party services, including payment processing (Square), hosting and storage (Vercel), database services (Neon), email delivery (Resend), document backups (Dropbox), and address data (Smarty).",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "reader-1-finding-terms-dropbox"
+      ],
+      "review": {
+        "reviewer": "reviewer-A",
+        "evidence": "Confirmed at the commit (reviewer-A-reader-1-terms-third-parties-omit-dropbox): reopened terms.md:100-108 (section 20 lists Square, Vercel, Neon, Resend, Smarty; no Dropbox anywhere in terms.md), privacy.md:40 (adds \"Dropbox (document backups)\"), backup.ts:6 (imports mirrorFile from ./dropbox) and dropbox.ts:6-8 (\"Verified client-file backup\"). Ledger items 69/224/225/261/N1.02 and rulings.md hold nothing on the Terms list \u2014 new. The replacement is factually right and complete, but it edits a Terms of Service clause disclaiming responsibility for named third parties, so the owner rules on it.",
+        "replacement": "needs owner ruling",
+        "priorCompared": true
+      },
+      "bucket": 1,
+      "reader": "reader-1",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "reader-1-terms-third-parties-omit-dropbox",
+      "verdict": "disputed",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "currentLocation": "webapp/src/content/terms.md:104",
+      "currentEvidence": [
+        "Dropbox is absent from Terms20 list but present in Privacy40 and backup implementation. The Terms say including, not only, and refer readers to Privacy for information use.",
+        "Therefore the finding\u2019s claim that Terms assert an exhaustive five-provider list is unsupported. Addition is a reasonable consistency improvement, not demonstrated false disclosure or failure of the disclaimer to apply to other third parties."
+      ],
+      "verificationLevel": "source",
+      "runtimeRerun": false,
+      "historicalAssessment": "The historical omission observation is accurate, but its asserted contradiction is not supported by the actual nonexhaustive wording.",
+      "replacementVerdict": "factually sensible optional edit; overstated necessity",
+      "plainEnglishRepair": "Optionally add document backups (Dropbox) to the illustrative Terms list, using the existing Privacy description. Do not report the mere omission as a substantive contradiction.",
+      "canonicalDuplicate": "reader-1-terms-third-parties-omit-dropbox",
+      "priorItem": null,
+      "ownerDecisionNeeded": true,
+      "ownerDecisionReason": "Only an optional Terms wording addition is identified; whether to make it is an editorial choice, not an unresolved legal defect.",
+      "primarySources": []
+    },
+    "evidence": [
+      "Dropbox is absent from Terms20 list but present in Privacy40 and backup implementation. The Terms say including, not only, and refer readers to Privacy for information use.",
+      "Therefore the finding\u2019s claim that Terms assert an exhaustive five-provider list is unsupported. Addition is a reasonable consistency improvement, not demonstrated false disclosure or failure of the disclaimer to apply to other third parties."
+    ],
+    "proposal": "Optionally add document backups (Dropbox) to the illustrative Terms list, using the existing Privacy description. Do not report the mere omission as a substantive contradiction.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 84,
+    "key": "compare-A-s-multi-title-omits-multiple-members",
+    "disposition": "optional-editorial-or-layout",
+    "reviewTopic": "compare-A-s-multi-title-omits-multiple-members",
+    "original": {
+      "key": "compare-A-s-multi-title-omits-multiple-members",
+      "where": "Operating agreement, multi-member S forms, title and colophon (and Manual \u00a77 table)",
+      "file": "webapp/server/templates-oa-member-s.md",
+      "line": 6,
+      "reads": "**(Member-Managed \u2014 S Corporation)**",
+      "claims": "Form title.",
+      "truth": "Titles: master 1 '(Member-Managed \u2014 S Corporation)', master 6 '(Manager-Managed \u2014 S Corporation)', while master 4 says '(Member-Managed \u2014 Multiple Members / Partnership Taxation)' and masters 2/7 say '\u2026 Single Member / S Corporation'. Colophons (1:507, 6:521) likewise '(Member-Managed / S Corporation)'. The Manual's \u00a77 table (docs/owners-manual.md:116-117) mirrors the current titles ('Manager-Managed, S Corporation' / 'Member-Managed, S Corporation'), so a change touches the Manual too. Severity: housekeeping. Other text: master 2 line 6: \"**(Member-Managed \u2014 Single Member / S Corporation)**\"",
+      "replacement": "**(Member-Managed \u2014 Multiple Members / S Corporation)**  and in the colophon '(Member-Managed, Multiple Members / S Corporation)'; same for templates-oa-s.md:6 and :521 with 'Manager-Managed'; update docs/owners-manual.md:116-117 to match.",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "compare-A-masters-1-2"
+      ],
+      "review": {
+        "reviewer": "reviewer-E",
+        "evidence": "reviewer-E-compare-A-s-multi-title-omits-multiple-members: reopened line 6 and the colophon of all eight masters, Manual :110-120, Instructions :25-31, ledger 235's fix assertions and docs/md-to-docx.py:415-434. Only masters 1 and 6 omit the owner count in title (1:6, 6:6) and colophon (1:507, 6:521); Manual :116-117 mirrors them. No ledger item or ruling: new confirmed. Coordination the finding omits: ledger 235 (Batch 18 rev 2, implemented) carries \"present\" assertions on the exact colophon lines of all eight masters, so the two colophon edits must update those assertions; md-to-docx.py does not key on the title text (:428 is a comment). Replacement is concrete and consistent with the other six masters; agreement text plus Manual.",
+        "replacement": "needs owner ruling",
+        "priorCompared": true
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "compare-A-s-multi-title-omits-multiple-members",
+      "verdict": "confirmed-current",
+      "currentLocation": "webapp/server/templates-oa-member-s.md:6",
+      "currentFile": "webapp/server/templates-oa-member-s.md",
+      "currentLine": 6,
+      "evidence": "The two multi-member S titles and colophons omit Multiple Members while single-member S titles specify Single Member and partnership multi titles specify Multiple Members. Manual table mirrors existing titles. This is less explicit labeling, not a wrong tax/management model.",
+      "verificationLevel": "source",
+      "replacementVerdict": "reasonable optional editorial improvement; coordinate downstream exact text",
+      "plainEnglishRepair": "If approved, add Multiple Members to the two S multi titles/colophons and manual entries, and update affected exact-colophon assertions and generated artifacts through the document workflow.",
+      "canonicalDuplicateOrPrior": null,
+      "ownerDecisionNeeded": true,
+      "ownerDecisionReason": "Changes agreement titles/colophons and Manual wording; owner chooses whether the added specificity is worthwhile.",
+      "findingType": "optional labeling",
+      "relatedLocations": [
+        "webapp/server/templates-oa-s.md:6",
+        "webapp/server/templates-oa-member-s.md:507",
+        "webapp/server/templates-oa-s.md:521",
+        "docs/owners-manual.md:116"
+      ],
+      "limitations": "No new runtime reproduction; current source inspected.",
+      "reviewedHead": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0"
+    },
+    "evidence": [
+      "The two multi-member S titles and colophons omit Multiple Members while single-member S titles specify Single Member and partnership multi titles specify Multiple Members. Manual table mirrors existing titles. This is less explicit labeling, not a wrong tax/management model."
+    ],
+    "proposal": "If approved, add Multiple Members to the two S multi titles/colophons and manual entries, and update affected exact-colophon assertions and generated artifacts through the document workflow.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 89,
+    "key": "compare-B-manual-5-4-b-unqualified",
+    "disposition": "optional-editorial-or-layout",
+    "reviewTopic": "compare-B-manual-5-4-b-unqualified",
+    "original": {
+      "key": "compare-B-manual-5-4-b-unqualified",
+      "where": "Owner's Manual, section 11, \"Make it match your agreement\" \u2014 read against the four manager-managed masters (templates-oa-multi.md, templates-oa-s.md, templates-oa-single-s.md, templates-oa-single.md)",
+      "file": "docs/owners-manual.md",
+      "line": 204,
+      "reads": "**Make it match your agreement.** If \u00a75.4(b) requires a majority of ownership to encumber real property, say the same thing in the statement. A statement that contradicts your operating agreement creates the exact ambiguity you filed it to avoid \u2014 which is why your agreement provides that any statement you file must be consistent with it.",
+      "claims": "The reader's agreement may have a \u00a75.4(b) that requires a majority of ownership to encumber real property, and the statement of authority should say the same.",
+      "truth": "Only the member-managed multi-member form has that \u00a75.4(b) (templates-oa-member.md:170: \"(b) no Member acting alone has actual authority to sell, convey, mortgage, pledge, or otherwise encumber any interest in real property \u2026 without the consent of a Majority in Interest\"), which line 188 of the Manual names correctly: \"\u00a75.4(b) in the member-managed multi-member forms\". In the manager-managed multi-member forms \u00a75.4(b) is the consent of a Majority in Interest to move an Associated Asset between silos (templates-oa-multi.md:172: \"(b) **cause any Associated Asset to become an Associated Asset of the Company or of a different Protected Series** \u2014 the consent of a Majority in Interest;\"), and in the manager-managed single-member forms \u00a75.4(b) is the Member's consent to a statement of authority (templates-oa-single.md:154: \"(b) file, amend, or cancel a statement of authority under s. 605.0302, Florida Statutes, or record a certified copy of one.\"). A manager-managed owner following line 204 looks up a different rule. The sentence's second half is true of every form (\u00a75.8: \"A statement so filed shall be consistent with this Agreement\").",
+      "replacement": "**Make it match your agreement.** If your agreement limits who may encumber real property \u2014 \u00a75.4(b) in the member-managed multi-member form requires a majority of ownership \u2014 say the same thing in the statement. A statement that contradicts your operating agreement creates the exact ambiguity you filed it to avoid \u2014 which is why your agreement provides that any statement you file must be consistent with it.",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "compare-B-manual-5",
+        "compare-B-manual-8"
+      ],
+      "review": {
+        "reviewer": "reviewer-E",
+        "evidence": "reviewer-E-compare-B-manual-5-4-b-unqualified: reopened Manual :186-206 and \u00a75.4 of masters 5-8, \u00a75.4/\u00a75.5 of 1 and 4, \u00a75.4-5.7 of 2 and 3: only 4:170 and 1:170 have the real-property \u00a75.4(b); 5:172/6:172 (b) is the asset-move consent; 8:154/7:158 (b) is the statement-of-authority consent; 2 and 3 have no \u00a75.4(b); Manual :188 already qualifies the reference; the \"consistent with this Agreement\" half is true of every form (\u00a75.7/5.8/5.9). No ledger item cites owners-manual.md:204; no ruling: new confirmed. Replacement is accurate (mirrors :188's own qualification); client-facing Manual text.",
+        "replacement": "needs owner ruling",
+        "priorCompared": true
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "compare-B-manual-5-4-b-unqualified",
+      "verdict": "partly-confirmed-current",
+      "currentLocation": "docs/owners-manual.md:204",
+      "currentFile": "docs/owners-manual.md",
+      "currentLine": 204,
+      "evidence": "Unqualified5.4(b) remains, but the sentence expressly starts If, and line188 already identifies member-managed multi-member forms. Thus it is not categorically false for every reader. The proposed added qualification would nevertheless make this paragraph stand alone and prevent an irrelevant lookup in other variants.",
+      "verificationLevel": "source",
+      "replacementVerdict": "accurate clarity improvement",
+      "plainEnglishRepair": "If approved, name the member-managed multi-member form in the example while preserving the general instruction that a statement must match the agreement.",
+      "canonicalDuplicateOrPrior": null,
+      "ownerDecisionNeeded": true,
+      "ownerDecisionReason": "Manual prose revision is an editorial owner choice; do not describe the conditional example as universal false legal advice.",
+      "findingType": "manual clarity",
+      "relatedLocations": [
+        "docs/owners-manual.md:188",
+        "webapp/server/templates-oa-member.md:170",
+        "webapp/server/templates-oa-multi.md:172",
+        "webapp/server/templates-oa-single.md:154"
+      ],
+      "limitations": "Agreement cross-reference comparison; broader statement-of-authority legal claims not revalidated.",
+      "reviewedHead": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0"
+    },
+    "evidence": [
+      "Unqualified5.4(b) remains, but the sentence expressly starts If, and line188 already identifies member-managed multi-member forms. Thus it is not categorically false for every reader. The proposed added qualification would nevertheless make this paragraph stand alone and prevent an irrelevant lookup in other variants."
+    ],
+    "proposal": "If approved, name the member-managed multi-member form in the example while preserving the general instruction that a statement must match the agreement.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 92,
+    "key": "render-consent-signature-split",
+    "disposition": "optional-editorial-or-layout",
+    "reviewTopic": "render-consent-signature-split",
+    "original": {
+      "key": "render-consent-signature-split",
+      "where": "Client portal, Add a series \u2192 the Unanimous Written Consent PDF, MEMBERS signature block (pages 1\u20132)",
+      "file": "webapp/server/pdf-render.ts",
+      "line": 350,
+      "reads": "      // Signature blocks (Adam, 9 Sep 2026): a line of underscores is a\n      // signature line, and the name beneath it and the \"Date:\" line beneath\n      // that sit tight, with no paragraph gap between them; the gap goes\n      // before the signature line instead, so signers are set apart.",
+      "claims": "Signature blocks are laid out as units.",
+      "truth": "Nothing keeps the consent's MEMBERS block together or on the signature page: with three owners the first signature line lands at the foot of page 1 and the other two on page 2, which then holds only two signature lines and an [INTENTIONALLY LEFT BLANK] notice (evidence/render/pdf-series-consent.pdf and pdf-series-consent-member.pdf, pages 1\u20132; images pages/pdf-series-consent/p-1.png, p-2.png). The agreements avoid this by forcing SIGNATURES onto a fresh page (oa.ts:726); the consent has no such break.",
+      "replacement": "In new-series.ts, insert `[[pagebreak]]` before the **MEMBERS:** heading of the consent (as oa.ts does for SIGNATURES), or in pdf-render.ts treat a `**MEMBERS:**`/`**MEMBER:**` label as a lead-in that must be kept with at least one full signature block (rule + name + Date = 3 lines).",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "render-pdf-series-consent",
+        "render-pdf-series-consent-member"
+      ],
+      "review": {
+        "reviewer": "reviewer-H",
+        "evidence": "reviewer-H-render-consent-signature-split, reviewer-H-probe-before, reviewer-H-probe-after. Reopened pdf-render.ts:347-393 (each rule is placed with need(lineH) alone), new-series.ts (131 lines; blocks built at :87-92, filled at :125, no page break), templates-new-series.md:27-31 and oa.ts:724-726. Both consents read: page 1 ends 'MEMBERS:' / first name / 'Date:', page 2 holds the other two blocks and the notice (p-2.png opened). Re-rendered the three-owner manager-managed consent: reproduced; with [[pagebreak]] inserted before **MEMBERS:** in new-series.ts, page 1 ends at item 7 without a notice and page 2 carries the label and all three blocks; pages 3-4 unchanged. No ledger item or batch ruling on the consent's pagination (batch 14 covers its title, footer, 'None' and asset rows); new confirmed.",
+        "replacement": "correct",
+        "priorCompared": true
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "render-consent-signature-split",
+      "verdict": "partly-confirmed-current",
+      "currentLocation": "webapp/server/pdf-render.ts:341",
+      "currentFile": "webapp/server/pdf-render.ts",
+      "currentLine": 341,
+      "evidence": "Batch25 now measures complete signature units and reserves need(height) at356. Current-source hashes match retained Batch25 evidence. Independently viewed ordinary-consent pages1/2: both entire member signatures fit page1 and exhibit begins page2. Entity stress pages1/2 retain MEMBERS alone at end ofpage1, with the full entity and second signer onpage2. Thus individual signature splitting is fixed; keeping the label with the first signature is a separate residual layout refinement. Splitting a large group between complete signature units is not inherently a defect.",
+      "verificationLevel": "existing runtime evidence",
+      "replacementVerdict": "reject unconditional pagebreak; optional label keep-with-next remains",
+      "plainEnglishRepair": "Preserve the measured unit repair. If owner wants further layout work, keep MEMBERS/MEMBER with the first full unit where it can fit; avoid unconditional extra signature pages.",
+      "canonicalDuplicateOrPrior": "AUD-post-batches-2026-09-20-4a344e2-B5-CONSENT-SIGNATURE-PAGINATION / Batch25 (fixed signature-unit portion)",
+      "ownerDecisionNeeded": true,
+      "ownerDecisionReason": "Decide whether the remaining orphaned group label in entity stress output warrants a separate layout refinement.",
+      "findingType": "rendered layout",
+      "relatedLocations": [
+        "webapp/server/pdf-render.ts:356",
+        "webapp/server/templates-new-series.md:27",
+        "docs/audit/batches/25/evidence/documents/REPORT.md",
+        "docs/audit/batches/25/evidence/documents/green-final/ordinary-consent.pdf",
+        "docs/audit/batches/25/evidence/documents/green-final/entity-consent.pdf"
+      ],
+      "limitations": "Four relevant repaired pages visually inspected and source hashes matched. Historical exact three-owner fixture was not regenerated; no current split-unit claim.",
+      "reviewedHead": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0"
+    },
+    "evidence": [
+      "Batch25 now measures complete signature units and reserves need(height) at356. Current-source hashes match retained Batch25 evidence. Independently viewed ordinary-consent pages1/2: both entire member signatures fit page1 and exhibit begins page2. Entity stress pages1/2 retain MEMBERS alone at end ofpage1, with the full entity and second signer onpage2. Thus individual signature splitting is fixed; keeping the label with the first signature is a separate residual layout refinement. Splitting a large group between complete signature units is not inherently a defect."
+    ],
+    "proposal": "Preserve the measured unit repair. If owner wants further layout work, keep MEMBERS/MEMBER with the first full unit where it can fit; avoid unconditional extra signature pages.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 93,
+    "key": "render-oa-exhibit-a-tail-page",
+    "disposition": "optional-editorial-or-layout",
+    "reviewTopic": "render-oa-exhibit-a-tail-page",
+    "original": {
+      "key": "render-oa-exhibit-a-tail-page",
+      "where": "Generated multi-member operating agreements \u2014 the page after Exhibit A's TOD table, before SERIES EXHIBIT PS-1",
+      "file": "webapp/server/pdf-render.ts",
+      "line": 271,
+      "reads": "  const TAIL_MAX_LINES = 16;\n  const tailHeightBeforeBreak = (from: number): number | null => {\n    let h = 0;\n    for (let k = from; k < blocks.length && k < from + 6; k++) {\n      const b = blocks[k];\n      if (b.kind === \"para\" && b.segs.length === 1 && b.segs[0].text.trim() === \"[[pagebreak]]\") {",
+      "claims": "Keep-tail-together prevents a few lines from being stranded alone on an otherwise blank page before a forced break.",
+      "truth": "When the tail is Exhibit A's one or two closing sentences and they do not fit under the TOD table, the code starts a new page for them, and the forced break before the series exhibit follows at once, so the new page holds two lines and the [INTENTIONALLY LEFT BLANK] notice: evidence/render/pdf-1-ordinary.pdf page 22 and pdf-1-professional.pdf page 22 ('A designation is effective only\u2026' / 'If no beneficiary is designated\u2026'), pdf-4-ordinary.pdf page 21 and pdf-4-professional.pdf page 21 ('If no beneficiary is designated\u2026'), pdf-6-professional.pdf page 21. The rule cures the case it was written for (s. 13.10 stranded) and produces the same stranding when the tail is short.",
+      "replacement": "Only pull the tail forward when it will NOT fit on the current page AND the pull leaves the new page more than a third full; otherwise let the tail finish on the current page (it fits by definition when `y - tail >= MARGIN`) \u2014 i.e. change the condition at line 301 to `if (tail !== null && tail > 0 && y - tail < MARGIN && tail > TEXT_H / 3)`; a two-line tail then stays under the table, which always has room for two lines or the table row itself would have broken.",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "render-pdf-1-ordinary",
+        "render-pdf-1-professional",
+        "render-pdf-4-ordinary",
+        "render-pdf-4-professional",
+        "render-pdf-6-professional"
+      ],
+      "review": {
+        "reviewer": "reviewer-H",
+        "evidence": "reviewer-H-render-oa-exhibit-a-tail-page, reviewer-H-probe-before, reviewer-H-probe-after, reviewer-H-replacements-diff. Reopened pdf-render.ts:203-217, :265-309 and :405-441; read the five cited pages with their neighbours (pdf-1-ordinary and pdf-1-professional p22 hold two paragraphs and the notice after the TOD table; pdf-4-ordinary/professional p21 one paragraph; pdf-6-professional p21 two): the observation is confirmed. I re-rendered pdf-1-ordinary, pdf-4-ordinary and pdf-6-professional from their stored inputs before and after the proposed condition (tail > TEXT_H / 3): pdf-1-ordinary p22 (4 lines + notice) and pdf-4-ordinary p21 (2 lines + notice) are unchanged, only pdf-6-professional loses its stranded page, and s. 16.7 of pdf-1 is now split across pages 18/19 because the rule that cured Codex PDF-002 no longer fires. The widow rule at :428-429 moves a two-line paragraph whole whenever it does not fit, so a tail that does not fit under the table strands either way; the premise that the table always leaves room for two lines is false (need(rowH) at :465 guarantees only the row). The cure is a layout or drafting choice (closing sentences above the table, a final table row, or pulling the last table row with the tail). No ledger item; new confirmed. Disputed in notes/reviewer-H.md.",
+        "replacement": "needs owner ruling",
+        "priorCompared": true
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "render-oa-exhibit-a-tail-page",
+      "verdict": "confirmed-current",
+      "currentLocation": "webapp/server/pdf-render.ts:272",
+      "currentFile": "webapp/server/pdf-render.ts",
+      "currentLine": 272,
+      "evidence": "New pure local reproduction used the five historical storedInputs with CURRENT assembleOa and renderMarkdownPdf, with fetch blocked, no server and no product writes. Text extraction and individual1400px page views confirm sparse ExhibitA tails in all5: pdf-1-ordinary p22 has4 narrative lines; pdf-4-ordinary p21 has2; pdf-6-professional p21 has4. pdf-1-professional p22 and pdf-4-professional p21 additionally contain the last TOD table row, so the historical paragraphs-only description is literal for3/5. Each sparse page is immediately followed by SERIES EXHIBIT PS-1. Current table need(rowH) does not reserve closing paragraphs. Proposed one-third threshold still cannot create space after the table and historical before/after evidence shows incomplete repair and regression.",
+      "verificationLevel": "newly reproduced",
+      "replacementVerdict": "reject proposed threshold; current sparse-tail occurrence verified",
+      "plainEnglishRepair": "If this layout cleanup is approved, choose a measured table-and-closing-text arrangement or deliberate text placement, preserving existing short-provision protection. Use these five exact fixtures as acceptance examples; a last-row-plus-tail reserve alone already resembles2/5 current outputs and should not be promised to eliminate sparsity.",
+      "canonicalDuplicateOrPrior": null,
+      "ownerDecisionNeeded": true,
+      "ownerDecisionReason": "The current sparse pages are confirmed; owner should choose whether to alter their layout. The proposed threshold is not a verified remedy.",
+      "findingType": "rendered layout",
+      "relatedLocations": [
+        "webapp/server/pdf-render.ts:272",
+        "webapp/server/pdf-render.ts:385",
+        "webapp/server/pdf-render.ts:549",
+        "evidence-3/render-tail.ts",
+        "evidence-3/render-manifest.json",
+        "evidence-3/page-analysis.json"
+      ],
+      "limitations": "Current assembler+renderer on retained storedInputs, watermark null (plain page-number footer), no HTTP/production path. Five relevant pages individually viewed; other122 pages were not visually audited. Pending Batch16 is absent, so professional layout must be rechecked after its approved recovery.",
+      "reviewedHead": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0"
+    },
+    "evidence": [
+      "New pure local reproduction used the five historical storedInputs with CURRENT assembleOa and renderMarkdownPdf, with fetch blocked, no server and no product writes. Text extraction and individual1400px page views confirm sparse ExhibitA tails in all5: pdf-1-ordinary p22 has4 narrative lines; pdf-4-ordinary p21 has2; pdf-6-professional p21 has4. pdf-1-professional p22 and pdf-4-professional p21 additionally contain the last TOD table row, so the historical paragraphs-only description is literal for3/5. Each sparse page is immediately followed by SERIES EXHIBIT PS-1. Current table need(rowH) does not reserve closing paragraphs. Proposed one-third threshold still cannot create space after the table and historical before/after evidence shows incomplete repair and regression."
+    ],
+    "proposal": "If this layout cleanup is approved, choose a measured table-and-closing-text arrangement or deliberate text placement, preserving existing short-provision protection. Use these five exact fixtures as acceptance examples; a last-row-plus-tail reserve alone already resembles2/5 current outputs and should not be promised to eliminate sparsity.",
+    "allRepairsRequireAdamReview": true
+  }
+]

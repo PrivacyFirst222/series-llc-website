@@ -1,0 +1,16 @@
+CHECK_RESULT {"suite":"batch34","label":"Exhibit A closing section stays together: pdf-1-ordinary","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"series exhibits keep separate starts: pdf-1-ordinary","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"Exhibit A closing section stays together: pdf-1-professional","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"series exhibits keep separate starts: pdf-1-professional","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"Exhibit A closing section stays together: pdf-4-ordinary","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"series exhibits keep separate starts: pdf-4-ordinary","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"Exhibit A closing section stays together: pdf-4-professional","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"series exhibits keep separate starts: pdf-4-professional","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"Exhibit A closing section stays together: pdf-6-professional","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"series exhibits keep separate starts: pdf-6-professional","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"consent heading stays with first signature: ordinary-consent","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"consent signature dates preserved: ordinary-consent","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"consent heading stays with first signature: entity-consent","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"consent signature dates preserved: entity-consent","ok":true,"commit":"local","run":"local"}
+CHECK_RESULT {"suite":"batch34","label":"oversized Exhibit A retains final owner and beneficiary","ok":true,"commit":"local","run":"local"}
+15/15 Batch34 checks passed

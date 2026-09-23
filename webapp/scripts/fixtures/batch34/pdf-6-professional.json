@@ -1,0 +1,93 @@
+{
+  "assets": [
+    {
+      "by": "Sam Ortiz and Riley Ortiz and Casey Member, Jr., equally",
+      "to": "Render Orange Ventures Law, PLLC, PS A",
+      "value": "$1,200,000",
+      "description": "900 Orange Avenue, Orlando (retail building)"
+    },
+    {
+      "by": "Sam Ortiz and Riley Ortiz (66.67%) and Casey Member, Jr. (33.33%)",
+      "to": "Render Orange Ventures Law, PLLC, PS B: $60,000; the Company: $30,000",
+      "value": "$90,000",
+      "description": "Cash"
+    }
+  ],
+  "series": [
+    {
+      "name": "Render Orange Ventures Law, PLLC, PS A",
+      "purpose": "Commercial real estate",
+      "contribution": "900 Orange Avenue, Orlando (retail building) ($1,200,000)",
+      "specialTerms": ""
+    },
+    {
+      "name": "Render Orange Ventures Law, PLLC, PS B",
+      "purpose": "",
+      "contribution": "Cash ($60,000)",
+      "specialTerms": "The Manager shall distribute this series' net rents quarterly."
+    }
+  ],
+  "members": [
+    {
+      "name": "Sam Ortiz and Riley Ortiz",
+      "address": "50 Sunset Blvd, Orlando, FL 32801",
+      "todBackup": "Ana Ortiz",
+      "percentage": 66.66666666666666,
+      "signatories": [
+        "Sam Ortiz",
+        "Riley Ortiz"
+      ],
+      "contribution": "$660,003",
+      "jointHolding": "tenants by the entirety",
+      "todBeneficiary": "Ortiz Family Trust",
+      "percentageLabel": "2/3"
+    },
+    {
+      "name": "Casey Member, Jr.",
+      "address": "100 Ocean Drive, Miami, FL 33139",
+      "todBackup": "",
+      "percentage": 33.33333333333333,
+      "contribution": "$629,997",
+      "todBeneficiary": "Jordan Member",
+      "percentageLabel": "1/3"
+    }
+  ],
+  "version": "s",
+  "retained": "$30,000",
+  "companyName": "Render Orange Ventures Law, PLLC",
+  "competition": "B",
+  "managerNames": [
+    "Casey Member, Jr.",
+    "Ortiz Management, LLC"
+  ],
+  "professional": true,
+  "effectiveDate": "September 1, 2026",
+  "retainedItems": "Cash ($30,000)",
+  "includeShotgun": false,
+  "amendedRestated": false,
+  "generationNumber": 2,
+  "principalAddress": "100 Ocean Drive, Suite 400, Miami, FL, 33139",
+  "seriesAllocations": [
+    {
+      "name": "Render Orange Ventures Law, PLLC, PS A",
+      "items": "900 Orange Avenue, Orlando (retail building) ($1,200,000)",
+      "total": "$1,200,000"
+    },
+    {
+      "name": "Render Orange Ventures Law, PLLC, PS B",
+      "items": "Cash ($60,000)",
+      "total": "$60,000"
+    }
+  ],
+  "borrowingThreshold": 25000,
+  "priorAgreementDate": null,
+  "includeCapitalCalls": false,
+  "managerEntitySigners": [
+    {
+      "name": "Riley Ortiz",
+      "title": "Manager",
+      "manager": "Ortiz Management, LLC"
+    }
+  ],
+  "contributionToCompany": "$660,003"
+}

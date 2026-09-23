@@ -2,12 +2,12 @@
 
 GENERATED from docs/audit/ledger.json by `bun run docs/audit/ledger-print.ts list`. Do not edit: the commit step refuses a copy that differs from the ledger. The auditors' original files are unchanged under docs/audit/sources/ and docs/audit/runs/.
 
-412 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 78 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 400.
+417 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 83 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Released: 0 of 405.
 
 A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.
 For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-session.ts. The historical coverage-check.ts alone does not establish complete prior-item reconciliation. Audit completion does not approve repairs or publication.
 
-## Public pages, Terms and Privacy — 47 open of 53
+## Public pages, Terms and Privacy — 48 open of 54
 
 - **1. [A30]** — **implemented**
   - FAQ hero: "Drawn from real client questions about Florida's Protected Series LLC statute." No clients yet. Replace: "The questions people ask before forming a Florida Protected Series LLC, answered."
@@ -430,6 +430,14 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Fixed: batch 31 revision 3, commit , by Codex; protected by 1 assertion(s).
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
+- **AUD-claude-optional-batch34-reader-1-terms-third-parties-omit-dropbox. [wording]** — **implemented**
+  - Terms of Service page, section 20 "Third-Party Services", first sentence — `webapp/src/content/terms.md:104`
+  - Reads: The Services incorporate third-party services, including payment processing (Square), hosting and storage (Vercel), database services (Neon), email delivery (Resend), and address data (Smarty). We are not responsible for third-party services and make no warranty regarding them. Links to third-party sites are provided for convenience only. Our use of information is described in our Privacy Policy.
+  - Claims: Optional improvement approved by Adam, not a newly established substantive error: reader-1-terms-third-parties-omit-dropbox
+  - True: The Privacy Policy on the next page (privacy.md:40) discloses a sixth provider, "Dropbox (document backups)", and the server mirrors every client file to Dropbox (backup.ts:6 imports mirrorFile from dropbox.ts; dropbox.ts:6-8 "Verified client-file backup. Sensitive files are copied as ciphertext."). Section 20 disclaims responsibility for the third-party services it lists; the list omits the one that holds copies of the client's documents. Two lists for one fact.
+  - Proposed replacement (not approved): The Services incorporate third-party services, including payment processing (Square), hosting and storage (Vercel), database services (Neon), email delivery (Resend), document backups (Dropbox), and address data (Smarty).
+  - Rechecked by Codex at 455be76607d5f351dd9a0a80701f74af23683d1f: Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place.
+  - Fixed: batch 34 revision 1, commit , by Codex; protected by 1 assertion(s).
 
 ## Order form and payment — 88 open of 90
 
@@ -2427,7 +2435,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
   - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).
 
-## Agreements and guidance — 100 open of 103
+## Agreements and guidance — 104 open of 107
 
 - **229. [A80]** — **implemented**
   - Manager-managed forms (4), Indemnification: "an act exceeding the authority conferred by Section 5.4"; 5.4 is the approval list, 5.3 the authority. Replace: "an act taken without the approval Section 5.4 requires" (both places).
@@ -2461,8 +2469,10 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 - **235. [A86]** — **implemented**
   - Colophons omit s. 711.50; two single-owner S forms list Code sections, six do not. Replace: list 711.50; Code sections in all or none.
   - **Codex rejected the proposed replacement:** Adding 711.50 is correct. “All or none” is not a complete replacement; choose one convention and enumerate the Code sections actually cited in each form.
-  - Fixed: batch 18 revision 2, commit , by Codex; protected by 8 assertion(s).
+  - Previous fix: 18 r2, commit ; 8 assertion(s) retained. Replacement attempt: 34 r1, work order 37ee730a48c64f58385e96780ecdd8f8ef9a7e1b9e85692578ff136f85cf27c6.
+  - Fixed: batch 34 revision 1, commit , by Codex; protected by 8 assertion(s).
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
+  - 2026-09-22 superseded by approved replacement: prior fix 18 r2 at ; approved work order 37ee730a48c64f58385e96780ecdd8f8ef9a7e1b9e85692578ff136f85cf27c6
 - **236. [A87]** — **open**
   - Four multi-member forms say "single class" twice (2.13 and 4.1). Replace: keep 4.1.
 - **237. [A88]** — **implemented**
@@ -3335,3 +3345,43 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Proposed replacement (not approved): const a = Buffer.from(expected); const b = Buffer.from(opts.signatureHeader); return a.length === b.length && timingSafeEqual(a, b);  (import { timingSafeEqual } from "node:crypto")
   - Rechecked by Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32: Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding.
   - Fixed: batch 33 revision 1, commit , by Codex; protected by 2 assertion(s).
+- **AUD-claude-optional-batch34-compare-A-s-multi-title-omits-multiple-members. [housekeeping]** — **implemented** — housekeeping
+  - Operating agreement, multi-member S forms, title and colophon (and Manual §7 table) — `webapp/server/templates-oa-member-s.md:6`
+  - Reads: **(Member-Managed — S Corporation)**
+  - Claims: Optional improvement approved by Adam, not a newly established substantive error: compare-A-s-multi-title-omits-multiple-members
+  - True: Titles: master 1 '(Member-Managed — S Corporation)', master 6 '(Manager-Managed — S Corporation)', while master 4 says '(Member-Managed — Multiple Members / Partnership Taxation)' and masters 2/7 say '… Single Member / S Corporation'. Colophons (1:507, 6:521) likewise '(Member-Managed / S Corporation)'. The Manual's §7 table (docs/owners-manual.md:116-117) mirrors the current titles ('Manager-Managed, S Corporation' / 'Member-Managed, S Corporation'), so a change touches the Manual too. Severity: housekeeping. Other text: master 2 line 6: "**(Member-Managed — Single Member / S Corporation)**"
+  - Proposed replacement (not approved): **(Member-Managed — Multiple Members / S Corporation)**  and in the colophon '(Member-Managed, Multiple Members / S Corporation)'; same for templates-oa-s.md:6 and :521 with 'Manager-Managed'; update docs/owners-manual.md:116-117 to match.
+  - Rechecked by Codex at 455be76607d5f351dd9a0a80701f74af23683d1f: Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place.
+  - Fixed: batch 34 revision 1, commit , by Codex; protected by 6 assertion(s).
+- **AUD-claude-optional-batch34-compare-B-manual-5-4-b-unqualified. [housekeeping]** — **implemented** — housekeeping
+  - Owner's Manual, section 11, "Make it match your agreement" — read against the four manager-managed masters (templates-oa-multi.md, templates-oa-s.md, templates-oa-single-s.md, templates-oa-single.md) — `docs/owners-manual.md:204`
+  - Reads: **Make it match your agreement.** If §5.4(b) requires a majority of ownership to encumber real property, say the same thing in the statement. A statement that contradicts your operating agreement creates the exact ambiguity you filed it to avoid — which is why your agreement provides that any statement you file must be consistent with it.
+  - Claims: Optional improvement approved by Adam, not a newly established substantive error: compare-B-manual-5-4-b-unqualified
+  - True: Only the member-managed multi-member form has that §5.4(b) (templates-oa-member.md:170: "(b) no Member acting alone has actual authority to sell, convey, mortgage, pledge, or otherwise encumber any interest in real property … without the consent of a Majority in Interest"), which line 188 of the Manual names correctly: "§5.4(b) in the member-managed multi-member forms". In the manager-managed multi-member forms §5.4(b) is the consent of a Majority in Interest to move an Associated Asset between silos (templates-oa-multi.md:172: "(b) **cause any Associated Asset to become an Associated Asset of the Company or of a different Protected Series** — the consent of a Majority in Interest;"), and in the manager-managed single-member forms §5.4(b) is the Member's consent to a statement of authority (templates-oa-single.md:154: "(b) file, amend, or cancel a statement of authority under s. 605.0302, Florida Statutes, or record a certified copy of one."). A manager-managed owner following line 204 looks up a different rule. The sentence's second half is true of every form (§5.8: "A statement so filed shall be consistent with this Agreement").
+  - Proposed replacement (not approved): **Make it match your agreement.** If your agreement limits who may encumber real property — §5.4(b) in the member-managed multi-member form requires a majority of ownership — say the same thing in the statement. A statement that contradicts your operating agreement creates the exact ambiguity you filed it to avoid — which is why your agreement provides that any statement you file must be consistent with it.
+  - Rechecked by Codex at 455be76607d5f351dd9a0a80701f74af23683d1f: Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place.
+  - Fixed: batch 34 revision 1, commit , by Codex; protected by 1 assertion(s).
+- **AUD-claude-optional-batch34-render-consent-signature-split. [housekeeping]** — **implemented** — housekeeping
+  - Client portal, Add a series → the Unanimous Written Consent PDF, MEMBERS signature block (pages 1–2) — `webapp/server/pdf-render.ts:350`
+  - Reads:       // Signature blocks (Adam, 9 Sep 2026): a line of underscores is a
+  -       // signature line, and the name beneath it and the "Date:" line beneath
+  -       // that sit tight, with no paragraph gap between them; the gap goes
+  -       // before the signature line instead, so signers are set apart.
+  - Claims: Optional improvement approved by Adam, not a newly established substantive error: render-consent-signature-split
+  - True: Nothing keeps the consent's MEMBERS block together or on the signature page: with three owners the first signature line lands at the foot of page 1 and the other two on page 2, which then holds only two signature lines and an [INTENTIONALLY LEFT BLANK] notice (evidence/render/pdf-series-consent.pdf and pdf-series-consent-member.pdf, pages 1–2; images pages/pdf-series-consent/p-1.png, p-2.png). The agreements avoid this by forcing SIGNATURES onto a fresh page (oa.ts:726); the consent has no such break.
+  - Proposed replacement (not approved): In new-series.ts, insert `[[pagebreak]]` before the **MEMBERS:** heading of the consent (as oa.ts does for SIGNATURES), or in pdf-render.ts treat a `**MEMBERS:**`/`**MEMBER:**` label as a lead-in that must be kept with at least one full signature block (rule + name + Date = 3 lines).
+  - Rechecked by Codex at 455be76607d5f351dd9a0a80701f74af23683d1f: Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place.
+  - Fixed: batch 34 revision 1, commit , by Codex; protected by 2 assertion(s).
+- **AUD-claude-optional-batch34-render-oa-exhibit-a-tail-page. [housekeeping]** — **implemented** — housekeeping
+  - Generated multi-member operating agreements — the page after Exhibit A's TOD table, before SERIES EXHIBIT PS-1 — `webapp/server/pdf-render.ts:271`
+  - Reads:   const TAIL_MAX_LINES = 16;
+  -   const tailHeightBeforeBreak = (from: number): number | null => {
+  -     let h = 0;
+  -     for (let k = from; k < blocks.length && k < from + 6; k++) {
+  -       const b = blocks[k];
+  -       if (b.kind === "para" && b.segs.length === 1 && b.segs[0].text.trim() === "[[pagebreak]]") {
+  - Claims: Optional improvement approved by Adam, not a newly established substantive error: render-oa-exhibit-a-tail-page
+  - True: When the tail is Exhibit A's one or two closing sentences and they do not fit under the TOD table, the code starts a new page for them, and the forced break before the series exhibit follows at once, so the new page holds two lines and the [INTENTIONALLY LEFT BLANK] notice: evidence/render/pdf-1-ordinary.pdf page 22 and pdf-1-professional.pdf page 22 ('A designation is effective only…' / 'If no beneficiary is designated…'), pdf-4-ordinary.pdf page 21 and pdf-4-professional.pdf page 21 ('If no beneficiary is designated…'), pdf-6-professional.pdf page 21. The rule cures the case it was written for (s. 13.10 stranded) and produces the same stranding when the tail is short.
+  - Proposed replacement (not approved): Only pull the tail forward when it will NOT fit on the current page AND the pull leaves the new page more than a third full; otherwise let the tail finish on the current page (it fits by definition when `y - tail >= MARGIN`) — i.e. change the condition at line 301 to `if (tail !== null && tail > 0 && y - tail < MARGIN && tail > TEXT_H / 3)`; a two-line tail then stays under the table, which always has room for two lines or the table row itself would have broken.
+  - Rechecked by Codex at 455be76607d5f351dd9a0a80701f74af23683d1f: Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place.
+  - Fixed: batch 34 revision 1, commit , by Codex; protected by 2 assertion(s).

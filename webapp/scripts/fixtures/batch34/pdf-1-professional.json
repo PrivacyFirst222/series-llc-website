@@ -1,0 +1,95 @@
+{
+  "assets": [
+    {
+      "by": "Dana Reed (50%) and Jamie Reed (50%)",
+      "to": "Render Palm Partners Law, PLLC, PS A",
+      "value": "$200,000",
+      "description": "123 Main Street, Tampa (duplex)"
+    },
+    {
+      "by": "Dana Reed (30%), Jamie Reed (20%), and Morgan Lee (50%)",
+      "to": "Render Palm Partners Law, PLLC, PS A: $10,000; Render Palm Partners Law, PLLC, PS B: $20,000; the Company: $30,000",
+      "value": "$60,000",
+      "description": "Cash"
+    },
+    {
+      "by": "Dana Reed, Jamie Reed, and Morgan Lee, equally",
+      "to": "the Company",
+      "value": "$8,000",
+      "description": "Office furniture and computers"
+    }
+  ],
+  "series": [
+    {
+      "name": "Render Palm Partners Law, PLLC, PS A",
+      "purpose": "Rental real estate",
+      "contribution": "123 Main Street, Tampa (duplex) ($200,000); Cash ($10,000)",
+      "specialTerms": "No Member may cause this series to borrow more than $50,000 without the written consent of all Members."
+    },
+    {
+      "name": "Render Palm Partners Law, PLLC, PS B",
+      "purpose": "",
+      "contribution": "Cash ($20,000)",
+      "specialTerms": ""
+    }
+  ],
+  "members": [
+    {
+      "name": "Dana Reed",
+      "address": "70 Palm Way, Tampa, FL 33601",
+      "todBackup": "",
+      "percentage": 40,
+      "contribution": "$120,666.67",
+      "todBeneficiary": "Reed Family Trust",
+      "percentageLabel": "40%"
+    },
+    {
+      "name": "Jamie Reed",
+      "address": "70 Palm Way, Tampa, FL 33601",
+      "todBackup": "",
+      "percentage": 35,
+      "contribution": "$114,666.67",
+      "todBeneficiary": "",
+      "percentageLabel": "35%"
+    },
+    {
+      "name": "Morgan Lee",
+      "address": "12 Bayshore Blvd, Tampa, FL 33606",
+      "todBackup": "Quinn Lee",
+      "percentage": 25,
+      "contribution": "$32,666.67",
+      "todBeneficiary": "Avery Lee",
+      "percentageLabel": "25%"
+    }
+  ],
+  "version": "member-s",
+  "retained": "$38,000",
+  "companyName": "Render Palm Partners Law, PLLC",
+  "competition": "A",
+  "managerNames": [],
+  "professional": true,
+  "effectiveDate": "September 1, 2026",
+  "retainedItems": "Cash ($30,000); Office furniture and computers ($8,000)",
+  "capitalCallCap": 10000,
+  "includeShotgun": true,
+  "amendedRestated": false,
+  "generationNumber": 1,
+  "principalAddress": "100 Ocean Drive, Suite 400, Miami, FL, 33139",
+  "seriesAllocations": [
+    {
+      "name": "Render Palm Partners Law, PLLC, PS A",
+      "items": "123 Main Street, Tampa (duplex) ($200,000); Cash ($10,000)",
+      "total": "$210,000"
+    },
+    {
+      "name": "Render Palm Partners Law, PLLC, PS B",
+      "items": "Cash ($20,000)",
+      "total": "$20,000"
+    }
+  ],
+  "borrowingThreshold": 30000,
+  "priorAgreementDate": null,
+  "includeCapitalCalls": true,
+  "managerEntitySigners": [],
+  "contributionToCompany": "$120,666.67"
+}

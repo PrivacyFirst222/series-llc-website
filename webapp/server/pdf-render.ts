@@ -347,7 +347,7 @@ export async function renderMarkdownPdf(opts: {
     if (isDate(paraTextAt(at))) at++;
     return at;
   };
-  const drawSignature = (from: number, end: number) => {
+  const signatureRows = (from: number, end: number) => {
     const lineH = BODY_SIZE + LINE_GAP;
     const rows = blocks.slice(from, end).map((b, i) => {
       if (b.kind !== "para") throw new Error("Signature block contains a non-paragraph");
@@ -360,6 +360,11 @@ export async function renderMarkdownPdf(opts: {
       const after = i === end - from - 1 || (!rule && !indent && !by && i === 0 && isBy(paraTextAt(from + 1))) ? 6 : 0;
       return {rule, by, date, offset, lines, before, after, height: before + (rule ? 1 : lines.length) * lineH + after};
     });
+    return rows;
+  };
+  const drawSignature = (from: number, end: number) => {
+    const lineH = BODY_SIZE + LINE_GAP;
+    const rows = signatureRows(from, end);
     const height = rows.reduce((total, r) => total + r.height, 0);
     if (height > TEXT_H) throw new Error("Signature block is too tall to fit on one page");
     need(height);
@@ -383,8 +388,44 @@ export async function renderMarkdownPdf(opts: {
     }
   };
 
+  // Measure with exactly the same row metrics used below. Closing Exhibit A
+  // sections can move as a whole; oversized tables retain normal pagination.
+  const tableRows = (rows: string[][]) => {
+    const cols = Math.max(...rows.map(r => r.length)), colW = width / cols;
+    const asset = /^Asset description/i.test(rows[0]?.[0] ?? "");
+    return rows.map((row, ri) => {
+      const fillable = asset && ri > 0 && row.every(c => c.trim() === "");
+      const cellLines = row.map(cell => (opts.encodedClientText ? cell.split(/&#13;&#10;|&#10;|&#13;/) : [cell]).flatMap(line => wrapSegs(fonts, parseInline(line, opts.encodedClientText).map(s => ri === 0 ? { ...s, bold: true } : s), colW - 8, 9.5)));
+      return { cellLines, fillable, rowH: (fillable ? 4 : Math.max(1, ...cellLines.map(c => c.length))) * 12 + 8 };
+    });
+  };
+  let inExhibitA = false;
   for (let bi = 0; bi < blocks.length; bi++) {
     const block = blocks[bi];
+    if (block.kind === "heading" && /^(EXHIBIT|SERIES EXHIBIT|ASSET SCHEDULE)/.test(block.text.trim())) inExhibitA = /^EXHIBIT A\b/.test(block.text.trim());
+    if (inExhibitA && block.kind === "para" && blocks[bi + 1]?.kind === "table") {
+      const table = blocks[bi + 1];
+      const tail = tailHeightBeforeBreak(bi + 2);
+      if (table.kind === "table" && tail !== null && tail > 0) {
+        const lead = wrapSegs(fonts, block.segs, width, BODY_SIZE).length * (BODY_SIZE + LINE_GAP) + 6;
+        const together = lead + tableRows(table.rows).reduce((n, r) => n + r.rowH, 0) + 8 + tail;
+        if (together <= TEXT_H) need(together);
+      }
+    }
+    // Keep MEMBERS/MEMBER with the first complete signature, not merely two
+    // lines of a long entity block. Very large groups keep existing limits.
+    if (block.kind === "para" && /^MEMBERS?:$/.test(block.segs.map(s => s.text).join("").trim())) {
+      let from = bi + 1, end = signatureEnd(from);
+      if (paraTextAt(from) === "[[signature-group]]") {
+        from++;
+        end = from;
+        while (end < blocks.length && paraTextAt(end) !== "[[/signature-group]]") end++;
+      }
+      if (end !== null && end < blocks.length) {
+        const together = wrapSegs(fonts, block.segs, width, BODY_SIZE).length * (BODY_SIZE + LINE_GAP) + 6 + signatureRows(from, end).reduce((n, r) => n + r.height, 0);
+        if (together <= TEXT_H) need(together);
+      }
+    }
     // A joint ownership unit has a heading and separate human signatures.
     // Reserve the complete group so the heading cannot be stranded.
     if (block.kind === "para" && block.sourceText.trim() === "[[signature-group]]") {
@@ -556,15 +597,11 @@ export async function renderMarkdownPdf(opts: {
       // wraps and auto-sizes its text — the PDF's own "0 Tf" rule, which
       // readers apply as "as large as fits, shrinking as the text grows".
       const isAssetSchedule = /^Asset description/i.test(block.rows[0]?.[0] ?? "");
-      const FILL_LINES = 4;
       if (isAssetSchedule) assetScheduleNo++;
+      const measuredRows = tableRows(block.rows);
       for (let ri = 0; ri < block.rows.length; ri++) {
         const row = block.rows[ri];
-        const fillable = isAssetSchedule && ri > 0 && row.every((c) => c.trim() === "");
-        const cellLines = row.map((cell) =>
-          (opts.encodedClientText ? cell.split(/&#13;&#10;|&#10;|&#13;/) : [cell]).flatMap((line) => wrapSegs(fonts, parseInline(line, opts.encodedClientText).map((s) => (ri === 0 ? { ...s, bold: true } : s)), colW - 2 * pad, size)),
-        );
-        const rowH = (fillable ? FILL_LINES : Math.max(1, ...cellLines.map((c) => c.length))) * lineH + 2 * pad;
+        const { fillable, cellLines, rowH } = measuredRows[ri];
         need(rowH);
         if (fillable) {
           const form = doc.getForm();

@@ -113,8 +113,8 @@ Your operating agreement comes in one of eight versions. Three questions decide 
 |---|---|---|
 | **One owner, manager-managed** | Manager-Managed, Single Member | Manager-Managed, Single Member, S Corporation |
 | **One owner, member-managed** | Member-Managed, Single Member | Member-Managed, Single Member, S Corporation |
-| **Multiple owners, manager-managed** | Manager-Managed, Multiple Members | Manager-Managed, S Corporation |
-| **Multiple owners, member-managed** | Member-Managed, Multiple Members | Member-Managed, S Corporation |
+| **Multiple owners, manager-managed** | Manager-Managed, Multiple Members | Manager-Managed, Multiple Members, S Corporation |
+| **Multiple owners, member-managed** | Member-Managed, Multiple Members | Member-Managed, Multiple Members, S Corporation |
 
 All eight share the same skeleton through Article 9. From there the multi-owner forms run to Article 16 — transfers (10), the bankruptcy provisions (11), admissions (12), dissociation and deadlock (13), dissolution (14), amendments (15), and miscellaneous (16). The single-owner forms need no transfer or deadlock articles (their bankruptcy continuity provision lives in Article 4), so they run to Article 13: admission of an additional member (10), dissolution (11), amendments (12), and miscellaneous (13). Here is the map, so you know where things live when a bank, title company, or lawyer asks:
 
@@ -201,7 +201,7 @@ If you decide to file, four steps:
 | **4. Record the certified copy** | In the official records of **every county where the company or a series owns real property.** The clerk charges a separate recording fee. |
 
 **Step 4 is the step that matters.** Filing with the state alone binds nobody. The statute protects a person relying on the statement only where a certified copy is recorded in the county where transfers of that property are recorded. A statement sitting in Tallahassee and nowhere else does nothing for your real estate.
-**Make it match your agreement.** If §5.4(b) requires a majority of ownership to encumber real property, say the same thing in the statement. A statement that contradicts your operating agreement creates the exact ambiguity you filed it to avoid — which is why your agreement provides that any statement you file must be consistent with it.
+**Make it match your agreement.** For example, if you use a member-managed, multi-member agreement and §5.4(b) requires a majority of ownership to encumber real property, say the same thing in the statement. A statement that contradicts your operating agreement creates the exact ambiguity you filed it to avoid — which is why your agreement provides that any statement you file must be consistent with it.
 **It expires in five years.** A statement of authority is cancelled by operation of law five years after it — or its most recent amendment — becomes effective (s. 605.0302(10)). Nothing warns you. Put the date on the calendar the day you file, and re-file before it lapses, with a fresh certified copy recorded in each county. Buy property in a new county? That county needs its own recording. To change or end one before it expires, use form **CR2E145, "Amend or Cancel Statement of Authority."**
 ## 12. BANK ACCOUNTS
 **The rule: every silo that handles money has at least one account of its own.** The company has its own; each active series has its own — more than one where the business calls for it (an operating account and a security-deposit account, say). What no two silos may ever do is share one. No exceptions for "it's all mine anyway" — commingling is the single most common way owners destroy the horizontal shield (and the vertical one).

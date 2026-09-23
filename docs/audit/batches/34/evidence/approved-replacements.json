@@ -1,0 +1,66 @@
+{
+  "webapp/src/content/terms.md": [
+    {
+      "kind": "replace",
+      "file": "webapp/src/content/terms.md",
+      "before": "email delivery (Resend), and address data (Smarty).",
+      "after": "email delivery (Resend), document backups (Dropbox), and address data (Smarty).",
+      "count": 1
+    }
+  ],
+  "webapp/server/templates-oa-s.md": [
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-s.md",
+      "before": "**(Manager-Managed \u2014 S Corporation)**",
+      "after": "**(Manager-Managed \u2014 Multiple Members / S Corporation)**",
+      "count": 1
+    },
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-s.md",
+      "before": "Operating Agreement (Manager-Managed / S Corporation), v1 draft.",
+      "after": "Operating Agreement (Manager-Managed, Multiple Members / S Corporation), v1 draft.",
+      "count": 1
+    }
+  ],
+  "docs/owners-manual.md": [
+    {
+      "kind": "replace",
+      "file": "docs/owners-manual.md",
+      "before": "| Manager-Managed, S Corporation |",
+      "after": "| Manager-Managed, Multiple Members, S Corporation |",
+      "count": 1
+    },
+    {
+      "kind": "replace",
+      "file": "docs/owners-manual.md",
+      "before": "| Member-Managed, S Corporation |",
+      "after": "| Member-Managed, Multiple Members, S Corporation |",
+      "count": 1
+    },
+    {
+      "kind": "replace",
+      "file": "docs/owners-manual.md",
+      "before": "If \u00a75.4(b) requires a majority of ownership to encumber real property, say the same thing in the statement.",
+      "after": "For example, if you use a member-managed, multi-member agreement and \u00a75.4(b) requires a majority of ownership to encumber real property, say the same thing in the statement.",
+      "count": 1
+    }
+  ],
+  "webapp/server/templates-oa-member-s.md": [
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-member-s.md",
+      "before": "**(Member-Managed \u2014 S Corporation)**",
+      "after": "**(Member-Managed \u2014 Multiple Members / S Corporation)**",
+      "count": 1
+    },
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-member-s.md",
+      "before": "Operating Agreement (Member-Managed / S Corporation), v1 draft.",
+      "after": "Operating Agreement (Member-Managed, Multiple Members / S Corporation), v1 draft.",
+      "count": 1
+    }
+  ]
+}

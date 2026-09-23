@@ -101,7 +101,7 @@ We may screen orders and customers against sanctions and watchlists and may refu
 If you provide a mobile number and opt in, we may send you service-related text messages. Message and data rates may apply. Reply STOP to opt out and HELP for help. We do not share mobile numbers with third parties for their marketing.
 
 ### 20. Third-Party Services
-The Services incorporate third-party services, including payment processing (Square), hosting and storage (Vercel), database services (Neon), email delivery (Resend), and address data (Smarty). We are not responsible for third-party services and make no warranty regarding them. Links to third-party sites are provided for convenience only. Our use of information is described in our Privacy Policy.
+The Services incorporate third-party services, including payment processing (Square), hosting and storage (Vercel), database services (Neon), email delivery (Resend), document backups (Dropbox), and address data (Smarty). We are not responsible for third-party services and make no warranty regarding them. Links to third-party sites are provided for convenience only. Our use of information is described in our Privacy Policy.
 
 ### 21. Internet Delays and Availability
 The Services depend on internet and third-party systems and may be delayed, interrupted, or unavailable. We are not liable for delays or failures caused by such systems.

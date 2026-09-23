@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "run": "claude-optional-batch34",
+  "commit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+  "completedAt": "2026-09-22T23:55:53.765890+00:00",
+  "manifestSha": "fbfc03af047afcd6f92a32d7c7e1c3e86ab64926ed7ffb47fd203caa1badc4fc",
+  "auditSha": "d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1",
+  "findings": [
+    {
+      "key": "reader-1-terms-third-parties-omit-dropbox",
+      "where": "Terms of Service page, section 20 \"Third-Party Services\", first sentence",
+      "file": "webapp/src/content/terms.md",
+      "line": 104,
+      "reads": "The Services incorporate third-party services, including payment processing (Square), hosting and storage (Vercel), database services (Neon), email delivery (Resend), and address data (Smarty). We are not responsible for third-party services and make no warranty regarding them. Links to third-party sites are provided for convenience only. Our use of information is described in our Privacy Policy.",
+      "claims": "Optional improvement approved by Adam, not a newly established substantive error: reader-1-terms-third-parties-omit-dropbox",
+      "truth": "The Privacy Policy on the next page (privacy.md:40) discloses a sixth provider, \"Dropbox (document backups)\", and the server mirrors every client file to Dropbox (backup.ts:6 imports mirrorFile from dropbox.ts; dropbox.ts:6-8 \"Verified client-file backup. Sensitive files are copied as ciphertext.\"). Section 20 disclaims responsibility for the third-party services it lists; the list omits the one that holds copies of the client's documents. Two lists for one fact.",
+      "replacement": "The Services incorporate third-party services, including payment processing (Square), hosting and storage (Vercel), database services (Neon), email delivery (Resend), document backups (Dropbox), and address data (Smarty).",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "reader-1-finding-terms-dropbox"
+      ],
+      "review": {
+        "reviewer": "Codex at 455be76607d5f351dd9a0a80701f74af23683d1f",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place."
+      },
+      "bucket": 1,
+      "reader": "reader-1",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "compare-A-s-multi-title-omits-multiple-members",
+      "where": "Operating agreement, multi-member S forms, title and colophon (and Manual \u00a77 table)",
+      "file": "webapp/server/templates-oa-member-s.md",
+      "line": 6,
+      "reads": "**(Member-Managed \u2014 S Corporation)**",
+      "claims": "Optional improvement approved by Adam, not a newly established substantive error: compare-A-s-multi-title-omits-multiple-members",
+      "truth": "Titles: master 1 '(Member-Managed \u2014 S Corporation)', master 6 '(Manager-Managed \u2014 S Corporation)', while master 4 says '(Member-Managed \u2014 Multiple Members / Partnership Taxation)' and masters 2/7 say '\u2026 Single Member / S Corporation'. Colophons (1:507, 6:521) likewise '(Member-Managed / S Corporation)'. The Manual's \u00a77 table (docs/owners-manual.md:116-117) mirrors the current titles ('Manager-Managed, S Corporation' / 'Member-Managed, S Corporation'), so a change touches the Manual too. Severity: housekeeping. Other text: master 2 line 6: \"**(Member-Managed \u2014 Single Member / S Corporation)**\"",
+      "replacement": "**(Member-Managed \u2014 Multiple Members / S Corporation)**  and in the colophon '(Member-Managed, Multiple Members / S Corporation)'; same for templates-oa-s.md:6 and :521 with 'Manager-Managed'; update docs/owners-manual.md:116-117 to match.",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "compare-A-masters-1-2"
+      ],
+      "review": {
+        "reviewer": "Codex at 455be76607d5f351dd9a0a80701f74af23683d1f",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place."
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "compare-B-manual-5-4-b-unqualified",
+      "where": "Owner's Manual, section 11, \"Make it match your agreement\" \u2014 read against the four manager-managed masters (templates-oa-multi.md, templates-oa-s.md, templates-oa-single-s.md, templates-oa-single.md)",
+      "file": "docs/owners-manual.md",
+      "line": 204,
+      "reads": "**Make it match your agreement.** If \u00a75.4(b) requires a majority of ownership to encumber real property, say the same thing in the statement. A statement that contradicts your operating agreement creates the exact ambiguity you filed it to avoid \u2014 which is why your agreement provides that any statement you file must be consistent with it.",
+      "claims": "Optional improvement approved by Adam, not a newly established substantive error: compare-B-manual-5-4-b-unqualified",
+      "truth": "Only the member-managed multi-member form has that \u00a75.4(b) (templates-oa-member.md:170: \"(b) no Member acting alone has actual authority to sell, convey, mortgage, pledge, or otherwise encumber any interest in real property \u2026 without the consent of a Majority in Interest\"), which line 188 of the Manual names correctly: \"\u00a75.4(b) in the member-managed multi-member forms\". In the manager-managed multi-member forms \u00a75.4(b) is the consent of a Majority in Interest to move an Associated Asset between silos (templates-oa-multi.md:172: \"(b) **cause any Associated Asset to become an Associated Asset of the Company or of a different Protected Series** \u2014 the consent of a Majority in Interest;\"), and in the manager-managed single-member forms \u00a75.4(b) is the Member's consent to a statement of authority (templates-oa-single.md:154: \"(b) file, amend, or cancel a statement of authority under s. 605.0302, Florida Statutes, or record a certified copy of one.\"). A manager-managed owner following line 204 looks up a different rule. The sentence's second half is true of every form (\u00a75.8: \"A statement so filed shall be consistent with this Agreement\").",
+      "replacement": "**Make it match your agreement.** If your agreement limits who may encumber real property \u2014 \u00a75.4(b) in the member-managed multi-member form requires a majority of ownership \u2014 say the same thing in the statement. A statement that contradicts your operating agreement creates the exact ambiguity you filed it to avoid \u2014 which is why your agreement provides that any statement you file must be consistent with it.",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "compare-B-manual-5",
+        "compare-B-manual-8"
+      ],
+      "review": {
+        "reviewer": "Codex at 455be76607d5f351dd9a0a80701f74af23683d1f",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place."
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "render-consent-signature-split",
+      "where": "Client portal, Add a series \u2192 the Unanimous Written Consent PDF, MEMBERS signature block (pages 1\u20132)",
+      "file": "webapp/server/pdf-render.ts",
+      "line": 350,
+      "reads": "      // Signature blocks (Adam, 9 Sep 2026): a line of underscores is a\n      // signature line, and the name beneath it and the \"Date:\" line beneath\n      // that sit tight, with no paragraph gap between them; the gap goes\n      // before the signature line instead, so signers are set apart.",
+      "claims": "Optional improvement approved by Adam, not a newly established substantive error: render-consent-signature-split",
+      "truth": "Nothing keeps the consent's MEMBERS block together or on the signature page: with three owners the first signature line lands at the foot of page 1 and the other two on page 2, which then holds only two signature lines and an [INTENTIONALLY LEFT BLANK] notice (evidence/render/pdf-series-consent.pdf and pdf-series-consent-member.pdf, pages 1\u20132; images pages/pdf-series-consent/p-1.png, p-2.png). The agreements avoid this by forcing SIGNATURES onto a fresh page (oa.ts:726); the consent has no such break.",
+      "replacement": "In new-series.ts, insert `[[pagebreak]]` before the **MEMBERS:** heading of the consent (as oa.ts does for SIGNATURES), or in pdf-render.ts treat a `**MEMBERS:**`/`**MEMBER:**` label as a lead-in that must be kept with at least one full signature block (rule + name + Date = 3 lines).",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "render-pdf-series-consent",
+        "render-pdf-series-consent-member"
+      ],
+      "review": {
+        "reviewer": "Codex at 455be76607d5f351dd9a0a80701f74af23683d1f",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place."
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "render-oa-exhibit-a-tail-page",
+      "where": "Generated multi-member operating agreements \u2014 the page after Exhibit A's TOD table, before SERIES EXHIBIT PS-1",
+      "file": "webapp/server/pdf-render.ts",
+      "line": 271,
+      "reads": "  const TAIL_MAX_LINES = 16;\n  const tailHeightBeforeBreak = (from: number): number | null => {\n    let h = 0;\n    for (let k = from; k < blocks.length && k < from + 6; k++) {\n      const b = blocks[k];\n      if (b.kind === \"para\" && b.segs.length === 1 && b.segs[0].text.trim() === \"[[pagebreak]]\") {",
+      "claims": "Optional improvement approved by Adam, not a newly established substantive error: render-oa-exhibit-a-tail-page",
+      "truth": "When the tail is Exhibit A's one or two closing sentences and they do not fit under the TOD table, the code starts a new page for them, and the forced break before the series exhibit follows at once, so the new page holds two lines and the [INTENTIONALLY LEFT BLANK] notice: evidence/render/pdf-1-ordinary.pdf page 22 and pdf-1-professional.pdf page 22 ('A designation is effective only\u2026' / 'If no beneficiary is designated\u2026'), pdf-4-ordinary.pdf page 21 and pdf-4-professional.pdf page 21 ('If no beneficiary is designated\u2026'), pdf-6-professional.pdf page 21. The rule cures the case it was written for (s. 13.10 stranded) and produces the same stranding when the tail is short.",
+      "replacement": "Only pull the tail forward when it will NOT fit on the current page AND the pull leaves the new page more than a third full; otherwise let the tail finish on the current page (it fits by definition when `y - tail >= MARGIN`) \u2014 i.e. change the condition at line 301 to `if (tail !== null && tail > 0 && y - tail < MARGIN && tail > TEXT_H / 3)`; a two-line tail then stays under the table, which always has room for two lines or the table row itself would have broken.",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "render-pdf-1-ordinary",
+        "render-pdf-1-professional",
+        "render-pdf-4-ordinary",
+        "render-pdf-4-professional",
+        "render-pdf-6-professional"
+      ],
+      "review": {
+        "reviewer": "Codex at 455be76607d5f351dd9a0a80701f74af23683d1f",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Optional Batch34 scope approved by Adam with Go approve all. Historical original and reconciliation retained separately; prior repairs stay in place."
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    }
+  ]
+}

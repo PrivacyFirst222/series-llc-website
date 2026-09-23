@@ -1,0 +1,369 @@
+{
+  "id": "34",
+  "revision": 1,
+  "title": "Optional document clarity and pagination",
+  "model": "Codex",
+  "base": "455be76607d5f351dd9a0a80701f74af23683d1f",
+  "items": [
+    {
+      "id": "AUD-claude-optional-batch34-reader-1-terms-third-parties-omit-dropbox",
+      "part": "all",
+      "scope": "Add Dropbox provider example.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/src/content/terms.md",
+          "before": "email delivery (Resend), and address data (Smarty).",
+          "after": "email delivery (Resend), document backups (Dropbox), and address data (Smarty).",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-optional-batch34-compare-A-s-multi-title-omits-multiple-members",
+      "part": "all",
+      "scope": "Clarify both multi-member S titles/colophons and matching Manual labels.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-s.md",
+          "before": "**(Manager-Managed \u2014 S Corporation)**",
+          "after": "**(Manager-Managed \u2014 Multiple Members / S Corporation)**",
+          "count": 1
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-s.md",
+          "before": "Operating Agreement (Manager-Managed / S Corporation), v1 draft.",
+          "after": "Operating Agreement (Manager-Managed, Multiple Members / S Corporation), v1 draft.",
+          "count": 1
+        },
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "| Manager-Managed, S Corporation |",
+          "after": "| Manager-Managed, Multiple Members, S Corporation |",
+          "count": 1
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-member-s.md",
+          "before": "**(Member-Managed \u2014 S Corporation)**",
+          "after": "**(Member-Managed \u2014 Multiple Members / S Corporation)**",
+          "count": 1
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-member-s.md",
+          "before": "Operating Agreement (Member-Managed / S Corporation), v1 draft.",
+          "after": "Operating Agreement (Member-Managed, Multiple Members / S Corporation), v1 draft.",
+          "count": 1
+        },
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "| Member-Managed, S Corporation |",
+          "after": "| Member-Managed, Multiple Members, S Corporation |",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-optional-batch34-compare-B-manual-5-4-b-unqualified",
+      "part": "all",
+      "scope": "Qualify Manual 5.4(b) example exactly as approved.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "If \u00a75.4(b) requires a majority of ownership to encumber real property, say the same thing in the statement.",
+          "after": "For example, if you use a member-managed, multi-member agreement and \u00a75.4(b) requires a majority of ownership to encumber real property, say the same thing in the statement.",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-optional-batch34-render-consent-signature-split",
+      "part": "all",
+      "scope": "Keep MEMBERS heading with first whole signature when combined group fits a page.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch34-check.ts",
+          "text": "consent heading stays with first signature"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch34-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-optional-batch34-render-oa-exhibit-a-tail-page",
+      "part": "all",
+      "scope": "Keep closing Exhibit A section with its table/heading where it fits, preserve all text and margins.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch34-check.ts",
+          "text": "Exhibit A closing section stays together"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch34-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "235",
+      "part": "all",
+      "scope": "Carry every prior colophon protection forward; change only the two owner-approved multi-member S form labels.",
+      "replaces": {
+        "batch": "18",
+        "revision": 2,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "present",
+            "file": "webapp/server/templates-oa-member-s.md",
+            "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \u00a7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*"
+          },
+          {
+            "kind": "present",
+            "file": "webapp/server/templates-oa-member-single-s.md",
+            "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.50, 711.501, 711.512, Fla. Stat. Internal Revenue Code sections: 1361, 1362, 1378.*"
+          },
+          {
+            "kind": "present",
+            "file": "webapp/server/templates-oa-member-single.md",
+            "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.50, 711.501, 711.512, Fla. Stat.*"
+          },
+          {
+            "kind": "present",
+            "file": "webapp/server/templates-oa-member.md",
+            "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \u00a7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 704, 754, 6221, 6223, 6226.*"
+          },
+          {
+            "kind": "present",
+            "file": "webapp/server/templates-oa-multi.md",
+            "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \u00a7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 704, 754, 6221, 6223, 6226.*"
+          },
+          {
+            "kind": "present",
+            "file": "webapp/server/templates-oa-s.md",
+            "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \u00a7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*"
+          },
+          {
+            "kind": "present",
+            "file": "webapp/server/templates-oa-single-s.md",
+            "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.50, 711.501, 711.512, Fla. Stat. Internal Revenue Code sections: 1361, 1362, 1378.*"
+          },
+          {
+            "kind": "present",
+            "file": "webapp/server/templates-oa-single.md",
+            "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.50, 711.501, 711.512, Fla. Stat.*"
+          }
+        ]
+      },
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-member-s.md",
+          "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Multiple Members / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \u00a7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-member-single-s.md",
+          "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.50, 711.501, 711.512, Fla. Stat. Internal Revenue Code sections: 1361, 1362, 1378.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-member-single.md",
+          "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 711.50, 711.501, 711.512, Fla. Stat.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-member.md",
+          "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \u00a7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 704, 754, 6221, 6223, 6226.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-multi.md",
+          "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Multiple Members / Partnership Taxation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \u00a7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 704, 754, 6221, 6223, 6226.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-s.md",
+          "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Multiple Members / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \u00a7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-single-s.md",
+          "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.50, 711.501, 711.512, Fla. Stat. Internal Revenue Code sections: 1361, 1362, 1378.*"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/server/templates-oa-single.md",
+          "text": "*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Single Member / Disregarded Entity), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0602, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 711.50, 711.501, 711.512, Fla. Stat.*"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/content/terms.md",
+      "mode": "replace",
+      "why": "Exact approved optional wording only."
+    },
+    {
+      "path": "webapp/server/templates-oa-s.md",
+      "mode": "replace",
+      "why": "Exact approved optional wording only."
+    },
+    {
+      "path": "docs/owners-manual.md",
+      "mode": "replace",
+      "why": "Exact approved optional wording only."
+    },
+    {
+      "path": "webapp/server/templates-oa-member-s.md",
+      "mode": "replace",
+      "why": "Exact approved optional wording only."
+    },
+    {
+      "path": "webapp/server/pdf-render.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved layout behavior, regression evidence and tracking."
+    },
+    {
+      "path": "webapp/scripts/batch34-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved layout behavior, regression evidence and tracking."
+    },
+    {
+      "path": "webapp/package.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved layout behavior, regression evidence and tracking."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved layout behavior, regression evidence and tracking."
+    },
+    {
+      "path": "docs/audit/intakes/claude-optional-batch34.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved layout behavior, regression evidence and tracking."
+    },
+    {
+      "path": "webapp/scripts/fixtures/batch34/pdf-1-ordinary.json",
+      "mode": "new",
+      "control": true,
+      "why": "Exact historical synthetic render input."
+    },
+    {
+      "path": "webapp/scripts/fixtures/batch34/pdf-1-professional.json",
+      "mode": "new",
+      "control": true,
+      "why": "Exact historical synthetic render input."
+    },
+    {
+      "path": "webapp/scripts/fixtures/batch34/pdf-4-ordinary.json",
+      "mode": "new",
+      "control": true,
+      "why": "Exact historical synthetic render input."
+    },
+    {
+      "path": "webapp/scripts/fixtures/batch34/pdf-4-professional.json",
+      "mode": "new",
+      "control": true,
+      "why": "Exact historical synthetic render input."
+    },
+    {
+      "path": "webapp/scripts/fixtures/batch34/pdf-6-professional.json",
+      "mode": "new",
+      "control": true,
+      "why": "Exact historical synthetic render input."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "why": "Normal tracked generation."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Normal tracked generation."
+    },
+    {
+      "path": "docs/word/SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerate approved source labels and Manual wording through existing generator."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerate approved source labels and Manual wording through existing generator."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerate approved source labels and Manual wording through existing generator."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerate approved source labels and Manual wording through existing generator."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerate approved source labels and Manual wording through existing generator."
+    },
+    {
+      "path": "docs/word/SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerate approved source labels and Manual wording through existing generator."
+    },
+    {
+      "path": "docs/word/SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerate approved source labels and Manual wording through existing generator."
+    },
+    {
+      "path": "docs/word/SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerate approved source labels and Manual wording through existing generator."
+    },
+    {
+      "path": "docs/word/FPSLLC Amendment to Operating Agreement - FORM.docx",
+      "mode": "generated",
+      "why": "Regenerate approved source labels and Manual wording through existing generator."
+    },
+    {
+      "path": "docs/word/Series LLC Owners Manual - REVISED DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerate approved source labels and Manual wording through existing generator."
+    },
+    {
+      "path": "docs/word/FPSLLC Statement of Authorized Representative - FORM.docx",
+      "mode": "generated",
+      "why": "Regenerate approved source labels and Manual wording through existing generator."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement Instructions - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerate approved source labels and Manual wording through existing generator."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": []
+}

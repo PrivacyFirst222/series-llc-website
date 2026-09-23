@@ -93790,7 +93790,7 @@ async function renderMarkdownPdf(opts) {
     if (isDate(paraTextAt(at))) at++;
     return at;
   };
-  const drawSignature = (from, end) => {
+  const signatureRows = (from, end) => {
     const lineH = BODY_SIZE + LINE_GAP;
     const rows = blocks.slice(from, end).map((b2, i) => {
       if (b2.kind !== "para") throw new Error("Signature block contains a non-paragraph");
@@ -93803,6 +93803,11 @@ async function renderMarkdownPdf(opts) {
       const after = i === end - from - 1 || !rule && !indent && !by && i === 0 && isBy(paraTextAt(from + 1)) ? 6 : 0;
       return { rule, by, date: date2, offset, lines, before, after, height: before + (rule ? 1 : lines.length) * lineH + after };
     });
+    return rows;
+  };
+  const drawSignature = (from, end) => {
+    const lineH = BODY_SIZE + LINE_GAP;
+    const rows = signatureRows(from, end);
     const height = rows.reduce((total, r) => total + r.height, 0);
     if (height > TEXT_H) throw new Error("Signature block is too tall to fit on one page");
     need(height);
@@ -93825,8 +93830,40 @@ async function renderMarkdownPdf(opts) {
       y -= row.after;
     }
   };
+  const tableRows = (rows) => {
+    const cols = Math.max(...rows.map((r) => r.length)), colW = width / cols;
+    const asset = /^Asset description/i.test(rows[0]?.[0] ?? "");
+    return rows.map((row, ri) => {
+      const fillable = asset && ri > 0 && row.every((c) => c.trim() === "");
+      const cellLines = row.map((cell2) => (opts.encodedClientText ? cell2.split(/&#13;&#10;|&#10;|&#13;/) : [cell2]).flatMap((line2) => wrapSegs(fonts, parseInline(line2, opts.encodedClientText).map((s) => ri === 0 ? { ...s, bold: true } : s), colW - 8, 9.5)));
+      return { cellLines, fillable, rowH: (fillable ? 4 : Math.max(1, ...cellLines.map((c) => c.length))) * 12 + 8 };
+    });
+  };
+  let inExhibitA = false;
   for (let bi2 = 0; bi2 < blocks.length; bi2++) {
     const block = blocks[bi2];
+    if (block.kind === "heading" && /^(EXHIBIT|SERIES EXHIBIT|ASSET SCHEDULE)/.test(block.text.trim())) inExhibitA = /^EXHIBIT A\b/.test(block.text.trim());
+    if (inExhibitA && block.kind === "para" && blocks[bi2 + 1]?.kind === "table") {
+      const table = blocks[bi2 + 1];
+      const tail = tailHeightBeforeBreak(bi2 + 2);
+      if (table.kind === "table" && tail !== null && tail > 0) {
+        const lead = wrapSegs(fonts, block.segs, width, BODY_SIZE).length * (BODY_SIZE + LINE_GAP) + 6;
+        const together = lead + tableRows(table.rows).reduce((n, r) => n + r.rowH, 0) + 8 + tail;
+        if (together <= TEXT_H) need(together);
+      }
+    }
+    if (block.kind === "para" && /^MEMBERS?:$/.test(block.segs.map((s) => s.text).join("").trim())) {
+      let from = bi2 + 1, end = signatureEnd(from);
+      if (paraTextAt(from) === "[[signature-group]]") {
+        from++;
+        end = from;
+        while (end < blocks.length && paraTextAt(end) !== "[[/signature-group]]") end++;
+      }
+      if (end !== null && end < blocks.length) {
+        const together = wrapSegs(fonts, block.segs, width, BODY_SIZE).length * (BODY_SIZE + LINE_GAP) + 6 + signatureRows(from, end).reduce((n, r) => n + r.height, 0);
+        if (together <= TEXT_H) need(together);
+      }
+    }
     if (block.kind === "para" && block.sourceText.trim() === "[[signature-group]]") {
       let end = bi2 + 1;
       while (end < blocks.length && paraTextAt(end) !== "[[/signature-group]]") end++;
@@ -93950,15 +93987,11 @@ async function renderMarkdownPdf(opts) {
       const lineH = size + 2.5;
       const pad = 4;
       const isAssetSchedule = /^Asset description/i.test(block.rows[0]?.[0] ?? "");
-      const FILL_LINES = 4;
       if (isAssetSchedule) assetScheduleNo++;
+      const measuredRows = tableRows(block.rows);
       for (let ri = 0; ri < block.rows.length; ri++) {
         const row = block.rows[ri];
-        const fillable = isAssetSchedule && ri > 0 && row.every((c) => c.trim() === "");
-        const cellLines = row.map(
-          (cell2) => (opts.encodedClientText ? cell2.split(/&#13;&#10;|&#10;|&#13;/) : [cell2]).flatMap((line2) => wrapSegs(fonts, parseInline(line2, opts.encodedClientText).map((s) => ri === 0 ? { ...s, bold: true } : s), colW - 2 * pad, size))
-        );
-        const rowH = (fillable ? FILL_LINES : Math.max(1, ...cellLines.map((c) => c.length))) * lineH + 2 * pad;
+        const { fillable, cellLines, rowH } = measuredRows[ri];
         need(rowH);
         if (fillable) {
           const form = doc.getForm();
@@ -101719,8 +101752,8 @@ Your operating agreement comes in one of eight versions. Three questions decide 
 |---|---|---|
 | **One owner, manager-managed** | Manager-Managed, Single Member | Manager-Managed, Single Member, S Corporation |
 | **One owner, member-managed** | Member-Managed, Single Member | Member-Managed, Single Member, S Corporation |
-| **Multiple owners, manager-managed** | Manager-Managed, Multiple Members | Manager-Managed, S Corporation |
-| **Multiple owners, member-managed** | Member-Managed, Multiple Members | Member-Managed, S Corporation |
+| **Multiple owners, manager-managed** | Manager-Managed, Multiple Members | Manager-Managed, Multiple Members, S Corporation |
+| **Multiple owners, member-managed** | Member-Managed, Multiple Members | Member-Managed, Multiple Members, S Corporation |
 
 All eight share the same skeleton through Article 9. From there the multi-owner forms run to Article 16 \u2014 transfers (10), the bankruptcy provisions (11), admissions (12), dissociation and deadlock (13), dissolution (14), amendments (15), and miscellaneous (16). The single-owner forms need no transfer or deadlock articles (their bankruptcy continuity provision lives in Article 4), so they run to Article 13: admission of an additional member (10), dissolution (11), amendments (12), and miscellaneous (13). Here is the map, so you know where things live when a bank, title company, or lawyer asks:
 
@@ -101807,7 +101840,7 @@ If you decide to file, four steps:
 | **4. Record the certified copy** | In the official records of **every county where the company or a series owns real property.** The clerk charges a separate recording fee. |
 
 **Step 4 is the step that matters.** Filing with the state alone binds nobody. The statute protects a person relying on the statement only where a certified copy is recorded in the county where transfers of that property are recorded. A statement sitting in Tallahassee and nowhere else does nothing for your real estate.
-**Make it match your agreement.** If \xA75.4(b) requires a majority of ownership to encumber real property, say the same thing in the statement. A statement that contradicts your operating agreement creates the exact ambiguity you filed it to avoid \u2014 which is why your agreement provides that any statement you file must be consistent with it.
+**Make it match your agreement.** For example, if you use a member-managed, multi-member agreement and \xA75.4(b) requires a majority of ownership to encumber real property, say the same thing in the statement. A statement that contradicts your operating agreement creates the exact ambiguity you filed it to avoid \u2014 which is why your agreement provides that any statement you file must be consistent with it.
 **It expires in five years.** A statement of authority is cancelled by operation of law five years after it \u2014 or its most recent amendment \u2014 becomes effective (s. 605.0302(10)). Nothing warns you. Put the date on the calendar the day you file, and re-file before it lapses, with a fresh certified copy recorded in each county. Buy property in a new county? That county needs its own recording. To change or end one before it expires, use form **CR2E145, "Amend or Cancel Statement of Authority."**
 ## 12. BANK ACCOUNTS
 **The rule: every silo that handles money has at least one account of its own.** The company has its own; each active series has its own \u2014 more than one where the business calls for it (an operating account and a security-deposit account, say). What no two silos may ever do is share one. No exceptions for "it's all mine anyway" \u2014 commingling is the single most common way owners destroy the horizontal shield (and the vertical one).
@@ -103846,7 +103879,7 @@ var templates_oa_s_default = `<!-- alternative:restated-title "# AMENDED AND RES
 ## [COMPANY NAME], LLC
 ### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
 
-**(Manager-Managed \u2014 S Corporation)**
+**(Manager-Managed \u2014 Multiple Members / S Corporation)**
 
 ---
 
@@ -104363,7 +104396,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Multiple Members / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
@@ -104890,7 +104923,7 @@ var templates_oa_member_s_default = `<!-- alternative:restated-title "# AMENDED 
 ## [COMPANY NAME], LLC
 ### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
 
-**(Member-Managed \u2014 S Corporation)**
+**(Member-Managed \u2014 Multiple Members / S Corporation)**
 
 ---
 
@@ -105393,7 +105426,7 @@ By: _____________________________
 
 ---
 
-*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*
+*Form document \u2014 [COMPANY NAME], LLC Operating Agreement (Member-Managed, Multiple Members / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. \xA7365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*
 
 *[TITLE] of [COMPANY NAME], LLC \u2014 generated by MyFloridaSeriesLLC \xB7 Master [EDITION]*
 `;
