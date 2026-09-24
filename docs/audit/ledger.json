@@ -34519,7 +34519,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -34578,22 +34578,15 @@
               "batch": "41",
               "revision": 4,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-24T00:03:35.521Z",
+              "event": "rejected r4",
+              "batch": "41",
+              "revision": 4,
+              "note": "Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance."
             }
-          ],
-          "batch": "41",
-          "fix": {
-            "batch": "41",
-            "revision": 4,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch41 agent obligations and payment recovery"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -34610,7 +34603,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -34669,22 +34662,15 @@
               "batch": "41",
               "revision": 4,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-24T00:03:35.521Z",
+              "event": "rejected r4",
+              "batch": "41",
+              "revision": 4,
+              "note": "Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance."
             }
-          ],
-          "batch": "41",
-          "fix": {
-            "batch": "41",
-            "revision": 4,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch41 financial correspondence recovery"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -34701,7 +34687,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -34760,22 +34746,15 @@
               "batch": "41",
               "revision": 4,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-24T00:03:35.521Z",
+              "event": "rejected r4",
+              "batch": "41",
+              "revision": 4,
+              "note": "Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance."
             }
-          ],
-          "batch": "41",
-          "fix": {
-            "batch": "41",
-            "revision": 4,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch41 agent balances and checkout states"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -34792,7 +34771,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -34851,22 +34830,15 @@
               "batch": "41",
               "revision": 4,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-24T00:03:35.521Z",
+              "event": "rejected r4",
+              "batch": "41",
+              "revision": 4,
+              "note": "Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance."
             }
-          ],
-          "batch": "41",
-          "fix": {
-            "batch": "41",
-            "revision": 4,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch41 office identity search and certificate refresh"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -34883,7 +34855,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -34942,22 +34914,15 @@
               "batch": "41",
               "revision": 4,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-24T00:03:35.521Z",
+              "event": "rejected r4",
+              "batch": "41",
+              "revision": 4,
+              "note": "Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance."
             }
-          ],
-          "batch": "41",
-          "fix": {
-            "batch": "41",
-            "revision": 4,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "walk",
-                "label": "batch41 office identity search and certificate refresh"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -34974,7 +34939,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -35033,22 +34998,15 @@
               "batch": "41",
               "revision": 4,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-24T00:03:35.521Z",
+              "event": "rejected r4",
+              "batch": "41",
+              "revision": 4,
+              "note": "Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance."
             }
-          ],
-          "batch": "41",
-          "fix": {
-            "batch": "41",
-            "revision": 4,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch41 B1 filing revision recovery"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -35065,7 +35023,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -35124,22 +35082,15 @@
               "batch": "41",
               "revision": 4,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-24T00:03:35.521Z",
+              "event": "rejected r4",
+              "batch": "41",
+              "revision": 4,
+              "note": "Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance."
             }
-          ],
-          "batch": "41",
-          "fix": {
-            "batch": "41",
-            "revision": 4,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch41 B2 retained package recovery"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -35156,7 +35107,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -35215,43 +35166,15 @@
               "batch": "41",
               "revision": 4,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-24T00:03:35.521Z",
+              "event": "rejected r4",
+              "batch": "41",
+              "revision": 4,
+              "note": "Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance."
             }
-          ],
-          "batch": "41",
-          "fix": {
-            "batch": "41",
-            "revision": 4,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "replace",
-                "file": "docs/owners-manual.md",
-                "before": "In the official records of **every county where the company or a series owns real property.** The clerk charges a separate recording fee.",
-                "after": "In the official records of **every county where the company owns real property.** The clerk charges a separate recording fee.",
-                "count": 1
-              },
-              {
-                "kind": "document",
-                "master": "docs/owners-manual.md",
-                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
-                "masterPresent": [
-                  "In the official records of **every county where the company owns real property.** The clerk charges a separate recording fee."
-                ],
-                "wordPresent": [
-                  "every county where the company owns real property."
-                ],
-                "wordAbsent": [
-                  "company or a series owns real property"
-                ]
-              },
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch41 Manual company filing and signature grouping"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -35268,7 +35191,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -35327,22 +35250,15 @@
               "batch": "41",
               "revision": 4,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-24T00:03:35.521Z",
+              "event": "rejected r4",
+              "batch": "41",
+              "revision": 4,
+              "note": "Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance."
             }
-          ],
-          "batch": "41",
-          "fix": {
-            "batch": "41",
-            "revision": 4,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch41 Manual company filing and signature grouping"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -35359,7 +35275,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -35418,22 +35334,15 @@
               "batch": "41",
               "revision": 4,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-24T00:03:35.521Z",
+              "event": "rejected r4",
+              "batch": "41",
+              "revision": 4,
+              "note": "Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance."
             }
-          ],
-          "batch": "41",
-          "fix": {
-            "batch": "41",
-            "revision": 4,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch41 ruling completeness and settled display"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -35450,7 +35359,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -35509,22 +35418,15 @@
               "batch": "41",
               "revision": 4,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-24T00:03:35.521Z",
+              "event": "rejected r4",
+              "batch": "41",
+              "revision": 4,
+              "note": "Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance."
             }
-          ],
-          "batch": "41",
-          "fix": {
-            "batch": "41",
-            "revision": 4,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch41 ruling completeness and settled display"
-              }
-            ]
-          }
+          ]
         }
       ]
     },
@@ -35541,7 +35443,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "open",
           "waitsOn": [],
           "history": [
             {
@@ -35600,22 +35502,15 @@
               "batch": "41",
               "revision": 4,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-24T00:03:35.521Z",
+              "event": "rejected r4",
+              "batch": "41",
+              "revision": 4,
+              "note": "Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance."
             }
-          ],
-          "batch": "41",
-          "fix": {
-            "batch": "41",
-            "revision": 4,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch41 ruling completeness and settled display"
-              }
-            ]
-          }
+          ]
         }
       ]
     }
@@ -37732,7 +37627,7 @@
       "id": "41",
       "revision": 4,
       "frozenHash": "457d6d7ead34029549ba6b0b3091bd93fdd125e67afc7ee61803ef4a90cc06f6",
-      "status": "implemented",
+      "status": "rejected",
       "model": "Codex",
       "base": "761af015e05507c19ec5a458af0cf839637ce8da",
       "history": [
@@ -37744,6 +37639,11 @@
         {
           "at": "2026-09-23T23:14:46.197Z",
           "event": "implemented"
+        },
+        {
+          "at": "2026-09-24T00:03:35.521Z",
+          "event": "rejected by Adam",
+          "note": "Adam's record of 2026-09-24T00:00 (Codex executing Adam standing authorization for necessary batch revisions): Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance."
         }
       ]
     }

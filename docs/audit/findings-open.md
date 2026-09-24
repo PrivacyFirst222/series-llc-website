@@ -2167,7 +2167,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
-- **AUD-codex-focused-release-40-2026-09-23-a4. [substantive]** — **implemented**
+- **AUD-codex-focused-release-40-2026-09-23-a4. [substantive]** — **open**
   - A4. Show completed replacement and separate resignation balances accurately — smaller correction — `webapp/src/pages/portal/PortalDashboard.tsx:368`
   - Reads:         ) : requestedAt ? (
   - Claims: ### A4. Show completed replacement and separate resignation balances accurately — smaller correction
@@ -2188,11 +2188,10 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
   - **New decision:** none. Sources: [portal condition](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/src/pages/portal/PortalDashboard.tsx:368>), [office labels](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/src/pages/admin/AdminDashboard.tsx:47>), [office query](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/routes-admin.ts:862>). Evidence: [replacement screenshot](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/focused/shots/replacement-portal.png>), [office debt screenshot](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/focused/shots/arrears-office-before.png>).
   - Rechecked by Codex focused release examination, with billing, recovery and document reviewers: Independent candidate runtime/render/control evidence in retained codex-release-review-40-2026-09-23; full approved proposal retained in this batch. New omissions or incomplete safeguards; earlier assertions remain intact.
-  - Implemented protections: batch 41 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Necessary Batch41 revision under Adam's standing authorization: declare v2 deletion-journal fixture checksum adapter, recovery test support, and mandatory generated API/Word outputs. Same twelve approved repairs; A2 excluded; no new policy or publication.
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
+  - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
 
 ## Office — 39 open of 39
 
@@ -2523,7 +2522,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 rejected r1: Declare the Batch02 tax-classification expectation and Batch10 usable-agreement fixture updates required by the approved Group A fixes; preserve the existing date assertions.
   - 2026-09-23 rejected r2: Record the approved Manual ownership-notation sentence as an exact replacement for the existing document-preservation gate.
   - 2026-09-23 rejected r3: Declare the existing legal-mail retry browser selector update for the approved Document notices label; preserve its retry assertion.
-- **AUD-codex-focused-release-40-2026-09-23-a6. [substantive]** — **implemented**
+- **AUD-codex-focused-release-40-2026-09-23-a6. [substantive]** — **open**
   - A6. Refresh the work queues after deleting the last certificate — smaller correction, additional finding — `webapp/src/pages/admin/OrderDetail.tsx:97`
   - Reads:     onSuccess: () => { onError(null); setConfirming(false); queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] }); },
   - Claims: ### A6. Refresh the work queues after deleting the last certificate — smaller correction, additional finding
@@ -2540,11 +2539,10 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
   - Source: [delete callback](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/src/pages/admin/OrderDetail.tsx:97>). Evidence: [actual UI/API assertions](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/office-delete/results.json>), [stale Completed card](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/office-delete/stale-completed-after-delete.png>), [correct after reload](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/office-delete/reload-post-filing.png>).
   - Rechecked by Codex focused release examination, with billing, recovery and document reviewers: Independent candidate runtime/render/control evidence in retained codex-release-review-40-2026-09-23; full approved proposal retained in this batch. New omissions or incomplete safeguards; earlier assertions remain intact.
-  - Implemented protections: batch 41 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Necessary Batch41 revision under Adam's standing authorization: declare v2 deletion-journal fixture checksum adapter, recovery test support, and mandatory generated API/Word outputs. Same twelve approved repairs; A2 excluded; no new policy or publication.
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
+  - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
 
 ## Emails and jobs — 43 open of 44
 
@@ -2992,7 +2990,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Rechecked by Codex release reviewer: Reopened at frozen c91b101 and reproduced offline in the sealed release review; not an independent second model review.
   - Implemented protections: batch 35 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
   - Implementation evidence: commit 1aa316bf63254673db2ac5370a76573e518aeaec, batch 35 revision 1, package 2d75b55e1df6. This records implementation, not acceptance or publication.
-- **AUD-codex-focused-release-40-2026-09-23-a3. [substantive]** — **implemented**
+- **AUD-codex-focused-release-40-2026-09-23-a3. [substantive]** — **open**
   - A3. Make payment notices truthful and usable when email fails — smaller correction — `webapp/server/renewals.ts:118`
   - Reads:   const date=isoOf(o.ra_renewal_date)!;const cancel=o.ra_cancellation_requested_at?easternDateIso(new Date(String(o.ra_cancellation_requested_at))):null;
   - Claims: ### A3. Make payment notices truthful and usable when email fails — smaller correction
@@ -3027,11 +3025,10 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
   - **New decision:** none; wording approval only. Sources: [job](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/renewals.ts:118>), [templates](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/email.ts:103>), [portal](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/src/pages/portal/PortalDashboard.tsx:431>). Evidence: [billing observations](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/focused/log.json>), [late first run](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/late-first/log.json>), [missing link screenshot](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/focused/shots/decline-before-mail-recovery.png>). The two duplicate document-review email sightings are included here.
   - Rechecked by Codex focused release examination, with billing, recovery and document reviewers: Independent candidate runtime/render/control evidence in retained codex-release-review-40-2026-09-23; full approved proposal retained in this batch. New omissions or incomplete safeguards; earlier assertions remain intact.
-  - Implemented protections: batch 41 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Necessary Batch41 revision under Adam's standing authorization: declare v2 deletion-journal fixture checksum adapter, recovery test support, and mandatory generated API/Word outputs. Same twelve approved repairs; A2 excluded; no new policy or publication.
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
+  - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
 
 ## Agreements and guidance — 137 open of 140
 
@@ -4346,7 +4343,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 rejected r3: Preserve Privacy Policy date assertion; only Terms date changes in this batch.
   - 2026-09-23 rejected r4: Standing authorization for necessary revisions: the browser caller still expects the retired reminder-hold test; declare and update that caller before final review.
   - 2026-09-23 rejected r5: Standing revision authorization: declare exact approved Manual replacement so document preservation check can verify it.
-- **AUD-codex-focused-release-40-2026-09-23-a1. [substantive]** — **implemented**
+- **AUD-codex-focused-release-40-2026-09-23-a1. [substantive]** — **open**
   - A1. Separate renewal sales from debts after resignation — release blocker — `webapp/server/ra-checkout.ts:37`
   - Reads:  if(kind==='renewal'&&t.purpose!=='resignation') {
   - Claims: ### A1. Separate renewal sales from debts after resignation — release blocker
@@ -4395,12 +4392,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
   - Sources: [portal](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/src/pages/portal/PortalDashboard.tsx:362>), [payment eligibility](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/ra-checkout.ts:37>), [office event handling](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/ra-office.ts:42>), [fulfillment/receipt](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/renewals.ts:175>), [checkout consent](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/src/pages/AgentCheckout.tsx:19>), [test](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/scripts/batch37-walk.ts:72>). Evidence: [fresh billing observations](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/focused/log.json>), [captured email](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/runs/focused/mail.jsonl>), [original check missing the mutation](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/mutation/defect-reintroduced/results.json>), [corrected negative detecting it](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/billing/mutation/corrected-negative/results.json>).
   - Rechecked by Codex focused release examination, with billing, recovery and document reviewers: Independent candidate runtime/render/control evidence in retained codex-release-review-40-2026-09-23; full approved proposal retained in this batch. New omissions or incomplete safeguards; earlier assertions remain intact.
-  - Implemented protections: batch 41 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Necessary Batch41 revision under Adam's standing authorization: declare v2 deletion-journal fixture checksum adapter, recovery test support, and mandatory generated API/Word outputs. Same twelve approved repairs; A2 excluded; no new policy or publication.
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
-- **AUD-codex-focused-release-40-2026-09-23-a5. [substantive]** — **implemented**
+  - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
+- **AUD-codex-focused-release-40-2026-09-23-a5. [substantive]** — **open**
   - A5. Search using the client's current email too — smaller correction — `webapp/server/admin-board.ts:35`
   - Reads:   const where = `${scope} AND ($1 = '' OR llc_name ILIKE $2 OR contact_name ILIKE $2 OR contact_email ILIKE $2)`;
   - Claims: ### A5. Search using the client's current email too — smaller correction
@@ -4417,12 +4413,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
   - Sources: [board search](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/admin-board.ts:35>), [email change](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/routes-admin.ts:991>). Evidence: [results](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/office/results.json>), [current address misses](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/office/current-email-search-empty.png>), [old address matches](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/office/historical-email-search-found.png>). The fixture sets the exact resulting account state directly; it does not claim a fresh end-to-end email-verification walk.
   - Rechecked by Codex focused release examination, with billing, recovery and document reviewers: Independent candidate runtime/render/control evidence in retained codex-release-review-40-2026-09-23; full approved proposal retained in this batch. New omissions or incomplete safeguards; earlier assertions remain intact.
-  - Implemented protections: batch 41 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Necessary Batch41 revision under Adam's standing authorization: declare v2 deletion-journal fixture checksum adapter, recovery test support, and mandatory generated API/Word outputs. Same twelve approved repairs; A2 excluded; no new policy or publication.
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
-- **AUD-codex-focused-release-40-2026-09-23-b1. [substantive]** — **implemented**
+  - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
+- **AUD-codex-focused-release-40-2026-09-23-b1. [substantive]** — **open**
   - B1. Preserve prior filing-document versions needed by completed backups — release blocker — `webapp/server/dropbox.ts:75`
   - Reads: export function documentMirrorPath(doc: {id: string; title: string; kind: string; llc_name?: string | null; email?: string | null; storage_key: string}): string {
   - Claims: ### B1. Preserve prior filing-document versions needed by completed backups — release blocker
@@ -4455,12 +4450,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
   - **New decision:** none. Sources: [Replace](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/routes-admin.ts:1415>), [mirror identity/overwrite](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/dropbox.ts:75>), [restore hash check](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/restore.ts:43>). Evidence: [decisive fresh results](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/recovery/coordinator-decisive-evidence.json>), [full observations](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/recovery/structured-observations.json>). Original snapshot control recovered 16 tables/9 files; after replacement, affected restores stopped with all 16 tables empty; a later snapshot restored successfully.
   - Rechecked by Codex focused release examination, with billing, recovery and document reviewers: Independent candidate runtime/render/control evidence in retained codex-release-review-40-2026-09-23; full approved proposal retained in this batch. New omissions or incomplete safeguards; earlier assertions remain intact.
-  - Implemented protections: batch 41 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Necessary Batch41 revision under Adam's standing authorization: declare v2 deletion-journal fixture checksum adapter, recovery test support, and mandatory generated API/Word outputs. Same twelve approved repairs; A2 excluded; no new policy or publication.
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
-- **AUD-codex-focused-release-40-2026-09-23-b2. [substantive]** — **implemented**
+  - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
+- **AUD-codex-focused-release-40-2026-09-23-b2. [substantive]** — **open**
   - B2. Recover the latest retained S-election package without losing deletion control — release blocker — `webapp/server/s-election-package-storage.ts:10`
   - Reads:  const id=crypto.randomUUID(),path=`staged/${id}.pdf.encrypted`;
   - Claims: ### B2. Recover the latest retained S-election package without losing deletion control — release blocker
@@ -4495,12 +4489,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
   - **New decision:** none for this retention-preserving repair. Sources: [replacement storage](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/s-election-package-storage.ts:10>), [retirement](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/document-retention.ts:16>), [restore treatment](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/restore.ts:19>), [recovery exclusion](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/s-election-recovery.ts:18>), [edit denial](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/webapp/server/routes-portal.ts:2269>). Evidence: [fresh results](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/recovery/coordinator-decisive-evidence.json>), [recovered portal](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/recovery/ui-live.png>), [portal readback](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/recovery/ui-live.txt>).
   - Rechecked by Codex focused release examination, with billing, recovery and document reviewers: Independent candidate runtime/render/control evidence in retained codex-release-review-40-2026-09-23; full approved proposal retained in this batch. New omissions or incomplete safeguards; earlier assertions remain intact.
-  - Implemented protections: batch 41 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Necessary Batch41 revision under Adam's standing authorization: declare v2 deletion-journal fixture checksum adapter, recovery test support, and mandatory generated API/Word outputs. Same twelve approved repairs; A2 excluded; no new policy or publication.
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
-- **AUD-codex-focused-release-40-2026-09-23-c1. [wording]** — **implemented**
+  - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
+- **AUD-codex-focused-release-40-2026-09-23-c1. [wording]** — **open**
   - C1. Correct the Manual's company-filing table — smaller substantive correction — `docs/owners-manual.md:194`
   - Reads: If you choose to file a statement of authority, identify the entity that holds the property. A statement concerning property held by the company identifies the company; a statement concerning property held by a protected series identifies that protected series. The company-form instructions below should not be used for a series filing without confirming the Division’s filing requirements for that series.
   - Claims: ### C1. Correct the Manual's company-filing table — smaller substantive correction
@@ -4535,12 +4528,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
   - Source: [Manual](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/owners-manual.md:194>). Evidence: [fresh PDF table](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/documents/manual-16.png>), [fresh Word page](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/documents/word/page-19.png>), [artifact identity](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/documents/identity.json>).
   - Rechecked by Codex focused release examination, with billing, recovery and document reviewers: Independent candidate runtime/render/control evidence in retained codex-release-review-40-2026-09-23; full approved proposal retained in this batch. New omissions or incomplete safeguards; earlier assertions remain intact.
-  - Implemented protections: batch 41 revision 4, release commit not recorded, by Codex; protected by 3 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Necessary Batch41 revision under Adam's standing authorization: declare v2 deletion-journal fixture checksum adapter, recovery test support, and mandatory generated API/Word outputs. Same twelve approved repairs; A2 excluded; no new policy or publication.
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
-- **AUD-codex-focused-release-40-2026-09-23-c2. [housekeeping]** — **implemented** — housekeeping
+  - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
+- **AUD-codex-focused-release-40-2026-09-23-c2. [housekeeping]** — **open** — housekeeping
   - C2. Keep the Word sample signature block together — smaller formatting correction — `docs/md-to-docx.py:564`
   - Reads:         if stripped.startswith("- ") is False and stripped.startswith("&gt; ") is False and stripped.startswith("> "):
   - Claims: ### C2. Keep the Word sample signature block together — smaller formatting correction
@@ -4555,12 +4547,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
   - Sources: [sample](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/owners-manual.md:216>), [generator](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/md-to-docx.py:564>). Evidence: [Word page 20](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/documents/word/page-20.png>), [page 21](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/documents/word/page-21.png>), [paragraph properties](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/documents/signature-ooxml.json>).
   - Rechecked by Codex focused release examination, with billing, recovery and document reviewers: Independent candidate runtime/render/control evidence in retained codex-release-review-40-2026-09-23; full approved proposal retained in this batch. New omissions or incomplete safeguards; earlier assertions remain intact.
-  - Implemented protections: batch 41 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Necessary Batch41 revision under Adam's standing authorization: declare v2 deletion-journal fixture checksum adapter, recovery test support, and mandatory generated API/Word outputs. Same twelve approved repairs; A2 excluded; no new policy or publication.
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
-- **AUD-codex-focused-release-40-2026-09-23-c3. [housekeeping]** — **implemented** — housekeeping
+  - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
+- **AUD-codex-focused-release-40-2026-09-23-c3. [housekeeping]** — **open** — housekeeping
   - C3. Display settled owner choices as settled — smaller tracking correction — `docs/audit/ledger-print.ts:40`
   - Reads:     out.push("", `## ${area} — ${inArea.filter((i) => i.verdict !== "dropped" && !done(i)).length} open of ${inArea.length}`, "");
   - Claims: ### C3. Display settled owner choices as settled — smaller tracking correction
@@ -4579,12 +4570,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
   - **New decision:** none. Sources: [renderer](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/audit/ledger-print.ts:40>), [retain mechanism](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/audit/tracking.ts:14>). Evidence: [all ten dispositions and 51 named waits](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/release/controls.json>).
   - Rechecked by Codex focused release examination, with billing, recovery and document reviewers: Independent candidate runtime/render/control evidence in retained codex-release-review-40-2026-09-23; full approved proposal retained in this batch. New omissions or incomplete safeguards; earlier assertions remain intact.
-  - Implemented protections: batch 41 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Necessary Batch41 revision under Adam's standing authorization: declare v2 deletion-journal fixture checksum adapter, recovery test support, and mandatory generated API/Word outputs. Same twelve approved repairs; A2 excluded; no new policy or publication.
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
-- **AUD-codex-focused-release-40-2026-09-23-c4. [housekeeping]** — **implemented** — housekeeping
+  - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
+- **AUD-codex-focused-release-40-2026-09-23-c4. [housekeeping]** — **open** — housekeeping
   - C4. Detect authentic rulings that never reach repository records — smaller safeguard correction — `docs/audit/ledger-lib.ts:426`
   - Reads:   if (!isPrefix(before.rulings, after.rulings)) out.push("rulings were rewritten (they are append-only)");
   - Claims: ### C4. Detect authentic rulings that never reach repository records — smaller safeguard correction
@@ -4599,12 +4589,11 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
   - Source: [current validation](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/audit/ledger-lib.ts:426>). Evidence: [control and mutation results](</Users/adam/Documents/FLPSLLC Website Review/codex-release-review-40-2026-09-23/evidence/release/controls.json>). Existing removal/forgery protections did reject their intended mutations.
   - Rechecked by Codex focused release examination, with billing, recovery and document reviewers: Independent candidate runtime/render/control evidence in retained codex-release-review-40-2026-09-23; full approved proposal retained in this batch. New omissions or incomplete safeguards; earlier assertions remain intact.
-  - Implemented protections: batch 41 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Necessary Batch41 revision under Adam's standing authorization: declare v2 deletion-journal fixture checksum adapter, recovery test support, and mandatory generated API/Word outputs. Same twelve approved repairs; A2 excluded; no new policy or publication.
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
-- **AUD-codex-focused-release-40-2026-09-23-c5. [housekeeping]** — **implemented** — housekeeping
+  - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
+- **AUD-codex-focused-release-40-2026-09-23-c5. [housekeeping]** — **open** — housekeeping
   - C5. Preserve exact approval provenance supplied in this handoff — smaller records correction — `docs/audit/batches/38/batch.md:3`
   - Reads: Adam approved all ten Group B proposals (items 15–24). This authorizes implementation and verification, not acceptance or publication. Product wording and business rules stay unchanged.
   - Claims: ### C5. Preserve exact approval provenance supplied in this handoff — smaller records correction
@@ -4631,11 +4620,10 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
 
   - Sources: [Batch 38](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/audit/batches/38/batch.md:3>), [Batch 39](</Users/adam/Documents/FLPSLLC Website Review/batch-40-implementation-2026-09-23/repo/docs/audit/batches/39/batch.md:3>), [your supplied handoff](</Users/adam/.codex/attachments/2d1431b2-b172-4c55-b6b3-b62d0d4439fc/Pasted text.txt>).
   - Rechecked by Codex focused release examination, with billing, recovery and document reviewers: Independent candidate runtime/render/control evidence in retained codex-release-review-40-2026-09-23; full approved proposal retained in this batch. New omissions or incomplete safeguards; earlier assertions remain intact.
-  - Implemented protections: batch 41 revision 4, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-23 rejected r1: Necessary Batch41 revision under Adam's standing authorization: declare v2 deletion-journal fixture checksum adapter, recovery test support, and mandatory generated API/Word outputs. Same twelve approved repairs; A2 excluded; no new policy or publication.
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
+  - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
 
 ## Cross-review adjudications — informational, not repair tasks
 
