@@ -52146,7 +52146,7 @@ async function registerDeletion(r) {
      ELSE COALESCE(s.details,'{}'::jsonb) END)
      - CASE WHEN EXISTS(SELECT 1 FROM affected_holds a WHERE a.service_id=s.id)
        AND NOT EXISTS(SELECT 1 FROM recovery_holds h WHERE h.service_id=s.id AND h.status='held'
-         AND h.id NOT IN (SELECT id FROM affected_holds)) THEN 'recoveryHold' ELSE '__no_deleted_hold__' END
+         AND h.id NOT IN (SELECT id FROM affected_holds)) THEN ARRAY['recoveryHold'] ELSE ARRAY[]::text[] END
    WHERE ($5::text IS DISTINCT FROM 'superseded' AND s.details->>'documentId'=$2::text)
      OR EXISTS(SELECT 1 FROM affected_holds a WHERE a.service_id=s.id)`,
     [r.storageKey, r.documentId, r.mirrorPath, r.requestedAt, r.reason ?? null, r.requestedAt]
