@@ -96869,10 +96869,16 @@ function sanitize2(s) {
 }
 function parseInline2(line2) {
   const parts = line2.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).filter(Boolean);
-  return parts.map((p2) => {
-    if (p2.startsWith("**") && p2.endsWith("**")) return { text: sanitize2(p2.slice(2, -2)), bold: true, italic: false };
-    if (p2.startsWith("*") && p2.endsWith("*") && p2.length > 2) return { text: sanitize2(p2.slice(1, -1)), bold: false, italic: true };
-    return { text: sanitize2(p2), bold: false, italic: false };
+  return parts.flatMap((p2) => {
+    const bold = p2.startsWith("**") && p2.endsWith("**");
+    const italic = !bold && p2.startsWith("*") && p2.endsWith("*") && p2.length > 2;
+    const text = bold ? p2.slice(2, -2) : italic ? p2.slice(1, -1) : p2;
+    return text.split(/([✓✔])/).filter(Boolean).map((part) => ({
+      text: /^[✓✔]$/.test(part) ? part : sanitize2(part),
+      bold,
+      italic,
+      checkmark: /^[✓✔]$/.test(part)
+    }));
   });
 }
 function parseManual(md) {
@@ -96959,7 +96965,7 @@ async function renderManualPdf(md) {
   };
   const width = PAGE_W2 - 2 * MARGIN2;
   const fontFor2 = (s) => s.bold && s.italic ? fonts.boldItalic : s.bold ? fonts.bold : s.italic ? fonts.italic : fonts.regular;
-  const segW = (s, size) => drawnWidth(fontFor2(s), s.text, size);
+  const segW = (s, size) => s.checkmark ? size * 0.8 : drawnWidth(fontFor2(s), s.text, size);
   const wrap2 = (segs, w, size) => {
     const out = [];
     let cur = [];
@@ -96999,6 +97005,13 @@ async function renderManualPdf(md) {
     let cx2 = x2;
     for (const seg of segs) {
       const font = fontFor2(seg);
+      if (seg.checkmark) {
+        const pivot = { x: cx2 + size * 0.28, y: yy + size * 0.12 };
+        p2.drawLine({ start: { x: cx2 + size * 0.05, y: yy + size * 0.36 }, end: pivot, thickness: 1, color });
+        p2.drawLine({ start: pivot, end: { x: cx2 + size * 0.72, y: yy + size * 0.72 }, thickness: 1, color });
+        cx2 += segW(seg, size);
+        continue;
+      }
       if (extra > 0 && seg.text.includes(" ")) {
         const parts = seg.text.split(" ");
         parts.forEach((word, wi2) => {
@@ -97100,24 +97113,29 @@ async function renderManualPdf(md) {
       if (lines.length > 2 && y - 2 * lineH < floor) newPage();
       const leadIn = block.segs.map((s) => s.text).join("").trimEnd().endsWith(":");
       if (leadIn) need(lines.length * lineH + 2 * lineH + 6);
+      const quoteExtents = /* @__PURE__ */ new Map();
       for (let li = 0; li < lines.length; li++) {
         if (li === lines.length - 2 && y - 2 * lineH < floor) newPage();
         need(lineH, floor);
         if (block.kind === "item" && li === 0) {
           page.drawText(block.marker, { x: MARGIN2 + 2, y: y - size, size: size - (block.marker === "\u2022" ? 0 : 1.5), font: fonts.regular, color: INK });
         }
-        if (block.kind === "quote" && li === 0) {
-          page.drawLine({
-            start: { x: MARGIN2 + 10, y: y - size - (lines.length - 1) * lineH - 2 },
-            end: { x: MARGIN2 + 10, y: y + 2 },
-            color: rgb(0.75, 0.77, 0.8),
-            thickness: 1.5
-          });
+        if (block.kind === "quote") {
+          const extent = quoteExtents.get(page);
+          quoteExtents.set(page, { top: extent?.top ?? y + 2, bottom: y - size - 2 });
         }
         const isLast = li === lines.length - 1;
         drawLine2(page, lines[li], MARGIN2 + indent, y - size, size, block.kind === "para" && !isLast ? width : void 0);
         linesOnPage++;
         y -= lineH;
+      }
+      for (const [quotePage, extent] of quoteExtents) {
+        quotePage.drawLine({
+          start: { x: MARGIN2 + 10, y: extent.bottom },
+          end: { x: MARGIN2 + 10, y: extent.top },
+          color: rgb(0.75, 0.77, 0.8),
+          thickness: 1.5
+        });
       }
       y -= block.kind === "item" ? 3 : 6;
       continue;
@@ -97257,7 +97275,7 @@ var init_manual_pdf = __esm({
   "server/manual-pdf.ts"() {
     init_es();
     init_pdf_render();
-    MANUAL_RENDERER_VERSION = 3;
+    MANUAL_RENDERER_VERSION = 4;
     PAGE_W2 = 612;
     PAGE_H2 = 792;
     MARGIN2 = 72;

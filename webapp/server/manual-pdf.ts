@@ -18,8 +18,9 @@ import { drawnWidth } from "./pdf-render";
  *  copy is hash-gated on the master's text, so without this a renderer fix
  *  never reaches a client — they keep downloading the previous PDF forever.
  *  v2: keep-with-next for headings, chapter-end floor (26 Aug 2026).
- *  v3: keep table headers with data and repeat them on continuation pages. */
-export const MANUAL_RENDERER_VERSION = 3;
+ *  v3: keep table headers with data and repeat them on continuation pages.
+ *  v4: vector checkmarks and page-local quote rules. */
+export const MANUAL_RENDERER_VERSION = 4;
 
 const PAGE_W = 612;
 const PAGE_H = 792;
@@ -31,7 +32,7 @@ const GRAY = rgb(0.55, 0.57, 0.6);
 const NAVY = rgb(0.09, 0.2, 0.33);
 const ACCENT = rgb(0.78, 0.33, 0.16);
 
-interface Seg { text: string; bold: boolean; italic: boolean }
+interface Seg { text: string; bold: boolean; italic: boolean; checkmark?: boolean }
 interface Fonts { regular: PDFFont; bold: PDFFont; italic: PDFFont; boldItalic: PDFFont }
 
 function sanitize(s: string): string {
@@ -48,10 +49,14 @@ function sanitize(s: string): string {
 
 function parseInline(line: string): Seg[] {
   const parts = line.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).filter(Boolean);
-  return parts.map((p) => {
-    if (p.startsWith("**") && p.endsWith("**")) return { text: sanitize(p.slice(2, -2)), bold: true, italic: false };
-    if (p.startsWith("*") && p.endsWith("*") && p.length > 2) return { text: sanitize(p.slice(1, -1)), bold: false, italic: true };
-    return { text: sanitize(p), bold: false, italic: false };
+  return parts.flatMap((p) => {
+    const bold = p.startsWith("**") && p.endsWith("**");
+    const italic = !bold && p.startsWith("*") && p.endsWith("*") && p.length > 2;
+    const text = bold ? p.slice(2, -2) : italic ? p.slice(1, -1) : p;
+    return text.split(/([✓✔])/).filter(Boolean).map((part) => ({
+      text: /^[✓✔]$/.test(part) ? part : sanitize(part), bold, italic,
+      checkmark: /^[✓✔]$/.test(part),
+    }));
   });
 }
 
@@ -139,7 +144,7 @@ export async function renderManualPdf(md: string): Promise<{ pdf: Uint8Array; pa
   const width = PAGE_W - 2 * MARGIN;
   const fontFor = (s: Seg) => (s.bold && s.italic ? fonts.boldItalic : s.bold ? fonts.bold : s.italic ? fonts.italic : fonts.regular);
   // Glyph-by-glyph, as drawn — see drawnWidth in pdf-render.ts (DOC-SPACING-001).
-  const segW = (s: Seg, size: number) => drawnWidth(fontFor(s), s.text, size);
+  const segW = (s: Seg, size: number) => s.checkmark ? size * 0.8 : drawnWidth(fontFor(s), s.text, size);
 
   const wrap = (segs: Seg[], w: number, size: number): Seg[][] => {
     const out: Seg[][] = [];
@@ -175,6 +180,13 @@ export async function renderManualPdf(md: string): Promise<{ pdf: Uint8Array; pa
     let cx = x;
     for (const seg of segs) {
       const font = fontFor(seg);
+      if (seg.checkmark) {
+        const pivot = { x: cx + size * 0.28, y: yy + size * 0.12 };
+        p.drawLine({ start: { x: cx + size * 0.05, y: yy + size * 0.36 }, end: pivot, thickness: 1, color });
+        p.drawLine({ start: pivot, end: { x: cx + size * 0.72, y: yy + size * 0.72 }, thickness: 1, color });
+        cx += segW(seg, size);
+        continue;
+      }
       if (extra > 0 && seg.text.includes(" ")) {
         const parts = seg.text.split(" ");
         parts.forEach((word, wi) => {
@@ -298,25 +310,27 @@ export async function renderManualPdf(md: string): Promise<{ pdf: Uint8Array; pa
       if (lines.length > 2 && y - 2 * lineH < floor) newPage();
       const leadIn = block.segs.map((s) => s.text).join("").trimEnd().endsWith(":");
       if (leadIn) need(lines.length * lineH + 2 * lineH + 6);
+      const quoteExtents = new Map<PDFPage, { top: number; bottom: number }>();
       for (let li = 0; li < lines.length; li++) {
         if (li === lines.length - 2 && y - 2 * lineH < floor) newPage();
         need(lineH, floor);
         if (block.kind === "item" && li === 0) {
           page.drawText(block.marker, { x: MARGIN + 2, y: y - size, size: size - (block.marker === "•" ? 0 : 1.5), font: fonts.regular, color: INK });
         }
-        if (block.kind === "quote" && li === 0) {
-          // a quiet rule marks the display block
-          page.drawLine({
-            start: { x: MARGIN + 10, y: y - size - (lines.length - 1) * lineH - 2 },
-            end: { x: MARGIN + 10, y: y + 2 },
-            color: rgb(0.75, 0.77, 0.8),
-            thickness: 1.5,
-          });
+        if (block.kind === "quote") {
+          const extent = quoteExtents.get(page);
+          quoteExtents.set(page, { top: extent?.top ?? y + 2, bottom: y - size - 2 });
         }
         const isLast = li === lines.length - 1;
         drawLine(page, lines[li], MARGIN + indent, y - size, size, block.kind === "para" && !isLast ? width : undefined);
         linesOnPage++;
         y -= lineH;
+      }
+      for (const [quotePage, extent] of quoteExtents) {
+        quotePage.drawLine({
+          start: { x: MARGIN + 10, y: extent.bottom }, end: { x: MARGIN + 10, y: extent.top },
+          color: rgb(0.75, 0.77, 0.8), thickness: 1.5,
+        });
       }
       y -= block.kind === "item" ? 3 : 6;
       continue;
