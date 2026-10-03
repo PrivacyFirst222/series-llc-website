@@ -21,7 +21,7 @@ import { documentInputs, decodeDocumentText, assertTemplateComplete } from "./do
  * what an owner — or their bank — actually wants.
  */
 import template from "./templates-new-series.md";
-import { resolveIf, OA_TEMPLATE_VERSION } from "./oa";
+import { resolveIf, titleCaseHolding, OA_TEMPLATE_VERSION } from "./oa";
 
 export interface NewSeriesInput {
   companyName: string;
@@ -45,6 +45,8 @@ export interface NewSeriesInput {
   /** Every person serving as Manager; s. 5.1 makes them act by majority. */
   managerNames: string[];
   memberManaged: boolean;
+  /** Derived from the selected saved agreement, never an independent portal flag. */
+  professional?: boolean;
 }
 
 function must(haystack: string, needle: string, label: string): void {
@@ -59,6 +61,14 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   // follows ", including, without limitation," only when one was given (Adam,
   // 13 Sep 2026: a stated purpose must never read as a limit).
   const purpose = input.purpose.trim();
+  // Resolve nested purposes before discarding the unused complete branch.
+  // The preceding master has no standard/professional alternatives; this
+  // ordering keeps the helper compatible while its approved master is updated.
+  s = resolveIf(s, "purpose", purpose !== "");
+  if (/<!--\s*if:standard\s*-->/.test(s)) {
+    s = resolveIf(s, "professional", input.professional === true);
+    s = resolveIf(s, "standard", input.professional !== true);
+  }
 
   // Who files, and who manages the series, are the master's own sentences,
   // one pair per management form (13 Sep 2026: the code said the Company was
@@ -100,7 +110,7 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
     if (!m?.signatories || m.signatories.length < 2 || signerOf(name)) return block(name, suffix, dated);
     return `[[signature-group]]
 
-${name}${m.jointHolding ? ` — ${m.jointHolding}` : ""}${suffix}\n\n${m.signatories.map(n => block(n, "", dated)).join("\n\n")}
+${name}${m.jointHolding ? ` — ${titleCaseHolding(m.jointHolding)}` : ""}${suffix}\n\n${m.signatories.map(n => block(n, "", dated)).join("\n\n")}
 
 [[/signature-group]]`;
   };
@@ -118,7 +128,6 @@ ${name}${m.jointHolding ? ` — ${m.jointHolding}` : ""}${suffix}\n\n${m.signato
   must(s, "PS-[N]", "series number");
   s = s.split("PS-[N]").join(`PS-${input.seriesNumber}`);
   must(s, "[SERIES PURPOSE]", "series purpose");
-  s = resolveIf(s, "purpose", purpose !== "");
   s = s.split("[SERIES PURPOSE]").join(purpose);
   must(s, "[CONTRIBUTION]", "contribution");
   // An empty contribution prints None, matching the agreement's Series Exhibit.

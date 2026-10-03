@@ -110222,6 +110222,11 @@ function assembleNewSeries(input) {
   input = documentInputs(input);
   let s = templates_new_series_default;
   const purpose = input.purpose.trim();
+  s = resolveIf(s, "purpose", purpose !== "");
+  if (/<!--\s*if:standard\s*-->/.test(s)) {
+    s = resolveIf(s, "professional", input.professional === true);
+    s = resolveIf(s, "standard", input.professional !== true);
+  }
   {
     const mgrs = input.managerNames.map((n) => n.trim()).filter(Boolean);
     s = resolveIf(s, "onemanager", mgrs.length <= 1);
@@ -110249,7 +110254,7 @@ ${n}${suffix}`) + (dated ? "\nDate: _____________________________" : "");
     if (!m2?.signatories || m2.signatories.length < 2 || signerOf(name)) return block(name, suffix, dated);
     return `[[signature-group]]
 
-${name}${m2.jointHolding ? ` \u2014 ${m2.jointHolding}` : ""}${suffix}
+${name}${m2.jointHolding ? ` \u2014 ${titleCaseHolding(m2.jointHolding)}` : ""}${suffix}
 
 ${m2.signatories.map((n) => block(n, "", dated)).join("\n\n")}
 
@@ -110265,7 +110270,6 @@ ${m2.signatories.map((n) => block(n, "", dated)).join("\n\n")}
   must2(s, "PS-[N]", "series number");
   s = s.split("PS-[N]").join(`PS-${input.seriesNumber}`);
   must2(s, "[SERIES PURPOSE]", "series purpose");
-  s = resolveIf(s, "purpose", purpose !== "");
   s = s.split("[SERIES PURPOSE]").join(purpose);
   must2(s, "[CONTRIBUTION]", "contribution");
   s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "None");
