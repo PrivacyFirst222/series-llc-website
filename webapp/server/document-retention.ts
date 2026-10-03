@@ -76,7 +76,7 @@ export async function registerDeletion(r:Deletion){
    WHERE ${hasDeletedHistorySql} RETURNING id
  ), affected_holds AS (
    UPDATE recovery_holds SET status='deleted'
-   WHERE id=$2::uuid AND status='held' AND $5::text IS DISTINCT FROM 'superseded'
+   WHERE id=$2::uuid AND status IN ('held','reconciled','aborted') AND $5::text IS DISTINCT FROM 'superseded'
    RETURNING id,service_id
  ) UPDATE service_orders s SET
    ein_secret=CASE WHEN s.details->>'documentId'=$2::text AND $5::text IS DISTINCT FROM 'superseded' THEN NULL ELSE s.ein_secret END,
