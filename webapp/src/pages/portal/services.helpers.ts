@@ -24,12 +24,18 @@ export function summaryOf(o: ServiceOrder): string {
   return `Federal EIN — ${o.details.target === "series" ? o.details.seriesName ?? "series" : o.llc_name}`;
 }
 
+/** Recovery holds await office reconciliation, not a fresh questionnaire. */
+export function isRecoveryHeld(o: ServiceOrder): boolean {
+  return o.type === "s-election" && "recoveryHold" in o.details && o.details.recoveryHold === true;
+}
+
 /** An order the CLIENT must act on now (Adam, 5 Sep 2026): it is waiting for
  *  their details, and the detail form is open to them — an EIN or S election
  *  on a company not yet formed is not, because that button opens the
  *  "formed first" explanation instead of the form. The dashboard's red
  *  outlines and its action-needed toast both use this rule. */
 export function clientMustAct(o: ServiceOrder, llcFormed: boolean): boolean {
+  if (isRecoveryHeld(o)) return false;
   if (o.status !== "awaiting_info") return false;
   if ((o.type === "ein" || o.type === "s-election") && !llcFormed) return false;
   return true;
@@ -39,4 +45,3 @@ export function clientMustAct(o: ServiceOrder, llcFormed: boolean): boolean {
 export function clientActionLabel(o: ServiceOrder): string {
   return `Provide details for the ${summaryOf(o)}`;
 }
-
