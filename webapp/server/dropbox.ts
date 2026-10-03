@@ -204,7 +204,19 @@ export async function readMirrorVersion(path:string):Promise<{data:Buffer;rev:st
  if(!configured()){const data=await readMirror(path);return data?{data,rev:hashBytes(data)}:null;}
  const r=await fetch('https://content.dropboxapi.com/2/files/download',{method:'POST',headers:{Authorization:`Bearer ${await accessToken()}`,'Dropbox-API-Arg':headerSafeJson({path})},signal:ioSignal()});
  if(r.status===409&&(await r.text()).includes('not_found'))return null;
- if(!r.ok)throw providerFailure(r,'Deletion journal read');
+ if(!r.ok){
+  // Keep provider diagnostics useful without logging its raw body, credentials
+  // or document contents. Production secrets cannot be read back for a probe.
+  const text=await r.text().catch(()=>''),known=['missing_scope','invalid_access_token','expired_access_token','invalid_select_user','invalid_select_admin','user_suspended'];
+  let category='unknown',requiredScope:string|null=null;
+  try{const error=JSON.parse(text).error;if(known.includes(error?.['.tag']))category=error['.tag'];if(['files.content.read','files.content.write','files.metadata.read'].includes(error?.required_scope))requiredScope=error.required_scope;}catch{/* Plain-text provider errors also occur. */}
+  const scope=text.match(/required scope ['"](files\.(?:content\.(?:read|write)|metadata\.read))['"]/);
+  if(scope){category='missing_scope';requiredScope=scope[1];}
+  else if(category==='unknown'&&text.includes('Content-Type'))category='bad_content_type';
+  const requestId=r.headers.get('x-dropbox-request-id');
+  console.error('[dropbox journal read]',{status:r.status,category,requiredScope,requestId:requestId&&/^[A-Za-z0-9_-]{1,128}$/.test(requestId)?requestId:null});
+  throw providerFailure(r,'Deletion journal read');
+ }
  const meta=JSON.parse(r.headers.get('dropbox-api-result')||'null');if(!meta?.rev)throw new Error('Deletion journal revision missing');
  return {data:Buffer.from(await r.arrayBuffer()),rev:meta.rev};
 }
