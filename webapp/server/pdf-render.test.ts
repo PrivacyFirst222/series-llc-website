@@ -10,7 +10,7 @@
  *  - The preamble is body copy, full-width and justified, while the title
  *    lines above it stay centered (Adam, 8 Sep 2026).
  *
- * Where `pdftotext` is installed (it is on Adam's Mac; not on the CI runner)
+ * Where `pdftotext` is installed (it is on Adam's Mac; installed before the CI consumer)
  * the rendered pages are read back: the preamble's "of E2E" join, no
  * template marker, and no page ending on a bare subsection label.
  */
@@ -22,10 +22,996 @@ import { join } from "node:path";
 import { drawnWidth, isLabelParagraph, parseMarkdown, renderMarkdownPdf, wrapSegs, type Fonts } from "./pdf-render";
 import { assembleOa, type OaInputs } from "./oa";
 
+// Literal assertion registry, preserved from the 150-result pre-repair run.
+// Evidence hash: 32531cfe27c1e268362375b4a3b111509b9f5cb6284f7f2fae0bac20d8108143.
+// Registration is separate from execution; a missing dependency never passes.
+const registry: {id:string;name:string;requires:string[]}[] = [
+  {
+    "id": "drawnWidth: 'AV' measures as A + V (no kerning)#1",
+    "name": "drawnWidth: 'AV' measures as A + V (no kerning)",
+    "requires": []
+  },
+  {
+    "id": "drawnWidth: a whole string is not shorter than its glyphs#1",
+    "name": "drawnWidth: a whole string is not shorter than its glyphs",
+    "requires": []
+  },
+  {
+    "id": "drawnWidth: a trailing space counts#1",
+    "name": "drawnWidth: a trailing space counts",
+    "requires": []
+  },
+  {
+    "id": "preamble parses as one paragraph#1",
+    "name": "preamble parses as one paragraph",
+    "requires": []
+  },
+  {
+    "id": "first line: the regular run ends with the space before the name#1",
+    "name": "first line: the regular run ends with the space before the name",
+    "requires": []
+  },
+  {
+    "id": "first line: the bold name follows on the same line#1",
+    "name": "first line: the bold name follows on the same line",
+    "requires": []
+  },
+  {
+    "id": "label: '3.6 Company as Owner.' is a label paragraph#1",
+    "name": "label: '3.6 Company as Owner.' is a label paragraph",
+    "requires": []
+  },
+  {
+    "id": "label: a bold lead-in with body text is not#1",
+    "name": "label: a bold lead-in with body text is not",
+    "requires": []
+  },
+  {
+    "id": "label: a heading-shaped plain paragraph is not#1",
+    "name": "label: a heading-shaped plain paragraph is not",
+    "requires": []
+  },
+  {
+    "id": "single: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#1",
+    "name": "single: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: single is a PDF#1",
+    "name": "renders: single is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: single preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: single preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single has no template marker#1",
+    "name": "read back: single has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single preamble starts at the body margin, like Recital A#1",
+    "name": "read back: single preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single title line stays centered#1",
+    "name": "read back: single title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single no page ends on a bare subsection label#1",
+    "name": "read back: single no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "single: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#2",
+    "name": "single: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: single (professional) is a PDF#1",
+    "name": "renders: single (professional) is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: single (professional) preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: single (professional) preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single (professional) has no template marker#1",
+    "name": "read back: single (professional) has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single (professional) preamble starts at the body margin, like Recital A#1",
+    "name": "read back: single (professional) preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single (professional) title line stays centered#1",
+    "name": "read back: single (professional) title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single (professional) no page ends on a bare subsection label#1",
+    "name": "read back: single (professional) no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "single-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#1",
+    "name": "single-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: single-s is a PDF#1",
+    "name": "renders: single-s is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: single-s preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: single-s preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single-s has no template marker#1",
+    "name": "read back: single-s has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single-s preamble starts at the body margin, like Recital A#1",
+    "name": "read back: single-s preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single-s title line stays centered#1",
+    "name": "read back: single-s title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single-s no page ends on a bare subsection label#1",
+    "name": "read back: single-s no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "single-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#2",
+    "name": "single-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: single-s (professional) is a PDF#1",
+    "name": "renders: single-s (professional) is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: single-s (professional) preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: single-s (professional) preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single-s (professional) has no template marker#1",
+    "name": "read back: single-s (professional) has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single-s (professional) preamble starts at the body margin, like Recital A#1",
+    "name": "read back: single-s (professional) preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single-s (professional) title line stays centered#1",
+    "name": "read back: single-s (professional) title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: single-s (professional) no page ends on a bare subsection label#1",
+    "name": "read back: single-s (professional) no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "member-single: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#1",
+    "name": "member-single: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: member-single is a PDF#1",
+    "name": "renders: member-single is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: member-single preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: member-single preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single has no template marker#1",
+    "name": "read back: member-single has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single preamble starts at the body margin, like Recital A#1",
+    "name": "read back: member-single preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single title line stays centered#1",
+    "name": "read back: member-single title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single no page ends on a bare subsection label#1",
+    "name": "read back: member-single no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "member-single: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#2",
+    "name": "member-single: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: member-single (professional) is a PDF#1",
+    "name": "renders: member-single (professional) is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: member-single (professional) preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: member-single (professional) preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single (professional) has no template marker#1",
+    "name": "read back: member-single (professional) has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single (professional) preamble starts at the body margin, like Recital A#1",
+    "name": "read back: member-single (professional) preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single (professional) title line stays centered#1",
+    "name": "read back: member-single (professional) title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single (professional) no page ends on a bare subsection label#1",
+    "name": "read back: member-single (professional) no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "member-single-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#1",
+    "name": "member-single-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: member-single-s is a PDF#1",
+    "name": "renders: member-single-s is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: member-single-s preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: member-single-s preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single-s has no template marker#1",
+    "name": "read back: member-single-s has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single-s preamble starts at the body margin, like Recital A#1",
+    "name": "read back: member-single-s preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single-s title line stays centered#1",
+    "name": "read back: member-single-s title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single-s no page ends on a bare subsection label#1",
+    "name": "read back: member-single-s no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "member-single-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#2",
+    "name": "member-single-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: member-single-s (professional) is a PDF#1",
+    "name": "renders: member-single-s (professional) is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: member-single-s (professional) preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: member-single-s (professional) preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single-s (professional) has no template marker#1",
+    "name": "read back: member-single-s (professional) has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single-s (professional) preamble starts at the body margin, like Recital A#1",
+    "name": "read back: member-single-s (professional) preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single-s (professional) title line stays centered#1",
+    "name": "read back: member-single-s (professional) title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-single-s (professional) no page ends on a bare subsection label#1",
+    "name": "read back: member-single-s (professional) no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "multi: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#1",
+    "name": "multi: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: multi is a PDF#1",
+    "name": "renders: multi is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: multi preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: multi preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: multi has no template marker#1",
+    "name": "read back: multi has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: multi preamble starts at the body margin, like Recital A#1",
+    "name": "read back: multi preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: multi title line stays centered#1",
+    "name": "read back: multi title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: multi no page ends on a bare subsection label#1",
+    "name": "read back: multi no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "multi: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#2",
+    "name": "multi: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: multi (professional) is a PDF#1",
+    "name": "renders: multi (professional) is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: multi (professional) preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: multi (professional) preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: multi (professional) has no template marker#1",
+    "name": "read back: multi (professional) has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: multi (professional) preamble starts at the body margin, like Recital A#1",
+    "name": "read back: multi (professional) preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: multi (professional) title line stays centered#1",
+    "name": "read back: multi (professional) title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: multi (professional) no page ends on a bare subsection label#1",
+    "name": "read back: multi (professional) no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#1",
+    "name": "s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: s is a PDF#1",
+    "name": "renders: s is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: s preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: s preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: s has no template marker#1",
+    "name": "read back: s has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: s preamble starts at the body margin, like Recital A#1",
+    "name": "read back: s preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: s title line stays centered#1",
+    "name": "read back: s title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: s no page ends on a bare subsection label#1",
+    "name": "read back: s no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#2",
+    "name": "s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: s (professional) is a PDF#1",
+    "name": "renders: s (professional) is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: s (professional) preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: s (professional) preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: s (professional) has no template marker#1",
+    "name": "read back: s (professional) has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: s (professional) preamble starts at the body margin, like Recital A#1",
+    "name": "read back: s (professional) preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: s (professional) title line stays centered#1",
+    "name": "read back: s (professional) title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: s (professional) no page ends on a bare subsection label#1",
+    "name": "read back: s (professional) no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "member: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#1",
+    "name": "member: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: member is a PDF#1",
+    "name": "renders: member is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: member preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: member preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member has no template marker#1",
+    "name": "read back: member has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member preamble starts at the body margin, like Recital A#1",
+    "name": "read back: member preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member title line stays centered#1",
+    "name": "read back: member title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member no page ends on a bare subsection label#1",
+    "name": "read back: member no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "member: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#2",
+    "name": "member: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: member (professional) is a PDF#1",
+    "name": "renders: member (professional) is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: member (professional) preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: member (professional) preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member (professional) has no template marker#1",
+    "name": "read back: member (professional) has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member (professional) preamble starts at the body margin, like Recital A#1",
+    "name": "read back: member (professional) preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member (professional) title line stays centered#1",
+    "name": "read back: member (professional) title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member (professional) no page ends on a bare subsection label#1",
+    "name": "read back: member (professional) no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "member-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#1",
+    "name": "member-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: member-s is a PDF#1",
+    "name": "renders: member-s is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: member-s preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: member-s preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-s has no template marker#1",
+    "name": "read back: member-s has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-s preamble starts at the body margin, like Recital A#1",
+    "name": "read back: member-s preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-s title line stays centered#1",
+    "name": "read back: member-s title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-s no page ends on a bare subsection label#1",
+    "name": "read back: member-s no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "member-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)#2",
+    "name": "member-s: the Interpretation section says the singular includes the plural (Adam, 16 Sep 2026)",
+    "requires": []
+  },
+  {
+    "id": "renders: member-s (professional) is a PDF#1",
+    "name": "renders: member-s (professional) is a PDF",
+    "requires": []
+  },
+  {
+    "id": "read back: member-s (professional) preamble reads \"of E2E Coastal\"#1",
+    "name": "read back: member-s (professional) preamble reads \"of E2E Coastal\"",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-s (professional) has no template marker#1",
+    "name": "read back: member-s (professional) has no template marker",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-s (professional) preamble starts at the body margin, like Recital A#1",
+    "name": "read back: member-s (professional) preamble starts at the body margin, like Recital A",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-s (professional) title line stays centered#1",
+    "name": "read back: member-s (professional) title line stays centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "read back: member-s (professional) no page ends on a bare subsection label#1",
+    "name": "read back: member-s (professional) no page ends on a bare subsection label",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "all 16 variants rendered#1",
+    "name": "all 16 variants rendered",
+    "requires": []
+  },
+  {
+    "id": "signatures: the signature introduction uses the defined Effective Date#1",
+    "name": "signatures: the signature introduction uses the defined Effective Date",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "signatures: the solo owner's name, then Date#1",
+    "name": "signatures: the solo owner's name, then Date",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "signatures: no typed underscores remain#1",
+    "name": "signatures: no typed underscores remain",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "signatures: the couple is headed by both names and their holding#1",
+    "name": "signatures: the couple is headed by both names and their holding",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "signatures: each spouse then signs on their own line with a Date#1",
+    "name": "signatures: each spouse then signs on their own line with a Date",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "signatures: no 'entireties'#1",
+    "name": "signatures: no 'entireties'",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "signatures: every rule ends at one right edge#1",
+    "name": "signatures: every rule ends at one right edge",
+    "requires": [
+      "pdftotext",
+      "pypdf"
+    ]
+  },
+  {
+    "id": "signatures: every signature rule is three and a half inches from the margin#1",
+    "name": "signatures: every signature rule is three and a half inches from the margin",
+    "requires": [
+      "pdftotext",
+      "pypdf"
+    ]
+  },
+  {
+    "id": "entity: the trust's block in the markdown#1",
+    "name": "entity: the trust's block in the markdown",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "entity: the Manager's block in the markdown#1",
+    "name": "entity: the Manager's block in the markdown",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "entity: read back — the trust's name, then By:, the trustee's name, title, Date#1",
+    "name": "entity: read back — the trust's name, then By:, the trustee's name, title, Date",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "entity: read back — the Manager's name, then By:, the signer's name, title, Date#1",
+    "name": "entity: read back — the Manager's name, then By:, the signer's name, title, Date",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "entity: no [[indent]] marker or underscores in the text#1",
+    "name": "entity: no [[indent]] marker or underscores in the text",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "entity: the printed name and title start flush with the left end of a By: rule that ends at the shared right edge#1",
+    "name": "entity: the printed name and title start flush with the left end of a By: rule that ends at the shared right edge",
+    "requires": [
+      "pdftotext",
+      "pypdf"
+    ]
+  },
+  {
+    "id": "entity: the By: label sits at the margin#1",
+    "name": "entity: the By: label sits at the margin",
+    "requires": [
+      "pdftotext",
+      "pypdf"
+    ]
+  },
+  {
+    "id": "Exhibit A lists the capital the Company allocated to the series and what it kept#1",
+    "name": "Exhibit A lists the capital the Company allocated to the series and what it kept",
+    "requires": []
+  },
+  {
+    "id": "licensed agreement renders#1",
+    "name": "licensed agreement renders",
+    "requires": []
+  },
+  {
+    "id": "the blank space before a forced break carries the notice#1",
+    "name": "the blank space before a forced break carries the notice",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "the encrypted text still reads (streams decrypt)#1",
+    "name": "the encrypted text still reads (streams decrypt)",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "the form declares its font where readers look (DR) and a document default appearance#1",
+    "name": "the form declares its font where readers look (DR) and a document default appearance",
+    "requires": [
+      "pypdf",
+      "cryptography"
+    ]
+  },
+  {
+    "id": "the licensed agreement is encrypted#1",
+    "name": "the licensed agreement is encrypted",
+    "requires": [
+      "pypdf",
+      "cryptography"
+    ]
+  },
+  {
+    "id": "the title decrypts cleanly for a compliant reader#1",
+    "name": "the title decrypts cleanly for a compliant reader",
+    "requires": [
+      "pypdf",
+      "cryptography"
+    ]
+  },
+  {
+    "id": "the Asset Schedule has 20 typeable fields for one series (5 rows × 4 columns)#1",
+    "name": "the Asset Schedule has 20 typeable fields for one series (5 rows × 4 columns)",
+    "requires": [
+      "pypdf",
+      "cryptography"
+    ]
+  },
+  {
+    "id": "every cell's appearance string decrypts and auto-sizes (0 Tf)#1",
+    "name": "every cell's appearance string decrypts and auto-sizes (0 Tf)",
+    "requires": [
+      "pypdf",
+      "cryptography"
+    ]
+  },
+  {
+    "id": "every cell is multiline (wraps)#1",
+    "name": "every cell is multiline (wraps)",
+    "requires": [
+      "pypdf",
+      "cryptography"
+    ]
+  },
+  {
+    "id": "instruction sheet: the title and the company name are centered#1",
+    "name": "instruction sheet: the title and the company name are centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "instruction sheet: the first section heading is at the margin, not centered#1",
+    "name": "instruction sheet: the first section heading is at the margin, not centered",
+    "requires": [
+      "pdftotext"
+    ]
+  },
+  {
+    "id": "instruction sheet: list items and body are at the margin#1",
+    "name": "instruction sheet: list items and body are at the margin",
+    "requires": [
+      "pdftotext"
+    ]
+  }
+];
+const occurrences = new Map<string, number>();
+const executed = new Set<string>();
+console.log("PDFREGISTRY:" + JSON.stringify(registry));
+
 let failures = 0;
 let checks = 0;
 function check(name: string, ok: boolean, got?: unknown): void {
   checks++;
+  const n=(occurrences.get(name)??0)+1;occurrences.set(name,n);
+  const id=name+"#"+n;
+  if(!registry.some(r=>r.id===id)){failures++;console.log("PDFREGISTRY_ERROR:"+JSON.stringify({id,reason:"unregistered assertion"}));}
+  executed.add(id);
+  console.log("PDFCASE:"+JSON.stringify({id,name,result:ok?"pass":"fail"}));
   if (ok) console.log(`✅ ${name}`);
   else { failures++; console.log(`❌ ${name}${got !== undefined ? ` — got ${JSON.stringify(got)?.slice(0, 200)}` : ""}`); }
 }
@@ -89,6 +1075,7 @@ const base = {
 } as unknown as Omit<OaInputs, "version" | "professional">;
 const hasPdftotext = (() => { try { execSync("pdftotext -v", { stdio: "ignore" }); return true; } catch { return false; } })();
 const hasPypdfRules = (() => { try { execSync("python3 -c \"import pypdf\"", { stdio: "ignore" }); return true; } catch { return false; } })();
+const hasPypdf = (() => { try { execSync("python3 -c 'import pypdf, cryptography'", { stdio: "ignore" }); return true; } catch { return false; } })();
 const outDir = mkdtempSync(join(tmpdir(), "pdf-render-test-"));
 let rendered = 0;
 for (const version of versions) {
@@ -281,7 +1268,6 @@ PY`).toString().trim();
     check("the blank space before a forced break carries the notice", /\[INTENTIONALLY LEFT BLANK\]/.test(text), (text.match(/INTENTIONALLY LEFT BLANK/g) ?? []).length);
     check("the encrypted text still reads (streams decrypt)", /Asset description/.test(text) && /Company as Owner/.test(text));
   }
-  const hasPypdf = (() => { try { execSync("python3 -c 'import pypdf, cryptography'", { stdio: "ignore" }); return true; } catch { return false; } })();
   if (hasPypdf) {
     // The field tree is walked by hand: pypdf's flattened listing drops a
     // leaf's own /DA, which is where the auto-size setting lives.
@@ -317,7 +1303,7 @@ print(json.dumps(out))
     check("every cell's appearance string decrypts and auto-sizes (0 Tf)", leaves.length > 0 && leaves.every((n) => /\b0 Tf\b/.test(parsed.fields[n].DA)), leaves.map((n) => parsed.fields[n].DA).slice(0, 3));
     check("every cell is multiline (wraps)", leaves.length > 0 && leaves.every((n) => ((parsed.fields[n].Ff ?? 0) & 4096) === 4096), leaves.map((n) => parsed.fields[n].Ff).slice(0, 3));
   } else {
-    console.log("(pypdf not installed here — the encrypted read-back checks ran 0 of 5)");
+    console.log("(pypdf not installed here — the encrypted read-back checks ran 0 of 6)");
   }
 }
 
@@ -339,7 +1325,15 @@ if (hasPdftotext) {
   check("instruction sheet: the first section heading is at the margin, not centered", section !== "" && indent(section) === indent(body), { section: indent(section), body: indent(body) });
   check("instruction sheet: list items and body are at the margin", item !== "" && indent(item) === indent(body), { item: indent(item), body: indent(body) });
 }
-if (!hasPdftotext) console.log("(pdftotext not installed here — the read-back checks ran 0 of 48; they run on a machine with poppler)");
+if (!hasPdftotext) console.log("(pdftotext not installed here — the read-back and reader checks ran 0 of 106; they run on a machine with poppler)");
 
+const available:Record<string,boolean>={pdftotext:hasPdftotext,pypdf:hasPypdfRules,cryptography:hasPypdf};
+let skipped=0;
+for(const r of registry)if(!executed.has(r.id)){
+  const missing=r.requires.filter(tool=>!available[tool]);
+  if(!missing.length){failures++;console.log("PDFCASE:"+JSON.stringify({id:r.id,name:r.name,result:"fail",reason:"required assertion never executed"}));}
+  else{skipped++;console.log("PDFCASE:"+JSON.stringify({id:r.id,name:r.name,result:"not yet run",reason:"dependency missing",missing}));}
+}
+console.log("PDFSUMMARY:"+JSON.stringify({registered:registry.length,executed:executed.size,skipped,failures,qualified:failures===0&&skipped===0}));
 console.log(`\n${checks} checks, ${failures} failures${hasPdftotext ? "" : " (read-back skipped)"}`);
 if (failures > 0) process.exit(1);
