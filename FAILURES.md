@@ -3791,3 +3791,20 @@ These causes come from how I work, not from a gap in my knowledge, so knowing th
 3. **The status of every rule I rely on:** whether Adam approved that specific rule, or it is Codex-written procedure that can be challenged.
 
 The recommendation comes last, derived from those three. If Adam wants this enforced rather than promised, a hook can refuse a review that lacks the three headings, the same way the user-walk hook works.
+
+
+## GIT-CONSOLIDATION-2026-10-03 — Local checkpoints were reported without completing repository integration
+
+### THE FAILURE
+
+Adam, 3 October 2026: "Fucking do that and NEVER create multiple repos again!!!!   NOT FUCKING EVER!!!!"
+
+Codex recorded completed local Git checkpoint maintenance in the SSD repair repository at 13af40a, while the GitHub-connected main repository remained at c459cf7, 59 commits ahead of GitHub ba8b8a6. The repositories share e405da4; the Mac has one later commit and the repair repository has 51 later commits. Three existing Mac hook edits also remained uncommitted. No GitHub push or deployment was performed. Local checkpoint completion did not resolve this integration gap.
+
+### WHY IT HAPPENED
+
+The observable failure was a scope mismatch: the maintenance task used the isolated repository named by the workspace instructions, and its completion checks covered that repository alone. They did not check the GitHub-connected checkout or require a demonstrated integration path. That let a local preservation result be presented as sufficient project-wide Git maintenance. This is an evidence-supported process explanation, not a claim to observe the model's internal mental state.
+
+### FIXED BY
+
+In progress under Adam's explicit instruction: consolidate both histories and existing hook edits into the GitHub-connected repository, verify preservation, retire the second active checkout, and record a standing prohibition on new clones, repositories or worktrees. Existing sealed historical evidence remains unchanged. No release acceptance or deployment is inferred.
