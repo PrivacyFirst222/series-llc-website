@@ -1,3 +1,4 @@
+import { getDb } from './db';
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { env } from "./env";
 import { hmacSha256Base64 } from "./crypto";
@@ -18,6 +19,7 @@ export interface CheckoutLink {
  *  returns a fake link straight to the confirmation page so the flow is testable. */
 export async function createCheckout(opts: {
   orderId: string;
+  service?: boolean;
   llcName: string;
   priced: PricedOrder;
   buyerEmail: string;
@@ -33,41 +35,42 @@ export async function createCheckout(opts: {
       squareOrderId: `dev-${opts.orderId}`,
     };
   }
-  const request = (withPrefill: boolean) =>
-    fetch(`${API_BASE}/v2/online-checkout/payment-links`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
-        "Content-Type": "application/json",
-        "Square-Version": "2025-01-23",
-      },
-      body: JSON.stringify({
-        idempotency_key: randomBytes(16).toString("hex"),
-        order: {
-          location_id: env.SQUARE_LOCATION_ID,
-          reference_id: opts.orderId,
-          line_items: opts.priced.lineItems.map((li) => ({
-            name: li.name,
-            quantity: "1",
-            base_price_money: { amount: li.amountCents, currency: "USD" },
-          })),
-        },
-        checkout_options: {
-          redirect_url: redirectUrl,
-          merchant_support_email: "support@myfloridaseriesllc.com",
-        },
-        ...(withPrefill ? { pre_populated_data: { buyer_email: opts.buyerEmail } } : {}),
-        description: opts.description ?? `Florida Protected Series LLC formation — ${opts.llcName}`,
-      }),
+  const db = await getDb();
+  const table = opts.service ? 'service_orders' : 'orders';
+  const [saved] = await db.query<{checkout_url:string|null;square_order_id:string|null;checkout_request:unknown}>(`SELECT checkout_url,square_order_id,checkout_request FROM ${table} WHERE id=$1`,[opts.orderId]);
+  if (saved?.checkout_url && saved.square_order_id) return {url:saved.checkout_url,squareOrderId:saved.square_order_id};
+  // A legacy link must be recovered, never replaced with another payable link.
+  if (saved?.square_order_id && !saved.square_order_id.startsWith('dev-')) {
+    let cursor: string | undefined;
+    do {
+      const page = await squareRead<{payment_links?:{url:string;order_id:string}[];cursor?:string}>('/v2/online-checkout/payment-links'+(cursor?'?cursor='+encodeURIComponent(cursor):''));
+      const link = page.payment_links?.find(p=>p.order_id===saved.square_order_id);
+      if (link) { await db.query(`UPDATE ${table} SET checkout_url=$2 WHERE id=$1`,[opts.orderId,link.url]); return {url:link.url,squareOrderId:link.order_id}; }
+      cursor=page.cursor;
+    } while(cursor);
+    throw new Error('The existing checkout could not be retrieved. Please contact support; no new checkout was created.');
+  }
+  const proposed = {
+    order: {location_id:env.SQUARE_LOCATION_ID,reference_id:opts.orderId,line_items:opts.priced.lineItems.map(li=>({name:li.name,quantity:'1',base_price_money:{amount:li.amountCents,currency:'USD'}}))},
+    checkout_options:{redirect_url:redirectUrl,merchant_support_email:'support@myfloridaseriesllc.com'},
+    pre_populated_data:{buyer_email:opts.buyerEmail},
+    description:opts.description ?? `Florida Protected Series LLC formation — ${opts.llcName}`,
+  };
+  // Persist the exact request before dispatch. Concurrent retries and a lost
+  // response use the same identity AND body, including the original email.
+  const [stored] = await db.query<{checkout_request:Record<string,unknown>}>(`UPDATE ${table} SET checkout_request=COALESCE(checkout_request,$2::jsonb) WHERE id=$1 RETURNING checkout_request`,[opts.orderId,JSON.stringify(proposed)]);
+  if (!stored) throw new Error('Checkout purchase record is missing');
+  const request = (withPrefill: boolean) => {
+    const body = {...stored.checkout_request};
+    if (!withPrefill) delete body.pre_populated_data;
+    return fetch(`${API_BASE}/v2/online-checkout/payment-links`, {
+      method:'POST', headers:squareHeaders(), signal:AbortSignal.timeout(15000),
+      body:JSON.stringify({...body,idempotency_key:createHash('sha256').update(`checkout:${opts.orderId}:${withPrefill}`).digest('hex').slice(0,40)}),
     });
+  };
 
-  // Square occasionally drops the socket mid-call (seen 25 Aug 2026: an
-  // ECONNRESET from the sandbox failed a checkout in the e2e suite). fetch
-  // throws only on network-level failures — HTTP errors return normally — so
-  // the catch below is exactly the dropped-connection case. Retrying is safe
-  // here: a payment link charges nothing until the buyer opens it, each
-  // attempt carries its own idempotency key, and the order keeps only the
-  // link this function returns. Two retries turn a blip into a short delay.
+  // Retry only with the same persisted identity; a lost response does not
+  // justify creating a second payment link.
   const attemptWithRetry = async (withPrefill: boolean): Promise<Response> => {
     let lastError: unknown;
     for (let i = 0; i < 3; i++) {
@@ -95,6 +98,7 @@ export async function createCheckout(opts: {
   if (!res.ok || !body.payment_link) {
     throw new Error(`Square payment link failed (${res.status}): ${JSON.stringify(body.errors ?? body)}`);
   }
+  await db.query(`UPDATE ${table} SET checkout_url=$2,square_order_id=$3 WHERE id=$1`,[opts.orderId,body.payment_link.url,body.payment_link.order_id]);
   return { url: body.payment_link.url, squareOrderId: body.payment_link.order_id };
 }
 
@@ -234,7 +238,7 @@ export function verifyWebhookSignature(opts: {
 }
 
 /** Registered-agent checkout authorizes first; capture waits for card eligibility/storage. */
-export interface AgentPayment { id: string; status: string; order_id?: string; card_details?: { card?: { prepaid_type?: string } } }
+export interface AgentPayment { id: string; status: string; reference_id?:string; location_id?:string; amount_money?:{amount:number;currency:string}; order_id?: string; card_details?: { card?: { prepaid_type?: string } } }
 export async function agentSquarePayment(action: 'authorize' | 'get' | 'complete' | 'cancel', opts: { id?: string; key?: string; source?: string; customerId?: string; amount?: number; email?: string; reference?: string; customerInitiated?: boolean }): Promise<AgentPayment> {
   if (!env.SQUARE_ACCESS_TOKEN) {
     if (action === 'authorize' && (opts.source?.includes('decline') || testHooks.declineNextRenewal)) {
@@ -277,4 +281,12 @@ export async function storeRenewalCard(opts:{attemptId:string;source:string;cust
  // Unknown prepaid classification is not positive evidence of eligibility.
  if(!['PREPAID','NOT_PREPAID'].includes(body.card.prepaid_type||'')){await disableCard(body.card.id);throw new SquareDecline('CARD_NOT_SUPPORTED');}
  return {customerId,cardId:body.card.id,last4:body.card.last_4||'',brand:body.card.card_brand||'',prepaid:body.card.prepaid_type==='PREPAID'};
+}
+
+/** Authenticated provider reads used for payment reconciliation. */
+export async function squareRead<T>(path:string):Promise<T> {
+  if(!env.SQUARE_ACCESS_TOKEN || !env.SQUARE_LOCATION_ID) throw new Error('Square payment verification is unavailable');
+  const response=await fetch(API_BASE+path,{headers:squareHeaders(),signal:AbortSignal.timeout(15000)});
+  if(!response.ok)throw new Error(`Square payment check failed (${response.status})`);
+  return await response.json() as T;
 }

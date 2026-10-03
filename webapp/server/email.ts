@@ -1,3 +1,4 @@
+import {ioSignal,activeDeadline,providerFailure} from './operation-deadline';
 import { RA_CANCELLATION } from "../src/lib/agentBilling";
 import { env } from "./env";
 import { getDb } from "./db";
@@ -7,6 +8,7 @@ interface Mail {
   subject: string;
   html: string;
   replyTo?: string;
+  idempotencyKey?: string;
   attachments?: {filename:string;content:string}[];
 }
 
@@ -31,39 +33,39 @@ async function recordMail(mail: Mail, ok: boolean, providerId: string | null, er
 
 /** Sends via Resend; development without a key records a simulated send,
  *  while production without a key refuses the send. */
-export async function sendMail(mail: Mail): Promise<void> {
+export async function sendMail(mail: Mail, options:{deadline?:number}={}): Promise<string> {
   if (!env.RESEND_API_KEY) {
     if (env.isProd) {await recordMail(mail,false,null,"Email provider is not configured");throw new Error("Email provider is not configured");}
     console.log(`[email:dev] to=${mail.to} subject="${mail.subject}"\n${mail.html}`);
     devOutbox.push(mail);
     if (devOutbox.length > 50) devOutbox.splice(0, devOutbox.length - 50);
     await recordMail(mail, true, "dev", null);
-    return;
+    return 'dev';
   }
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    signal: AbortSignal.timeout(30000),
-    headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: env.MAIL_FROM,
-      to: [mail.to],
-      subject: mail.subject,
-      html: mail.html,
-      reply_to: mail.replyTo,
-      attachments: mail.attachments,
-    }),
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));
-    throw new Error(`Resend ${res.status}: ${body}`);
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      signal: ioSignal(30000,Math.min(options.deadline??Infinity,activeDeadline())),
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+        ...(mail.idempotencyKey ? {"Idempotency-Key":mail.idempotencyKey} : {}),
+      },
+      body: JSON.stringify({
+        from: env.MAIL_FROM, to: [mail.to], subject: mail.subject, html: mail.html,
+        reply_to: mail.replyTo, attachments: mail.attachments,
+      }),
+    });
+    if (!res.ok) throw Object.assign(new Error(`Resend ${res.status}: ${await res.text()}`),{retryAfterMs:providerFailure(res,'Resend').retryAfterMs});
+    const accepted = (await res.json().catch(() => null)) as { id?: string } | null;
+    if (!accepted?.id) throw new Error("Email provider did not confirm acceptance");
+    await recordMail(mail, true, accepted.id, null);
+    return accepted.id;
+  } catch (error) {
+    // Includes a connection/timeout failure while reading the response body.
+    await recordMail(mail, false, null, (error instanceof Error ? error.message : String(error)).slice(0, 2000));
+    throw error;
   }
-  const accepted = (await res.json().catch(() => null)) as { id?: string } | null;
-  if (!accepted?.id) {await recordMail(mail,false,null,"Email provider did not confirm acceptance");throw new Error("Email provider did not confirm acceptance");}
-  await recordMail(mail, true, accepted.id, null);
 }
 
 const wrap = (inner: string) => `
@@ -486,15 +488,21 @@ export function escapeHtml(s: string): string {
 
 /** The EIN arrived and the client's Form 2553 package was rebuilt with it
  *  (Adam, 7 Sep 2026). */
-export function sElectionEinAddedEmail(opts: { llcName: string; einDisplay: string; portalUrl: string }): { subject: string; html: string } {
+export function sElectionEinAddedEmail(opts: { llcName: string; einDisplay: string; portalUrl: string } & ({ firstPackage: true; editableUntil: string } | { firstPackage: false })): { subject: string; html: string } {
+  if (opts.firstPackage && !opts.editableUntil) throw new Error('The S-election editing deadline is unavailable.');
   return {
     subject: `Your EIN has been added to your Form 2553 package — ${opts.llcName}`,
     html: wrap(`
       <p>The IRS has issued the EIN for <strong>${escapeHtml(opts.llcName)}</strong>:
       <strong>${escapeHtml(opts.einDisplay)}</strong>. The confirmation letter is in your portal.</p>
-      <p>Your S corporation election package is ready with the issued EIN in item A. <strong>Download the new copy before signing and
+      ${opts.firstPackage ? `<p>Your S corporation election package is ready with the issued EIN in item A.
+      <strong>Download the package before signing and faxing or mailing.</strong></p>
+      <p>You can correct your answers and regenerate the package until
+      <strong>${escapeHtml(opts.editableUntil)}</strong>. After that, editing closes and the full numbers are removed from the questionnaire records.
+      Your completed document stays encrypted in your portal until you choose to delete it.
+      Download and keep your own copy.</p>` : `<p>Your S corporation election package is ready with the issued EIN in item A. <strong>Download the new copy before signing and
       faxing or mailing</strong> — use this updated copy now that the
-      number exists.</p>
+      number exists.</p>`}
       <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
     `),
   };

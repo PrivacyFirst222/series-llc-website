@@ -1,3 +1,11 @@
+import {prepareCorrectionHistory} from './office-history-recovery';
+import {saveDocumentSubmission,DocumentUploadError} from './document-upload';
+import {officeFileIdentities} from './office-recovery-sources';
+import {verifyOfficeDelivery,OfficeRecoveryError,claimOfficeVerification,officeRecoveryTables,recoverOfficeFile} from './office-file-recovery';
+import {registerPublishedArticles,articlesCorrectionState} from './published-articles';
+import {requestCertificateDeletion,registerOfficeDocumentHistory} from './document-retention';
+import {assertRestoredOfficeAttemptLive,findOfficeOperation,claimOfficeOperation,saveOfficeFile,readOfficeFile,releaseOfficeOperation,officeHash,OfficeConflict,correctOfficeOperation,correctArticlesOperation,cleanupSupersededOfficeFiles} from './office-operation';
+import { storeElectionPackage,verifyOfficeElectionPackage } from "./s-election-package-storage";
 import { obligationPurpose } from "./agent-obligations";
 import { replaceFilingDocument } from "./filing-document-replacement";
 import { readOrderBoard, SERVICE_COMPANY_SQL } from "./admin-board";
@@ -22,7 +30,8 @@ import { mirrorStatus, runFileMirror } from "./dropbox";
 
 import { buildSElectionPackage, type SElectionDetails } from "./s-election";
 
-import { decryptSecret } from "./crypto";
+import { decryptSecret, SecretFormatError } from "./crypto";
+import { EncryptionKeyError } from "./encryption";
 
 import { createSession, rateLimit, clientIp } from "./auth";
 
@@ -32,15 +41,16 @@ import { einDigits, fmtEinDisplay, isValidEin } from "../src/lib/ein";
 import { filingGroups, seriesNames, AR_SIGNER } from "./filing";
 import { err, testHooks, MAX_UPLOAD_BYTES, looksLikePdf, requireAdmin } from "./shared";
 import { loadSummaryRow } from "./order-summary";
-import { oaSeed, purgeExpiredSElections, postSElectionPackage, isoDate, type SElectionStoredDetails } from "./routes-portal";
+import { oaSeed, purgeExpiredSElections, postSElectionPackage, sElectionWindow, isoDate, type SElectionStoredDetails } from "./routes-portal";
 import { evaluate2553Timing } from "../src/lib/form2553Timing";
 import { unpackSsns } from "../src/lib/jointOwner";
-import { easternDateIso } from "./datetime";
+import { easternDateIso, stampEastern } from "./datetime";
 
 import { refreshOwnersManual, ensureOwnersManual } from "./owners-manual";
 export { refreshOwnersManual } from "./owners-manual";
 
 export function registerAdminRoutes(app: Hono) {
+registerPublishedArticles(app,prepareStatement,appointedUs);
 
 // The admin page's view of the same list. It cannot use /portal/library: that
 // route requires a CLIENT session, and an admin-only session 401s — which
@@ -315,7 +325,7 @@ app.get("/admin/orders/:id", async (c) => {
   const docs = o.client_id
     ? await db.query<{ id: string; kind: string; title: string; meta: unknown; created_at: string }>(
         `SELECT id, kind, title, meta, created_at FROM documents
-          WHERE client_id = $1 AND order_id = $2 ORDER BY created_at`,
+          WHERE client_id = $1 AND order_id = $2 AND deleted_at IS NULL ORDER BY created_at`,
         [o.client_id, o.id],
       )
     : [];
@@ -373,13 +383,22 @@ app.get("/admin/orders/:id", async (c) => {
         (typeof o.copied_fields === "string" ? JSON.parse(o.copied_fields) : o.copied_fields) ?? {},
       series: allSeries.map((name) => ({ name, covered: covered.has(name) })),
       // In the order the client sees them (14 Sep 2026).
-      documents: sortDocuments(docs.map((d) => ({ id: d.id, kind: d.kind, title: d.title, created_at: String(d.created_at) }))).map((d) => ({
+      documents: sortDocuments(docs.map((d) => ({ id: d.id, kind: d.kind, title: d.title, source: metaOf(d).source === "portal" ? "portal" : "card", created_at: String(d.created_at) }))).map((d) => ({
         id: d.id,
         kind: d.kind,
         title: d.title,
         createdAt: d.created_at,
+        source: d.source,
       })),
+      articlesCorrection: await articlesCorrectionState(db,o.id),
       hasArticles: docs.some((d) => d.kind === "articles"),
+      hasStatement: docs.some((d) => d.kind === "statement"),
+      articlesPending: ['open','retiring'].includes((await findOfficeOperation(db,'articles',o.id))?.phase??''),
+      articlesRetiring: (await findOfficeOperation(db,'articles',o.id))?.phase==='retiring',
+      articlesRestoreReviewRequired: ((await findOfficeOperation(db,'articles',o.id))?.payload.restoreReview as {required?:boolean}|undefined)?.required===true,
+      articlesSavedDocumentNumber: String((await findOfficeOperation(db,'articles',o.id))?.payload.documentNumber??''),
+      articlesRevision: (await findOfficeOperation(db,'articles',o.id))?.id??null,
+      pendingCertificateDeletions: await db.query("SELECT d.id,d.title FROM documents d JOIN document_deletions x ON x.document_id=d.id WHERE d.order_id=$1 AND x.completed_at IS NULL AND d.kind IN ('certificate-of-status','certified-copy')",[o.id]),
       certStatusPurchased: !!(payload as { optionalDocuments?: { certificateOfStatus?: boolean } }).optionalDocuments?.certificateOfStatus,
       certifiedCopyPurchased: !!(payload as { optionalDocuments?: { certifiedCopy?: boolean } }).optionalDocuments?.certifiedCopy,
       // Intake certificates count only copies uploaded from the card; a
@@ -399,15 +418,7 @@ function appointedUs(payload: unknown): boolean {
   return p?.certifications?.articlesSignedBy === "SERVICE";
 }
 const DOC_NUMBER_NEEDED = "This client appointed us to sign. Enter the Florida document number so the Statement of Authorized Representative can name the company.";
-/** Generate and store the Statement beside the company's Articles. Returns
- *  its document id and storage key; callers validate the document number first. */
-async function issueStatement(
-  db: Awaited<ReturnType<typeof getDb>>,
-  o: { id: string; client_id: string | null; llc_name: string; payload?: unknown },
-  documentNumber: string,
-  put: (name: string, data: ArrayBuffer, type: string) => Promise<{ storageKey: string; sizeBytes: number }> = putFile,
-  retirePrior = true,
-): Promise<{ id: string; storageKey: string }> {
+async function prepareStatement(o:{llc_name:string;payload?:unknown},documentNumber:string){
   const { markdown, title, encodedClientText } = assembleStatement({
     companyName: o.llc_name,
     documentNumber: documentNumber.trim(),
@@ -419,6 +430,18 @@ async function issueStatement(
   // Our own statement, not a licensed deliverable: page numbers only.
   const pdf = await renderMarkdownPdf({ markdown, encodedClientText, watermark: null, title });
   const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength) as ArrayBuffer;
+  return {title,buf};
+}
+/** Generate and store the Statement beside the company's Articles. Returns
+ *  its document id and storage key; callers validate the document number first. */
+async function issueStatement(
+  db: Awaited<ReturnType<typeof getDb>>,
+  o: { id: string; client_id: string | null; llc_name: string; payload?: unknown },
+  documentNumber: string,
+  put: (name: string, data: ArrayBuffer, type: string) => Promise<{ storageKey: string; sizeBytes: number }> = putFile,
+  retirePrior = true,
+): Promise<{ id: string; storageKey: string }> {
+  const {title,buf}=await prepareStatement(o,documentNumber);
   const stored = await put(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
   const prior = await db.query<{ id: string; storage_key: string }>(
     "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = 'statement'", [o.id]);
@@ -455,39 +478,84 @@ app.post("/admin/orders/:id/articles", async (c) => {
     return c.json(err("Adding protected series requires no new Articles of Organization: the company already exists.", "BAD_STATE"), 400);
   }
   // The card offers the upload only while the order is With The State.
-  if (o.status !== "filed") {
+  const missingStatement=appointedUs(o.payload)&&(await db.query("SELECT id FROM documents WHERE order_id=$1 AND kind='articles' AND deleted_at IS NULL",[o.id])).length>0&&(await db.query("SELECT id FROM documents WHERE order_id=$1 AND kind='statement' AND deleted_at IS NULL",[o.id])).length===0;
+  if (o.status !== "filed"&&!missingStatement) {
     return c.json(err(`The filed Articles are uploaded while the order is With The State; ${whereItIs(o)}`, "BAD_STATE"), 400);
   }
-  const existing = await db.query<{ id: string }>(
-    "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'", [o.id]);
-  if (existing.length > 0) {
-    return c.json(err("Articles are already uploaded for this order.", "ALREADY_UPLOADED"), 409);
-  }
-  const form = await c.req.parseBody();
-  const articles = form.articles;
-  if (!(articles instanceof File)) {
-    return c.json(err("The Articles of Organization PDF is required.", "INVALID_INPUT"), 400);
-  }
-  const documentNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
-  const weSigned = appointedUs(o.payload);
-  if (weSigned && !documentNumber) return c.json(err(DOC_NUMBER_NEEDED, "DOCUMENT_NUMBER_REQUIRED"), 400);
-  // Sunbiz's own numbers are the letter L and eleven digits, and its search
-  // page warns: "use the number zero for all document numbers. The letter o
-  // is not acceptable." (14 Sep 2026)
-  // Checked whenever one is typed: a self-signed order's number is kept too (15 Sep 2026).
-  if (documentNumber && !/^L\d{11}$/.test(documentNumber)) return c.json(err("A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.", "DOCUMENT_NUMBER_SHAPE"), 400);
-  if (articles.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
-  if (!(await looksLikePdf(articles))) {
-    return c.json(err("This is not a readable PDF. Upload the filed Articles from Sunbiz.", "NOT_A_PDF"), 400);
-  }
-  const stored = await putFile(articles.name, await articles.arrayBuffer(), articles.type || "application/pdf");
-  await db.query(
-    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-     VALUES ($1, $2, 'articles', $3, $4, $5, $6, $7)`,
-    [o.client_id, o.id, `Articles of Organization — ${o.llc_name}`, stored.storageKey, articles.type || "application/pdf", stored.sizeBytes, JSON.stringify(documentNumber ? { documentNumber } : {})],
-  );
-  if (weSigned) await issueStatement(db, o, documentNumber);
-  return c.json({ data: { ok: true, statement: weSigned } });
+  const existing=await db.query<{id:string;storage_key:string;title:string;size_bytes:number;meta:Record<string,unknown>}>("SELECT * FROM documents WHERE order_id=$1 AND kind='articles' AND deleted_at IS NULL",[o.id]);
+  const statements=await db.query("SELECT id FROM documents WHERE order_id=$1 AND kind='statement' AND deleted_at IS NULL",[o.id]);
+  const prior=await findOfficeOperation(db,'articles',o.id);
+  const form=await c.req.parseBody();
+  const file=form.articles instanceof File?form.articles:null;
+  const weSigned=appointedUs(o.payload);
+  if(existing.length&&(!weSigned||statements.length)&&!prior)return c.json(err("Articles are already uploaded for this order.","ALREADY_UPLOADED"),409);
+  const documentNumber=String(form.documentNumber||prior?.payload.documentNumber||existing[0]?.meta?.documentNumber||'').trim();
+  if(weSigned&&!documentNumber)return c.json(err(DOC_NUMBER_NEEDED,"DOCUMENT_NUMBER_REQUIRED"),400);
+  if(documentNumber&&!/^L\d{11}$/.test(documentNumber))return c.json(err("A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.","DOCUMENT_NUMBER_SHAPE"),400);
+  if(file&&(file.size>MAX_UPLOAD_BYTES||!(await looksLikePdf(file))))return c.json(err("This is not a readable PDF under 20 MB. Upload the filed Articles from Sunbiz.","NOT_A_PDF"),400);
+  if(!file&&!existing.length&&!prior?.files.articles)return c.json(err("The Articles of Organization PDF is required.","INVALID_INPUT"),400);
+  const bytes=file?Buffer.from(await file.arrayBuffer()):null;
+  let op:Awaited<ReturnType<typeof claimOfficeOperation>>|undefined;
+  try{
+    const correctionOf=typeof form.correctionOf==='string'?form.correctionOf:'';
+    const hash=officeHash({documentNumber,pdf:(prior?prior.payload.existingId:existing[0]?.id)||bytes?.toString('base64')});
+    if(correctionOf){
+      if(!bytes)throw new OfficeConflict('Choose the corrected Articles PDF.','UPLOAD_REQUIRED');
+      await correctArticlesOperation(db,o.id,correctionOf,hash,{documentNumber,weSigned,existingId:null});
+      await cleanupSupersededOfficeFiles(db);
+    }
+    op=await claimOfficeOperation(db,'articles',o.id,!file&&prior?null:hash,{documentNumber,weSigned,existingId:existing[0]?.id??null},false,form.reviewRestoredOriginal==='true');
+    if(op.phase==='done'){await verifyOfficeDelivery(db,op,bytes?{slot:op.kind==='articles'?'articles':'upload',bytes}:undefined);await releaseOfficeOperation(db,op);return c.json({data:op.result});}
+    // The request may have read the old filing before another writer finished.
+    // Recheck after taking the reservation, before writing any document bytes.
+    const liveDocuments=await db.query<{id:string;kind:string}>("SELECT id,kind FROM documents WHERE order_id=$1 AND kind IN ('articles','statement') AND deleted_at IS NULL",[o.id]);
+    const liveArticles=liveDocuments.filter(d=>d.kind==='articles');
+    const expectedArticles=op.payload.existingId;
+    if(liveDocuments.some(d=>d.kind==='statement')||
+      (expectedArticles?liveArticles.length!==1||liveArticles[0].id!==expectedArticles:liveArticles.length!==0)){
+      // An unused claim has no recovery bytes to retain. Clear only our own
+      // still-live lease and reservation; never discard a staged file intent.
+      await db.query(`WITH abandoned AS (DELETE FROM office_operations
+        WHERE id=$1 AND lease=$2 AND lease_until>now() AND phase='open' AND files='{}'::jsonb
+        AND coalesce(payload->'fileIntents','{}'::jsonb)='{}'::jsonb RETURNING id)
+        UPDATE orders SET office_upload_id=NULL WHERE id=$3 AND office_upload_id IN (SELECT id FROM abandoned)`,[op.id,op.lease,o.id]);
+      throw new OfficeConflict('The filing documents changed before this upload was reserved. Reload the order.','OFFICE_CONFLICT');
+    }
+    // A pre-repair partial upload already owns its Articles. Repair only its
+    // missing Statement; a new operation publishes both references together.
+    if(!op.payload.existingId&&!op.files.articles){
+      if(!bytes)throw new OfficeConflict('Select the original Articles PDF to resume this upload.','UPLOAD_REQUIRED');
+      await saveOfficeFile(db,op,'articles',bytes,{kind:'articles',title:`Articles of Organization — ${o.llc_name}`,meta:{documentNumber:op.payload.documentNumber}});
+    }
+    if(op.payload.weSigned&&!op.files.statement){
+      // Fix the generated bytes before storage. An expired renderer cannot
+      // overwrite the winner with a freshly dated/generated version.
+      if(!op.payload.statementPdf){
+        const prepared=await prepareStatement(o,String(op.payload.documentNumber));
+        const [intent]=await db.query<{payload:Record<string,unknown>}>(`UPDATE office_operations SET payload=payload||$3::jsonb WHERE id=$1 AND lease=$2 AND lease_until>now() AND phase='open' RETURNING payload`,[op.id,op.lease,JSON.stringify({statementPdf:Buffer.from(prepared.buf).toString('base64'),statementTitle:prepared.title})]);
+        if(!intent)throw new OfficeConflict('Another request resumed this work. Reload and retry.');op.payload=intent.payload;
+      }
+      await saveOfficeFile(db,op,'statement',Buffer.from(String(op.payload.statementPdf),'base64'),{kind:'statement',title:String(op.payload.statementTitle),meta:{documentNumber:op.payload.documentNumber}});
+    }
+    if(bytes&&op.files.articles)await saveOfficeFile(db,op,'articles',bytes,{kind:'articles',title:op.files.articles.title,meta:op.files.articles.meta});
+    if(op.files.statement&&op.payload.statementPdf)await saveOfficeFile(db,op,'statement',Buffer.from(String(op.payload.statementPdf),'base64'),{kind:'statement',title:op.files.statement.title,meta:op.files.statement.meta});
+    const files=Object.values(op.files);
+    for(const saved of files)await readOfficeFile(saved);
+    // Pending uploads from the previous release have no per-file digest.
+    // Their immutable intent still proves the exact original Articles bytes.
+    if(op.files.articles&&!op.payload.existingId){
+      const original=await readOfficeFile(op.files.articles);
+      if(officeHash({documentNumber:op.payload.documentNumber,pdf:original.toString('base64')})!==op.input_hash)throw new OfficeConflict('The saved Articles differ from the original. Select the original PDF and retry.','UPLOAD_REQUIRED');
+    }
+    const [done]=await db.query(`WITH operation AS (SELECT * FROM office_operations WHERE id=$1 AND lease=$2 AND lease_until>now() AND phase='open' FOR UPDATE), owner AS (
+      UPDATE orders SET office_upload_id=NULL WHERE id=$3 AND office_upload_id=$1 AND replacing_at IS NULL AND status IN ('filed','formed') AND EXISTS(SELECT 1 FROM operation) RETURNING id), inserted AS (
+      INSERT INTO documents(id,client_id,order_id,kind,title,storage_key,content_type,size_bytes,meta)
+      SELECT f.id,$4,$3,f.kind,f.title,f.key,'application/pdf',f.size,f.meta FROM jsonb_to_recordset($5::jsonb) AS f(id uuid,kind text,title text,key text,size int,meta jsonb) WHERE EXISTS(SELECT 1 FROM owner) RETURNING id)
+      UPDATE office_operations SET phase='done',payload=payload-'statementPdf',result=$6,lease=NULL,lease_until=NULL WHERE id=$1 AND EXISTS(SELECT 1 FROM owner) AND (SELECT count(*) FROM inserted)=$7 RETURNING result`,[op.id,op.lease,o.id,o.client_id,JSON.stringify(files),JSON.stringify({ok:true,statement:!!op.payload.weSigned}),files.length]);
+    if(!done)throw new OfficeConflict('The filing changed while saving. Reload and retry.');
+    return c.json({data:{ok:true,statement:!!op.payload.weSigned}});
+  }catch(e){if(op)await releaseOfficeOperation(db,op,e);if(e instanceof OfficeRecoveryError)return c.json(err(e.message,e.code),e.status);if(e instanceof OfficeConflict)return c.json(err(e.message,e.code),409);throw e;}
+
 });
 
 /** The state's certificates on their own (Adam, 7 Sep 2026: "I uploaded the
@@ -582,7 +650,7 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
     return c.json(err("A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.", "DOCUMENT_NUMBER_SHAPE"), 400);
   }
   const existingNumbers = articles ? await db.query<{meta: unknown}>(
-    "SELECT meta FROM documents WHERE order_id=$1 AND kind IN ('articles','statement') ORDER BY CASE WHEN kind='articles' THEN 0 ELSE 1 END, created_at DESC", [o.id]) : [];
+    "SELECT meta FROM documents WHERE order_id=$1 AND kind IN ('articles','statement') AND deleted_at IS NULL ORDER BY CASE WHEN kind='articles' THEN 0 ELSE 1 END, created_at DESC", [o.id]) : [];
   const priorDocNumber = existingNumbers.map(d => String(metaOf(d).documentNumber ?? "")).find(n => /^L\d{11}$/.test(n)) ?? "";
   const formedDocNumber = suppliedDocNumber || priorDocNumber;
   const formedWeSigned = appointedUs(o.payload);
@@ -598,11 +666,13 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
     // The Articles went up at the With-The-State step; here only the
     // designations arrive. Without the Articles on file, nothing can be formed.
     const already = await db.query<{ id: string }>(
-      "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles'", [o.id]);
+      "SELECT id FROM documents WHERE order_id = $1 AND kind = 'articles' AND deleted_at IS NULL", [o.id]);
     if (already.length === 0) {
       return c.json(err("The Articles of Organization PDF is required.", "INVALID_INPUT"), 400);
     }
   }
+  if(!articles&&!isConversion&&formedWeSigned&&!(await db.query("SELECT id FROM documents WHERE order_id=$1 AND kind='statement' AND deleted_at IS NULL",[o.id])).length)return c.json(err("Statement of Authorized Representative — missing. Retry the Articles upload before completing formation.","STATEMENT_REQUIRED"),409);
+  if((await findOfficeOperation(db,'articles',o.id))?.phase==='open')return c.json(err("The Articles upload is unfinished. Resume it before completing formation.","ARTICLES_PENDING"),409);
   // psd[] files, each with a matching psdSeries[] entry: a JSON array of the
   // series names that file designates.
   const psdFiles = (Array.isArray(form["psd"]) ? form["psd"] : [form["psd"]]).filter(
@@ -682,8 +752,8 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   // that serializes payment fulfillment — and a stale claim self-releases
   // after ten minutes so a crashed attempt cannot wedge the order.
   const claim = await db.query<{ id: string }>(
-    `UPDATE orders SET replacing_at = now()
-      WHERE id = $1 AND (replacing_at IS NULL OR replacing_at < now() - interval '10 minutes')
+    `UPDATE orders SET replacing_at = now(), office_upload_id=NULL
+      WHERE id = $1 AND (office_upload_id IS NULL OR EXISTS(SELECT 1 FROM office_operations WHERE id=orders.office_upload_id AND phase='done')) AND (replacing_at IS NULL OR replacing_at < now() - interval '10 minutes')
       RETURNING id`,
     [o.id],
   );
@@ -698,7 +768,7 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   // Certificates are never retired: every copy stays (Adam, 15 Sep 2026).
   const retiredKinds = ["psd", ...(articles ? ["articles"] : []), ...(articles && formedWeSigned ? ["statement"] : [])];
   const priorDocs = await db.query<{ id: string; storage_key: string }>(
-    "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = ANY($2::text[])",
+    "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = ANY($2::text[]) AND deleted_at IS NULL",
     [o.id, retiredKinds],
   );
   const newKeys: string[] = [];
@@ -784,12 +854,19 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
     throw e;
   }
 
-  // The new package is fully stored and recorded; retire the old one.
+  // Published office originals remain recoverable history when this older
+  // formation entry point replaces them. Removing their owning rows would
+  // invalidate the immutable operation identity for the entire backup.
   if (priorDocs.length > 0) {
-    await db.query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [priorDocs.map((d) => d.id)]);
-    for (const d of priorDocs) {
-      await deleteFile(d.storage_key);
-    }
+    const retained=await db.query<{id:string}>(`UPDATE documents d SET deleted_at=now(),meta=meta||'{"officeHistory":true}'::jsonb
+      WHERE d.id=ANY($1::uuid[]) AND d.kind IN ('articles','statement')
+      AND d.order_id=$2 AND d.client_id=$3
+      AND EXISTS(SELECT 1 FROM office_operations op,jsonb_each(op.files) f
+       WHERE op.target_id=$2 AND (op.phase IN ('committed','done') OR (op.phase='superseded' AND op.payload->>'previousPhase' IN ('committed','done')))
+       AND f.value->>'id'=d.id::text) RETURNING d.id`,[priorDocs.map(d=>d.id),o.id,o.client_id]);
+    const kept=new Set(retained.map(d=>d.id)),removed=priorDocs.filter(d=>!kept.has(d.id));
+    if(removed.length)await db.query("DELETE FROM documents WHERE id = ANY($1::uuid[])", [removed.map(d=>d.id)]);
+    for (const d of removed) await deleteFile(d.storage_key);
   }
 
   // No invented "sent" date: filed_at is set only by the button (14 Sep 2026).
@@ -877,12 +954,14 @@ app.get("/admin/clients", async (c) => {
                 'last_date', (SELECT to_char(r.renewal_date, 'FMMon FMDD, YYYY') FROM ra_renewals r WHERE r.order_id = o.id ORDER BY r.renewal_date DESC LIMIT 1)
               ) ORDER BY o.llc_name), '[]'::jsonb)
                FROM orders o
-              WHERE o.client_id = cl.id AND o.status <> 'pending_payment'
+              WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL AND o.status <> 'pending_payment'
                 AND o.payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_cards,
             (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', o.id, 'llc_name', o.llc_name, 'contact_name', o.contact_name, 'has_summary', o.summary_storage_key IS NOT NULL) ORDER BY o.paid_at DESC), '[]'::jsonb)
                FROM orders o
               WHERE o.client_id = cl.id AND o.paid_at IS NOT NULL) AS companies
-     FROM clients cl LEFT JOIN documents d ON d.client_id = cl.id
+     FROM clients cl LEFT JOIN documents d ON d.client_id = cl.id AND d.deleted_at IS NULL
+     WHERE EXISTS (SELECT 1 FROM orders paid WHERE paid.client_id=cl.id AND paid.paid_at IS NOT NULL AND paid.status <> 'pending_payment')
+        OR EXISTS (SELECT 1 FROM service_orders paid WHERE paid.client_id=cl.id AND paid.paid_at IS NOT NULL AND paid.status NOT IN ('pending_payment','cancelled'))
      GROUP BY cl.id ORDER BY cl.created_at DESC`,
   );
   type Balance = { purpose: string; status: string; date: unknown; link_url: string | null; reconcilingPayment?: boolean; [key: string]: unknown };
@@ -1017,13 +1096,18 @@ app.post("/admin/clients/:id/email", async (c) => {
   if (taken.length > 0) {
     return c.json(err("That address is already in use on another account.", "EMAIL_TAKEN"), 400);
   }
-  await db.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2", [
-    newEmail,
-    c.req.param("id"),
-  ]);
+  try {
+    await db.query(`WITH changed AS (UPDATE clients SET email=$1,pending_email=NULL,auth_version=auth_version+1 WHERE id=$2 RETURNING id) UPDATE auth_tokens SET used_at=now() WHERE client_id IN (SELECT id FROM changed) AND used_at IS NULL`, [
+      newEmail,
+      c.req.param("id"),
+    ]);
+  } catch (error) {
+    if ((error as { code?: string }).code !== "23505") throw error;
+    return c.json(err("That address is already in use on another account. Choose a different address.", "EMAIL_TAKEN"), 400);
+  }
   const mail = emailChangedEmail(newEmail);
-  sendMail({ to: newEmail, ...mail }).catch((e) => console.error("[admin] email-changed (new) failed:", e));
-  sendMail({ to: previous, ...mail }).catch((e) => console.error("[admin] email-changed (old) failed:", e));
+  await sendMail({ to: newEmail, ...mail }).catch((e) => console.error("[admin] email-changed (new) failed:", e));
+  await sendMail({ to: previous, ...mail }).catch((e) => console.error("[admin] email-changed (old) failed:", e));
   return c.json({ data: { ok: true, email: newEmail } });
 });
 
@@ -1043,9 +1127,11 @@ app.get("/admin/services", async (c) => {
             ${SERVICE_COMPANY_SQL} AS board_order_id,
             so.created_at, so.paid_at, so.fulfilled_at,
             (so.ein_secret IS NOT NULL) AS has_secret,
+            (EXISTS(SELECT 1 FROM office_operations oo WHERE oo.kind='service' AND oo.target_id=so.id) OR (so.type='s-election' AND so.details->>'documentId' IS NOT NULL)) AS completion_available,
             cl.email AS client_email, cl.name AS client_name
      FROM service_orders so JOIN clients cl ON cl.id = so.client_id
-     ${orderIds ? `WHERE (${SERVICE_COMPANY_SQL})::text = ANY($1::text[])` : ""}
+     WHERE so.paid_at IS NOT NULL AND so.status NOT IN ('pending_payment','duplicate_payment')
+     ${orderIds ? `AND (${SERVICE_COMPANY_SQL})::text = ANY($1::text[])` : ""}
      ORDER BY so.created_at DESC`,
     orderIds ? [orderIds] : [],
   );
@@ -1084,6 +1170,7 @@ app.get("/admin/services/:id", async (c) => {
     "SELECT id FROM service_orders WHERE client_id = $1 AND formation_order_id = $2 AND type = 's-election' AND status NOT IN ('pending_payment', 'cancelled') LIMIT 1",
     [so.client_id, companyId],
   )).length > 0;
+  const completionOperation=await findOfficeOperation(db,'service',so.id);
   return c.json({
     data: {
       id: so.id,
@@ -1092,6 +1179,15 @@ app.get("/admin/services/:id", async (c) => {
       llc_name: so.llc_name,
       details: so.details,
       sElectionPaid,
+      retirementState: completionOperation?.phase==='retiring'?'retiring':null,
+      retirementOperationId: completionOperation?.phase==='retiring'?completionOperation.id:null,
+      restoreReviewRequired: (completionOperation?.payload.restoreReview as {required?:boolean}|undefined)?.required===true,
+      restoredAssignedEin: (completionOperation?.payload.restoreReview as {required?:boolean}|undefined)?.required===true ? String(completionOperation?.payload.assignedEin??'') : null,
+      replacementInputRequired: completionOperation?.phase==='open'&&!!completionOperation.payload.corrects&&!completionOperation.files.upload,
+      completionPending: !!completionOperation && completionOperation.phase!=='done',
+      completionRevision: completionOperation?.id??(so.type==='s-election' && (so.details as {documentId?:string})?.documentId ? `document:${(so.details as {documentId:string}).documentId}` : null),
+      completionPublished: !!completionOperation?.result.documentId || !!completionOperation?.payload.previousDocumentId || !!(so.details as {documentId?:string})?.documentId,
+      completionError: completionOperation ? 'A saved completion can be resumed or explicitly corrected.' : null,
       amount_cents: so.amount_cents,
       created_at: so.created_at,
       paid_at: so.paid_at,
@@ -1227,12 +1323,16 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   let file: File | null = null;
   let titleOverride = "";
   let assignedEin = "";
+  let correctionOf = "";
+  let reviewRestoredOriginal=false;
   if (contentType.includes("multipart/form-data")) {
     const form = await c.req.parseBody();
     if (form.file instanceof File && form.file.size > 0) file = form.file;
     notify = form.notify !== "false";
     if (typeof form.title === "string") titleOverride = form.title.trim();
     if (typeof form.ein === "string") assignedEin = einDigits(form.ein);
+    if (typeof form.correctionOf === "string") correctionOf=form.correctionOf;
+    reviewRestoredOriginal=form.reviewRestoredOriginal==='true';
   } else {
     const body = (await c.req.json().catch(() => ({}))) as { notify?: boolean };
     notify = body.notify !== false;
@@ -1248,8 +1348,35 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   );
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
   const so = rows[0];
-  if (so.status === "pending_payment" || so.status === "fulfilled") {
+  let priorOperation=await findOfficeOperation(db,'service',so.id);
+  const publishedCorrection=so.type==='s-election' && correctionOf.startsWith('document:');
+  if (so.status === "pending_payment" || (so.status === "fulfilled"&&!priorOperation&&!publishedCorrection)) {
     return c.json(err("This order is not in a fulfillable state.", "BAD_STATE"), 400);
+  }
+  if(correctionOf&&(!file||(!priorOperation&&!publishedCorrection)))return c.json(err("Select the corrected PDF and reload the saved completion before correcting it.","INVALID_INPUT"),400);
+  if(priorOperation?.phase==='retiring'&&!correctionOf)return c.json(err('Continue the saved replacement before resuming.','DOCUMENT_DELETED'),409);
+  if((priorOperation?.payload.restoreReview as {required?:boolean}|undefined)?.required&&!correctionOf)await assertRestoredOfficeAttemptLive(priorOperation!);
+  if((priorOperation?.payload.restoreReview as {required?:boolean}|undefined)?.required&&!correctionOf&&(!reviewRestoredOriginal||!file))return c.json(err('Review the restored upload and attach its original PDF.','RECOVERY_REVIEW_REQUIRED'),409);
+  const resuming=!file&&!!priorOperation&&!correctionOf;
+  if(resuming&&priorOperation){
+    assignedEin=String(priorOperation.payload.assignedEin||'');notify=Boolean(priorOperation.payload.notify);
+    titleOverride=String(priorOperation.payload.titleOverride||'');
+    if(priorOperation.files.upload){
+      let held:typeof priorOperation|undefined;
+      try{
+       let original:Buffer;
+       if(['committed','done'].includes(priorOperation.phase)){
+        held=await claimOfficeVerification(db,priorOperation);
+        const identities=officeFileIdentities(await officeRecoveryTables(db));
+        const identity=identities.get(priorOperation.files.upload.key);
+        if(!identity)throw new OfficeRecoveryError('Original identity is unavailable. Attach the original.','UPLOAD_REQUIRED');
+        original=(await recoverOfficeFile(identity)).plain;
+       }else original=await readOfficeFile(priorOperation.files.upload);
+       file=new File([new Uint8Array(original)],'saved-upload.pdf',{type:'application/pdf'});
+      }catch(e){if(e instanceof OfficeRecoveryError)return c.json(err(e.message,e.code),e.status);if(e instanceof OfficeConflict)return c.json(err(e.message,e.code),409);throw e;}
+      finally{if(held)await releaseOfficeOperation(db,held);}
+    }
+    if(so.type==='series'&&!file&&(priorOperation.payload.attachmentRequired===true||priorOperation.input_hash!==officeHash({assignedEin,titleOverride,notify})))return c.json(err('The original PDF was not saved. Attach that PDF to finish this delivery.','UPLOAD_REQUIRED'),409);
   }
   // An EIN order's deliverable IS the IRS letter — and fulfillment deletes the
   // TIN, so completing without the letter would strand the client. Required.
@@ -1262,7 +1389,7 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   if (so.type === "ein" && !isValidEin(assignedEin)) {
     return c.json(err("Enter the 9-digit EIN from the IRS confirmation letter.", "EIN_REQUIRED"), 400);
   }
-  if (so.type === "s-election" && !file) {
+  if (so.type === "s-election" && !file && priorOperation?.phase!=="committed" && priorOperation?.phase!=="done") {
     return c.json(err("Attach the election package PDF to fulfill an S election order.", "PACKAGE_REQUIRED"), 400);
   }
   // A certificate order's deliverable IS the state document.
@@ -1283,9 +1410,9 @@ app.post("/admin/services/:id/fulfill", async (c) => {
             ? `Certified Copy of the Articles — ${so.llc_name}`
             : `Federal EIN — ${details.target === "series" ? details.seriesName ?? so.llc_name : so.llc_name}`;
 
-  let documentId: string | null = null;
-  if (file) {
-    const title =
+  let title=summary;
+  if(file){
+    title =
       titleOverride ||
       (so.type === "series"
         ? `Protected Series Designation — ${details.seriesName ?? so.llc_name} — ${so.llc_name}`
@@ -1296,84 +1423,106 @@ app.post("/admin/services/:id/fulfill", async (c) => {
             : so.type === "certified-copy"
               ? certTitle("Certified Copy of the Articles", so.llc_name)
               : `EIN Confirmation Letter — ${details.target === "series" ? details.seriesName ?? so.llc_name : so.llc_name}`);
-    // Every service deliverable is a PDF (CP 575, the 2553 package, a filed
-    // designation) and lands directly in the client's portal — and for EIN and
-    // S election orders, fulfillment deletes the retained taxpayer identifiers
-    // right after this block. A non-PDF here would replace the client's
-    // deliverable with junk at the same moment the data to redo it is
-    // destroyed (Codex UPLOAD-002). Strict check, not claims-based.
-    if (!(await looksLikePdf(file))) {
-      return c.json(err(`${file.name} is not a readable PDF. The deliverable must be the actual PDF document.`, "NOT_A_PDF"), 400);
-    }
-    const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf", so.type === "ein" || so.type === "s-election");
-    // A designation delivered through a series order is a designation: stored
-    // as one, covering its series, so the card counts it (14 Sep 2026).
-    const isDesignation = so.type === "series" && !!details.seriesName;
-    // A certificate bought from the portal is stored under its own kind, so
-    // it sorts under the Articles like one delivered at formation (14 Sep 2026).
-    const storedKind = so.type === "certificate-of-status" || so.type === "certified-copy" ? so.type : isDesignation ? "psd" : "package";
-    const doc = await db.query<{ id: string }>(
-      `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)
-       VALUES ($1, $6, $7, $2, $3, $4, $5, $8) RETURNING id`,
-      // A portal purchase's copy is marked as its own, so the intake
-      // certificate is not counted delivered by it (Adam, 15 Sep 2026).
-      [so.client_id, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, so.formation_order_id, storedKind, JSON.stringify((so.type === "ein" || so.type === "s-election") ? {sensitive:true,serviceOrderId:so.id} : isDesignation ? { seriesNames: [details.seriesName] } : CERT_KINDS.includes(so.type as typeof CERT_KINDS[number]) ? { source: "portal", serviceOrderId: so.id } : {})],
-    );
-    documentId = doc[0].id;
-  }
 
-  if (documentId && (so.type === "ein" || so.type === "s-election")) {
-    await db.query("UPDATE service_orders SET details=COALESCE(details,'{}'::jsonb)||$2::jsonb WHERE id=$1",[so.id,JSON.stringify({documentId})]);
+    if(!(await looksLikePdf(file)))return c.json(err(`${file.name} is not a readable PDF. The deliverable must be the actual PDF document.`,"NOT_A_PDF"),400);
   }
-  // The active questionnaire TIN is removed when the office records fulfillment.
-  // The encrypted delivered document has its separate client-controlled retention.
-  await db.query(
-    "UPDATE service_orders SET status = 'fulfilled', fulfilled_at = now(), ein_secret = NULL WHERE id = $1",
-    [so.id],
-  );
-  // Fulfilled while still waiting on the client's details: the office
-  // obtained them outside the portal (Adam's override, 6 Sep 2026). Record
-  // it on the order so the detail view never reads as if the client
-  // submitted them.
-  if (so.status === "awaiting_info" && (so.type === "ein" || so.type === "s-election")) {
-    await db.query(
-      "UPDATE service_orders SET details = COALESCE(details, '{}'::jsonb) || $2::jsonb WHERE id = $1",
-      [so.id, JSON.stringify({ fulfilledByOverride: true, overrideAt: new Date().toISOString() })],
-    );
-  }
+  const bytes=file?Buffer.from(await file.arrayBuffer()):null;
+  let op:Awaited<ReturnType<typeof claimOfficeOperation>>|undefined;
+  try{
+    const hash=officeHash({pdf:bytes?.toString('base64'),assignedEin,titleOverride,notify});
+    if(resuming&&bytes&&priorOperation?.input_hash!==hash)throw new OfficeConflict('The saved upload differs from the original. Select the original PDF and retry.','UPLOAD_REQUIRED');
+    const intent={assignedEin,titleOverride,notify,title,summary,attachmentRequired:!!bytes};
+    if(publishedCorrection){
+      const documentId=correctionOf.slice('document:'.length);
+      if(!z.string().uuid().safeParse(documentId).success)throw new OfficeConflict('Reload the current package before correcting it.','OFFICE_CONFLICT');
+      // Automatically generated packages have no office completion operation.
+      // Adopt the identified published revision, preserving it as history.
+      await db.query(`INSERT INTO office_operations(kind,target_id,input_hash,payload,phase,result)
+        SELECT 'service',id,$3,jsonb_build_object('assignedEin',details->>'ein','adoptedDocumentId',$2::text),'done',jsonb_build_object('documentId',$2::text)
+        FROM service_orders WHERE id=$1 AND details->>'documentId'=$2 AND paid_at IS NOT NULL AND status NOT IN ('pending_payment','cancelled','duplicate_payment')
+        ON CONFLICT(kind,target_id) DO NOTHING`,[so.id,documentId,officeHash({publishedDocument:documentId})]);
+      priorOperation=await findOfficeOperation(db,'service',so.id);
+      if(priorOperation?.payload.adoptedDocumentId!==documentId){
+        const previous=priorOperation?.payload.corrects?(await db.query<{id:string;payload:Record<string,unknown>}>('SELECT id,payload FROM office_operations WHERE id=$1',[priorOperation.payload.corrects]))[0]:null;
+        if(previous?.payload.adoptedDocumentId!==documentId)throw new OfficeConflict('The package has changed. Reload before correcting it.','OFFICE_CONFLICT');
+        correctionOf=previous.id;
+      }else correctionOf=priorOperation.id;
+    }
+    if(correctionOf){
+      if(so.type==='s-election'&&!isValidEin(assignedEin))throw new OfficeConflict('Enter the EIN shown on the corrected S-election package.','EIN_REQUIRED');
+      if(so.type==='ein'&&(details.target??'company')==='company'){
+        const blocked=await db.query(`SELECT id FROM service_orders WHERE client_id=$1 AND formation_order_id=$2 AND type='s-election' AND status NOT IN ('pending_payment','cancelled') AND details->>'ein'=ANY($3::text[]) AND details->>'ein'<>$4 AND details->>'documentId' IS NOT NULL AND ein_secret IS NULL`,[so.client_id,so.formation_order_id,[priorOperation?.payload.assignedEin,priorOperation?.payload.previousEin,...(Array.isArray(priorOperation?.payload.previousEins)?priorOperation.payload.previousEins:[])].filter((x):x is string=>typeof x==='string'&&!!x),assignedEin]);
+        if(blocked.length)throw new OfficeConflict('First replace the dependent S-election package with a corrected package and its EIN. Then retry this EIN correction.','DEPENDENT_CORRECTION_REQUIRED');
+      }
+      const priorDocumentId=priorOperation?.result.documentId??priorOperation?.payload.previousDocumentId;
+      if(typeof priorDocumentId==='string')await registerOfficeDocumentHistory(priorDocumentId,so.client_id);
+      await correctOfficeOperation(db,so.id,correctionOf,hash,intent);
+      await cleanupSupersededOfficeFiles(db);
+    }
+    // Repair only the old false-completed series state, under its same immutable intent.
+    if(so.type==='series'&&bytes&&!correctionOf)await db.query("UPDATE office_operations SET phase='open' WHERE kind='service' AND target_id=$1 AND input_hash=$2 AND phase='done' AND result->>'documentId' IS NULL AND NOT(files ? 'upload')",[so.id,hash]);
+    op=await claimOfficeOperation(db,'service',so.id,resuming?null:hash,intent,so.type==='s-election',reviewRestoredOriginal);
+    if(op.phase==='done'){await verifyOfficeDelivery(db,op,bytes?{slot:op.kind==='articles'?'articles':'upload',bytes}:undefined);await releaseOfficeOperation(db,op);return c.json({data:op.result});}
+    title=String(op.payload.title);
+    if(op.files.upload&&bytes){
+      const existing=op.files.upload;
+      await saveOfficeFile(db,op,'upload',bytes,{title:existing.title,kind:existing.kind,meta:existing.meta},!!existing.meta.sensitive);
+    }
+    if(op.phase==='open'){
+      if(bytes&&so.type!=='s-election')await saveOfficeFile(db,op,'upload',bytes,{title,kind:so.type==='certificate-of-status'||so.type==='certified-copy'?so.type:so.type==='series'&&details.seriesName?'psd':'package',meta:so.type==='ein'||so.type==='s-election'?{sensitive:true,serviceOrderId:so.id}:so.type==='series'&&details.seriesName?{seriesNames:[details.seriesName]}:CERT_KINDS.includes(so.type as typeof CERT_KINDS[number])?{source:'portal',serviceOrderId:so.id}:{}},so.type==='ein'||so.type==='s-election');
+      const patch:Record<string,unknown>={...(so.type==='ein'?{assignedEin:String(op.payload.assignedEin)}:{}),...(so.type==='s-election'&&op.payload.corrects?{ein:String(op.payload.assignedEin),einPending:false,einSource:'letter'}:{})};
+      if(so.status==='awaiting_info'&&(so.type==='ein'||so.type==='s-election'))Object.assign(patch,{fulfilledByOverride:true,overrideAt:new Date().toISOString()});
+      if(so.type==='s-election'){
+        // Fence the package's existing atomic commit with this delivery lease.
+        const documentId=await storeElectionPackage(db,{serviceId:so.id,clientId:so.client_id,companyId:so.formation_order_id,title,pdf:bytes!,details:{...details,...patch},ssns:[],retainQuestionnaireNumbers:false,priorDocumentId:(details as {documentId?:string}).documentId,officeOperation:{id:op.id,lease:op.lease}});
+        op.result={documentId};op.phase='committed';
+      }else{
+        const f=op.files.upload;
+        const gaps=await prepareCorrectionHistory(db,op,(await requireAdmin(c))!.tokenHash);
+        if(f&&(so.type==='ein'))patch.documentId=f.id;
+        const [committed]=await db.query<{result:Record<string,unknown>}>(`WITH operation AS (SELECT * FROM office_operations WHERE id=$1 AND lease=$2 AND lease_until>now() AND phase='open' FOR UPDATE), inserted AS (
+          INSERT INTO documents(id,client_id,order_id,kind,title,storage_key,content_type,size_bytes,meta,mirror_path)
+          SELECT $3::uuid,$4::uuid,$5::uuid,$6,$7,$8,'application/pdf',$9,$10::jsonb,$13 FROM operation WHERE $3::uuid IS NOT NULL
+          ON CONFLICT(id) DO UPDATE SET storage_key=EXCLUDED.storage_key,size_bytes=EXCLUDED.size_bytes,title=EXCLUDED.title,meta=EXCLUDED.meta,mirror_path=EXCLUDED.mirror_path,mirrored_at=NULL
+          WHERE documents.client_id=EXCLUDED.client_id AND documents.deleted_at IS NULL RETURNING id),
+          updated AS (UPDATE service_orders SET details=COALESCE(details,'{}'::jsonb)||$11::jsonb WHERE id=$12 AND EXISTS(SELECT 1 FROM operation) AND ($3::uuid IS NULL OR EXISTS(SELECT 1 FROM inserted)) RETURNING id)
+          , history AS (UPDATE office_operations h SET payload=jsonb_set(h.payload,'{historyRecovery}',coalesce(h.payload->'historyRecovery','{}'::jsonb)||g.value) FROM jsonb_each($14::jsonb) g WHERE h.id::text=g.key AND EXISTS(SELECT 1 FROM updated) RETURNING h.id)
+          UPDATE office_operations SET phase='committed',result=jsonb_build_object('documentId',$3::uuid) WHERE id=$1 AND EXISTS(SELECT 1 FROM updated) RETURNING result`,[op.id,op.lease,f?.id??null,so.client_id,so.formation_order_id,f?.kind??'',title,f?.key??'',f?.size??0,JSON.stringify(f?.meta??{}),JSON.stringify(patch),so.id,f?.mirrorPath??null,JSON.stringify(gaps)]);
+        if(!committed)throw new OfficeConflict('Another request resumed this work. Reload and retry.');
+        op.result=committed.result;op.phase='committed';
+      }
+    }
+    if(so.type==='s-election')await verifyOfficeElectionPackage(db,op,so.id,so.client_id,bytes);
+    let rebuiltSElections=0;
+    if(so.type==='ein'&&(details.target??'company')==='company')rebuiltSElections=await carryEinIntoSElections({clientId:so.client_id,companyOrderId:so.formation_order_id,llcName:so.llc_name,ein:String(op.payload.assignedEin),previousEin:op.payload.corrects?String(op.payload.previousEin||''):undefined,previousEins:op.payload.corrects&&Array.isArray(op.payload.previousEins)?op.payload.previousEins.filter((x):x is string=>typeof x==='string'):undefined,officeOperation:{id:op.id,lease:op.lease,parent:true}});
+    await verifyOfficeDelivery(db,op,bytes?{slot:'upload',bytes}:undefined);
+    const result={ok:true,documentId:op.result.documentId??null,rebuiltSElections};
+    // Notice dispatch is attempted once per durable operation, even if the
+    // response to the send or to final completion is lost. Existing failed-mail
+    // review behavior is retained; this is not an automatic email retry loop.
+    if(op.payload.notify){
+      const [dispatch]=await db.query(`UPDATE office_operations SET notice_started_at=now() WHERE id=$1 AND lease=$2 AND lease_until>now() AND notice_started_at IS NULL RETURNING id`,[op.id,op.lease]);
+      if(dispatch){const [client]=await db.query<{email:string}>('SELECT email FROM clients WHERE id=$1',[so.client_id]);if(client)await sendMail({to:client.email,...serviceFulfilledClientEmail({summary:String(op.payload.summary),portalUrl:env.PUBLIC_BASE_URL+'/portal'})}).catch(e=>console.error('[admin] fulfill email failed:',e));}
+    }
+    const [done]=await db.query(`WITH operation AS (SELECT id FROM office_operations WHERE id=$1 AND lease=$2 AND lease_until>now() AND phase='committed' FOR UPDATE), service AS (
+      UPDATE service_orders SET status='fulfilled',fulfilled_at=COALESCE(fulfilled_at,now()),ein_secret=NULL WHERE id=$3 AND EXISTS(SELECT 1 FROM operation) RETURNING id)
+      UPDATE office_operations SET phase='done',result=$4::jsonb,lease=NULL,lease_until=NULL,error=NULL WHERE id=$1 AND EXISTS(SELECT 1 FROM service) RETURNING id`,[op.id,op.lease,so.id,JSON.stringify(result)]);
+    if(!done)throw new OfficeConflict('Another request resumed this work. Reload and retry.');
+    return c.json({data:result});
+  }catch(e){if(op)await releaseOfficeOperation(db,op,e);if(e instanceof OfficeRecoveryError)return c.json(err(e.message,e.code),e.status);if(e instanceof OfficeConflict)return c.json(err(e.message,e.code),409);throw e;}
 
-  if (notify) {
-    const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [so.client_id]);
-    if (clients[0]) {
-      const mail = serviceFulfilledClientEmail({ summary, portalUrl: `${env.PUBLIC_BASE_URL}/portal` });
-      sendMail({ to: clients[0].email, ...mail }).catch((e) =>
-        console.error("[admin] fulfill email failed:", e),
-      );
-    }
-  }
-  let rebuiltSElections = 0;
-  if (so.type === "ein") {
-    await db.query(
-      "UPDATE service_orders SET details = COALESCE(details, '{}'::jsonb) || $2::jsonb WHERE id = $1",
-      [so.id, JSON.stringify({ assignedEin })],
-    );
-    if ((details.target ?? "company") === "company") {
-      rebuiltSElections = await carryEinIntoSElections({ clientId: so.client_id, companyOrderId: so.formation_order_id, llcName: so.llc_name, ein: assignedEin });
-    }
-  }
-  return c.json({ data: { ok: true, documentId, rebuiltSElections } });
 });
 
 /** The EIN just arrived: saved S-election answers for this company become
  *  a filing package with the issued number, and the client is told. Legacy
  *  pending packages can also be rebuilt while their encrypted numbers remain.
  *  If those numbers were purged, notify the client. Returns packages built. */
-async function carryEinIntoSElections(args: { clientId: string; companyOrderId: string | null; llcName: string; ein: string }): Promise<number> {
+async function carryEinIntoSElections(args: { clientId: string; companyOrderId: string | null; llcName: string; ein: string; previousEin?:string; previousEins?:string[]; officeOperation?:{id:string;lease:string;parent?:boolean} }): Promise<number> {
   if (!args.companyOrderId) return 0;
   await associateLegacyServices(args.clientId);
   const db = await getDb();
-  const rows = await db.query<{ id: string; client_id: string; llc_name: string; status: string; details: unknown; ein_secret: string | null }>(
-    `SELECT id, client_id, llc_name, status, details, ein_secret FROM service_orders
+  const rows = await db.query<{ id: string; client_id: string; llc_name: string; status: string; details: unknown; ein_secret: string | null; fulfilled_at: unknown }>(
+    `SELECT id, client_id, llc_name, status, details, ein_secret, fulfilled_at FROM service_orders
       WHERE client_id = $1 AND type = 's-election' AND status NOT IN ('pending_payment','cancelled')
         AND formation_order_id::text = $2::text`,
     [args.clientId, args.companyOrderId],
@@ -1384,9 +1533,12 @@ async function carryEinIntoSElections(args: { clientId: string; companyOrderId: 
   let rebuilt = 0;
   for (const row of rows) {
     const d = ((typeof row.details === "string" ? JSON.parse(row.details) : row.details) ?? {}) as SElectionStoredDetails;
+    if ((d as unknown as Record<string,unknown>).recoveryMetadataUnavailable || (d as unknown as Record<string,unknown>).recoveryHold) continue;
     const appliedFor = Boolean(d.einPending) || !d.ein;
-    if (!appliedFor || !d.shareholders?.length) continue; // nothing built yet, or the number was already on it
+    const correcting=d.ein!==args.ein&&[args.previousEin,...(args.previousEins??[])].some(previous=>!!previous&&d.ein===previous);
+    if ((!appliedFor&&!correcting) || !d.shareholders?.length) continue; // nothing built yet, or the number was already on it
     if (!row.ein_secret) {
+      if(correcting)throw new OfficeConflict('Replace the dependent S-election package with the corrected EIN, then resume this completion.','DEPENDENT_CORRECTION_REQUIRED');
       const needed = recoveryDetails(row);
       if (needed) {
         const changed = await db.query<{id: string}>(
@@ -1395,26 +1547,36 @@ async function carryEinIntoSElections(args: { clientId: string; companyOrderId: 
         if (changed.length) await notifyTaxpayerNumbersRequired(db, row);
       } else if (d.documentId || d.purgedAt) {
         const mail = sElectionEinArrivedLateEmail({ llcName: row.llc_name, einDisplay, portalUrl: `${env.PUBLIC_BASE_URL}/portal`, supportEmail: "support@myfloridaseriesllc.com" });
-        sendMail({ to, ...mail }).catch((e) => console.error("[admin] ein-late email failed:", e));
+        await sendMail({ to, ...mail }).catch((e) => console.error("[admin] ein-late email failed:", e));
       }
       continue;
     }
     let ssns: string[];
     try {
       ssns = JSON.parse(decryptSecret(row.ein_secret)) as string[];
-    } catch (e) {
-      console.error("[admin] s-election secret decrypt failed:", e);
-      continue;
+    } catch (error) {
+      const editable = row.status === 'awaiting_info' || (row.status === 'in_progress' && d.einPending === true && !row.fulfilled_at) || sElectionWindow(row.fulfilled_at).open;
+      let action: string;
+      if (error instanceof EncryptionKeyError) {
+        action = 'Contact technical support to restore encryption access, then retry this EIN completion. Do not delete the saved work.';
+      } else if ((error instanceof SecretFormatError || error instanceof SyntaxError) && !d.documentDeletedAt) {
+        action = editable
+          ? 'Ask the client to re-enter the shareholder numbers in their S-election form in the portal, then retry this EIN completion.'
+          : 'Use Correct delivered completion on this S-election to upload a reviewed package with the issued EIN, then retry this EIN completion.';
+      } else {
+        action = 'Contact technical support to check the saved numbers and encryption access before retrying. Do not delete the saved work.';
+      }
+      throw new OfficeConflict(`The saved S-election numbers for ${row.llc_name} could not be read. EIN completion remains pending and its letter is saved. ${action}`,"DEPENDENT_NUMBERS_UNREADABLE");
     }
+    const firstPackage = !d.documentId;
     const merged: SElectionStoredDetails = { ...d, ein: args.ein, einPending: false, einSource: "letter" };
-    const built = await postSElectionPackage({ so: { id: row.id, client_id: row.client_id, llc_name: row.llc_name }, merged, ssns, priorDocumentId: d.documentId });
+    const built = await postSElectionPackage({ so: { id: row.id, client_id: row.client_id, llc_name: row.llc_name }, merged, ssns, priorDocumentId: d.documentId, officeOperation:args.officeOperation });
     if (!built.ok) {
-      console.error("[admin] s-election rebuild with EIN failed:", row.id);
-      continue;
+      throw new Error("The S-election package could not be completed. Retry this EIN completion.");
     }
     rebuilt++;
-    const mail = sElectionEinAddedEmail({ llcName: row.llc_name, einDisplay, portalUrl: `${env.PUBLIC_BASE_URL}/portal` });
-    sendMail({ to, ...mail }).catch((e) => console.error("[admin] ein-added email failed:", e));
+    const mail = sElectionEinAddedEmail({ llcName: row.llc_name, einDisplay, portalUrl: `${env.PUBLIC_BASE_URL}/portal`, ...(firstPackage ? { firstPackage: true as const, editableUntil: built.editableUntil ? stampEastern(new Date(built.editableUntil)) : '' } : { firstPackage: false as const }) });
+    await sendMail({ to, ...mail }).catch((e) => console.error("[admin] ein-added email failed:", e));
   }
   return rebuilt;
 }
@@ -1433,9 +1595,8 @@ app.delete("/admin/documents/:id", async (c) => {
   if (!CERT_KINDS.includes(rows[0].kind as typeof CERT_KINDS[number])) {
     return c.json(err("Only a certificate copy can be deleted. Replace the Articles or a designation instead.", "BAD_KIND"), 400);
   }
-  await db.query("DELETE FROM documents WHERE id = $1", [rows[0].id]);
-  await deleteFile(rows[0].storage_key).catch(() => {});
-  return c.json({ data: { ok: true } });
+  const deletion=await requestCertificateDeletion(rows[0].id);
+  return c.json({data:{ok:true,pending:deletion.pending,message:deletion.pending?"Certificate removed from the portal. Storage cleanup is pending; retry cleanup.":"Certificate deleted."}});
 });
 
 /** Replace a wrong Articles or designation PDF in place (15 Sep 2026): the
@@ -1477,7 +1638,7 @@ app.get("/admin/documents/unscoped", async (c) => {
   const rows = await db.query(
     `SELECT d.id, d.title, d.kind, d.created_at, cl.email AS client_email
        FROM documents d JOIN clients cl ON cl.id = d.client_id
-      WHERE d.order_id IS NULL AND d.kind = 'package' ORDER BY d.created_at DESC`,
+      WHERE d.order_id IS NULL AND d.kind = 'package' AND d.deleted_at IS NULL ORDER BY d.created_at DESC`,
   );
   return c.json({ data: { count: rows.length, documents: rows } });
 });
@@ -1497,6 +1658,8 @@ app.post("/admin/documents", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const form = await c.req.parseBody();
+  const submissionId=typeof form.submissionId==='string'?form.submissionId:'';
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(submissionId))return c.json(err('A valid upload submission ID is required.','INVALID_INPUT'),400);
   const file = form.file;
   const clientId = typeof form.clientId === "string" ? form.clientId : "";
   const kind = form.kind === "legal_mail" ? "legal_mail" : "package";
@@ -1545,14 +1708,13 @@ app.post("/admin/documents", async (c) => {
     }
   }
 
-  const stored = await putFile(file.name, await file.arrayBuffer(), file.type || "application/pdf");
-  const rows = await db.query<{ id: string }>(
-    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta, notice_status)
-     VALUES ($1, $7, $2, $3, $4, $5, $6, $8::jsonb, $9) RETURNING id`,
-    [clientId, kind, title, stored.storageKey, file.type || "application/pdf", stored.sizeBytes, orderId, JSON.stringify({...(kind === "legal_mail" ? {receivedOn} : {}),...(notify ? {noticeKind:"document"} : {})}), notify ? "pending" : null],
-  );
-
-  const notified = notify ? await notifyDocument(rows[0].id) : false;
-  return c.json({ data: { id: rows[0].id, notified } });
+  const [company]=await db.query<{llc_name:string}>('SELECT llc_name FROM orders WHERE id=$1 AND client_id=$2',[orderId,clientId]);
+  if(!company||!orderId)return c.json(err('Company not found.','NOT_FOUND'),404);
+  try{
+    return c.json({data:await saveDocumentSubmission(db,{id:submissionId,clientId,orderId,kind,title,receivedOn:kind==='legal_mail'?receivedOn:'',notify,bytes:Buffer.from(await file.arrayBuffer()),llcName:company.llc_name})});
+  }catch(error){
+    if(error instanceof DocumentUploadError)return c.json(err(error.message,error.code),error.status);
+    throw error;
+  }
 });
 }

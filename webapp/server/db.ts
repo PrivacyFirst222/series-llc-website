@@ -1,5 +1,10 @@
+import { PURCHASE_MIGRATION } from './purchase-migration';
+import { SERIES_IDENTITY_MIGRATION } from './series-identity-migration';
+import { SERIES_OWNER_MIGRATION } from './series-owner-migration';
+import { SERIES_FORMAT_MIGRATION } from './series-format-migration';
 import { createHash } from "node:crypto";
 import { env } from "./env";
+import {activeDeadline,checkDeadline,ioSignal} from './operation-deadline';
 
 export interface Db {
   /** Parameterized query returning rows. */
@@ -19,7 +24,8 @@ async function createDb(): Promise<Db> {
     const sql = neon(env.DATABASE_URL);
     return {
       async query<T>(text: string, params: unknown[] = []) {
-        const rows = await sql.query(text, params);
+        checkDeadline();
+        const rows = await sql.query(text, params,Number.isFinite(activeDeadline())?{fetchOptions:{signal:ioSignal()}}:undefined);
         return rows as T[];
       },
     };
@@ -59,6 +65,7 @@ async function createDb(): Promise<Db> {
   }
   return {
     async query<T>(text: string, params: unknown[] = []) {
+      checkDeadline();
       const res = await pg.query<T>(text, params);
       return res.rows;
     },
@@ -546,6 +553,38 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
     `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_payment_target uuid`,
     `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS correspondence jsonb NOT NULL DEFAULT '{}'::jsonb`,
     `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS correspondence_lock_until timestamptz`,
+  ]},
+  { id: 18, name: "payment-reservation-fencing-and-first-notice-cutoff", statements: [
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_payment_generation uuid`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_payment_attempt_id uuid`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ra_payment_protocol int NOT NULL DEFAULT 0`,
+    `ALTER TABLE ra_payment_attempts ADD COLUMN IF NOT EXISTS reservation_generation uuid`,
+    `ALTER TABLE ra_renewals ADD COLUMN IF NOT EXISTS notice_suppression_reason text`,
+    `CREATE TABLE IF NOT EXISTS launch_policy (id text PRIMARY KEY, first_notice_cutoff timestamptz NOT NULL)`,
+    `INSERT INTO launch_policy(id,first_notice_cutoff) VALUES('initial-launch',now()) ON CONFLICT(id) DO NOTHING`,
+    `CREATE TABLE IF NOT EXISTS payment_reconciliation_log (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), order_id uuid NOT NULL, target_id uuid NOT NULL, actor text NOT NULL, disposition text NOT NULL, evidence jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT now())`,
+    `CREATE TABLE IF NOT EXISTS recovery_holds (id uuid PRIMARY KEY, service_id uuid NOT NULL, client_id uuid NOT NULL, record jsonb NOT NULL, reason text NOT NULL, status text NOT NULL DEFAULT 'held', acknowledged_at timestamptz, acknowledged_by text, evidence jsonb, created_at timestamptz NOT NULL DEFAULT now())`,
+    `ALTER TABLE staged_documents ADD COLUMN IF NOT EXISTS cleanup_checked_at timestamptz`,
+  ]},
+  { id: 19, name: "restore-activation-and-notice-leases", statements: [
+    `CREATE TABLE IF NOT EXISTS recovery_activation (id text PRIMARY KEY CHECK (id='restore'), restore_id uuid NOT NULL, restored_at timestamptz NOT NULL DEFAULT now(), activated_at timestamptz, production_origin text, operator text)`,
+    `ALTER TABLE service_orders ADD COLUMN IF NOT EXISTS recovery_notice_lock_until timestamptz`,
+  ]},
+  { id: 20, name: "password-link-account-revision", statements: [
+    `ALTER TABLE clients ADD COLUMN IF NOT EXISTS auth_version bigint NOT NULL DEFAULT 0`,
+    `ALTER TABLE auth_tokens ADD COLUMN IF NOT EXISTS account_version bigint NOT NULL DEFAULT 0`,
+  ]},
+  { id: 21, name: "password-session-revision", statements: [
+    `ALTER TABLE clients ADD COLUMN IF NOT EXISTS password_version bigint NOT NULL DEFAULT 0`,
+    `ALTER TABLE sessions ADD COLUMN IF NOT EXISTS password_version bigint NOT NULL DEFAULT 0`,
+  ]},
+  { id: 22, name: "purchase-identity-and-payment-recovery", statements: PURCHASE_MIGRATION },
+  { id: 23, name: "company-scoped-series-identity", statements: SERIES_IDENTITY_MIGRATION },
+  { id: 24, name: "series-owner-punctuation-identity", statements: SERIES_OWNER_MIGRATION },
+  { id: 25, name: "series-boundary-format-identity", statements: SERIES_FORMAT_MIGRATION },
+  { id: 26, name: "recoverable-office-delivery", statements: [
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS office_upload_id uuid`,
+    `CREATE TABLE IF NOT EXISTS office_operations (id uuid PRIMARY KEY DEFAULT gen_random_uuid(),kind text NOT NULL,target_id uuid NOT NULL,input_hash text NOT NULL,payload jsonb NOT NULL,files jsonb NOT NULL DEFAULT '{}'::jsonb,phase text NOT NULL DEFAULT 'open',result jsonb NOT NULL DEFAULT '{}'::jsonb,lease uuid,lease_until timestamptz,error text,notice_started_at timestamptz,created_at timestamptz NOT NULL DEFAULT now(),UNIQUE(kind,target_id))`,
   ]},
   // Append future migrations here with the next id. Never edit an entry.
 ];

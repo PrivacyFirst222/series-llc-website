@@ -6,7 +6,7 @@ import type {Ledger, Item, RulingRecord} from './ledger-lib';
 const home=mkdtempSync(join(tmpdir(),'batch41-owner-'));
 process.env.FPSLLC_HOME=home;
 const lib=await import('./ledger-lib');
-const {renderList}=await import('./ledger-print');
+const {renderList,listRenderVersion}=await import('./ledger-print');
 const rows:{label:string;ok:boolean;detail?:unknown}[]=[];
 const check=(label:string,ok:boolean,detail?:unknown)=>rows.push({label,ok,detail});
 const item=(id:string):Item=>({id,tag:'wording',area:'Agreements and guidance',housekeeping:false,source:'synthetic fixture',text:'Synthetic wording',verdict:'open',waitsOn:[],parts:[{key:'all',scope:'synthetic',status:'open',waitsOn:[],history:[]}]});
@@ -20,6 +20,23 @@ const candidate=lib as typeof lib & {rulingCompletenessProblems?:(l:Ledger,r:typ
 const completeness=(v:Ledger,r=read)=>candidate.rulingCompletenessProblems
  ? candidate.rulingCompletenessProblems(v,r,[record]) : lib.ledgerRegressions(v,v,{read:r,external:'skip'});
 try {
+ const ownerPath=join(home,'rulings.jsonl');
+ const local=()=>lib.rulingCompletenessProblems(l,read);
+ writeFileSync(ownerPath,'');
+ check('empty owner records fail explicit completeness',local().includes('authenticated owner ruling records contain no rulings; current local completeness was not checked'));
+ writeFileSync(ownerPath,JSON.stringify({...record,text:'other'})+'\n');
+ check('valid-line truncation cannot erase ledger ruling',local().some(x=>x.includes('fixture')&&x.includes('no matching authenticated')));
+ writeFileSync(ownerPath,JSON.stringify(record)+'\n{');
+ check('malformed owner record names exact line',local().includes('authenticated owner ruling records unreadable at line 2; current local completeness was not checked'));
+ rmSync(ownerPath);
+ check('unavailable owner records refuse current local claim',local().includes('authenticated owner ruling records unavailable; current local completeness was not checked'));
+ writeFileSync(ownerPath,JSON.stringify(record)+'\n');
+ check('formatted supported renderer version is recognized',listRenderVersion('export const LIST_RENDER_VERSION =\n 2 ;\n')===2);
+ check('old renderer without declaration remains version one',listRenderVersion('export function renderList() {}')===1);
+ for(const source of ['export const LIST_RENDER_VERSION=3;','export const LIST_RENDER_VERSION=2.5;','export const LIST_RENDER_VERSION="2";','export const LIST_RENDER_VERSION=2+1;']){
+  let refused=false;try{listRenderVersion(source);}catch{refused=true;}
+  check('malformed renderer refused: '+source,refused);
+ }
  check('complete authentic ledger and canonical text pass',completeness(l).length===0,completeness(l));
  const missing=structuredClone(l);missing.rulings=[];
  check('authentic ruling missing from ledger is refused',completeness(missing).some(x=>x.includes('missing')),completeness(missing));
@@ -56,6 +73,7 @@ try {
  const history=Bun.spawn(['bun',resolve(import.meta.dir,'guard.ts'),'--against',`${historicalCommit}..${historicalCommit}`],{cwd:resolve(import.meta.dir,'../..'),stdout:'pipe',stderr:'pipe'});
  const [historyOut,historyError,historyExit]=await Promise.all([new Response(history.stdout).text(),new Response(history.stderr).text(),history.exited]);
  check('actual pre41 tracked snapshot passes explicit historical comparison',historyExit===0,{exit:historyExit,stdout:historyOut,stderr:historyError});
+ check('historical CI check discloses private records were not checked',historyOut.includes('completeness against his external ruling records was not checked'));
  const real=JSON.parse(readFileSync(resolve(import.meta.dir,'ledger.json'),'utf8')) as Ledger;
  const wanted=['8','15','22','34','38','139','N2.14','232','236','N2.02'];
  check('all ten authentic retained choices recorded',wanted.every(id=>real.dispositions?.some(d=>d.item===id&&d.disposition==='owner-retained'&&real.rulings.some(r=>JSON.stringify(r)===JSON.stringify(d.ruling)))),wanted.filter(id=>!real.dispositions?.some(d=>d.item===id)));

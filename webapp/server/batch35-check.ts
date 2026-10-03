@@ -47,6 +47,13 @@ async function child(mode:string,dir:string){
   test('restored committed replacement retires prior usable package only',!(await readObject('staged/'+packages.prior+'.pdf.encrypted'))&&!!(await readObject('staged/'+packages.current+'.pdf.encrypted'))&&(await db.query('SELECT state FROM staged_documents WHERE id=$1',[packages.current]))[0].state==='retired');
   const token=newToken();await db.query("INSERT INTO sessions(token_hash,client_id,expires_at) VALUES($1,$2,now()+interval '1 day')",[token.tokenHash,client]);
   const request=(body?:unknown)=>app.request('/api/portal/companies/'+order+'/renewal-card',{method:body?'POST':'GET',headers:{Cookie:`fpsllc_session=${token.token}`,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
+  const inactive=await request();const inactiveBody=await inactive.json();
+  test('restored target blocks portal before explicit activation',inactive.status===503&&inactiveBody.error?.code==='RECOVERY_ACTIVATION_REQUIRED',inactiveBody);
+  // This fixture now tests switching the synthetic restored target into service,
+  // using the same operator action as the runbook. A rehearsal stays inactive.
+  const {activateRecovery}=await import('./s-election-recovery');
+  const activation=await activateRecovery(db,new URL(env.PUBLIC_BASE_URL).origin,'offline-regression-operator');
+  test('operator activation enables the restored fixture',activation.activated===true);
   const pending=await(await request()).json();test('portal returns restored pending attempt',pending.data?.pendingAttemptId===attempt);
   // Only the provider boundary is mocked; app route, stored request and key generation are real.
   env.SQUARE_ACCESS_TOKEN='synthetic-test-only';const calls:{path:string;body:Record<string,unknown>}[]=[];

@@ -81,7 +81,7 @@ export default function OAQuestionnaire() {
   // one per keystroke.
   const revRef = useRef(0);
   const editSequence = useRef(0);
-  const conflict = useRef(false);
+  const conflict = useRef<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [invalidMoney, setInvalidMoney] = useState<Set<string>>(new Set());
   const onMoneyValidity = useCallback((id: string, valid: boolean) => setInvalidMoney(prev => {
@@ -114,7 +114,7 @@ export default function OAQuestionnaire() {
     if (data && !loaded) {
       const saved = data.answers ?? {};
       revRef.current = data.rev ?? 0;
-      conflict.current = false;
+      conflict.current = null;
       const restored: Answers = {
         ...saved,
         assets: saved.assets ?? [],
@@ -157,16 +157,21 @@ export default function OAQuestionnaire() {
   const save = useMutation({
     scope: { id: `oa-save-${oaCompany ?? "default"}` },
     mutationFn: async ({ answers }: { answers: Answers; sequence: number }) => {
-      if (conflict.current) throw new Error("This draft changed elsewhere. Reload it before continuing.");
+      if (conflict.current) throw new Error(conflict.current);
       try {
         const result = await api.put<{ rev: number; stale?: boolean }>(`/api/portal/oa/answers?baseRev=${revRef.current}&rev=${revRef.current + 1}${oaCompany ? `&company=${oaCompany}` : ""}`, answers);
         if (result.stale || !Number.isSafeInteger(result.rev)) throw new Error("The server did not confirm this save. Reload the draft before continuing.");
         revRef.current = result.rev;
       } catch (e) {
+        // Validation is refused before any write, so a corrected answer may
+        // use the same confirmed revision. Other failures may have committed.
+        if (e instanceof ApiError && e.status === 400 && (e.data as { code?: string } | undefined)?.code === "INVALID_INPUT") throw e;
         // An uncertain save may have reached the server; do not overwrite it
         // by retrying against a guessed revision.
-        conflict.current = true;
-        throw e;
+        conflict.current = e instanceof ApiError && e.status === 409
+          ? e.message
+          : "We could not confirm your last change was saved. Reload the questionnaire before continuing; later changes may not have been saved.";
+        throw new Error(conflict.current);
       }
     },
     onSuccess: (_, variables) => {

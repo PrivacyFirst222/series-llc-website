@@ -690,9 +690,13 @@ export function defectGroup(l: Ledger, ref: PartRef): { item: Item; part: Part }
   return out;
 }
 /** Another batch already working on this defect, if any. */
-export function familyClaim(l: Ledger, ref: PartRef, myBatch: string, replacing?: Fix): string | null {
+export function familyClaim(l: Ledger, ref: PartRef, myBatch: string, replacing?: Fix, replacements: BatchFile["items"] = []): string | null {
   for (const { item, part } of defectGroup(l, ref)) {
     if (replacing && item.id === ref.item && part.key === ref.part && same(part.fix, replacing) && part.status === "implemented") continue;
+    // A joint replacement names each linked part's own prior fix. Merely
+    // sharing a defect or an old batch never authorizes replacing a peer.
+    const declared = replacements.find(x => x.id === item.id && x.part === part.key);
+    if (replacing && declared?.replaces && part.status === "implemented" && same(part.fix, declared.replaces)) continue;
     if (part.batch && part.batch !== myBatch && (part.status === "assigned" || part.status === "implemented")) return `item ${item.id}${part.key === "all" ? "" : ` (${part.key})`} is ${part.status} in batch ${part.batch}`;
   }
   return null;
@@ -825,8 +829,25 @@ export function rulingCompletenessProblems(
       ? ["authenticated owner ruling records unavailable; current local completeness was not checked"] : [];
   }
   const out: string[] = [];
+  if(records===undefined){
+    records=[];
+    const raw=rd(RULINGS_FILE).split('\n');
+    for(let i=0;i<raw.length;i++){
+      if(!raw[i].trim())continue;
+      try{
+        const value=JSON.parse(raw[i]);
+        if(!value||typeof value!=='object'||!['ruling','migration','replacement'].includes(value.kind)||(value.kind==='ruling'&&(typeof value.item!=='string'||typeof value.text!=='string')))throw Error('malformed');
+        records.push(value);
+      }catch{return [`authenticated owner ruling records unreadable at line ${i+1}; current local completeness was not checked`];}
+    }
+  }
+  const authenticated=records.filter(r=>r.kind==='ruling');
+  if(!authenticated.length&&ledger.rulings.some(r=>rulingKind(r)==='ruling'))out.push('authenticated owner ruling records contain no rulings; current local completeness was not checked');
+  for(const ruling of ledger.rulings.filter(r=>rulingKind(r)==='ruling')){
+    if(!authenticated.some(r=>r.item===ruling.item&&(r.part??'')===(ruling.part??'')&&r.text===ruling.text))out.push(`ruling on item ${ruling.item}${ruling.part?` (${ruling.part})`:''}: ledger exact text has no matching authenticated owner record`);
+  }
   const lines = new Set((read("docs/audit/rulings.md") ?? "").split("\n"));
-  for (const record of records ?? rulingRecords()) {
+  for (const record of records) {
     if (record.kind !== "ruling") continue;
     const name = `ruling on item ${record.item}${record.part ? ` (${record.part})` : ""}`;
     const item = ledger.items.find(i => i.id === record.item);

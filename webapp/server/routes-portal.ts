@@ -1,4 +1,7 @@
-import { obligationPurpose } from './agent-obligations';
+import { checkCheckout } from './checkout-recovery';
+import { claimServicePurchase, seriesPurchaseIdentities } from './service-purchase';
+import {hasRenewalCard, longDate} from './renewals';
+import { obligationPurpose, lateNoticeFee } from './agent-obligations';
 import { agreementSources, AGREEMENT_UNAVAILABLE } from "./agreement-source";
 import { storeElectionPackage } from './s-election-package-storage';
 import { registerRenewalCard } from './renewal-card';
@@ -38,7 +41,7 @@ import { EIN_CATEGORY_NAMES, EIN_REASONS, followUpOk } from "../src/lib/einActiv
 import { assembleOa, oaVersion, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { assembleAmendment } from "./oa-amendment";
 import { renderMarkdownPdf, stampExistingPdf } from "./pdf-render";
-import { createSession, getSession, getAdminSession, destroySession, rateLimit, clientIp } from "./auth";
+import { sessionCredentials, setSessionCookie, createSession, getSession, getAdminSession, destroySession, rateLimit, clientIp } from "./auth";
 
 import { deleteFile, putFile, readFileStream } from "./storage";
 import { sendMail, resetEmail, raCancellationEmail, raCancellationAdminEmail, einDetailsSubmittedAdminEmail, passwordChangedEmail, verifyNewEmail, emailChangeRequestedEmail, emailChangedEmail, sElectionReadyEmail } from "./email";
@@ -254,7 +257,6 @@ export const oaAnswersSchema = z.object({
         cashAllocations: z.array(z.number().min(0).max(1_000_000_000_000).multipleOf(0.01)).max(200).optional(),
       }),
     )
-    .max(50)
     .optional(),
   couples: z
     .array(
@@ -456,38 +458,40 @@ export async function clientSeries(clientId: string, orderId?: string | null): P
   for (const r of formation) {
     const p = typeof r.payload === "string" ? JSON.parse(r.payload) : r.payload;
     for (const n of seriesNames(p)) {
-      names.push(n.toLowerCase().startsWith(llcName.toLowerCase()) ? n : `${llcName} - ${n}`);
+      names.push(n);
     }
   }
   // Only unambiguously associated service orders belong to this company.
   const svc = orderId
     ? await db.query<{ type: string; details: unknown }>(
         `SELECT type, details FROM service_orders
-         WHERE client_id = $1 AND type IN ('series', 'ein') AND status <> 'pending_payment'
+         WHERE client_id = $1 AND type IN ('series', 'ein') AND status NOT IN ('pending_payment','duplicate_payment')
            AND formation_order_id = $2`,
         [clientId, orderId],
       )
     : await db.query<{ type: string; details: unknown }>(
         `SELECT type, details FROM service_orders
-         WHERE client_id = $1 AND type IN ('series', 'ein') AND status <> 'pending_payment'`,
+         WHERE client_id = $1 AND type IN ('series', 'ein') AND status NOT IN ('pending_payment','duplicate_payment')`,
         [clientId],
       );
-  const einSeries = new Set<string>();
+  const einNames: string[] = [];
   for (const r of svc) {
     const d = (typeof r.details === "string" ? JSON.parse(r.details) : r.details) as {
       seriesName?: string;
       target?: string;
     } | null;
     if (r.type === "series" && d?.seriesName) names.push(d.seriesName);
-    if (r.type === "ein" && d?.target === "series" && d.seriesName) einSeries.add(d.seriesName.trim().toLowerCase());
+    if (r.type === "ein" && d?.target === "series" && d.seriesName) einNames.push(d.seriesName);
   }
+  const identities = await seriesPurchaseIdentities([...names, ...einNames], llcName);
+  const einSeries = new Set(identities.slice(names.length).map(i => i.key));
   const seen = new Set<string>();
   const out: { name: string; einOrdered: boolean }[] = [];
-  for (const n of names) {
-    const k = n.trim().toLowerCase();
+  for (const [index, n] of names.entries()) {
+    const k = identities[index].key;
     if (!k || seen.has(k)) continue;
     seen.add(k);
-    out.push({ name: n.trim(), einOrdered: einSeries.has(k) });
+    out.push({ name: identities[index].hasCompanyPrefix ? n.trim() : `${llcName} - ${n.trim()}`, einOrdered: einSeries.has(k) });
   }
   return out;
 }
@@ -542,6 +546,8 @@ export async function sElectionEligibility(clientId: string, orderId?: string | 
 export const S_ELECTION_EDIT_DAYS = 14;
 
 export interface SElectionStoredDetails {
+  recoveryHold?:boolean;
+  recoveryMetadataUnavailable?:boolean;
   ein?: string;
   einPending?: boolean;
   /** "letter": the number came from the CP 575 the office uploaded. */
@@ -784,12 +790,13 @@ export async function postSElectionPackage(args: {
   merged: SElectionStoredDetails;
   ssns: string[];
   priorDocumentId?: string;
+  officeOperation?:{id:string;lease:string;parent?:boolean};
 }): Promise<{ ok: true; documentId: string; editableUntil: string | null } | { ok: false }> {
   const { so, merged, ssns } = args;
   if (merged.documentDeletedAt) return { ok: false };
   const db = await getDb();
   const [current]=await db.query<{details:SElectionStoredDetails}>('SELECT details FROM service_orders WHERE id=$1 AND client_id=$2',[so.id,so.client_id]);
-  if (!current || current.details?.documentDeletedAt) return {ok:false};
+  if (!current || current.details?.documentDeletedAt || current.details?.recoveryHold) return {ok:false};
   const formation = merged.dateIncorporated ?? "";
   const { effectiveDate, shareholders } = withFormationDefaults(merged);
   const companyId = await serviceCompanyId(so.id, so.client_id);
@@ -829,7 +836,7 @@ export async function postSElectionPackage(args: {
   }
 
   const title = `S Corporation Election Package (Form 2553) — ${so.llc_name}`;
-  merged.documentId = await storeElectionPackage(db,{serviceId:so.id,clientId:so.client_id,companyId,title,pdf:Buffer.from(pdf),details:merged as unknown as Record<string,unknown>,ssns,priorDocumentId:args.priorDocumentId});
+  merged.documentId = await storeElectionPackage(db,{serviceId:so.id,clientId:so.client_id,companyId,title,pdf:Buffer.from(pdf),details:merged as unknown as Record<string,unknown>,ssns,priorDocumentId:args.priorDocumentId,officeOperation:args.officeOperation});
   const after = await db.query<{ fulfilled_at: unknown }>(
     "SELECT fulfilled_at FROM service_orders WHERE id = $1",
     [so.id],
@@ -841,7 +848,9 @@ export async function postSElectionPackage(args: {
     editableUntil: window.deleteOn ? stampEastern(new Date(window.deleteOn)) : "",
     portalUrl: `${env.PUBLIC_BASE_URL}/portal`,
   });
-  sendMail({ to: clients[0]?.email ?? "", ...mail }).catch((e) =>
+  // Parent EIN completion sends the more specific EIN-added notice and its
+  // ordinary completion notice. Direct package preparation still sends this.
+  if (!args.officeOperation?.parent) await sendMail({ to: clients[0]?.email ?? "", ...mail }).catch((e) =>
     console.error("[service] s-election ready email failed:", e),
   );
   return { ok: true, documentId: merged.documentId, editableUntil: window.deleteOn };
@@ -864,7 +873,7 @@ app.post("/auth/login", async (c) => {
   const bad = () => c.json(err("Incorrect email or password.", "BAD_CREDENTIALS"), 401);
   if (rows.length === 0 || !rows[0].password_hash) return bad();
   if (!(await verifyPassword(body.data.password, rows[0].password_hash))) return bad();
-  await createSession(c, { clientId: rows[0].id });
+  if (!(await createSession(c, { clientId: rows[0].id, verifiedPasswordHash: rows[0].password_hash }))) return bad();
   return c.json({ data: { ok: true } });
 });
 
@@ -906,11 +915,16 @@ app.post("/auth/forgot", async (c) => {
   if (rows.length > 0) {
     const { token, tokenHash } = newToken();
     await db.query(
-      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'reset_password', $3)",
-      [tokenHash, rows[0].id, new Date(Date.now() + 3600_000).toISOString()],
+      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at, account_version) SELECT $1,id,'reset_password',$3,auth_version FROM clients WHERE id=$2 AND email=$4",
+      [tokenHash, rows[0].id, new Date(Date.now() + 3600_000).toISOString(), body.data.email.toLowerCase()],
     );
     const mail = resetEmail(`${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`);
-    await sendMail({ to: body.data.email, ...mail });
+    try {
+      await sendMail({ to: body.data.email, ...mail });
+    } catch (error) {
+      // Same public response whether an account exists; sendMail records the failure.
+      console.error("[account] password recovery email failed:", error);
+    }
   }
   return c.json({ data: { ok: true } });
 });
@@ -928,25 +942,29 @@ app.post("/auth/set-password", async (c) => {
   // password; accepting any purpose here would also silently grant that power
   // to every token type added later. Consuming the token is the same
   // statement that authorizes the write, so a token can never be spent twice.
-  const rows = await db.query<{ token_hash: string; client_id: string }>(
-    `UPDATE auth_tokens SET used_at = now()
-      WHERE token_hash = $1 AND expires_at > now() AND used_at IS NULL
-        AND purpose IN ('set_password', 'reset_password')
-      RETURNING token_hash, client_id`,
-    [hashToken(body.data.token)],
-  );
-  if (rows.length === 0) {
-    return c.json(err("This link is invalid or has expired. Use “Forgot your password?” to get a new one.", "BAD_TOKEN"), 400);
-  }
-  await db.query(`WITH changed AS (
-    UPDATE clients SET password_hash = $1, pending_email = NULL WHERE id = $2 RETURNING id
-  ) UPDATE auth_tokens SET used_at = now()
-    WHERE client_id IN (SELECT id FROM changed) AND purpose = 'verify_email' AND used_at IS NULL`, [
-    await hashPassword(body.data.password),
-    rows[0].client_id,
-  ]);
-  await db.query("DELETE FROM sessions WHERE client_id = $1", [rows[0].client_id]);
-  await createSession(c, { clientId: rows[0].client_id });
+  const passwordHash = await hashPassword(body.data.password);
+  const credentials = sessionCredentials();
+  // One database statement commits the credential, token consumption and
+  // replacement session. A failure anywhere leaves the reset link retryable.
+  const rows = await db.query<{ client_id: string }>(`WITH changed AS (
+    UPDATE clients c SET password_hash=$2,pending_email=NULL,
+      auth_version=c.auth_version+1,password_version=c.password_version+1
+    FROM auth_tokens t WHERE t.token_hash=$1 AND t.client_id=c.id
+      AND t.expires_at>now() AND t.used_at IS NULL
+      AND t.purpose IN ('set_password','reset_password') AND t.account_version=c.auth_version
+    RETURNING c.id,c.password_version
+  ), revoked AS (
+    UPDATE auth_tokens SET used_at=now() WHERE client_id IN (SELECT id FROM changed)
+      AND purpose IN ('set_password','reset_password','verify_email') AND used_at IS NULL RETURNING token_hash
+  ), removed AS (
+    DELETE FROM sessions WHERE client_id IN (SELECT id FROM changed) RETURNING token_hash
+  ) INSERT INTO sessions (token_hash,client_id,expires_at,password_version)
+    SELECT $3,id,$4,password_version FROM changed
+    WHERE (SELECT count(*) FROM revoked)>=0 AND (SELECT count(*) FROM removed)>=0
+    RETURNING client_id`,
+  [hashToken(body.data.token), passwordHash, credentials.tokenHash, credentials.expires.toISOString()]);
+  if (!rows.length) return c.json(err("This link is invalid or has expired. Use “Forgot your password?” to get a new one.", "BAD_TOKEN"), 400);
+  setSessionCookie(c, credentials);
   return c.json({ data: { ok: true } });
 });
 
@@ -960,13 +978,14 @@ app.get("/portal/companies", async (c) => {
   const db = await getDb();
   // The registered agent facts belong to the company (15 Sep 2026: the
   // card showed one company's service under every tab).
-  const rows = await db.query<{ id: string; llc_name: string; formed_at: string | null; filing_path: string | null; ra_service: boolean; ra_renewal_date: unknown; cancellation_date?:unknown; ra_cancellation_requested_at: string | null; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note:string|null; ra_appointment_date:unknown;ra_resignation_due:unknown;ra_resignation_submitted:unknown;ra_resignation_filed:unknown;ra_replaced_at:unknown;ra_ended_date:unknown; renewals: unknown }>(
+  const rows = await db.query<{ id: string; llc_name: string; formed_at: string | null; filing_path: string | null; ra_service: boolean; ra_renewal_date: unknown; cancellation_date?:unknown; ra_cancellation_requested_at: string | null; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note:string|null; ra_appointment_date:unknown;ra_resignation_due:unknown;ra_resignation_submitted:unknown;ra_resignation_filed:unknown;ra_replaced_at:unknown;ra_ended_date:unknown; renewals: unknown; payload:unknown; square_card_id:string|null; square_customer_id:string|null; recovery_hold:boolean }>(
     `SELECT id, llc_name, formed_at, payload->>'filingPath' AS filing_path,
             (payload->'registeredAgent'->>'choice' = 'SERVICE') AS ra_service,
             ra_renewal_date, COALESCE(ra_cancellation_renewal_date,ra_renewal_date) AS cancellation_date, ra_cancellation_requested_at, ra_appointment_date,ra_resignation_due,ra_resignation_submitted,ra_resignation_filed,ra_replaced_at,ra_ended_date,card_note,
-            card_status, card_last4, card_brand,
+            card_status, card_last4, card_brand, payload, square_card_id, square_customer_id,
+            EXISTS(SELECT 1 FROM recovery_holds h WHERE h.client_id=orders.client_id AND h.record->>'companyId'=orders.id::text AND h.status='held') AS recovery_hold,
             -- The renewals, newest first (16 Sep 2026).
-            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', r.id, 'reconcilingPayment',r.status NOT IN ('charged','paid_by_link','cancelled') AND EXISTS(SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed')), 'purpose',r.purpose,'linkUrl',r.link_url,'date', r.renewal_date, 'amountCents', r.amount_cents, 'status', r.status, 'chargedAt', r.charged_at) ORDER BY r.renewal_date DESC), '[]'::jsonb)
+            (SELECT COALESCE(jsonb_agg(jsonb_build_object('id', r.id, 'reconcilingPayment',r.status NOT IN ('charged','paid_by_link','cancelled') AND EXISTS(SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed')), 'purpose',r.purpose,'linkUrl',r.link_url,'date', r.renewal_date, 'chargeDue',r.charge_due, 'amountCents', r.amount_cents, 'status', r.status, 'chargedAt', r.charged_at) ORDER BY r.renewal_date DESC), '[]'::jsonb)
                FROM ra_renewals r WHERE r.order_id = orders.id) AS renewals
        FROM orders WHERE client_id = $1 AND paid_at IS NOT NULL
       ORDER BY paid_at DESC NULLS LAST`,
@@ -974,6 +993,7 @@ app.get("/portal/companies", async (c) => {
   );
   return c.json({ data: rows.map((r) => ({
     orderId: r.id,
+    recoveryHold:r.recovery_hold,
     llcName: r.llc_name,
     formed: !!r.formed_at,
     raService: r.ra_service === true,
@@ -990,7 +1010,14 @@ app.get("/portal/companies", async (c) => {
     cardStatus: r.card_status ?? null,
     cardLast4: r.card_last4 ?? null,
     cardBrand: r.card_brand ?? null,
-    renewals: ((typeof r.renewals === "string" ? JSON.parse(r.renewals) : r.renewals) as { id: string;reconcilingPayment?:boolean;purpose?:string;linkUrl?:string|null; date: unknown; amountCents: number; status: string; chargedAt: string | null }[] | null ?? []).map((x) => {const purpose=obligationPurpose({...r,...x,renewal_date:x.date});return { ...x,purpose,linkUrl:purpose==='unavailable'?null:x.linkUrl, date: x.date ? isoDate(x.date) : null };}),
+    renewals: ((typeof r.renewals === "string" ? JSON.parse(r.renewals) : r.renewals) as { id: string;reconcilingPayment?:boolean;purpose?:string;linkUrl?:string|null; date: unknown; chargeDue:unknown; amountCents: number; status: string; chargedAt: string | null }[] | null ?? []).map((x) => {const purpose=obligationPurpose({...r,...x,renewal_date:x.date});const today=easternDateIso(),due=x.chargeDue?isoDate(x.chargeDue):null;
+      let lateNoticeMessage:string|null=null;
+      if(r.ra_cancellation_requested_at&&lateNoticeFee({...r,renewal_date:x.date})&&!['charged','paid_by_link','cancelled','declined'].includes(x.status)&&!x.reconcilingPayment&&due){
+        const ending=' Replacing us does not waive this fee. Any refund is at our discretion.';
+        if(today<due&&hasRenewalCard(r))lateNoticeMessage=`Your cancellation notice arrived less than 30 days before renewal. The $99 annual renewal fee will be charged on ${longDate(due)}, even though your replacement registered agent took effect before renewal.`+ending;
+        else if(today>=due)lateNoticeMessage=`Your cancellation notice arrived less than 30 days before renewal. The $99 annual renewal fee for ${longDate(isoDate(x.date))} remains due, even though your replacement registered agent took effect before renewal.`+ending;
+      }
+      return { ...x,purpose,lateNoticeMessage,linkUrl:purpose==='unavailable'?null:x.linkUrl, date: x.date ? isoDate(x.date) : null };}),
   })) });
 });
 
@@ -998,7 +1025,7 @@ app.delete("/portal/documents/:id", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   if (!await requestDocumentDeletion(c.req.param("id"), session.clientId)) return c.json(err("Not found or this document cannot be deleted here.", "NOT_FOUND"), 404);
-  const db=await getDb();const [state]=await db.query<{pending:boolean}>('SELECT completed_at IS NULL AS pending FROM document_deletions WHERE document_id=$1',[c.req.param('id')]);
+  const db=await getDb();const [state]=await db.query<{pending:boolean}>('SELECT COALESCE(bool_or(completed_at IS NULL),true) AS pending FROM document_deletions WHERE document_id=$1',[c.req.param('id')]);
   return c.json({data:{ok:true,cleanupPending:state?.pending===true}});
 });
 
@@ -1011,7 +1038,7 @@ app.get("/portal/documents", async (c) => {
   }>(
     `SELECT d.id, d.kind, d.title, d.size_bytes, d.created_at, d.order_id, d.meta, o.llc_name AS company_name
        FROM documents d LEFT JOIN orders o ON o.id = d.order_id AND o.client_id = d.client_id
-       WHERE d.client_id = $1 AND d.deleted_at IS NULL ORDER BY d.created_at DESC`,
+       WHERE d.client_id = $1 AND d.deleted_at IS NULL AND NOT EXISTS (SELECT 1 FROM recovery_holds h WHERE h.id=d.id AND h.status='held') ORDER BY d.created_at DESC`,
     [session.clientId],
   );
   // Legal mail carries the day it was received (14 Sep 2026); nothing else
@@ -1028,9 +1055,12 @@ app.get("/portal/documents/:id/download", async (c) => {
   const session = await getSession(c);
   const admin = await getAdminSession(c);
   if (!session?.clientId && !admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+  if (!z.string().uuid().safeParse(c.req.param("id")).success) {
+    return c.json(err("Document not found", "NOT_FOUND"), 404);
+  }
   const db = await getDb();
   const rows = await db.query<{ storage_key: string; title: string; content_type: string; client_id: string }>(
-    "SELECT storage_key, title, content_type, client_id FROM documents WHERE id = $1 AND deleted_at IS NULL",
+    "SELECT storage_key, title, content_type, client_id FROM documents WHERE id = $1 AND deleted_at IS NULL AND NOT EXISTS (SELECT 1 FROM recovery_holds h WHERE h.id=documents.id AND h.status='held')",
     [c.req.param("id")],
   );
   if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
@@ -1843,6 +1873,14 @@ app.get("/portal/services", async (c) => {
   const db = await getDb();
   const svcCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
   if (c.req.query("company") !== undefined && !svcCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
+  // The return ID only prioritizes an owned purchase; it grants no authority.
+  const pendingPayments = await db.query<{id:string}>(`SELECT id FROM service_orders
+    WHERE client_id=$1 AND formation_order_id=$2 AND status='pending_payment'
+      AND (payment_check_after IS NULL OR payment_check_after<=now())
+    ORDER BY (id::text=$3) DESC,payment_check_after NULLS FIRST,created_at DESC LIMIT 3`,
+    [session.clientId, svcCompanyId, c.req.query("paid") || ""]);
+  for (const pending of pendingPayments) await checkCheckout('service', pending.id);
+
   await purgeExpiredSElections().catch((e) => console.error("[purge] failed:", e));
   const orders = svcCompanyId
     ? await db.query<{ id: string; type: string; status: string; details: unknown; fulfilled_at: unknown }>(
@@ -1915,18 +1953,14 @@ app.post("/portal/services/s-election", async (c) => {
   const db = await getDb();
   // Only a purchase that passed every check spends the allowance (Adam,
   // 14 Sep 2026: refusals do not count).
+  const serviceOrderId = await claimServicePurchase(session.clientId, purchaseCompanyId, 's-election', llcName, {}, S_ELECTION_FEE_CENTS);
   if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
-  const rows = await db.query<{ id: string }>(
-    `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
-     VALUES ($1, 's-election', $2, $3, $4, $5) RETURNING id`,
-    [session.clientId, llcName, JSON.stringify({}), S_ELECTION_FEE_CENTS, purchaseCompanyId],
-  );
-  const serviceOrderId = rows[0].id;
   const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [session.clientId]);
   const checkout = await createCheckout({
     orderId: serviceOrderId,
+    service: true,
     llcName,
     priced: {
       serviceFeeCents: S_ELECTION_FEE_CENTS,
@@ -1935,7 +1969,7 @@ app.post("/portal/services/s-election", async (c) => {
       lineItems: [{ name: `S corporation election package (Form 2553) — ${llcName}`, amountCents: S_ELECTION_FEE_CENTS }],
     },
     buyerEmail: clients[0]?.email ?? "",
-    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?paid=${serviceOrderId}`,
+    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?company=${purchaseCompanyId}&paid=${serviceOrderId}`,
     description: `S corporation election package — ${llcName}`,
   });
   await db.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
@@ -1978,18 +2012,14 @@ app.post("/portal/services/series", async (c) => {
   const db = await getDb();
   // Only a purchase that passed every check spends the allowance (Adam,
   // 14 Sep 2026: refusals do not count).
+  const serviceOrderId = await claimServicePurchase(session.clientId, purchaseCompanyId, 'series', llcName, {seriesName, purpose: body.data.purpose ?? ''}, amountCents);
   if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
-  const rows = await db.query<{ id: string }>(
-    `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
-     VALUES ($1, 'series', $2, $3, $4, $5) RETURNING id`,
-    [session.clientId, llcName, JSON.stringify({ seriesName, purpose: body.data.purpose ?? "" }), amountCents, purchaseCompanyId],
-  );
-  const serviceOrderId = rows[0].id;
   const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [session.clientId]);
   const checkout = await createCheckout({
     orderId: serviceOrderId,
+    service: true,
     llcName,
     priced: {
       serviceFeeCents: SERIES_ADDON_PREP_CENTS,
@@ -2001,7 +2031,7 @@ app.post("/portal/services/series", async (c) => {
       ],
     },
     buyerEmail: clients[0]?.email ?? "",
-    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?paid=${serviceOrderId}`,
+    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?company=${purchaseCompanyId}&paid=${serviceOrderId}`,
     description: `Protected Series Designation — ${seriesName}`,
   });
   await db.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
@@ -2047,18 +2077,14 @@ app.post("/portal/services/certificate", async (c) => {
   }
   // Only a purchase that passed every check spends the allowance (Adam,
   // 14 Sep 2026: refusals do not count).
+  const serviceOrderId = await claimServicePurchase(session.clientId, purchaseCompanyId, body.data.kind, llcName, {}, spec.fee);
   if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
-  const rows = await db.query<{ id: string }>(
-    `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
-     VALUES ($1, $2, $3, '{}'::jsonb, $4, $5) RETURNING id`,
-    [session.clientId, body.data.kind, llcName, spec.fee, purchaseCompanyId],
-  );
-  const serviceOrderId = rows[0].id;
   const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [session.clientId]);
   const checkout = await createCheckout({
     orderId: serviceOrderId,
+    service: true,
     llcName,
     priced: {
       serviceFeeCents: spec.fee,
@@ -2067,7 +2093,7 @@ app.post("/portal/services/certificate", async (c) => {
       lineItems: [{ name: `${spec.name} — ${llcName}`, amountCents: spec.fee }],
     },
     buyerEmail: clients[0]?.email ?? "",
-    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?paid=${serviceOrderId}`,
+    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?company=${purchaseCompanyId}&paid=${serviceOrderId}`,
     description: `${spec.name} — ${llcName}`,
   });
   await db.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
@@ -2092,24 +2118,18 @@ app.post("/portal/services/ein", async (c) => {
     return c.json(err("Name the protected series the EIN is for.", "INVALID_INPUT"), 400);
   }
   const target = body.data.target;
-  const seriesName = body.data.seriesName?.trim() ?? "";
+  let seriesName = body.data.seriesName?.trim() ?? "";
   const db = await getDb();
   // One EIN per entity: a paid order (formation-included or portal) for the
   // same target refuses a second purchase. Unpaid drafts don't block — an
   // abandoned checkout must not lock the client out forever.
-  const existingEin = await db.query<{ details: unknown }>(
-    `SELECT details FROM service_orders
-     WHERE client_id = $1 AND formation_order_id = $2 AND type = 'ein' AND status NOT IN ('pending_payment', 'cancelled')`,
-    [session.clientId, purchaseCompanyId],
+  const existingEin = await db.query<{ id: string }>(
+    `SELECT id FROM service_orders
+     WHERE client_id = $1 AND formation_order_id = $2 AND type = 'ein' AND status NOT IN ('pending_payment', 'cancelled', 'duplicate_payment')
+       AND purchase_target('ein',details,$3)=purchase_target('ein',$4::jsonb,$3)`,
+    [session.clientId, purchaseCompanyId, llcName, JSON.stringify({target,seriesName})],
   );
-  const alreadyOrdered = existingEin.some((r) => {
-    const d = (typeof r.details === "string" ? JSON.parse(r.details) : r.details) as {
-      target?: string;
-      seriesName?: string;
-    } | null;
-    if (target === "company") return (d?.target ?? "company") === "company";
-    return d?.target === "series" && (d.seriesName ?? "").trim().toLowerCase() === seriesName.toLowerCase();
-  });
+  const alreadyOrdered = existingEin.length > 0;
   if (alreadyOrdered) {
     return c.json(
       err(
@@ -2126,27 +2146,26 @@ app.post("/portal/services/ein", async (c) => {
   // series that does not exist.
   if (target === "series") {
     const mine = await clientSeries(session.clientId, purchaseCompanyId);
-    const match = mine.find((s) => s.name.toLowerCase() === seriesName.toLowerCase());
+    const identities = await seriesPurchaseIdentities([seriesName, ...mine.map(s => s.name)], llcName);
+    const match = mine.find((_s,index) => identities[index+1].key === identities[0].key);
     if (!match) return c.json(err("That protected series is not on your account.", "UNKNOWN_SERIES"), 400);
     if (match.einOrdered) {
       return c.json(err("An EIN for that protected series is already ordered — See Orders in progress.", "ALREADY_ORDERED"), 400);
     }
+    // Aliases identify the existing entity; new EIN work keeps its recorded name.
+    seriesName = match.name;
   }
   // Only a purchase that passed every check spends the allowance (Adam,
   // 14 Sep 2026: refusals do not count).
+  const serviceOrderId = await claimServicePurchase(session.clientId, purchaseCompanyId, 'ein', llcName, {target, seriesName}, EIN_FEE_CENTS);
   if (!(await rateLimit(`svc:${session.clientId}`, 20, 3600_000))) {
     return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
   }
-  const rows = await db.query<{ id: string }>(
-    `INSERT INTO service_orders (client_id, type, llc_name, details, amount_cents, formation_order_id)
-     VALUES ($1, 'ein', $2, $3, $4, $5) RETURNING id`,
-    [session.clientId, llcName, JSON.stringify({ target, seriesName }), EIN_FEE_CENTS, purchaseCompanyId],
-  );
-  const serviceOrderId = rows[0].id;
   const clients = await db.query<{ email: string }>("SELECT email FROM clients WHERE id = $1", [session.clientId]);
   const forName = target === "series" ? seriesName : llcName;
   const checkout = await createCheckout({
     orderId: serviceOrderId,
+    service: true,
     llcName,
     priced: {
       serviceFeeCents: EIN_FEE_CENTS,
@@ -2155,7 +2174,7 @@ app.post("/portal/services/ein", async (c) => {
       lineItems: [{ name: `Federal EIN service — ${forName}`, amountCents: EIN_FEE_CENTS }],
     },
     buyerEmail: clients[0]?.email ?? "",
-    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?paid=${serviceOrderId}`,
+    redirectUrl: `${env.PUBLIC_BASE_URL}/portal?company=${purchaseCompanyId}&paid=${serviceOrderId}`,
     description: `Federal EIN service — ${forName}`,
   });
   await db.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
@@ -2185,6 +2204,11 @@ app.post("/portal/services/:id/ein-details", async (c) => {
   if (so.type !== "ein" || so.status !== "awaiting_info") {
     return c.json(err("This order is not awaiting details.", "BAD_STATE"), 400);
   }
+  const companyId = await serviceCompanyId(so.id, session.clientId);
+  if (!companyId) {
+    return c.json(err("This service needs to be linked to its company. Contact support@myfloridaseriesllc.com before providing details.", "COMPANY_REQUIRED"), 400);
+  }
+  so.formation_order_id = companyId;
   if (!(await clientLlcFormed(session.clientId, so.formation_order_id))) {
     return c.json(err("Your LLC must be formed before an EIN can be obtained.", "NOT_FORMED"), 400);
   }
@@ -2237,7 +2261,7 @@ app.post("/portal/services/:id/ein-details", async (c) => {
       clientEmail: clients[0]?.email ?? "",
       adminUrl: `${env.PUBLIC_BASE_URL}/admin`,
     });
-    sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail }).catch((e) =>
+    await sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...mail }).catch((e) =>
       console.error("[service] ein-details admin email failed:", e),
     );
   }
@@ -2264,10 +2288,16 @@ app.post("/portal/services/:id/s-election-details", async (c) => {
   }
   const so = rows[0];
   if (so.type !== "s-election") return c.json(err("Not found", "NOT_FOUND"), 404);
+  const companyId = await serviceCompanyId(so.id, session.clientId);
+  if (!companyId) {
+    return c.json(err("This service needs to be linked to its company. Contact support@myfloridaseriesllc.com before providing details.", "COMPANY_REQUIRED"), 400);
+  }
+  so.formation_order_id = companyId;
   if (!(await clientLlcFormed(session.clientId, so.formation_order_id))) {
     return c.json(err("Your LLC must be formed before an S election can be made.", "NOT_FORMED"), 400);
   }
   const prior = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as SElectionStoredDetails;
+  if (prior?.recoveryHold) return c.json(err("Your S-election package is awaiting recovery reconciliation. Contact support@myfloridaseriesllc.com for help.", "RECOVERY_HOLD"),409);
   if (prior?.documentDeletedAt) return c.json(err("You deleted this document. Contact us if you need a new form.", "DOCUMENT_DELETED"), 400);
   const editable = so.status === "awaiting_info" || (so.status === "in_progress" && prior?.einPending === true && !so.fulfilled_at) || sElectionWindow(so.fulfilled_at).open;
   if (!editable) {
@@ -2445,20 +2475,34 @@ app.post("/portal/account/password", async (c) => {
   if (!client?.password_hash || !(await verifyPassword(body.data.currentPassword, client.password_hash))) {
     return c.json(err("That current password is not correct.", "BAD_CREDENTIALS"), 401);
   }
-  await db.query(`WITH changed AS (
-    UPDATE clients SET password_hash = $1, pending_email = NULL WHERE id = $2 RETURNING id
-  ) UPDATE auth_tokens SET used_at = now()
-    WHERE client_id IN (SELECT id FROM changed) AND purpose = 'verify_email' AND used_at IS NULL`, [
-    await hashPassword(body.data.newPassword),
-    session.clientId,
-  ]);
-  // Sign out every other device; the current session stays valid.
-  await db.query("DELETE FROM sessions WHERE client_id = $1 AND token_hash <> $2", [
-    session.clientId,
-    session.tokenHash,
-  ]);
+  // Lock the authorizing session so logout cannot remove it between our
+  // final authority check and retaining it. Recheck the verified credential
+  // after any competing password update has finished.
+  const changed = await db.query<{ id: string }>(`WITH authorized AS (
+    SELECT token_hash,password_version FROM sessions
+    WHERE token_hash=$4 AND client_id=$2 AND expires_at>now() FOR UPDATE
+  ), changed AS (
+    UPDATE clients c SET password_hash=$1,pending_email=NULL,
+      auth_version=c.auth_version+1,password_version=c.password_version+1
+    WHERE c.id=$2 AND c.password_hash=$3 AND EXISTS (
+      SELECT 1 FROM authorized a WHERE a.password_version=c.password_version
+    ) RETURNING c.id,c.password_version
+  ), revoked AS (
+    UPDATE auth_tokens SET used_at=now() WHERE client_id IN (SELECT id FROM changed)
+      AND purpose IN ('verify_email','set_password','reset_password') AND used_at IS NULL RETURNING token_hash
+  ), retained AS (
+    UPDATE sessions s SET password_version=c.password_version FROM changed c
+      WHERE s.client_id=c.id AND s.token_hash=$4 RETURNING s.client_id
+  ), removed AS (
+    DELETE FROM sessions WHERE client_id IN (SELECT id FROM changed) AND token_hash<>$4 RETURNING token_hash
+  ) SELECT id FROM changed WHERE id IN (SELECT client_id FROM retained)
+    AND (SELECT count(*) FROM revoked)>=0 AND (SELECT count(*) FROM removed)>=0`,
+  [await hashPassword(body.data.newPassword), session.clientId, client.password_hash, session.tokenHash]);
+  if (!changed.length) {
+    return c.json(err("Your account changed while this request was running. Sign in again and retry.", "ACCOUNT_CHANGED"), 409);
+  }
   const mail = passwordChangedEmail(`${env.PUBLIC_BASE_URL}/portal`);
-  sendMail({ to: client.email, ...mail }).catch((e) =>
+  await sendMail({ to: client.email, ...mail }).catch((e) =>
     console.error("[account] password-changed email failed:", e),
   );
   return c.json({ data: { ok: true } });
@@ -2569,16 +2613,24 @@ app.post("/auth/verify-email", async (c) => {
   // Someone else may have claimed the address between request and confirmation.
   const taken = await db.query("SELECT id FROM clients WHERE email = $1", [pending]);
   if (taken.length > 0) {
-    await db.query("UPDATE clients SET pending_email = NULL WHERE id = $1", [rows[0].client_id]);
-    return c.json(err("That address is now in use on another account.", "EMAIL_TAKEN"), 400);
+    await db.query("UPDATE clients SET pending_email = NULL WHERE id = $1 AND pending_email = $2", [rows[0].client_id, pending]);
+    return c.json(err("That address is now in use on another account. Request a different address from your portal.", "EMAIL_TAKEN"), 400);
   }
   const previous = clients[0].email;
   // Recheck at the write in case a password change cancelled it after the read.
-  const changed = await db.query("UPDATE clients SET email = $1, pending_email = NULL WHERE id = $2 AND pending_email = $1 RETURNING id", [pending, rows[0].client_id]);
+  let changed;
+  try {
+    changed = await db.query(`WITH changed AS (UPDATE clients SET email=$1,pending_email=NULL,auth_version=auth_version+1 WHERE id=$2 AND pending_email=$1 RETURNING id), revoked AS (UPDATE auth_tokens SET used_at=now() WHERE client_id IN (SELECT id FROM changed) AND used_at IS NULL RETURNING token_hash) SELECT id FROM changed`, [pending, rows[0].client_id]);
+  } catch (error) {
+    if ((error as { code?: string }).code !== "23505") throw error;
+    // Do not clear a newer request that may have replaced this one.
+    await db.query("UPDATE clients SET pending_email=NULL WHERE id=$1 AND pending_email=$2", [rows[0].client_id, pending]);
+    return c.json(err("That address is now in use on another account. Request a different address from your portal.", "EMAIL_TAKEN"), 400);
+  }
   if (changed.length === 0) return c.json(err("This email change was cancelled. Request it again from your portal.", "BAD_TOKEN"), 400);
   const mail = emailChangedEmail(pending);
-  sendMail({ to: pending, ...mail }).catch((e) => console.error("[account] email-changed (new) failed:", e));
-  sendMail({ to: previous, ...mail }).catch((e) => console.error("[account] email-changed (old) failed:", e));
+  await sendMail({ to: pending, ...mail }).catch((e) => console.error("[account] email-changed (new) failed:", e));
+  await sendMail({ to: previous, ...mail }).catch((e) => console.error("[account] email-changed (old) failed:", e));
   return c.json({ data: { ok: true, email: pending } });
 });
 
@@ -2629,12 +2681,12 @@ app.post("/portal/registered-agent/cancel", async (c) => {
   const renewalIso=cycle?.ra_cancellation_renewal_date?isoDate(cycle.ra_cancellation_renewal_date):null;
   const late=!!renewalIso && easternDateIso(new Date(requestedAt)) > new Date(new Date(renewalIso+'T12:00:00Z').getTime()-30*86400000).toISOString().slice(0,10);
   const confirmation = raCancellationEmail(client.name, renewalIso ? fmtDate(renewalIso) : null, order.llc_name, late);
-  sendMail({ to: client.email, ...confirmation }).catch((e) =>
+  await sendMail({ to: client.email, ...confirmation }).catch((e) =>
     console.error("ra-cancel confirmation email failed", e),
   );
   if (env.ADMIN_NOTIFY_EMAIL) {
     const notice = raCancellationAdminEmail({ clientName: client.name, clientEmail: client.email, llcName: order.llc_name });
-    sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...notice, replyTo: client.email }).catch((e) =>
+    await sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...notice, replyTo: client.email }).catch((e) =>
       console.error("ra-cancel admin email failed", e),
     );
   }

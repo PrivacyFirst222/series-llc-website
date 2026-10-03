@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { loginErrorMessage } from "@/lib/authMessages";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
+  const [search] = useSearchParams();
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [busy, setBusy] = useState<boolean>(false);
@@ -19,7 +20,8 @@ export default function AdminLogin() {
     setError("");
     try {
       await api.post("/api/admin/login", { password });
-      navigate("/admin");
+      const problem = search.get("backupProblem");
+      navigate("/admin" + (problem && /^[a-f0-9]{64}$/.test(problem) ? "?backupProblem=" + problem : ""));
     } catch (e) {
       setError(loginErrorMessage(e, true));
     } finally {

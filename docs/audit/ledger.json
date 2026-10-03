@@ -580,9 +580,49 @@
               "batch": "40",
               "revision": 6,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-25T08:58:40.167Z",
+              "event": "superseded by approved replacement",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1,
+              "note": "prior fix 40 r6 at ; approved work order fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90"
+            },
+            {
+              "at": "2026-09-25T08:58:40.167Z",
+              "event": "assigned",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-25T08:58:46.074Z",
+              "event": "implemented",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1,
+              "note": "by Codex"
+            },
+            {
+              "at": "2026-09-28T11:32:29.511Z",
+              "event": "superseded by approved replacement",
+              "batch": "chunk3-qualification-guard-2026-09-28",
+              "revision": 1,
+              "note": "prior fix launch-guard-2026-09-25 r1 at ; approved work order 22df7f9dfacd371fae2431cbf82a12494c05f4622f6e3b85facf7f797e5170b5"
+            },
+            {
+              "at": "2026-09-28T11:32:29.511Z",
+              "event": "assigned",
+              "batch": "chunk3-qualification-guard-2026-09-28",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-28T11:32:33.866Z",
+              "event": "implemented",
+              "batch": "chunk3-qualification-guard-2026-09-28",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
-          "batch": "40",
+          "batch": "chunk3-qualification-guard-2026-09-28",
           "supersessions": [
             {
               "prior": {
@@ -727,18 +767,66 @@
               "batch": "40",
               "revision": 6,
               "hash": "1754a2702af6cfdca193b9a9ee92aa2e47116b552ca36485d1e5142016549926"
+            },
+            {
+              "prior": {
+                "batch": "40",
+                "revision": 6,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/content/terms.md",
+                    "text": "Last updated: **September 23, 2026**"
+                  },
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/content/privacy.md",
+                    "text": "Last updated: **September 21, 2026**"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1,
+              "hash": "fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90"
+            },
+            {
+              "prior": {
+                "batch": "launch-guard-2026-09-25",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/content/terms.md",
+                    "text": "Last updated: **September 24, 2026**"
+                  },
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/content/privacy.md",
+                    "text": "Last updated: **September 21, 2026**"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "chunk3-qualification-guard-2026-09-28",
+              "revision": 1,
+              "hash": "22df7f9dfacd371fae2431cbf82a12494c05f4622f6e3b85facf7f797e5170b5"
             }
           ],
           "fix": {
-            "batch": "40",
-            "revision": 6,
+            "batch": "chunk3-qualification-guard-2026-09-28",
+            "revision": 1,
             "commit": "",
             "doneBy": "Codex",
             "assertions": [
               {
                 "kind": "present",
                 "file": "webapp/src/content/terms.md",
-                "text": "Last updated: **September 23, 2026**"
+                "text": "Last updated: **September 27, 2026**"
               },
               {
                 "kind": "present",
@@ -13413,11 +13501,60 @@
               "batch": "20",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-25T08:58:40.167Z",
+              "event": "superseded by approved replacement",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1,
+              "note": "prior fix 20 r1 at ; approved work order fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90"
+            },
+            {
+              "at": "2026-09-25T08:58:40.167Z",
+              "event": "assigned",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-25T08:58:46.074Z",
+              "event": "implemented",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
-          "batch": "20",
+          "batch": "launch-guard-2026-09-25",
+          "supersessions": [
+            {
+              "prior": {
+                "batch": "20",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "absent",
+                    "text": "ein_outstanding"
+                  },
+                  {
+                    "kind": "absent",
+                    "text": "ein_purchased"
+                  },
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/pages/admin/OrderDetail.tsx",
+                    "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1,
+              "hash": "fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90"
+            }
+          ],
           "fix": {
-            "batch": "20",
+            "batch": "launch-guard-2026-09-25",
             "revision": 1,
             "commit": "",
             "doneBy": "Codex",
@@ -13433,7 +13570,7 @@
               {
                 "kind": "present",
                 "file": "webapp/src/pages/admin/OrderDetail.tsx",
-                "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+                "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string; source: \"card\" | \"portal\" }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
               }
             ]
           }
@@ -13690,15 +13827,64 @@
               "batch": "20",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-25T08:58:40.168Z",
+              "event": "superseded by approved replacement",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1,
+              "note": "prior fix 20 r1 at ; approved work order fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90"
+            },
+            {
+              "at": "2026-09-25T08:58:40.168Z",
+              "event": "assigned",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-25T08:58:46.074Z",
+              "event": "implemented",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "187",
             "part": "unused-fields"
           },
-          "batch": "20",
+          "batch": "launch-guard-2026-09-25",
+          "supersessions": [
+            {
+              "prior": {
+                "batch": "20",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "absent",
+                    "text": "ein_outstanding"
+                  },
+                  {
+                    "kind": "absent",
+                    "text": "ein_purchased"
+                  },
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/pages/admin/OrderDetail.tsx",
+                    "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1,
+              "hash": "fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90"
+            }
+          ],
           "fix": {
-            "batch": "20",
+            "batch": "launch-guard-2026-09-25",
             "revision": 1,
             "commit": "",
             "doneBy": "Codex",
@@ -13714,7 +13900,7 @@
               {
                 "kind": "present",
                 "file": "webapp/src/pages/admin/OrderDetail.tsx",
-                "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+                "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string; source: \"card\" | \"portal\" }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
               }
             ]
           }
@@ -13759,15 +13945,64 @@
               "batch": "20",
               "revision": 1,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-09-25T08:58:40.168Z",
+              "event": "superseded by approved replacement",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1,
+              "note": "prior fix 20 r1 at ; approved work order fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90"
+            },
+            {
+              "at": "2026-09-25T08:58:40.168Z",
+              "event": "assigned",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1
+            },
+            {
+              "at": "2026-09-25T08:58:46.074Z",
+              "event": "implemented",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1,
+              "note": "by Codex"
             }
           ],
           "canonical": {
             "item": "187",
             "part": "unused-fields"
           },
-          "batch": "20",
+          "batch": "launch-guard-2026-09-25",
+          "supersessions": [
+            {
+              "prior": {
+                "batch": "20",
+                "revision": 1,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "absent",
+                    "text": "ein_outstanding"
+                  },
+                  {
+                    "kind": "absent",
+                    "text": "ein_purchased"
+                  },
+                  {
+                    "kind": "present",
+                    "file": "webapp/src/pages/admin/OrderDetail.tsx",
+                    "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+                  }
+                ]
+              },
+              "priorStatus": "implemented",
+              "batch": "launch-guard-2026-09-25",
+              "revision": 1,
+              "hash": "fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90"
+            }
+          ],
           "fix": {
-            "batch": "20",
+            "batch": "launch-guard-2026-09-25",
             "revision": 1,
             "commit": "",
             "doneBy": "Codex",
@@ -13783,7 +14018,7 @@
               {
                 "kind": "present",
                 "file": "webapp/src/pages/admin/OrderDetail.tsx",
-                "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+                "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string; source: \"card\" | \"portal\" }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
               }
             ]
           }
@@ -38007,6 +38242,44 @@
         },
         {
           "at": "2026-09-24T00:04:58.618Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "launch-guard-2026-09-25",
+      "revision": 1,
+      "frozenHash": "fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "a6e1e39e7cebfdceac62bf2ce18ccfbfc998f180",
+      "history": [
+        {
+          "at": "2026-09-25T08:58:40.168Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-25T08:58:46.074Z",
+          "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "chunk3-qualification-guard-2026-09-28",
+      "revision": 1,
+      "frozenHash": "22df7f9dfacd371fae2431cbf82a12494c05f4622f6e3b85facf7f797e5170b5",
+      "status": "implemented",
+      "model": "Codex",
+      "base": "a6e1e39e7cebfdceac62bf2ce18ccfbfc998f180",
+      "history": [
+        {
+          "at": "2026-09-28T11:32:29.511Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-09-28T11:32:33.866Z",
           "event": "implemented"
         }
       ]

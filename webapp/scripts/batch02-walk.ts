@@ -13,7 +13,7 @@ export async function batch02Walk(browser:Browser,web:string,check:Check){
  let portalTarget='series',uploadBody='';
  await guardedRoute(page,'**/api/**',async route=>{
    const u=new URL(route.request().url()); const json=(data:unknown)=>route.fulfill({contentType:'application/json',body:JSON.stringify({data})});
-   if(u.pathname==='/api/admin/documents'&&route.request().method()==='POST'){uploadBody=route.request().postDataBuffer()?.toString()??'';return json({notified:true});}
+   if(u.pathname==='/api/admin/documents'&&route.request().method()==='POST'){uploadBody=route.request().postDataBuffer()?.toString()??'';const id=uploadBody.match(/name="submissionId"\r?\n\r?\n([^\r\n]+)/)?.[1];return json({id,notified:true});}
    if(u.pathname==='/api/admin/clients')return json([{id:'client1',name:'Alice Example',email:'scope@example.test',created_at:'2026-09-01',orders:[],companies:[{id:'co1',llc_name:name},{id:'co2',llc_name:'Scope Beta, LLC'}],documents:[]}]);
    if(u.pathname==='/api/admin/me')return json({ok:true});
    if(u.pathname==='/api/auth/me')return json({name:'Alice Example',email:'scope@example.test'});

@@ -1,3 +1,4 @@
+import {ioSignal,checkDeadline,activeDeadline} from './operation-deadline';
 import { randomBytes, createHash } from 'node:crypto';
 import { env } from './env';
 import { seal, unseal, isEncrypted } from './encryption';
@@ -8,22 +9,24 @@ export interface StoredFile { storageKey: string; sizeBytes: number }
 const root = () => process.env.DEV_STORAGE_DIR || fileURLToPath(new URL('../.dev-data/blob/', import.meta.url));
 const digest = (s: string) => createHash('sha256').update(s).digest('hex');
 export async function putObject(path: string, bytes: Buffer, overwrite = false): Promise<string> {
+  checkDeadline();
   if (env.BLOB_READ_WRITE_TOKEN) {
     const { put } = await import('@vercel/blob');
-    return (await put(path, bytes, { access: 'private', contentType: 'application/octet-stream', addRandomSuffix: false, allowOverwrite: overwrite, token: env.BLOB_READ_WRITE_TOKEN })).url;
+    return (await put(path, bytes, { access: 'private', contentType: 'application/octet-stream', addRandomSuffix: false, allowOverwrite: overwrite, token: env.BLOB_READ_WRITE_TOKEN, ...(Number.isFinite(activeDeadline())?{abortSignal:ioSignal()}: {}) })).url;
   }
   if (env.isProd) throw new Error('BLOB_READ_WRITE_TOKEN is required');
   const p = join(root(), path); await mkdir(dirname(p), { recursive: true });
   await writeFile(p, bytes, { flag: overwrite ? 'w' : 'wx' }); return `dev:${path}`;
 }
 export async function readObject(key: string): Promise<Buffer | null> {
+  checkDeadline();
   if (key.startsWith('dev:') || !env.BLOB_READ_WRITE_TOKEN) {
     if (env.isProd) throw new Error('Private storage is not configured');
     try { return await readFile(join(root(), key.replace(/^dev:/, ''))); }
     catch (e) { if ((e as NodeJS.ErrnoException).code === 'ENOENT') return null; throw e; }
   }
   const { get } = await import('@vercel/blob');
-  const r = await get(key, { access: 'private', token: env.BLOB_READ_WRITE_TOKEN, useCache: false });
+  const r = await get(key, { access: 'private', token: env.BLOB_READ_WRITE_TOKEN, useCache: false, ...(Number.isFinite(activeDeadline())?{abortSignal:ioSignal()}: {}) });
   if (!r) return null;
   if (r.statusCode !== 200) throw new Error(`Storage read returned ${r.statusCode}`);
   return Buffer.from(await new Response(r.stream).arrayBuffer());
@@ -44,10 +47,11 @@ export async function putFile(filename: string, data: ArrayBuffer, _contentType:
   return { storageKey: await putObject(env.BLOB_READ_WRITE_TOKEN ? `docs/${key}` : key, stored), sizeBytes: bytes.length };
 }
 export async function removeStoredFile(key: string): Promise<void> {
+  checkDeadline();
   if (key.startsWith('dev:')) {
     try { await unlink(join(root(), key.slice(4))); } catch(e) { if ((e as NodeJS.ErrnoException).code !== 'ENOENT') throw e; } return;
   }
-  const { del } = await import('@vercel/blob'); await del(key, { token: env.BLOB_READ_WRITE_TOKEN });
+  const { del } = await import('@vercel/blob'); await del(key, { token: env.BLOB_READ_WRITE_TOKEN, ...(Number.isFinite(activeDeadline())?{abortSignal:ioSignal()}: {}) });
 }
 /** Existing ordinary-document callers retain their best-effort cleanup. Tax
  * document deletion uses removeStoredFile and records/retries every failure. */

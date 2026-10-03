@@ -55,10 +55,12 @@ export function encryptSecret(plain: string): string {
   return `v2:${seal(Buffer.from(plain)).toString("base64")}`;
 }
 
+export class SecretFormatError extends Error {}
+
 export function decryptSecret(stored: string): string {
   if (stored.startsWith("v2:")) return unseal(Buffer.from(stored.slice(3), "base64")).toString();
   const [v, ivHex, tagHex, ctHex] = stored.split(":");
-  if (v !== "v1" || !ivHex || !tagHex || !ctHex) throw new Error("bad secret format");
+  if (v !== "v1" || !ivHex || !tagHex || !ctHex) throw new SecretFormatError("bad secret format");
   const decipher = createDecipheriv("aes-256-gcm", secretKey(), Buffer.from(ivHex, "hex"));
   decipher.setAuthTag(Buffer.from(tagHex, "hex"));
   return Buffer.concat([decipher.update(Buffer.from(ctHex, "hex")), decipher.final()]).toString("utf8");

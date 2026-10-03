@@ -44,7 +44,7 @@ async function child(){
  const retry=stored?await req(`/admin/contact-messages/${stored.id}/resend`,{}):null;const contacts=await query<{notice_status:string}>('SELECT * FROM contact_messages');
  check('A03',contact.status===200&&contacts.length===1&&stored?.notice_status==='failed'&&retry?.status===200&&contacts[0].notice_status==='sent',{status:contact.status,stored,contacts});
  // Existing legal mail, current address, no duplicate document upload.
- const {PDFDocument}=await import('@cantoo/pdf-lib');const pdf=await PDFDocument.create();pdf.addPage();const bytes=await pdf.save();const form=new FormData();form.set('file',new File([new Uint8Array(bytes)],'mail.pdf',{type:'application/pdf'}));form.set('clientId',cid);form.set('orderId',co);form.set('kind','legal_mail');form.set('title','Service of process');form.set('receivedOn','2026-09-20');
+ const {PDFDocument}=await import('@cantoo/pdf-lib');const pdf=await PDFDocument.create();pdf.addPage();const bytes=await pdf.save();const form=new FormData();form.set('file',new File([new Uint8Array(bytes)],'mail.pdf',{type:'application/pdf'}));form.set('submissionId',crypto.randomUUID());form.set('clientId',cid);form.set('orderId',co);form.set('kind','legal_mail');form.set('title','Service of process');form.set('receivedOn','2026-09-20');
  failMail=true;const upload=await req('/admin/documents',form);const uploaded=await upload.json();const [mailDoc]=await query('SELECT * FROM documents WHERE id=$1',[uploaded.data?.id]);failMail=false;await query("UPDATE clients SET email='updated@example.test' WHERE id=$1",[cid]);
  const resend=await req(`/admin/documents/${uploaded.data?.id}/resend-notice`,{});const [afterMail]=await query('SELECT * FROM documents WHERE id=$1',[uploaded.data?.id]);const forbidden=await req(`/admin/documents/${uploaded.data?.id}/resend-notice`,{},'client');
  check('A02',upload.status===200&&uploaded.data?.notified===false&&mailDoc?.notice_status==='failed'&&(await resend.json()).data?.notified===true&&afterMail?.notice_recipient==='updated@example.test'&&afterMail?.storage_key===mailDoc?.storage_key&&forbidden.status===401,{mailDoc,afterMail,forbidden:forbidden.status});
@@ -144,7 +144,7 @@ async function restore(){
  const omitted=parsed.records.find((r:{documentId:string})=>r.documentId===want.goneId);
  if(!omitted)throw Error('Incomplete-journal fixture lacks the known deletion');
  const incomplete={...parsed,records:parsed.records.filter((r:{storageKey:string})=>r.storageKey!==omitted.storageKey)};
- incomplete.sha=createHash('sha256').update(JSON.stringify(incomplete.version===2?{version:2,records:incomplete.records,packages:incomplete.packages}:incomplete.records)).digest('hex');
+ incomplete.sha=createHash('sha256').update(JSON.stringify(incomplete.version>=2?{version:incomplete.version,records:incomplete.records,packages:incomplete.packages,...(incomplete.firstNoticeCutoff?{firstNoticeCutoff:incomplete.firstNoticeCutoff}:{}),...(incomplete.version===4?{copies:incomplete.copies}:{})}:incomplete.records)).digest('hex');
  const partialDump=structuredClone(dump);partialDump.deletionCheckpoint=[...(dump.deletionCheckpoint||[]),omitted.storageKey];
  const files=()=>readdirSync(process.env.DEV_STORAGE_DIR!,{recursive:true}).sort();
  const beforeFiles=JSON.stringify(files());let writes=0,refusal='';const realQuery=db.query.bind(db);

@@ -61,7 +61,7 @@ export async function batch04Walk(browser:Browser,web:string,check:(ok:boolean,l
  });
  await attempt('batch04 N3.09: failed mail loading is not empty mail',async()=>{
   docsStatus=503;await go('/portal?company=company1');await page.waitForTimeout(7500);const body=await text();check(body.includes('We could not load your documents or legal mail. Try again.')&&!body.includes("Nothing here — that's good news"),'batch04 N3.09: failed mail loading is not empty mail',body);await shot('mail-failure');
-  docsStatus=200;const retry=page.getByRole('button',{name:'Try again',exact:true});if(await retry.count())await retry.first().click();else await go('/portal?company=company1');await page.getByText(/Nothing here — that's good news/).waitFor();check(true,'batch04 successful empty mail load is distinguished from failure');
+  docsStatus=200;await page.getByRole('button',{name:'Retry',exact:true}).first().click();await page.getByText(/Nothing here — that's good news/).waitFor();check(true,'batch04 successful empty mail load is distinguished from failure');
   const empty=await text();check(empty.includes('Your documents will appear here as they are prepared or uploaded.'),'batch04 145: documents explain preparation and upload',empty);
  });
  await attempt('batch04 115: agreement tools explain paid-order eligibility',async()=>{

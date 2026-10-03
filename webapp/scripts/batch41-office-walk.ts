@@ -34,6 +34,7 @@ const company=async(name:string,status:string,cert=false)=>{
 const cert=await company('Certificate Refresh LLC','formed',true),active=await company('Identity Search LLC','paid');
 const {PDFDocument}=await import('@cantoo/pdf-lib');const pdf=await PDFDocument.create();pdf.addPage();const bytes=await pdf.save();
 async function upload(){const form=new FormData();form.set('certStatus',new File([bytes],'certificate.pdf',{type:'application/pdf'}));form.set('notify','false');const r=await request(`orders/${cert}/certificates`,{method:'POST',body:form});if(!r.ok)throw Error(await r.text());}
+for(let n=0;n<55;n++)await company('Unpaid checkout '+n,'pending_payment');
 await upload();await upload();
 for(const [view,id] of [['active',active],['completed',cert]])for(const q of ['current-office@example.test','original-office@example.test','Current Identity','Original Identity']){
  const result=await board(`view=${view}&q=${encodeURIComponent(q)}`);check(`${view} finds ${q}`,result.total===1&&result.orders[0]?.id===id,result);
@@ -52,6 +53,12 @@ page.setDefaultTimeout(8000);const origin=`http://127.0.0.1:${server.port}`,erro
 const shot=async(name:string)=>{if(evidence)await page.screenshot({path:resolve(evidence,name+'.png'),fullPage:true,animations:'disabled'});};
 try{
  await page.context().addCookies([{name:'fpsllc_admin',value:token.token,url:origin}]);await page.goto(origin);
+ const activePage=await board('view=active'),unpaidPage=await board('view=unpaid');
+ check('paid first page is not displaced by 55 unpaid checkouts',activePage.total===1&&activePage.orders[0]?.id===active&&unpaidPage.total===55&&unpaidPage.orders.length===50,{active:activePage.total,unpaid:unpaidPage.total});
+ await page.getByRole('tab',{name:'Unpaid checkouts',exact:true}).click();
+ await page.getByText('These checkouts have not been paid. They are not in the filing queue.').waitFor();
+ check('unpaid view renders its independent server total',(await page.locator('body').innerText()).includes('of 55 unpaid checkouts'));await shot('unpaid-checkouts');
+ await page.getByRole('tab',{name:'Formations & Service Orders',exact:true}).click();
  await page.getByRole('searchbox').fill('current-office@example.test');
  const activeFound=await page.getByRole('button',{name:/Identity Search LLC/}).waitFor({timeout:2500}).then(()=>true,()=>false);check('rendered active search finds current email',activeFound);await shot('current-email-active');
  await page.getByRole('tab',{name:'Completed Orders',exact:true}).click();
@@ -68,7 +75,7 @@ try{
  const removed=await page.getByRole('button',{name:/Certificate Refresh LLC/}).waitFor({state:'hidden',timeout:2500}).then(()=>true,()=>false);
  const done=await board('view=completed');check('last deletion removes completed card without reload',removed&&done.total===0&&done.page===1,{removed,done});await shot('completed-refreshed');
  await page.getByRole('tab',{name:'Formations & Service Orders',exact:true}).click();await page.getByRole('button',{name:/Certificate Refresh LLC/}).waitFor();
- check('last deletion appears in post-filing without reload',(await board('view=active')).orders.some(o=>o.id===cert&&o.work_stage==='post-filing'));await shot('post-filing-refreshed');
+ check('last deletion appears in post-filing after tab switch',(await board('view=active')).orders.some(o=>o.id===cert&&o.work_stage==='post-filing'));await shot('post-filing-refreshed');
  await page.setViewportSize({width:390,height:844});check('office view fits narrow viewport',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await shot('mobile-refreshed');
  check('no browser runtime errors or external requests',errors.length===0&&blocked.size===0,{errors,blocked:[...blocked]});
 }catch(e){check('office UI workflow',false,String(e));await shot('failure');}

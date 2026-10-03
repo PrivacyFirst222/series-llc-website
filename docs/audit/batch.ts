@@ -77,7 +77,7 @@ if (cmd === "authorize") {
       if (part.fix.batch === b.id) die(`${name(x)}: a replacement uses a new batch id; the released batch remains final`);
     }
     if (!bi.replaces && part.status !== "open" && part.batch !== b.id) die(`${name(x)} is ${part.status} in batch ${part.batch} — it cannot be claimed twice`);
-    const claim = familyClaim(l, { item: bi.id, part: bi.part }, b.id, bi.replaces);
+    const claim = familyClaim(l, { item: bi.id, part: bi.part }, b.id, bi.replaces, b.items);
     if (claim) die(`${name(x)} is the same defect as work already under way — ${claim}. A defect is claimed once, whatever numbers it was seen under`);
     for (const w of unmetWaits(l, it, part)) die(`${name(x)} waits on ${w.startsWith("ruling:") ? `Adam's ruling on item ${w.slice(7)}` : `item ${w}`}`);
     if (bi.assertions.length === 0) die(`${name(x)} has no assertion`);

@@ -1,6 +1,8 @@
 import { ApiError } from "./api";
+import { InputValidationError } from "./englishText";
 
 export function loginErrorMessage(error: unknown, office = false): string {
+  if (error instanceof InputValidationError) return error.message;
   const status = error instanceof ApiError ? error.status : undefined;
   if (status === 429) return "Too many attempts. Try again in a few minutes.";
   if (status === 401) return office ? "Incorrect password." : "Incorrect email or password.";

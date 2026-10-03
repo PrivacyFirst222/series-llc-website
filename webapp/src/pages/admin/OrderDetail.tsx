@@ -1,3 +1,5 @@
+import {OfficeRecoveryPanel,ContinueOfficeReplacement} from './OfficeRecoveryPanel';
+import {PublishedArticlesCorrection,type ArticlesCorrectionState} from './PublishedArticlesCorrection';
 import { AgentServicePanel } from "./AgentServicePanel";
 import { sunbizSearchUrl } from "@/components/forms/florida-llc/nameSimilarity";
 import { NameCheck } from "@/components/forms/florida-llc/NameCheck";
@@ -42,7 +44,7 @@ interface OrderDetailData {
   seriesFiledAt: string | null;
   copiedFields: Record<string, boolean>;
   series: { name: string; covered: boolean }[];
-  documents: { id: string; kind: string; title: string; createdAt: string }[];
+  documents: { id: string; kind: string; title: string; createdAt: string; source: "card" | "portal" }[];
   hasArticles: boolean;
   /** The client appointed us to sign the Articles: the Statement of
    *  Authorized Representative is made when the Articles go up, and the
@@ -57,6 +59,17 @@ interface OrderDetailData {
   /** The order took our registered agent service. */
   raService: boolean;
   raRenewalDate: string | null;
+}
+
+interface RecoverableOrderDetail extends OrderDetailData {
+  articlesCorrection?: ArticlesCorrectionState|null;
+  hasStatement?: boolean;
+  articlesPending?: boolean;
+  articlesRevision?: string|null;
+  articlesRetiring?:boolean;
+  articlesRestoreReviewRequired?:boolean;
+  articlesSavedDocumentNumber?:string;
+  pendingCertificateDeletions?: {id:string;title:string}[];
 }
 
 /** Replace a wrong Articles or designation PDF in place (15 Sep 2026). */
@@ -85,17 +98,18 @@ function ReplaceButton({ docId, orderId, onError }: { docId: string; orderId: st
 }
 
 /** Delete one certificate copy, after a plain-words confirmation (Adam, 15 Sep 2026). */
-function DeleteCopyButton({ docId, orderId, onError }: { docId: string; orderId: string; onError: (m: string | null) => void }) {
+function DeleteCopyButton({ docId, orderId, source, onError, cleanup=false }: { docId: string; orderId: string; source: "card" | "portal"; cleanup?:boolean; onError: (m: string | null) => void }) {
   const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState(false);
   const remove = useMutation({
     mutationFn: async () => {
       const res = await fetch(`/api/admin/documents/${docId}`, { method: "DELETE", credentials: "include" });
-      const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+      const body = (await res.json().catch(() => null)) as { data?: {pending?:boolean}; error?: { message?: string } } | null;
       if (!res.ok) throw new Error(body?.error?.message ?? "The copy could not be deleted. Try again.");
+      return body?.data;
     },
-    onSuccess: async () => {
-      onError(null);
+    onSuccess: async (result) => {
+      onError(result?.pending ? "Certificate removed from the portal. Storage cleanup is pending; retry cleanup below." : null);
       setConfirming(false);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] }),
@@ -104,10 +118,11 @@ function DeleteCopyButton({ docId, orderId, onError }: { docId: string; orderId:
     },
     onError: (e: Error) => onError(e.message),
   });
+  if(cleanup)return <Button type="button" size="sm" disabled={remove.isPending} onClick={()=>remove.mutate()}>Retry cleanup</Button>;
   if (confirming) {
     return (
       <span className="inline-flex items-center gap-1 text-xs">
-        Delete this copy? The client will no longer see it.
+        Delete this copy? The client will no longer see it. {source === "portal" ? "Bought separately in the portal — does not count toward this order" : "Included with this order — counts toward completion"}
         <Button type="button" variant="destructive" size="sm" className="h-7 rounded-full px-2 text-xs" disabled={remove.isPending} onClick={() => remove.mutate()} data-testid="confirm-delete-copy">
           {remove.isPending ? "Deleting…" : "Delete"}
         </Button>
@@ -271,12 +286,15 @@ export default function OrderDetail({
   markingFiled: boolean;
 }) {
   const queryClient = useQueryClient();
-  const [docNumber, setDocNumber] = useState<string>("");
+  const [reviewRestoredArticles,setReviewRestoredArticles]=useState(false);
+  const [correctArticles,setCorrectArticles]=useState(false);
+  const [docNumber, setDocNumber] = useState<string|null>(null);
   /** Whether the formed email actually left, from the route's own report. */
   const [formedNotified, setFormedNotified] = useState<boolean | null>(null);
   /** The server's reason when a button press is refused (14 Sep 2026: five
    *  buttons failed silently). */
   const [actionError, setActionError] = useState<string | null>(null);
+  const [recoveryMessage, setRecoveryMessage] = useState('');
   const [psdRows, setPsdRows] = useState<{ file: File | null; covers: string[] }[]>([
     { file: null, covers: [] },
   ]);
@@ -300,13 +318,19 @@ export default function OrderDetail({
   const uploadArticles = useMutation({
     mutationFn: async () => {
       const f = articlesFirstRef.current?.files?.[0];
-      if (!f) throw new Error("Choose the filed Articles PDF.");
+      if (!f && !d?.articlesPending && !(d?.articlesSignedByUs && d.hasArticles && !d.hasStatement)) throw new Error("Choose the filed Articles PDF.");
       // Sunbiz's own numbers: the letter L and eleven digits (14 Sep 2026).
       // An empty box is the server's "required" message, which says why.
-      if (docNumber.trim() && !/^L\d{11}$/.test(docNumber.trim())) throw new Error(DOC_NUMBER_SHAPE);
+      const chosenNumber=(docNumber??(d?.articlesRestoreReviewRequired?d.articlesSavedDocumentNumber:'')??'').trim();
+      if (chosenNumber && !/^L\d{11}$/.test(chosenNumber)) throw new Error(DOC_NUMBER_SHAPE);
       const fd = new FormData();
-      fd.append("articles", f);
-      fd.append("documentNumber", docNumber.trim());
+      if(f) fd.append("articles", f);
+      if(correctArticles){
+        if(!f)throw new Error("Choose the corrected Articles PDF.");
+        if(d?.articlesRevision)fd.append("correctionOf",d.articlesRevision);
+      }
+      fd.append("documentNumber", chosenNumber);
+      if(reviewRestoredArticles)fd.append("reviewRestoredOriginal","true");
       const res = await fetch(`/api/admin/orders/${orderId}/articles`, { method: "POST", body: fd, credentials: "include" });
       const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
       if (!res.ok) throw new Error(body?.error?.message ?? "The upload did not go through. Try again.");
@@ -314,9 +338,10 @@ export default function OrderDetail({
     },
     onSuccess: () => {
       setUploadError(null);
+      setCorrectArticles(false);
       queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] });
     },
-    onError: (e: Error) => setUploadError(e.message),
+    onError: (e: Error) => {setUploadError(e.message);queryClient.invalidateQueries({queryKey:["admin","order",orderId]});},
   });
 
   const seriesFiled = useMutation({
@@ -330,7 +355,7 @@ export default function OrderDetail({
 
   const detail = useQuery({
     queryKey: ["admin", "order", orderId],
-    queryFn: () => api.get<OrderDetailData>(`/api/admin/orders/${orderId}`),
+    queryFn: () => api.get<RecoverableOrderDetail>(`/api/admin/orders/${orderId}`),
   });
 
   const setCopied = useMutation({
@@ -445,6 +470,7 @@ export default function OrderDetail({
     },
     onSuccess: () => {
       setUploadError(null);
+      setCorrectArticles(false);
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] });
     },
@@ -455,7 +481,7 @@ export default function OrderDetail({
   const claimed = new Set(psdRows.flatMap((r) => (r.file ? r.covers : [])));
   const uncovered = (d?.series ?? []).filter((s) => !s.covered && !claimed.has(s.name));
   const canUpload =
-    (isConversion || d?.hasArticles) &&
+    (isConversion || (d?.hasArticles && (!d.articlesSignedByUs || d.hasStatement))) &&
     psdRows.some((r) => r.file) && uncovered.length === 0;
 
 
@@ -556,12 +582,19 @@ export default function OrderDetail({
               <p className="text-sm text-destructive" data-testid="action-error">{actionError}</p>
             ) : null}
 
+            <OfficeRecoveryPanel key={'recovery-'+d.id} orderId={d.id}/>
+            {d.articlesCorrection && !isConversion && ['filed','formed'].includes(d.status) ? <PublishedArticlesCorrection key={d.id} orderId={d.id} number={d.documentNumber} state={d.articlesCorrection} weSigned={d.articlesSignedByUs}/> : null}
             {/* With The State: the stamped Articles come back from the
                 Division days after submission — this is where they go up,
                 straight into the client's portal (Adam, 30 Aug 2026). */}
-            {d.status === "filed" && !isConversion ? (
-              !d.hasArticles ? (
+            {(d.status === "filed" || (d.articlesSignedByUs && d.hasArticles && !d.hasStatement)) && !isConversion ? (
+              (!d.hasArticles || (d.articlesSignedByUs && !d.hasStatement)) ? (
                 <div className="rounded-lg border border-border p-3">
+                  {d.articlesSignedByUs && (d.hasArticles || d.articlesPending) && !d.hasStatement ? <p role="alert" className="text-sm text-destructive">Statement of Authorized Representative — missing</p> : null}
+                  {d.articlesRetiring&&d.articlesRevision?<ContinueOfficeReplacement operationId={d.articlesRevision} onContinued={text=>{setRecoveryMessage(text);queryClient.invalidateQueries({queryKey:['admin','order',orderId]});}}/>:null}
+                  {recoveryMessage?<p role="status">{recoveryMessage}</p>:null}
+                  {d.articlesRestoreReviewRequired?<label className="flex gap-2 text-sm"><input type="checkbox" checked={reviewRestoredArticles} onChange={e=>setReviewRestoredArticles(e.target.checked)}/>Review restored upload: I confirmed the displayed Florida document number and will attach the original Articles.</label>:null}
+                  {d.articlesPending && !d.hasArticles ? <label className="mb-3 flex gap-2 text-sm"><input type="checkbox" checked={correctArticles} onChange={e=>{setCorrectArticles(e.target.checked);setUploadError(null);}} />Correct failed Articles upload</label> : null}
                   {/* The Statement of Authorized Representative names the
                       company by its Florida document number, which is on the
                       stamped Articles in the office's hand (Adam, 13 Sep 2026). */}
@@ -571,7 +604,7 @@ export default function OrderDetail({
                   <input
                     id="articles-document-number"
                     type="text"
-                    value={docNumber}
+                    value={docNumber??(d.articlesRestoreReviewRequired?d.articlesSavedDocumentNumber??'':'')}
                     onChange={(e) => { setDocNumber(e.target.value); setUploadError(null); }}
                     placeholder="L26000123456"
                     className="mt-1 mb-3 block w-full max-w-xs rounded-md border border-border bg-background px-3 py-2 text-sm"
@@ -596,7 +629,7 @@ export default function OrderDetail({
                       onClick={() => uploadArticles.mutate()}
                     >
                       {uploadArticles.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileUp className="mr-2 h-4 w-4" />}
-                      Upload Articles
+                      {correctArticles ? "Save corrected Articles and Statement" : d.articlesPending || d.hasArticles ? "Retry Articles and Statement" : "Upload Articles"}
                     </Button>
                     {uploadError ? <p className="basis-full text-sm text-destructive" data-testid="articles-upload-error">{uploadError}</p> : null}
                     {/* The Division's other possible answer, side by side
@@ -637,6 +670,7 @@ export default function OrderDetail({
               )
             ) : null}
 
+            {d.pendingCertificateDeletions?.map(doc=><div key={doc.id} className="rounded border p-2 text-sm"><p>Storage cleanup pending: {doc.title}</p><DeleteCopyButton docId={doc.id} orderId={d.id} source="card" cleanup onError={setUploadError}/></div>)}
             {isConversion ? sheet : null}
 
             {d.status !== "paid" || isConversion ? (
@@ -668,7 +702,7 @@ export default function OrderDetail({
                         <ReplaceButton docId={doc.id} orderId={orderId} onError={setActionError} />
                       ) : null}
                       {doc.kind === "certificate-of-status" || doc.kind === "certified-copy" ? (
-                        <DeleteCopyButton docId={doc.id} orderId={orderId} onError={setActionError} />
+                        <><span className="text-xs">{doc.source === "portal" ? "Bought separately in the portal — does not count toward this order" : "Included with this order — counts toward completion"}</span><DeleteCopyButton docId={doc.id} orderId={orderId} source={doc.source} onError={setActionError} /></>
                       ) : null}
                     </li>
                   ))}

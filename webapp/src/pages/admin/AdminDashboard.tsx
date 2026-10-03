@@ -1,7 +1,7 @@
 import { cardStatusWords } from "@/lib/agentBilling";
 import { AgentServicePanel } from "./AgentServicePanel";
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Upload, Eye, FileText, ArrowDown, ArrowUp, ArrowUpDown, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ import { api, ApiError } from "@/lib/api";
 import OrderBoard from "./OrderBoard";
 import { LibrarySection } from "./LibrarySection";
 
-interface AgentBalance {id:string;purpose:string;status:string;amount_cents:number;date:string;charged_at:string|null;link_url:string|null;notice_error?:string|null}
+interface AgentBalance {reconcilingPayment?:boolean;id:string;purpose:string;status:string;amount_cents:number;date:string;charged_at:string|null;link_url:string|null;notice_error?:string|null}
 interface AdminClient {
   id: string;
   email: string;
@@ -56,13 +56,13 @@ const renewalStatusWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): st
 const balanceWords = (b:AgentBalance):string => {
  const label=b.purpose==='resignation'?'Resignation charge':b.purpose==='service_fee'?'Outstanding service fees':'Renewal';
  const amount=`$${(b.amount_cents/100).toFixed(b.amount_cents%100?2:0)}`;
- const state=['charged','paid_by_link'].includes(b.status)?`Paid ${b.charged_at?new Date(b.charged_at).toLocaleDateString('en-US',{timeZone:'America/New_York'}):b.date}`:b.status==='declined'?'payment declined':`unpaid${b.link_url?'; payment link available':''}`;
+ const state=['charged','paid_by_link'].includes(b.status)?`Paid ${b.charged_at?new Date(b.charged_at).toLocaleDateString('en-US',{timeZone:'America/New_York'}):b.date}`:b.reconcilingPayment?'payment result not yet confirmed':b.status==='declined'?'payment declined':`unpaid${b.link_url?'; payment link available':''}`;
  return `${label}: ${amount} — ${state}${b.notice_error?' — notice failed':''}`;
 };
 const renewalWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
   c.balances?.length ? c.balances.filter(b=>b.status!=="cancelled"&&b.purpose!=="unavailable").map(balanceWords).join("\n") : renewalStatusWords(c) + (c.notice_error ? " — notice failed" : "");
 /** A row that needs a hand: a notice failure, decline, or missing card. */
-const raNeedsHand = (cl: AdminClient): boolean => (cl.ra_cards ?? []).some((c) => c.balances?.some(b=>b.notice_error||(!["charged","paid_by_link","cancelled"].includes(b.status)&&b.purpose!=="unavailable")) || Boolean(c.resignation_submitted&&!c.ended_date) || c.notice_error || c.last_status === "declined" || c.last_status === "notice_pending" || c.card_status !== "on_file" || Boolean(c.resignation_due && !c.resignation_submitted));
+const raNeedsHand = (cl: AdminClient): boolean => (cl.ra_cards ?? []).some((c) => c.balances?.some(b=>b.notice_error||(!["charged","paid_by_link","cancelled"].includes(b.status)&&b.purpose!=="unavailable"&&(b.reconcilingPayment||b.status==="declined"||b.date<new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"})))) || Boolean(c.resignation_submitted&&!c.ended_date) || c.notice_error || c.last_status === "declined" || c.card_status !== "on_file" || Boolean(c.resignation_due && !c.resignation_submitted));
 
 interface EmailRow {
   id: string;
@@ -263,25 +263,40 @@ function LegalMailNotices({client}:{client:AdminClient}){
  return <Dialog open={open} onOpenChange={setOpen}><DialogTrigger asChild><Button variant="outline" size="sm">Document notices</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>Document notices — {client.name||client.email}</DialogTitle><DialogDescription>Retry the notice for the existing document without uploading it again.</DialogDescription></DialogHeader><div className="max-h-[60vh] overflow-auto">{open?<NoticeList clientId={client.id}/>:null}</div></DialogContent></Dialog>;
 }
 
+class OfficeUploadError extends Error {
+  constructor(message: string, public code: string | undefined, public status: number) { super(message); }
+}
+
 function UploadDialog({ client }: { client: AdminClient }) {
   const queryClient = useQueryClient();
+  const receiptKey=`office-upload-v1:${client.id}`;
+  const [receipt,setReceipt]=useState<null|{id:string;title?:string;kind?:'package'|'legal_mail';receivedOn?:string;notify?:boolean;orderId?:string}>(()=>{
+    try{const value=JSON.parse(sessionStorage.getItem(receiptKey)||'null');return value&&typeof value.id==='string'?value:null;}catch{return null;}
+  });
   const [open, setOpen] = useState<boolean>(false);
-  const [title, setTitle] = useState<string>("");
-  const [kind, setKind] = useState<"package" | "legal_mail">("package");
+  const [title, setTitle] = useState<string>(receipt?.title??"");
+  const [kind, setKind] = useState<"package" | "legal_mail">(receipt?.kind??"package");
   /** The day legal mail was received (Adam, 14 Sep 2026): required, and the
    *  date the client's email names. */
-  const [receivedOn, setReceivedOn] = useState<string>("");
-  const [notify, setNotify] = useState<boolean>(true);
+  const [receivedOn, setReceivedOn] = useState<string>(receipt?.receivedOn??"");
+  const [notify, setNotify] = useState<boolean>(receipt?.notify??true);
   const [file, setFile] = useState<File | null>(null);
+  const [fileInputVersion, setFileInputVersion] = useState(0);
   // Packages and legal mail identify one company; a sole company is preselected.
   const companies = client.companies ?? [];
-  const [orderId, setOrderId] = useState<string>(companies.length === 1 ? companies[0].id : "");
+  const [orderId, setOrderId] = useState<string>(receipt?.orderId??(companies.length === 1 ? companies[0].id : ""));
   const needsCompany = companies.length !== 1;
 
   const upload = useMutation({
     mutationFn: async () => {
       if (!file) throw new Error("Choose a file");
+      // Persist before dispatch. If the tab cannot save the receipt, do not
+      // upload with a retry identity that a reload would lose.
+      const pending=JSON.parse(sessionStorage.getItem(receiptKey)||'null') as {id:string}|null;
+      const attempt={id:pending?.id??crypto.randomUUID(),title,kind,receivedOn,notify,orderId};
+      sessionStorage.setItem(receiptKey,JSON.stringify(attempt));setReceipt(attempt);
       const form = new FormData();
+      form.set("submissionId",attempt.id);
       form.set("clientId", client.id);
       form.set("kind", kind);
       form.set("title", title);
@@ -295,16 +310,19 @@ function UploadDialog({ client }: { client: AdminClient }) {
         credentials: "include",
       });
       if (!res.ok) {
-        const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
-        throw new Error(body?.error?.message ?? "The upload did not go through. Try again.");
+        const body = (await res.json().catch(() => null)) as { error?: { message?: string; code?: string } } | null;
+        throw new OfficeUploadError(body?.error?.message ?? "The upload did not go through. Try again.", body?.error?.code, res.status);
       }
-      return (await res.json().catch(() => null)) as { data?: { notified?: boolean } } | null;
+      const body=await res.json() as {data?:{id?:string;notified?:boolean;noticeStatus?:string|null}};
+      if(body.data?.id!==attempt.id)throw new Error('The upload result could not be confirmed. Retry the same file.');
+      return body;
     },
     onSuccess: (body) => {
       // What the route reports, not what the box said (14 Sep 2026).
       const sent = body?.data?.notified === true;
       const wanted = notify || kind === "legal_mail";
-      toast({ title: "Document uploaded", description: wanted ? (sent ? "The client was emailed." : "The email to the client could not be sent.") : undefined });
+      toast({ title: "Document uploaded", description: wanted ? (sent ? "The client was emailed." : body.data?.noticeStatus==='pending'||body.data?.noticeStatus==='sending' ? "The notification is pending. Check the document notice status; use Resend notice if needed." : "The email to the client could not be sent. Use Resend notice to retry the email.") : undefined });
+      sessionStorage.removeItem(receiptKey);setReceipt(null);
       queryClient.invalidateQueries({ queryKey: ["admin-clients"] });
       setOpen(false);
       setTitle("");
@@ -314,7 +332,7 @@ function UploadDialog({ client }: { client: AdminClient }) {
       setKind("package");
       setReceivedOn("");
     },
-    onError: (e: Error) => toast({ duration: Infinity, title: "Upload failed", description: e.message }),
+    onError: (e: Error) => toast({ duration: Infinity, title: e instanceof OfficeUploadError && e.status === 503 && e.code === 'RECOVERY_UNAVAILABLE' ? 'Upload not confirmed' : 'Upload failed', description: e.message }),
   });
 
   return (
@@ -330,6 +348,10 @@ function UploadDialog({ client }: { client: AdminClient }) {
           <DialogTitle>Upload for {client.name || client.email}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
+          {receipt?<div className="space-y-2"><p role="status" className="text-sm">This tab has a pending upload. Reattach the original PDF to retry it. For a different document or changed information, choose New upload.</p><Button type="button" variant="outline" disabled={upload.isPending} onClick={()=>{
+            try{const next={id:crypto.randomUUID()};sessionStorage.setItem(receiptKey,JSON.stringify(next));setReceipt(next);upload.reset();setFile(null);setFileInputVersion(v=>v+1);setTitle('');setKind('package');setReceivedOn('');setNotify(true);setOrderId(companies.length===1?companies[0].id:'');}
+            catch{toast({duration:Infinity,title:'Upload not started',description:'This tab cannot save an upload receipt. Enable browser storage before uploading.'});}
+          }}>New upload</Button></div>:null}
           <div className="space-y-2">
             <Label htmlFor="doc-title">Document title</Label>
             <Input
@@ -384,6 +406,7 @@ function UploadDialog({ client }: { client: AdminClient }) {
             <Label htmlFor="doc-file">File</Label>
             <Input
               id="doc-file"
+              key={fileInputVersion}
               type="file"
               accept="application/pdf,.pdf"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
@@ -647,6 +670,9 @@ function ClientsTable({
 }
 
 export default function AdminDashboard() {
+  const [search] = useSearchParams();
+  const backupProblem = search.get("backupProblem");
+  const recoverySearch = backupProblem && /^[a-f0-9]{64}$/.test(backupProblem) ? "?backupProblem=" + backupProblem : "";
 
   const authQuery = useQuery({
     queryKey: ["admin-me"],
@@ -661,7 +687,15 @@ export default function AdminDashboard() {
   });
 
   if (authQuery.isError) {
-    return <Navigate to={"/admin/login"} replace />;
+    if (authQuery.error instanceof ApiError && authQuery.error.status === 401) {
+      return <Navigate to={"/admin/login" + recoverySearch} replace />;
+    }
+    return (
+      <section className="container-wide section-y" role="alert">
+        We couldn’t load the office. Please try again.{" "}
+        <Button disabled={authQuery.isFetching} onClick={() => void authQuery.refetch()}>Retry</Button>
+      </section>
+    );
   }
   if (authQuery.isLoading) {
     return (
@@ -675,6 +709,12 @@ export default function AdminDashboard() {
   // ra_llcs may be missing on a response cached before the field existed —
   // never let a stale cache blank the page.
   const raClients = clients.filter((cl) => (cl.ra_llcs ?? []).length > 0);
+  const clientsState = clientsQuery.isError ? (
+    <div role="alert">
+      We couldn’t load the client list. Please try again.{" "}
+      <Button disabled={clientsQuery.isFetching} onClick={() => void clientsQuery.refetch()}>Retry</Button>
+    </div>
+  ) : clientsQuery.isPending ? <p>Loading clients…</p> : null;
 
   return (
     <section className="container-wide section-y">
@@ -703,19 +743,19 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="ra-clients">
-          <ClientsTable
+          {clientsState ?? <ClientsTable
             clients={raClients}
             variant="ra"
             emptyText="No registered agent clients yet — clients appear here when a paid order takes our registered agent service."
-          />
+          />}
         </TabsContent>
 
         <TabsContent value="clients">
-          <ClientsTable
+          {clientsState ?? <ClientsTable
             clients={clients}
             variant="all"
             emptyText="Clients appear here after their first paid order."
-          />
+          />}
         </TabsContent>
       </Tabs>
     </section>

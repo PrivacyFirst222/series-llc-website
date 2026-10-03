@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
@@ -13,12 +13,14 @@ export function ViewingAsBanner() {
     queryFn: () => api.get<{ email: string; name: string; viewingAsAdmin?: boolean }>("/api/auth/me"),
     retry: false,
   });
+  const exit = useMutation({
+    mutationFn: () => api.post("/api/auth/logout", {}),
+    onSuccess: () => {
+      clearAllDrafts();
+      window.location.assign("/admin");
+    },
+  });
   if (!me.data?.viewingAsAdmin) return null;
-  const exit = async () => {
-    await api.post("/api/auth/logout", {}).catch(() => undefined);
-    clearAllDrafts();
-    window.location.assign("/admin");
-  };
   return (
     <div
       className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-500/60 bg-amber-500/10 px-4 py-3 text-sm text-amber-950 dark:text-amber-200"
@@ -32,9 +34,15 @@ export function ViewingAsBanner() {
           Anything you do here happens as the client.
         </span>
       </span>
-      <Button type="button" size="sm" variant="outline" className="rounded-full" onClick={exit}>
+      <Button type="button" size="sm" variant="outline" className="rounded-full" disabled={exit.isPending} onClick={() => exit.mutate()}>
         Exit
       </Button>
+      {exit.isError ? (
+        <div role="alert" className="w-full">
+          We couldn’t end this client view. Please try again.{" "}
+          <Button type="button" size="sm" variant="outline" disabled={exit.isPending} onClick={() => exit.mutate()}>Retry</Button>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -3,6 +3,8 @@ import { waitForOwnedApi } from "../scripts/isolated-stack";
 import { batch16Checks } from "./batch16-check";
 import {batch05Checks} from "./batch05-check";
 import {batch04Checks} from "./batch04-check";
+import {p105Checks} from "./p105-check";
+import {remainingAccountChecks} from "./chunk1-remaining-check";
 import {batch03Checks} from "./batch03-check";
 import { batch02Checks } from "./batch02-check";
 import { equalShares, sharesAreComplete } from "../src/lib/ownership";
@@ -170,6 +172,27 @@ async function adminSession() {
     adminLogin = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
   }
   return adminLogin;
+}
+
+// Office-only assertions need a paid order under Adam's unpaid-checkout rule.
+async function payForOfficeInspection(id: string, label: string) {
+  const admin = await adminSession();
+  const before = await api(`/api/admin/orders/${id}`, { cookies: admin.cookie });
+  check(`${label}: unpaid checkout is absent from office`, before.status === 404, before.body);
+  const paid = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: id, card: "credit" }) });
+  check(`${label}: fixture payment succeeds before office inspection`, paid.status === 200, paid.body);
+}
+
+// The offline checkout adapter explicitly uses dev-<orderId> (square.ts).
+// Verify its dev URL rather than requesting payment metadata from an office
+// route that correctly refuses unpaid checkouts. The creation response supplies
+// the server-computed price; status is read from the confirmation endpoint.
+function offlineCheckoutReference(result: { body: { data?: { orderId?: string; checkoutUrl?: string } } }): string {
+  const data = result.body.data;
+  if (!data?.orderId || !data.checkoutUrl || new URL(data.checkoutUrl).searchParams.get("dev") !== "1") {
+    throw new Error("Webhook fixture requires an actual offline checkout creation response");
+  }
+  return `dev-${data.orderId}`;
 }
 
 // The suite is hermetic by default: it creates orders, documents, backups and
@@ -377,6 +400,7 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
 {
   // The sheet's agent signature row is a person's name when we are the
   // agent (Adam, 14 Sep 2026), not the series' name.
+  await payForOfficeInspection(svc.body.data.orderId, "service-agent sheet");
   const admS = await adminSession();
   const sheet = (await api(`/api/admin/orders/${svc.body?.data?.orderId}`, { cookies: admS.cookie })).body?.data as { groups?: { fields: { key: string; value: string }[] }[] } | undefined;
   const sig = sheet?.groups?.flatMap((g) => g.fields).find((f) => f.key === "raSignature");
@@ -546,7 +570,11 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
     }
     const again = new FormData(); again.set("articles", pdfFile()); again.set("documentNumber", "L26000123456");
     const againRes = await fetch(`${BASE}/api/admin/orders/${apId}/articles`, { method: "POST", headers: { Cookie: adm.cookie }, body: again });
-    check("statement: a second Articles upload at this step is still refused as before", againRes.status === 409);
+    // R3: an identical retry returns the saved result; a different upload is
+    // still refused (covered by the separate duplicate-upload case below).
+    const afterRetry = await api("/api/portal/documents", { cookies: apPw.cookie });
+    const afterIds = ((afterRetry.body?.data ?? []) as {id:string}[]).map(d=>d.id).sort();
+    check("statement: an identical Articles retry reuses the same documents", againRes.status === 200 && JSON.stringify(afterIds) === JSON.stringify(clientList.map(d=>d.id).sort()), {status:againRes.status,afterIds});
   }
 }
 
@@ -731,6 +759,7 @@ check("client account auto-created on payment", !!client && !client.has_password
       clientEmail: uc("stray"), confirmClientEmail: uc("stray"), correspondentEmail: uc("stray"), confirmCorrespondentEmail: uc("stray"),
     }) });
     check("a conversion with a stray S election tick and no agent acceptance is accepted", stray.status === 200, stray.body);
+    await payForOfficeInspection(stray.body.data.orderId, "conversion record");
     const strayDet = (await api(`/api/admin/orders/${stray.body?.data?.orderId}`, { cookies: admin.cookie })).body?.data as { payload?: unknown; groups?: { title: string; fields: { key: string; value: string }[] }[] } | undefined;
     const sp = (typeof strayDet?.payload === "string" ? JSON.parse(strayDet.payload) : strayDet?.payload) as { optionalDocuments?: { sElection?: boolean }; acknowledgments?: { sElectionFilingAcknowledgment?: boolean }; certifications?: { authorizedRepresentativeSignature?: string } } | undefined;
     check("the conversion's record carries no S election, no S election acknowledgment, and no client signature", sp?.optionalDocuments?.sElection === false && sp?.acknowledgments?.sElectionFilingAcknowledgment === false && (sp?.certifications?.authorizedRepresentativeSignature ?? "") === "", { od: sp?.optionalDocuments, ack: sp?.acknowledgments?.sElectionFilingAcknowledgment, sig: sp?.certifications?.authorizedRepresentativeSignature });
@@ -743,6 +772,7 @@ check("client account auto-created on payment", !!client && !client.has_password
     const noState = await api("/api/orders", { method: "POST", headers: strayIp(), body: JSON.stringify({ ...formData, clientAddress: { ...formData.clientAddress, state: "" }, clientEmail: uc("nost"), confirmClientEmail: uc("nost"), correspondentEmail: uc("nost"), confirmCorrespondentEmail: uc("nost") }) });
     check("the client's state is required by the server", noState.status === 400 && /clientAddress/.test(JSON.stringify(noState.body)) && /state/i.test(JSON.stringify(noState.body)), noState.body);
   }
+  await payForOfficeInspection(conv.body.data.orderId, "conversion company name");
   const fullC = await api(`/api/admin/orders/${conv.body?.data?.orderId}`, { cookies: admin.cookie });
   check("a conversion order is named by the company being converted",
     (fullC.body?.data as { llcName?: string })?.llcName === "E2E Converted Holdings, LLC",
@@ -929,6 +959,7 @@ check("no duplicate client on repeat webhook", dupes.length === 1);
 
 // 7. Admin uploads a document for the client (multipart)
 const fd = new FormData();
+fd.set("submissionId", crypto.randomUUID());
 fd.set("clientId", client!.id);
 fd.set("kind", "package");
 fd.set("title", "Operating Agreement");
@@ -948,7 +979,8 @@ check("admin uploads document", uploadRes.status === 200, await uploadRes.clone(
   const afterPackage = (await outbox()).filter((m) => m.to === testEmail).at(-1);
   check("a formation package sends the plain new-document notice", afterPackage?.subject === "A new document is available in your portal", afterPackage?.subject);
   const lm = new FormData();
-  lm.set("clientId", client!.id);
+  lm.set("submissionId", crypto.randomUUID());
+lm.set("clientId", client!.id);
   lm.set("kind", "legal_mail");
   lm.set("title", "Summons — Coastal v. E2E Coastal Holdings");
   lm.set("notify", "true");
@@ -976,7 +1008,8 @@ check("admin uploads document", uploadRes.status === 200, await uploadRes.clone(
 // be one used to sail through and reach the client dressed as a PDF.
 {
   const txtFd = new FormData();
-  txtFd.set("clientId", client!.id);
+  txtFd.set("submissionId", crypto.randomUUID());
+txtFd.set("clientId", client!.id);
   txtFd.set("kind", "package");
   txtFd.set("title", "Not A PDF Probe");
   txtFd.set("notify", "false");
@@ -1032,7 +1065,7 @@ if (mint.status === 200) {
 
   // Cross-purpose rejection: a token minted to verify an email address must
   // not be able to set a password (AUD-002). The wrong-purpose token is left
-  // unconsumed so it still works for its own purpose.
+  // unconsumed so prior use cannot explain its refusal.
   const wrongPurpose = await api("/api/dev/mint-reset-token", {
     method: "POST",
     body: JSON.stringify({ email: testEmail, purpose: "verify_email" }),
@@ -1041,9 +1074,13 @@ if (mint.status === 200) {
     method: "POST",
     body: JSON.stringify({ token: wrongPurpose.body.data.token, password: "e2e-crosspurpose-1" }),
   });
+  const purposeFixtureCurrent = wrongPurpose.status === 200 &&
+    mint.body.data.accountVersion !== undefined && wrongPurpose.body.data.accountVersion !== undefined &&
+    BigInt(wrongPurpose.body.data.accountVersion) === BigInt(mint.body.data.accountVersion) + 1n;
+  check("wrong-purpose fixture uses the current account revision", purposeFixtureCurrent);
   check(
     "verify_email token cannot set a password",
-    crossPw.status === 400 && crossPw.body?.error?.code === "BAD_TOKEN",
+    purposeFixtureCurrent && crossPw.status === 400 && crossPw.body?.error?.code === "BAD_TOKEN",
     crossPw.body,
   );
   const me = await api("/api/auth/me", { cookies: setPw.cookie });
@@ -1961,7 +1998,8 @@ if (mint.status === 200) {
       check("the series consent carries its company", consentDoc?.order_id === orderId, consentDoc);
       const admU = await adminSession();
       const noCompany = new FormData();
-      noCompany.set("clientId", client!.id);
+      noCompany.set("submissionId", crypto.randomUUID());
+noCompany.set("clientId", client!.id);
       noCompany.set("kind", "package");
       noCompany.set("title", "Hand-uploaded package");
       noCompany.set("notify", "false");
@@ -1969,7 +2007,8 @@ if (mint.status === 200) {
       const noCompanyRes = await fetch(`${BASE}/api/admin/documents`, { method: "POST", body: noCompany, headers: { Cookie: admU.cookie, "X-Forwarded-For": RUN_IP } });
       check("a hand-uploaded package for a two-company client must name the company", noCompanyRes.status === 400 && ((await noCompanyRes.json().catch(() => null)) as { error?: { code?: string } } | null)?.error?.code === "COMPANY_REQUIRED");
       const withCompany = new FormData();
-      withCompany.set("clientId", client!.id);
+      withCompany.set("submissionId", crypto.randomUUID());
+withCompany.set("clientId", client!.id);
       withCompany.set("kind", "package");
       withCompany.set("title", "Hand-uploaded package");
       withCompany.set("notify", "false");
@@ -1982,7 +2021,8 @@ if (mint.status === 200) {
       const handDoc = docsAfterHand.find((d) => d.title === "Hand-uploaded package");
       check("the hand-uploaded package carries the chosen company", handDoc?.order_id === secondId, handDoc);
       const mail = new FormData();
-      mail.set("clientId", client!.id);
+      mail.set("submissionId", crypto.randomUUID());
+mail.set("clientId", client!.id);
       mail.set("kind", "legal_mail");
       mail.set("title", "Hand-uploaded legal mail");
       mail.set("notify", "false");
@@ -2893,6 +2933,7 @@ if (mint.status === 200) {
   const aOrder = await api("/api/orders", { method: "POST", body: JSON.stringify(acctData) });
   check("account-test order accepted", aOrder.status === 200, aOrder.body);
   const aId = aOrder.body?.data?.orderId as string;
+  await payForOfficeInspection(aId, "account correspondence record");
   {
     const adm = await adminSession();
     const stored = await api(`/api/admin/orders/${aId}`, { cookies: adm.cookie });
@@ -3115,6 +3156,7 @@ if (mint.status === 200) {
       clientEmail: convEmail, confirmClientEmail: convEmail, correspondentEmail: convEmail, confirmCorrespondentEmail: convEmail,
     }) });
     check("a conversion is not refused over a taken name it never uses", convTaken.status === 200, convTaken.body);
+    await payForOfficeInspection(convTaken.body.data.orderId, "conversion discarded fields");
     const admN = await adminSession();
     const raw = (await api(`/api/admin/orders/${convTaken.body?.data?.orderId}`, { cookies: admN.cookie })).body?.data?.payload;
     const pl = typeof raw === "string" ? JSON.parse(raw) : raw;
@@ -3289,10 +3331,10 @@ if (mint.status === 200) {
     // paid for later.
     const { readdirSync, existsSync } = await import("node:fs");
     const { fileURLToPath } = await import("node:url");
-    const root = fileURLToPath(new URL("../.dev-data/dropbox-mirror/", import.meta.url));
+    const root = process.env.DEV_MIRROR_DIR || fileURLToPath(new URL("../.dev-data/dropbox-mirror/", import.meta.url));
     const firstDet = (await api(`/api/admin/orders/${orderId}`, { cookies: adm.cookie })).body?.data as { documents: { id: string; kind: string }[] };
     const artsId = firstDet.documents.find((d) => d.kind === "articles")?.id ?? "";
-    const folder = `${root}E2E Coastal Holdings, LLC`;
+    const folder = joinPath(root, "E2E Coastal Holdings, LLC");
     const inOwn = existsSync(folder) && readdirSync(folder).some((f) => f.startsWith(artsId.slice(0, 8)));
     check("a document is mirrored into its own company's folder, not the client's newest company's", inOwn, { folder, artsId, listing: existsSync(folder) ? readdirSync(folder).slice(-5) : "missing" });
   }
@@ -3389,11 +3431,12 @@ if (mint.status === 200) {
     }),
   });
   const id = ord.body?.data?.orderId as string;
-  const detail = await api(`/api/admin/orders/${id}`, { cookies: adm.cookie });
-  const squareOrderId = detail.body?.data?.squareOrderId as string;
-  const total = detail.body?.data?.totalCents as number;
+  const unpaidOffice = await api(`/api/admin/orders/${id}`, { cookies: adm.cookie });
+  check("payment reconciliation: unpaid checkout is absent from office", unpaidOffice.status === 404, unpaidOffice.body);
+  const squareOrderId = offlineCheckoutReference(ord);
+  const total = ord.body?.data?.totalCents as number;
   const statusOf = async () =>
-    (await api(`/api/admin/orders/${id}`, { cookies: adm.cookie })).body?.data?.status;
+    (await api(`/api/orders/${id}/status`)).body?.data?.status;
   const hook = (eventId: string, amount: number | null, currency: string) =>
     api("/api/square/webhook", {
       method: "POST",
@@ -3553,10 +3596,11 @@ if (mint.status === 200) {
     });
     const id = res.body?.data?.orderId as string;
     const full = await api(`/api/admin/orders/${id}`, { cookies: adm.cookie });
-    return { id, squareOrderId: full.body?.data?.squareOrderId as string };
+    check(`${name}: unpaid checkout is absent from office`, full.status === 404, full.body);
+    return { id, squareOrderId: offlineCheckoutReference(res) };
   };
   const statusOf = async (id: string) =>
-    (await api(`/api/admin/orders/${id}`, { cookies: adm.cookie })).body?.data?.status;
+    (await api(`/api/orders/${id}/status`)).body?.data?.status;
   const hook = (eventId: string, squareOrderId: string, payId: string) =>
     api("/api/square/webhook", {
       method: "POST",
@@ -3874,7 +3918,9 @@ if (mint.status === 200) {
       }) });
       const giftId = giftRes.body?.data?.orderId as string;
       const refused = await api("/api/dev/simulate-payment", {method:"POST",body:JSON.stringify({orderId:giftId,card:"prepaid"})});
-      const pending = (await api(`/api/admin/orders/${giftId}`,{cookies:adm.cookie})).body?.data;
+      const pending = (await api(`/api/orders/${giftId}/status`)).body?.data;
+      const giftOffice = await api(`/api/admin/orders/${giftId}`,{cookies:adm.cookie});
+      check("refused prepaid checkout stays absent from office", giftOffice.status===404, giftOffice.body);
       check("prepaid attempted agent purchase is refused before completion",refused.status===400&&refused.body?.error?.code==="PREPAID_CARD"&&pending?.status==="pending_payment",{refused:refused.body,pending:pending?.status});
       const retry=await api("/api/dev/simulate-payment",{method:"POST",body:JSON.stringify({orderId:giftId,card:"credit"})});
       check("eligible card can retry a refused prepaid purchase immediately",retry.status===200,retry.body);
@@ -3969,6 +4015,8 @@ await batch03Checks((label,ok,detail)=>batch03Results.set(label,{ok,detail}));
 for(const [label,r]of batch03Results)check(label,r.ok,r.detail);
 
 const batch04Results = new Map<string,{ok:boolean;detail?:unknown}>();
+await p105Checks(check);
+await remainingAccountChecks(check);
 await batch04Checks((label,ok,detail)=>batch04Results.set(label,{ok,detail}));
 {const r=batch04Results.get("batch04 64: welcome resend follows paid account state");check("batch04 64: welcome resend follows paid account state",r?.ok===true,r?.detail);batch04Results.delete("batch04 64: welcome resend follows paid account state");}
 {const r=batch04Results.get("batch04 N4.06: failed welcome email remains retryable");check("batch04 N4.06: failed welcome email remains retryable",r?.ok===true,r?.detail);batch04Results.delete("batch04 N4.06: failed welcome email remains retryable");}

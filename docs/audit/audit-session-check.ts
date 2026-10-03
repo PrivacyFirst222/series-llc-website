@@ -1,5 +1,5 @@
 /** Fault injection against audit coverage and the real ledger guard. No product writes. */
-import { mkdtempSync, rmSync, writeFileSync, readFileSync, mkdirSync, copyFileSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync, readFileSync, mkdirSync, copyFileSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -89,11 +89,13 @@ try{
   // Real intake and guard commands in a tiny synthetic Git repository. The
   // fixture evidence below is deliberately simulated, never a product audit.
   const fixture=join(temp,"intake-repo");mkdirSync(join(fixture,"docs/audit"),{recursive:true});mkdirSync(join(fixture,"webapp/server"),{recursive:true});mkdirSync(join(fixture,"webapp/src"),{recursive:true});
+  // The copied historical renderer uses the same installed TypeScript parser.
+  symlinkSync(join(ROOT,"webapp/node_modules"),join(fixture,"webapp/node_modules"));
   for(const name of ["audit-session-lib.ts","audit-session.ts","audit-import-lib.ts","audit-import.ts","ledger-lib.ts","evidence.ts","ledger-print.ts","inventory.ts","inventory-policy.json","guard.ts","audit-reader.md"])copyFileSync(join(ROOT,"docs/audit",name),join(fixture,"docs/audit",name));
   const env={...process.env,FPSLLC_BATCH:"",FPSLLC_HOME:join(temp,"owner"),GIT_AUTHOR_NAME:"audit fixture",GIT_AUTHOR_EMAIL:"fixture@example.invalid",GIT_COMMITTER_NAME:"audit fixture",GIT_COMMITTER_EMAIL:"fixture@example.invalid"};
   const cmd=(...args:string[])=>spawnSync(args[0],args.slice(1),{cwd:fixture,env,encoding:"utf8",maxBuffer:64*1024*1024});
   const must=(...args:string[])=>{const r=cmd(...args);if(r.status!==0)throw Error(r.stdout+r.stderr);return r.stdout.trim();};
-  must("git","init","--quiet");writeFileSync(join(fixture,"webapp/server/fixture.ts"),text);writeFileSync(join(fixture,"webapp/vercel.json"),"{}\n");writeFileSync(join(fixture,"docs/audit/ledger.json"),JSON.stringify(ledger));writeFileSync(join(fixture,"docs/audit/rulings.md"),"# Synthetic fixture decisions\n");
+  must("git","init","--quiet");writeFileSync(join(fixture,".git/info/exclude"),"/webapp/node_modules\n");writeFileSync(join(fixture,"webapp/server/fixture.ts"),text);writeFileSync(join(fixture,"webapp/vercel.json"),"{}\n");writeFileSync(join(fixture,"docs/audit/ledger.json"),JSON.stringify(ledger));writeFileSync(join(fixture,"docs/audit/rulings.md"),"# Synthetic fixture decisions\n");
   must("git","add","webapp/server/fixture.ts","webapp/vercel.json","docs/audit/ledger.json","docs/audit/rulings.md","docs/audit/inventory-policy.json");must("git","commit","--quiet","-m","synthetic audit fixture");
   const runDir=join(temp,"complete-fixture");must("bun","docs/audit/audit-session.ts","init",runDir,"intake-fixture","HEAD","1");
   const fm=JSON.parse(readFileSync(join(runDir,"manifest.json"),"utf8"));

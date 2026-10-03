@@ -1,3 +1,4 @@
+import {ContinueOfficeReplacement,HistoryRecoveryPanel} from './OfficeRecoveryPanel';
 import { formatDate } from "@/lib/datetime";
 import { jointDisplayName } from "@/lib/jointOwner";
 import { fmtEinDisplay, isValidEin } from "@/lib/ein";
@@ -51,11 +52,20 @@ export interface AdminServiceOrder {
   paid_at: string | null;
   fulfilled_at: string | null;
   has_secret: boolean;
+  completion_available?: boolean;
   client_email: string;
   client_name: string;
 }
 
 interface ServiceDetail {
+  retirementState?:string|null;
+  retirementOperationId?:string|null;
+  restoreReviewRequired?:boolean;
+  restoredAssignedEin?:string|null;
+  replacementInputRequired?:boolean;
+  completionPending?: boolean;
+  completionRevision?: string|null;
+  completionPublished?: boolean;
   id: string;
   type: string;
   status: string;
@@ -88,6 +98,7 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
   viewing: AdminServiceOrder | null; onClose: () => void;
 }) {
   const queryClient = useQueryClient();
+  const [recoveryMessage, setRecoveryMessage] = useState('');
   const [attachment, setAttachment] = useState<File | null>(null);
   const [skipDocument, setSkipDocument] = useState(false);
   // Adam's override (6 Sep 2026): the details were obtained outside the
@@ -113,6 +124,9 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
     });
   };
   const einOk = isValidEin(assignedEin);
+  const [reviewRestored,setReviewRestored]=useState(false);
+  const [correcting,setCorrecting]=useState<boolean>(false);
+  useEffect(()=>{setCorrecting(false);setReviewRestored(false);},[viewing?.id]);
 
   const detailQuery = useQuery({
     queryKey: ["admin-service-detail", viewing?.id],
@@ -136,10 +150,12 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
   });
 
   const fulfill = useMutation({
-    mutationFn: async (args: { id: string; file: File | null; ein?: string }) => {
+    mutationFn: async (args: { id: string; file: File | null; ein?: string; correctionOf?:string }) => {
       const fd = new FormData();
       if (args.file) fd.set("file", args.file);
       if (args.ein) fd.set("ein", args.ein);
+      if (args.correctionOf) fd.set("correctionOf",args.correctionOf);
+      if(reviewRestored)fd.set("reviewRestoredOriginal","true");
       const res = await fetch(`/api/admin/services/${args.id}/fulfill`, {
         method: "POST",
         body: fd,
@@ -151,8 +167,10 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
       }
       return res.json();
     },
+    onError: () => {queryClient.invalidateQueries({queryKey:["admin-service-detail"]});},
     onSuccess: () => {
       setAttachment(null);
+      setCorrecting(false);
       setSkipDocument(false);
       setOverride(false);
       setAssignedEin("");
@@ -383,7 +401,7 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
             fulfilled — the IRS forms are built from those details, and
             fulfilling deletes them. Say so instead of greying out a button
             (Adam, 6 Sep 2026: "I can't upload the pdf"). */}
-        {(viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" ? (
+        {(viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" && !detailQuery.data?.restoreReviewRequired ? (
           <div className="rounded-xl border border-amber-300/60 bg-amber-50 p-4 text-sm text-amber-900" data-testid="waiting-on-client">
             <p className="font-medium">{WAITING_FOR_CLIENT}</p>
             <p className="mt-1">
@@ -403,7 +421,20 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
             </label>
           </div>
         ) : null}
-        {viewing?.status === "fulfilled" || ((viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" && !override) ? null : (
+        {detailQuery.data?.completionRevision ? <div className="space-y-2 border-t pt-3">
+          <label className="flex gap-2 text-sm"><input type="checkbox" checked={correcting} onChange={e=>{setCorrecting(e.target.checked);setAttachment(null);setSkipDocument(false);}} />
+            {detailQuery.data.completionPublished ? 'Correct delivered completion' : 'Correct failed completion'}
+          </label>
+          {correcting ? <p className="text-sm">Choose the corrected PDF and enter its EIN when requested. The previous attempt stays in the history. A running request must finish before it can be corrected.</p> : null}
+          {detailQuery.data.retirementOperationId?<ContinueOfficeReplacement operationId={detailQuery.data.retirementOperationId} onContinued={text=>{setRecoveryMessage(text);queryClient.invalidateQueries({queryKey:['admin-service-detail']});}}/>:null}
+          {recoveryMessage?<p role="status">{recoveryMessage}</p>:null}
+          {detailQuery.data.restoreReviewRequired?<label className="flex gap-2 text-sm"><input type="checkbox" checked={reviewRestored} onChange={e=>setReviewRestored(e.target.checked)}/>I reviewed the restored upload, confirmed its EIN and will attach the exact original PDF.</label>:null}
+          {detailQuery.data.restoreReviewRequired?<p className="text-sm">Review restored upload before resuming.</p>:null}
+          {detailQuery.data.restoreReviewRequired&&detailQuery.data.restoredAssignedEin?<p className="text-sm font-medium">Saved EIN: {detailQuery.data.restoredAssignedEin}</p>:null}
+          {viewing?.formation_order_id?<HistoryRecoveryPanel orderId={viewing.formation_order_id}/>:null}
+          {detailQuery.data.completionPending&&!correcting&&!detailQuery.data.retirementState ? <Button disabled={fulfill.isPending} onClick={()=>viewing&&fulfill.mutate({id:viewing.id,file:null})}>Resume saved completion</Button> : null}
+        </div> : null}
+        {(!correcting && viewing?.status === "fulfilled" && !detailQuery.data?.completionPending) || (!correcting && (viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" && !override && !detailQuery.data?.restoreReviewRequired) ? null : (
         <div className="space-y-2 border-t border-border pt-3">
           <label htmlFor="service-attachment-file" className="text-sm font-medium">
             {viewing?.type === "ein"
@@ -423,7 +454,7 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
             onChange={(e) => setAttachment(e.target.files?.[0] ?? null)}
             className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-full file:border file:border-border file:bg-secondary file:px-4 file:py-1.5 file:text-sm file:font-medium"
           />
-          {viewing?.type === "ein" ? (
+          {viewing?.type === "ein" || (correcting&&viewing?.type === "s-election") ? (
             <div className="space-y-1" data-testid="assigned-ein">
               <label htmlFor="assigned-ein" className="text-sm font-medium">EIN as issued (9 digits)</label>
               <Input
@@ -469,14 +500,14 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
         {fulfill.isError ? (
           <p className="text-xs text-destructive">{(fulfill.error as Error).message}</p>
         ) : null}
-        {viewing?.status === "fulfilled" || ((viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" && !override) ? null : (
+        {(!correcting && viewing?.status === "fulfilled" && !detailQuery.data?.completionPending) || (!correcting && (viewing?.type === "ein" || viewing?.type === "s-election") && viewing?.status === "awaiting_info" && !override && !detailQuery.data?.restoreReviewRequired) ? null : (
           <DialogFooter>
             <Button
               className="rounded-full"
-              disabled={fulfill.isPending || (!attachment && !skipDocument) || (viewing?.type === "ein" && !einOk)}
-              onClick={() => viewing && fulfill.mutate({ id: viewing.id, file: attachment, ein: viewing.type === "ein" ? assignedEin : undefined })}
+              disabled={fulfill.isPending || (correcting&&!attachment) || (!attachment && !skipDocument) || ((viewing?.type === "ein" || (correcting&&viewing?.type === "s-election")) && !einOk)}
+              onClick={() => viewing && fulfill.mutate({ id: viewing.id, file: attachment, ein: viewing.type === "ein" || (correcting&&viewing.type === "s-election") ? assignedEin : undefined,correctionOf:correcting?detailQuery.data?.completionRevision??undefined:undefined })}
             >
-              {fulfill.isPending ? "Fulfilling…" : attachment ? "Upload & fulfill" : "Mark fulfilled"}
+              {fulfill.isPending ? "Saving…" : correcting ? "Save corrected completion" : attachment ? "Upload & fulfill" : "Mark fulfilled"}
             </Button>
           </DialogFooter>
         )}

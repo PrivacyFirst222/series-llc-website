@@ -8,12 +8,24 @@ import { putFile, readFileStream } from './storage';
 import { addYears, addDays, isoOf, gaveConsent, currentAgentNoticeEmail } from './renewals';
 import { easternDateIso } from './datetime';
 import { sendMail } from './email';
+import { payAgentTarget } from './ra-checkout';
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(s=>!Number.isNaN(Date.parse(s+'T12:00:00Z'))&&new Date(s+'T12:00:00Z').toISOString().slice(0,10)===s,'Enter a valid calendar date.');
 export function registerAgentOffice(app:Hono) {
  app.get('/admin/orders/:id/agent',async c=>{
   if(!await requireAdmin(c))return c.json(err('Not signed in','UNAUTHENTICATED'),401);
   const db=await getDb();const [o]=await db.query('SELECT ra_appointment_date,ra_renewal_date,ra_cancellation_requested_at,ra_cancellation_note,ra_replaced_at,ra_proof_received_at,ra_proof_note,ra_resignation_due,ra_resignation_submitted,ra_resignation_filed,ra_resignation_mailed,ra_resignation_emailed_at,ra_resignation_document,ra_resignation_reason,ra_resignation_note,ra_ended_date,card_status,card_note FROM orders WHERE id=$1',[c.req.param('id')]);
-  return o?c.json({data:o}):c.json(err('Not found','NOT_FOUND'),404);
+  if(!o)return c.json(err('Not found','NOT_FOUND'),404);
+  const pending=await db.query(`SELECT DISTINCT r.id,r.amount_cents,r.purpose FROM ra_renewals r JOIN orders o ON o.id=r.order_id WHERE r.order_id=$1 AND r.status NOT IN ('charged','paid_by_link','cancelled') AND (o.ra_payment_target=r.id OR EXISTS (SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed')))`,[c.req.param('id')]);
+  return c.json({data:{...o,pending}});
+ });
+ app.post('/admin/orders/:id/agent/check-payment',async c=>{
+  if(!await requireAdmin(c))return c.json(err('Not signed in','UNAUTHENTICATED'),401);
+  const db=await getDb();const body=z.object({targetId:z.string().uuid()}).safeParse(await c.req.json().catch(()=>null));
+  if(!body.success)return c.json(err('Choose the payment to check.','INVALID_INPUT'),400);
+  const [owned]=await db.query('SELECT id FROM ra_renewals WHERE id=$1 AND order_id=$2',[body.data.targetId,c.req.param('id')]);
+  if(!owned)return c.json(err('Payment not found.','NOT_FOUND'),404);
+  const result=await payAgentTarget('renewal',body.data.targetId,{resumeOnly:true,actor:'authenticated office'});
+  return c.json({data:result});
  });
  app.post('/admin/orders/:id/agent',async c=>{
   if(!await requireAdmin(c))return c.json(err('Not signed in','UNAUTHENTICATED'),401);
@@ -40,8 +52,9 @@ export function registerAgentOffice(app:Hono) {
   }else if(b.action==='cancellation') {
    await db.query("UPDATE orders SET ra_cancellation_requested_at=LEAST(COALESCE(ra_cancellation_requested_at,$2::timestamptz),$2::timestamptz) WHERE id=$1",[id,b.date+'T12:00:00Z']);
    await db.query("UPDATE orders SET ra_cancellation_note=$2, ra_cancellation_renewal_date=LEAST(ra_renewal_date,(SELECT min(renewal_date) FROM ra_renewals WHERE order_id=$1 AND purpose='renewal' AND renewal_date >= (orders.ra_cancellation_requested_at AT TIME ZONE 'America/New_York')::date)) WHERE id=$1",[id,b.note]);
+   await normalizeAgentObligations(db,id);
   }else if(b.action==='replacement') {
-   const changed=await db.query(`UPDATE orders SET ra_replaced_at=$2,ra_ended_date=$2,ra_proof_received_at=now(),ra_proof_note=$3 WHERE id=$1 AND ra_payment_target IS NULL AND NOT EXISTS (SELECT 1 FROM ra_payment_attempts a JOIN ra_renewals r ON r.id=a.target_id WHERE r.order_id=orders.id AND a.status IN ('pending','approved','completed') AND r.status NOT IN ('charged','paid_by_link','cancelled')) RETURNING id`,[id,b.date,b.note]);
+   const changed=await db.query(`UPDATE orders SET ra_replaced_at=$2,ra_ended_date=LEAST(ra_ended_date,$2::date),ra_proof_received_at=now(),ra_proof_note=$3 WHERE id=$1 AND ra_payment_target IS NULL AND NOT EXISTS (SELECT 1 FROM ra_payment_attempts a JOIN ra_renewals r ON r.id=a.target_id WHERE r.order_id=orders.id AND a.status IN ('pending','approved','completed') AND r.status NOT IN ('charged','paid_by_link','cancelled')) RETURNING id`,[id,b.date,b.note]);
    if(!changed.length)return c.json(err(PAYMENT_RECONCILE,'PROCESSING'),409);
    await normalizeAgentObligations(db,id);
   }else if(b.action==='submitted') {
@@ -64,7 +77,7 @@ export function registerAgentOffice(app:Hono) {
    if(!fee.notice_sent_at)await deliverAgentCorrespondence(fee.id,today);
   }else if(b.action==='filed') {
    if(!o.ra_resignation_submitted||b.date<isoOf(o.ra_resignation_submitted)!)return c.json(err('Record submission first, then the actual state filing date.','BAD_STATE'),400);
-   await db.query('UPDATE orders SET ra_resignation_filed=$2,ra_ended_date=CASE WHEN ra_replaced_at IS NOT NULL THEN LEAST(ra_replaced_at,$3::date) ELSE $3::date END WHERE id=$1',[id,b.date,addDays(b.date,31)]);
+   await db.query('UPDATE orders SET ra_resignation_filed=$2,ra_ended_date=LEAST(ra_ended_date,ra_replaced_at,$3::date) WHERE id=$1',[id,b.date,addDays(b.date,31)]);
   }else {
    if(!o.ra_resignation_submitted||b.date<isoOf(o.ra_resignation_submitted)!)return c.json(err('Submit the resignation before recording its mailed notice.','BAD_STATE'),400);
    await db.query('UPDATE orders SET ra_resignation_mailed=$2 WHERE id=$1',[id,b.date]);

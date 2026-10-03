@@ -1,3 +1,4 @@
+import {exactAssertions,billingExpected} from '../../docs/audit/expected-assertions';
 import {mkdtempSync,rmSync,writeFileSync,mkdirSync} from 'node:fs';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
@@ -7,7 +8,7 @@ export async function batch41BillingChecks(check:Check){
  try{const p=Bun.spawn(['bun',import.meta.filename,'--child'],{cwd:process.cwd(),env:{...process.env,E2E_OFFLINE:'1',VERCEL:'',DEV_PG_DIR:join(dir,'db'),DEV_STORAGE_DIR:join(dir,'files'),DEV_MIRROR_DIR:join(dir,'mirror')},stdout:'pipe',stderr:'pipe'});
  const [out,err,code]=await Promise.all([new Response(p.stdout).text(),new Response(p.stderr).text(),p.exited]);
  const rows=out.split('\n').filter(x=>x.startsWith('B41B:')).map(x=>JSON.parse(x.slice(5)));
- for(const group of ['obligations','correspondence']){const own=rows.filter(r=>r.group===group);check(group==='obligations'?'batch41 agent obligations and payment recovery':'batch41 financial correspondence recovery',code===0&&own.length>=5&&own.every(r=>r.ok),{rows:own,exit:code,stderr:code?err:undefined});}
+ for(const group of ['obligations','correspondence'] as const){const own=rows.filter(r=>r.group===group);check(group==='obligations'?'batch41 agent obligations and payment recovery':'batch41 financial correspondence recovery',code===0&&rows.every(r=>['obligations','correspondence'].includes(r.group))&&exactAssertions(own,billingExpected[group]),{rows:own,exit:code,stderr:code?err:undefined});}
  if(process.env.BATCH41_BILLING_EVIDENCE){mkdirSync(process.env.BATCH41_BILLING_EVIDENCE,{recursive:true});writeFileSync(join(process.env.BATCH41_BILLING_EVIDENCE,'server-raw.log'),out+'\n'+err);writeFileSync(join(process.env.BATCH41_BILLING_EVIDENCE,'server-results.json'),JSON.stringify(rows,null,2));}
  }finally{rmSync(dir,{recursive:true,force:true});}
 }

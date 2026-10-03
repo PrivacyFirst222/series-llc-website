@@ -3,17 +3,34 @@ import { env } from './env';
 import { legalMailEmail, newDocumentEmail, llcFormedEmail, sendMail } from './email';
 import { seriesNames } from './filing';
 import { associateLegacyServices } from './company-scope';
+import {claimOfficeVerification,verifyOfficeDelivery} from './office-file-recovery';
+import {releaseOfficeOperation,type OfficeOperation} from './office-operation';
+import {OfficeRecoveryError} from './office-recovery-sources';
 const fmtDate = (s:string) => s ? new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric',timeZone:'UTC'}) : 'date not recorded';
 const escape = (s:string) => s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 /** A document-specific send attempt. A provider acceptance is recorded as sent,
  * not inbox delivery. Failure never removes the document or its retry action. */
-export async function notifyDocument(id:string):Promise<boolean> {
+export async function notifyDocument(id:string,verification?:OfficeOperation):Promise<boolean> {
  const db=await getDb();
- const [d]=await db.query<{id:string;client_id:string;order_id:string|null;kind:string;title:string;meta:{receivedOn?:string;noticeKind?:string};name:string;email:string}>(`WITH locked AS (
+ const [doc]=await db.query<{meta:{noticeKind?:string;correctionId?:string}}>('SELECT meta FROM documents WHERE id=$1 AND deleted_at IS NULL',[id]);
+ let held:OfficeOperation|undefined;
+ try {
+  if(doc?.meta.noticeKind==='formation-correction'){
+   const [op]=await db.query<OfficeOperation>('SELECT * FROM office_operations WHERE id=$1',[doc.meta.correctionId]);
+   if(!op)throw new OfficeRecoveryError('The saved correction identity is missing.','RECOVERY_IDENTITY_CONFLICT');
+   held=verification?.id===op.id?verification:await claimOfficeVerification(db,op);
+   await verifyOfficeDelivery(db,held);
+  }
+  return await sendDocumentNotice(id);
+ }finally{if(held&&held!==verification)await releaseOfficeOperation(db,held);}
+}
+async function sendDocumentNotice(id:string):Promise<boolean> {
+ const db=await getDb();
+ const [d]=await db.query<{id:string;client_id:string;order_id:string|null;kind:string;title:string;meta:{receivedOn?:string;noticeKind?:string;correctionId?:string};name:string;email:string}>(`WITH locked AS (
  UPDATE documents SET notice_status='sending',notice_lock_until=now()+interval '2 minutes'
- WHERE id=$1 AND (kind='legal_mail' OR meta->>'noticeKind' IN ('document','formation')) AND deleted_at IS NULL AND (notice_lock_until IS NULL OR notice_lock_until<now()) RETURNING *)
+ WHERE id=$1 AND (kind='legal_mail' OR meta->>'noticeKind' IN ('document','formation','formation-correction')) AND deleted_at IS NULL AND (meta->>'noticeKind' IS DISTINCT FROM 'formation-correction' OR notice_status IS DISTINCT FROM 'sent') AND (notice_lock_until IS NULL OR notice_lock_until<now()) RETURNING *)
  SELECT locked.*,c.name,c.email FROM locked JOIN clients c ON c.id=locked.client_id`,[id]);
- if(!d)return false;
+ if(!d)return (await db.query("SELECT id FROM documents WHERE id=$1 AND meta->>'noticeKind'='formation-correction' AND notice_status='sent' AND deleted_at IS NULL",[id])).length>0;
  try {
   const portalUrl=env.PUBLIC_BASE_URL+'/portal';
   let mail = d.kind==='legal_mail'
@@ -30,7 +47,12 @@ export async function notifyDocument(id:string):Promise<boolean> {
     otherDocuments:[...docs.some(x=>x.kind==='statement')?['Statement of Authorized Representative']:[],...docs.some(x=>x.kind==='certificate-of-status')?['Certificate of Status']:[],...docs.some(x=>x.kind==='certified-copy')?['Certified Copy of the Articles']:[]],
     outstandingServices:services.map(s=>{const detail=typeof s.details==='string'?JSON.parse(s.details):s.details as {target?:string;seriesName?:string}|null;return {type:s.type,status:s.status,...s.type==='ein'&&detail?.target==='series'&&detail.seriesName?{seriesName:detail.seriesName}:{}};})});
   }
-  await sendMail({to:d.email,...mail});
+  if(d.meta?.noticeKind==='formation-correction'){
+   const [order]=await db.query<{llc_name:string}>("SELECT llc_name FROM orders WHERE id=$1 AND client_id=$2",[d.order_id,d.client_id]);
+   if(!order)throw new Error('Formation order is unavailable');
+   mail={subject:'Your formation documents have been corrected',html:`<p>We corrected the formation documents for ${escape(order.llc_name)}. The updated documents are available in your client portal.</p><p><a href="${escape(portalUrl)}">View corrected documents</a></p>`};
+  }
+  await sendMail({to:d.email,...mail,...(d.meta?.noticeKind==='formation-correction'?{idempotencyKey:`formation-correction/${d.meta.correctionId}`}:{})});
   await db.query("UPDATE documents SET notice_status='sent',notice_sent_at=now(),notice_error=NULL,notice_recipient=$2,notice_lock_until=NULL WHERE id=$1",[id,d.email]);return true;
  }catch(e){await db.query("UPDATE documents SET notice_status='failed',notice_error=$2,notice_recipient=$3,notice_lock_until=NULL WHERE id=$1",[id,String(e).slice(0,300),d.email]);return false;}
 }

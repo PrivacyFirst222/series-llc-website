@@ -610,10 +610,7 @@ export async function renderMarkdownPdf(opts: {
       const isAssetSchedule = /^Asset description/i.test(block.rows[0]?.[0] ?? "");
       if (isAssetSchedule) assetScheduleNo++;
       const measuredRows = tableRows(block.rows);
-      for (let ri = 0; ri < block.rows.length; ri++) {
-        const row = block.rows[ri];
-        const { fillable, cellLines, rowH } = measuredRows[ri];
-        need(rowH);
+      const drawRow=(ri:number,cellLines:Seg[][][],rowH:number,fillable=false)=>{
         if (fillable) {
           const form = doc.getForm();
           for (let ci = 0; ci < cols; ci++) {
@@ -647,7 +644,7 @@ export async function renderMarkdownPdf(opts: {
             thickness: 0.5,
           });
         }
-        for (let ci = 0; ci < row.length; ci++) {
+        for (let ci = 0; ci < cellLines.length; ci++) {
           let cy = y - pad;
           for (const ln of cellLines[ci]) {
             drawSegLine(page, ln, MARGIN + ci * colW + pad, cy - size, size);
@@ -655,6 +652,33 @@ export async function renderMarkdownPdf(opts: {
           }
         }
         y -= rowH;
+      };
+      const header=measuredRows[0];
+      const pageForRow=(ri:number,continuation:boolean)=>{
+        newPage();
+        if(ri>0&&header.rowH<TEXT_H/3)drawRow(0,header.cellLines,header.rowH);
+        if(continuation){
+          page.drawText('Continued from previous page',{x:MARGIN,y:y-size,size,font:fonts.italic});
+          y-=lineH+pad;
+        }
+      };
+      for(let ri=0;ri<measuredRows.length;ri++){
+        const {fillable,cellLines,rowH}=measuredRows[ri];
+        if(fillable){need(rowH);drawRow(ri,cellLines,rowH,true);continue;}
+        // Ordinary rows stay together. A cell taller than a page is split by
+        // measured lines, with the column headings repeated on each new page.
+        const repeatedHeader=ri>0&&header.rowH<TEXT_H/3?header.rowH:0;
+        if(rowH<=TEXT_H-repeatedHeader&&y-rowH<MARGIN)pageForRow(ri,false);
+        const count=Math.max(1,...cellLines.map(lines=>lines.length));
+        let offset=0;
+        while(offset<count){
+          let capacity=Math.floor((y-MARGIN-2*pad)/lineH);
+          if(capacity<1){pageForRow(ri,offset>0);capacity=Math.floor((y-MARGIN-2*pad)/lineH);}
+          const take=Math.min(count-offset,capacity);
+          drawRow(ri,cellLines.map(lines=>lines.slice(offset,offset+take)),take*lineH+2*pad);
+          offset+=take;
+          if(offset<count)pageForRow(ri,true);
+        }
       }
       y -= 8;
       continue;

@@ -1,3 +1,4 @@
+import { serviceQueryUrl } from "@/lib/serviceQueryUrl";
 import { UpdateRenewalCard } from './UpdateRenewalCard';
 import { RA_CANCELLATION, cardStatusWords } from "@/lib/agentBilling";
 import { AgreementLoadError } from "./AgreementLoadError";
@@ -278,7 +279,14 @@ function AgreementAndLibraryRow({ company }: { company: string | null }) {
           <BookOpen className="h-4 w-4 text-trust" />
           <h2 className="font-display text-lg">Reference library</h2>
         </div>
-        {library.length === 0 ? (
+        {libraryQuery.isError ? (
+          <div role="alert" className="px-5 py-6 text-sm">
+            We couldn’t load the reference library. Please try again.{" "}
+            <Button size="sm" variant="outline" disabled={libraryQuery.isFetching} onClick={() => void libraryQuery.refetch()}>Retry</Button>
+          </div>
+        ) : libraryQuery.isPending ? (
+          <p className="px-5 py-6 text-sm text-muted-foreground">Loading reference library…</p>
+        ) : library.length === 0 ? (
           <p className="px-5 py-6 text-sm text-muted-foreground">
             The Series LLC Owner's Manual and other reference materials will appear here.
           </p>
@@ -324,11 +332,12 @@ interface CompanyInfo {
   cardNote?:string|null;
   raCancellationRequestedAt: string | null;
   raCancellationLate?: boolean;
+  recoveryHold?:boolean;
   /** The card kept with Square for the renewal (16 Sep 2026). */
   cardStatus?: "on_file" | "none" | "gift_card" | null;
   cardLast4?: string | null;
   cardBrand?: string | null;
-  renewals?: { reconcilingPayment?:boolean; linkUrl?:string|null;purpose?:string; date: string | null; amountCents: number; status: string; chargedAt: string | null }[];
+  renewals?: { lateNoticeMessage?:string|null; reconcilingPayment?:boolean; linkUrl?:string|null;purpose?:string; date: string | null; amountCents: number; status: string; chargedAt: string | null }[];
 }
 
 const brandWord = (b: string | null | undefined): string => {
@@ -361,7 +370,7 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
       </div>
       <div className="px-5 py-4">
         {company.raReplacedAt ? (
-          <p role="status" className="text-sm">Replacement registered agent verified. Our registered-agent appointment {company.raReplacedAt <= new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'}) ? 'ended' : 'ends'} on {formatDate(company.raReplacedAt)}.</p>
+          <p role="status" className="text-sm">Replacement registered agent verified. Our registered-agent appointment {company.raReplacedAt <= new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'}) ? 'ended' : 'ends'} on {formatDate(company.raEndedDate??company.raReplacedAt)}.</p>
         ) : company.raResignationSubmitted ? (
           <p role="status" className="text-sm">
             Resignation submitted {formatDate(company.raResignationSubmitted)}. {company.raResignationFiled ? `Filed by the state ${formatDate(company.raResignationFiled)}. ` : "State filing has not yet been recorded. "}{company.raEndedDate
@@ -424,7 +433,7 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
             </AlertDialog>
           </div>
         )}
-        {company.raCancellationLate ? <p className="mt-3 text-sm font-medium">Your cancellation notice arrived less than 30 days before renewal. The full annual renewal fee remains due; any payment already received is shown below.</p> : null}
+        {company.renewals?.filter(r=>r.lateNoticeMessage).map(r=><p key={r.date} className="mt-3 text-sm font-medium">{r.lateNoticeMessage}</p>)}
         <div className="mt-3 text-sm">              {/* The card kept for the renewal, or why none is (16 Sep 2026). */}
               {company.cardStatus === "on_file" ? (
                 <p className="mt-1" data-testid="renewal-card">Renewal card: {brandWord(company.cardBrand)} ending {company.cardLast4}.</p>
@@ -454,6 +463,14 @@ function RegisteredAgentCard({ company }: { company: CompanyInfo }) {
 export default function PortalDashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const logout = useMutation({
+    mutationFn: () => api.post("/api/auth/logout", {}),
+    onSuccess: () => {
+      clearAllDrafts();
+      queryClient.clear();
+      navigate("/portal/login");
+    },
+  });
   const [searchParams, setSearchParams] = useSearchParams();
 
   const meQuery = useQuery({
@@ -470,7 +487,10 @@ export default function PortalDashboard() {
     enabled: meQuery.isSuccess,
   });
   const companies = companiesQuery.data ?? [];
-  const company = searchParams.get("company") ?? companies[0]?.orderId ?? null;
+  const requestedCompany = searchParams.get("company");
+  // A stale link must select an actual account company before filtering mail.
+  const company = requestedCompany && (!companiesQuery.isSuccess || companies.some(c => c.orderId === requestedCompany))
+    ? requestedCompany : companies[0]?.orderId ?? null;
 
   // What the client still has to do for THIS company (Adam, 5 Sep 2026):
   // the agreement questionnaire until an agreement exists, and every service
@@ -480,7 +500,7 @@ export default function PortalDashboard() {
     queryKey: ["portal-services", company ?? null],
     queryFn: () =>
       api.get<{ orders: ServiceOrder[]; llcFormed: boolean }>(
-        `/api/portal/services${company ? `?company=${company}` : ""}`,
+        serviceQueryUrl(company),
       ),
     enabled: meQuery.isSuccess,
   });
@@ -687,6 +707,14 @@ export default function PortalDashboard() {
   }
 
   const docs = docsQuery.data ?? [];
+  // Both lists depend on the company selection. Unavailable companies are
+  // not an empty/single-company account, even when documents loaded first.
+  const companyDocumentsPending = companiesQuery.isPending || docsQuery.isPending;
+  const companyDocumentsError = companiesQuery.isError || docsQuery.isError;
+  const retryCompanyDocuments = () => {
+    void companiesQuery.refetch();
+    void docsQuery.refetch();
+  };
   // "articles" and "psd" are the filed originals, uploaded when the company is
   // formed. They belong with the formation package rather than in a section of
   // their own — and they must be listed explicitly, because a filter that names
@@ -708,12 +736,7 @@ export default function PortalDashboard() {
     (d) => !FORMATION_KINDS.includes(d.kind) && d.kind !== "legal_mail",
   );
 
-  const logout = async () => {
-    await api.post("/api/auth/logout", {});
-    clearAllDrafts();
-    queryClient.clear();
-    navigate("/portal/login");
-  };
+
 
   return (
     <section className="container-wide section-y">
@@ -726,11 +749,18 @@ export default function PortalDashboard() {
             Signed in as {meQuery.data?.email}
           </p>
         </div>
-        <Button variant="ghost" size="sm" onClick={logout} className="self-start rounded-full sm:self-auto">
+        <Button variant="ghost" size="sm" disabled={logout.isPending} onClick={() => logout.mutate()} className="self-start rounded-full sm:self-auto">
           <LogOut className="mr-1.5 h-4 w-4" />
           Sign out
         </Button>
       </div>
+
+      {logout.isError ? (
+        <div role="alert" className="mt-3 text-sm">
+          We couldn’t sign you out. Please try again.{" "}
+          <Button size="sm" variant="outline" disabled={logout.isPending} onClick={() => logout.mutate()}>Retry</Button>
+        </div>
+      ) : null}
 
       {companies.length > 1 ? (
         <div className="mt-8 flex flex-wrap gap-2" role="tablist" aria-label="Your companies">
@@ -759,9 +789,10 @@ export default function PortalDashboard() {
             <FileText className="h-4 w-4 text-trust" />
             <h2 className="font-display text-lg">Your documents</h2>
           </div>
-          {docsQuery.isPending ? <p className="p-5 text-sm text-muted-foreground">Loading your documents…</p> : docsQuery.isError ? (
-            <div role="alert" className="p-5"><p>We could not load your documents or legal mail. Try again.</p><Button onClick={() => docsQuery.refetch()}>Try again</Button></div>
-          ) : <DocList
+          {companies.find(c=>c.orderId===company)?.recoveryHold ? <p role="status" className="p-5 text-sm">Your S-election package is awaiting recovery reconciliation. Contact support@myfloridaseriesllc.com for help.</p> : null}
+          {companyDocumentsError ? (
+            <div role="alert" className="p-5"><p>We could not load your documents or legal mail. Try again.</p><Button onClick={retryCompanyDocuments}>Retry</Button></div>
+          ) : companyDocumentsPending ? <p className="p-5 text-sm text-muted-foreground">Loading your documents…</p> : <DocList
             docs={packageDocs}
             onDeleteTax={setDeleteTaxDoc}
             empty="Your documents will appear here as they are prepared or uploaded."
@@ -782,9 +813,9 @@ export default function PortalDashboard() {
             <Mail className="h-4 w-4 text-trust" />
             <h2 className="font-display text-lg">Legal mail</h2>
           </div>
-          {docsQuery.isPending ? <p className="p-5 text-sm text-muted-foreground">Loading your legal mail…</p> : docsQuery.isError ? (
-            <div role="alert" className="p-5"><p>We could not load your documents or legal mail. Try again.</p><Button onClick={() => docsQuery.refetch()}>Try again</Button></div>
-          ) : <DocList
+          {companyDocumentsError ? (
+            <div role="alert" className="p-5"><p>We could not load your legal mail. Try again.</p><Button onClick={retryCompanyDocuments}>Retry</Button></div>
+          ) : companyDocumentsPending ? <p className="p-5 text-sm text-muted-foreground">Loading your legal mail…</p> : <DocList
             docs={legalMail}
             empty="Nothing here — that's good news. Anything we receive for you as registered agent will be posted here, and you'll get an email the moment it is."
           />}

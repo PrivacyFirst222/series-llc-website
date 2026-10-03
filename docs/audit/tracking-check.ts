@@ -1,7 +1,7 @@
 /** Real commands in a disposable synthetic repository. Fixture commits bypass hooks;
  * no production network, decisions or database are touched. Package check rows here
  * are simulated inputs to gate tests, not claimed product test runs. */
-import {mkdtempSync,mkdirSync,readFileSync,writeFileSync,copyFileSync,rmSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,readFileSync,writeFileSync,copyFileSync,rmSync,symlinkSync,appendFileSync} from 'node:fs';
 import {join,dirname} from 'node:path';import{tmpdir}from'node:os';import{spawnSync}from'node:child_process';
 import{ROOT}from'./ledger-lib';
 const temp=mkdtempSync(join(tmpdir(),'tracking-check-')),repo=join(temp,'repo'),home=join(temp,'home');mkdirSync(repo);mkdirSync(home);
@@ -11,6 +11,9 @@ const must=(args:string[])=>{const r=run(args);if(r.code)throw Error(r.text);ret
 const put=(path:string,value:unknown)=>{mkdirSync(dirname(join(repo,path)),{recursive:true});writeFileSync(join(repo,path),typeof value==='string'?value:JSON.stringify(value,null,2)+'\n');};
 try{
  must(['git','init','-q']);
+ mkdirSync(join(repo,'webapp'),{recursive:true});
+ symlinkSync(join(ROOT,'webapp/node_modules'),join(repo,'webapp/node_modules'));
+ appendFileSync(join(repo,'.git/info/exclude'),'\n/webapp/node_modules\n');
  for(const file of ['ledger-lib.ts','ledger-print.ts','audit-import-lib.ts','audit-session-lib.ts','evidence.ts','tracking.ts','release-check.ts','publish-docs.ts']) {mkdirSync(join(repo,'docs/audit'),{recursive:true});copyFileSync(join(ROOT,'docs/audit',file),join(repo,'docs/audit',file));}
  // Runs inside the fixture so every shared helper resolves its own repository/home.
  put('probe.ts',String.raw`

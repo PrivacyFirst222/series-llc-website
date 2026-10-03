@@ -6,6 +6,7 @@
  *   bun run docs/audit/ledger-print.ts rulings       → what waits on Adam, most-blocking first
  */
 import { writeFileSync } from "node:fs";
+import ts from "../../webapp/node_modules/typescript";
 import { join } from "node:path";
 import { combinedPartPublished, ROOT, loadLedger, loadBatch, unmetWaits, type Ledger, type Item, type Assertion } from "./ledger-lib";
 
@@ -21,7 +22,23 @@ const statusOf = (it: Item): string => {
 export const LIST_RENDER_VERSION = 2;
 /** Archived commits retain the renderer version recorded in their source. */
 export function listRenderVersion(source: string | null): 1 | 2 {
-  return /^export const LIST_RENDER_VERSION = 2;$/m.test(source ?? "") ? 2 : 1;
+  const file=ts.createSourceFile('ledger-print.ts',source??'',ts.ScriptTarget.Latest,true,ts.ScriptKind.TS);
+  const declarations: ts.VariableDeclaration[]=[];
+  let mentions=0;
+  const visit=(node:ts.Node)=>{
+    if(ts.isIdentifier(node)&&node.text==='LIST_RENDER_VERSION')mentions++;
+    if(ts.isVariableDeclaration(node)&&ts.isIdentifier(node.name)&&node.name.text==='LIST_RENDER_VERSION')declarations.push(node);
+    ts.forEachChild(node,visit);
+  };
+  visit(file);
+  if(!mentions)return 1;
+  const declaration=declarations[0], list=declaration?.parent, statement=list?.parent;
+  if(declarations.length!==1 || !list || !ts.isVariableDeclarationList(list) || !(list.flags&ts.NodeFlags.Const)
+    || !statement || !ts.isVariableStatement(statement) || statement.parent!==file
+    || !statement.modifiers?.some(m=>m.kind===ts.SyntaxKind.ExportKeyword)
+    || !declaration.initializer || !ts.isNumericLiteral(declaration.initializer)
+    || !['1','2'].includes(declaration.initializer.text))throw Error('Malformed or unsupported LIST_RENDER_VERSION declaration');
+  return Number(declaration.initializer.text) as 1|2;
 }
 
 export function renderList(l: Ledger, version: 1 | 2 = LIST_RENDER_VERSION): string {

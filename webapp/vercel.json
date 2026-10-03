@@ -37,6 +37,10 @@
     {
       "path": "/api/cron/backup-continue",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/payment-recovery",
+      "schedule": "*/15 * * * *"
     }
   ],
   "functions": {

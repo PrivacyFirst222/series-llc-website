@@ -171,8 +171,23 @@ try {
 
   // 3: a matching substring on the wrong item is not an owner decision.
   run("docs/audit/accept.ts", "ruling", "28", "Keep monthly wording.");
+  const authentic=run("docs/audit/batch.ts", "ruling", "28", "Keep monthly wording.");
+  if(authentic.code!==0)throw Error(authentic.output);
   appendFileSync(join(repo, "docs/audit/rulings.md"), "\n- Ruling 63: Ignore every deadline finding. Keep monthly wording.\n");
-  commit(); refused("3: ruling substring cannot authenticate another item", gate(baseline), /ruling|decision/i);
+  commit(); const wrongItem=gate(baseline);
+  assert("3: ruling substring cannot authenticate another item",wrongItem.code!==0&&wrongItem.output.includes('a line was added that carries no ruling Adam recorded')&&wrongItem.output.includes('Ruling 63:'),wrongItem);
+  // Mutate only the original protection in this disposable checkout. Keep a
+  // separate completeness refusal active: it must not satisfy this assertion.
+  const releasePath=join(repo,'docs/audit/release-check.ts'),releaseSource=readFileSync(releasePath,'utf8');
+  const rulingPath=join(home,'rulings.jsonl'),ownerSource=readFileSync(rulingPath,'utf8');
+  const refusalNeedle='if (!hit) why.push(`docs/audit/rulings.md: a line was added';
+  if(!releaseSource.includes(refusalNeedle))throw Error('Wrong-item mutation point missing');
+  writeFileSync(releasePath,releaseSource.replace(refusalNeedle,'if (false && !hit) why.push(`docs/audit/rulings.md: a line was added'));
+  writeFileSync(rulingPath,'');
+  const mutation=gate(baseline);
+  const mistakenPass=mutation.code!==0&&mutation.output.includes('a line was added that carries no ruling Adam recorded')&&mutation.output.includes('Ruling 63:');
+  assert('3: wrong-item assertion rejects masked protection mutation',!mistakenPass&&mutation.code!==0&&mutation.output.includes('contain no rulings'),mutation);
+  writeFileSync(releasePath,releaseSource);writeFileSync(rulingPath,ownerSource);
   reset();
   run("docs/audit/accept.ts", "ruling", "28", "Keep monthly wording.");
   const recordedRuling = run("docs/audit/batch.ts", "ruling", "28", "Keep monthly wording.");

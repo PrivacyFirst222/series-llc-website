@@ -68,7 +68,7 @@ if(mode==='source'){
  // A database response is lost after the transaction commits. The real catch
  // and cleanup path must finalize external recovery, not delete the new file.
  const realQuery=db.query.bind(db);let loseCommit=true;
- db.query=(async(text:string,params?:unknown[])=>{const rows=await realQuery(text,params);if(loseCommit&&text.startsWith('WITH owner AS')){loseCommit=false;throw Error('Injected lost committed response');}return rows;}) as typeof db.query;
+ db.query=(async(text:string,params?:unknown[])=>{const rows=await realQuery(text,params);if(loseCommit&&(text.startsWith('WITH owner AS')||text.startsWith('WITH fence AS'))){loseCommit=false;throw Error('Injected lost committed response');}return rows;}) as typeof db.query;
  let responseLost=false;try{await storeElectionPackage(db,args('Live',latest.Live));}catch{responseLost=true;}finally{db.query=realQuery;}
  const [liveAfterLoss]=await q<{details:{documentId:string}}>('SELECT details FROM service_orders WHERE id=$1',[services.Live]);latest.Live=liveAfterLoss.details.documentId;
  check('package lost committed response remains recoverable',responseLost&&(await readRecoveryJournal()).packages.some(p=>p.id===latest.Live&&p.state==='committed'));
@@ -81,7 +81,7 @@ if(mode==='source'){
  // release the DB promotion. The atomic journal decision must beat promotion.
  const [currentPlain]=await q<{details:{documentId:string}}>('SELECT details FROM service_orders WHERE id=$1',[services.Plain]);
  let entered!:()=>void,release!:()=>void;const atCommit=new Promise<void>(r=>{entered=r;}),gate=new Promise<void>(r=>{release=r;});
- db.query=(async(text:string,params?:unknown[])=>{if(text.startsWith('WITH owner AS')){entered();await gate;}return realQuery(text,params);}) as typeof db.query;
+ db.query=(async(text:string,params?:unknown[])=>{if((text.startsWith('WITH owner AS')||text.startsWith('WITH fence AS'))){entered();await gate;}return realQuery(text,params);}) as typeof db.query;
  const racing=storeElectionPackage(db,args('Plain',currentPlain.details.documentId)).then(()=>true,()=>false);await atCommit;
  await requestDocumentDeletion(currentPlain.details.documentId,cid);release();const won=await racing;db.query=realQuery;
  const active=await q('SELECT id FROM documents WHERE order_id=$1 AND deleted_at IS NULL',[companies.Plain]);
@@ -92,11 +92,11 @@ if(mode==='source'){
  mkdirSync(process.env.DEV_MIRROR_DIR!,{recursive:true});cpSync(join(dir,p,'mirror'),process.env.DEV_MIRROR_DIR!,{recursive:true});
  const dump=JSON.parse(readFileSync(join(dir,mode==='second'?'b2.json':mode==='restore'?'legacy.json':'b1.json'),'utf8'));
  if(mode==='corrupt'){const j=await readRecoveryJournal(),r=j.packages.find(p=>p.id===ids.latest.Plain)!;writeFileSync(join(process.env.DEV_MIRROR_DIR!,r.mirrorPath),'invalid ciphertext');}
- else if(mode==='checkpoint'){dump.packageCheckpoint=[ids.latest.Plain];const j=JSON.parse(readFileSync(jfile(),'utf8'));j.packages=j.packages.filter((p:{id:string})=>p.id!==ids.latest.Plain);j.sha=hashBytes(Buffer.from(JSON.stringify({version:2,records:j.records,packages:j.packages})));writeFileSync(jfile(),JSON.stringify(j));}
+ else if(mode==='checkpoint'){dump.packageCheckpoint=[ids.latest.Plain];const j=JSON.parse(readFileSync(jfile(),'utf8'));j.packages=j.packages.filter((p:{id:string})=>p.id!==ids.latest.Plain);j.sha=hashBytes(Buffer.from(JSON.stringify({version:j.version,records:j.records,packages:j.packages,...(j.firstNoticeCutoff?{firstNoticeCutoff:j.firstNoticeCutoff}:{}),...(j.version===4?{copies:j.copies}:{})})));writeFileSync(jfile(),JSON.stringify(j));}
  let error='';try{await restoreBackup(db,dump);}catch(e){error=String(e);}
  if(['corrupt','pending','checkpoint'].includes(mode)){
-  const counts=await Promise.all(BACKUP_TABLES.map(async t=>Number((await q<{n:string}>('SELECT count(*) AS n FROM '+t))[0].n)));
-  check('package '+mode+' evidence refuses before rows',!!error&&counts.every(n=>n===0),{error,counts});check('package '+mode+' refusal precedes primary-storage writes',!existsSync(process.env.DEV_STORAGE_DIR!));check('package '+mode+' refusal is actionable',mode==='checkpoint'?error.includes('missing a recorded package'):error.includes('Recovery could not verify the current S-election package'),error);
+  const counts=await Promise.all(BACKUP_TABLES.filter(t=>t!=='launch_policy').map(async t=>Number((await q<{n:string}>('SELECT count(*) AS n FROM '+t))[0].n)));
+  check('package '+mode+' evidence refuses before rows',!!error&&counts.every(n=>n===0),{error,counts});check('package '+mode+' refusal precedes primary-storage writes',!existsSync(process.env.DEV_STORAGE_DIR!));check('package '+mode+' refusal is actionable',mode==='checkpoint'?error.includes('missing a recorded package'):mode==='pending'?error.includes('interrupted package operation'):error.includes('Recovery could not verify the current S-election package'),error);
  }else{
   check('package '+mode+' restore succeeds',!error,error);
   if(!error){await cleanupStagedDocuments();

@@ -1,5 +1,6 @@
-import { ensureAgentPaymentLink, deliverAgentCorrespondence, queueAgentCorrespondence, retryAgentCorrespondence } from './agent-correspondence';
-import { obligationPurpose } from './agent-obligations';
+import { runCheckoutRecovery } from './checkout-recovery';
+import { ensureAgentPaymentLink, deliverAgentCorrespondence, retryAgentCorrespondence } from './agent-correspondence';
+import { obligationPurpose, lateNoticeFee } from './agent-obligations';
 import { getDb, type Db } from "./db";
 import { RA_RENEWAL_FEE_CENTS } from "./pricing";
 import { disableCard, saveCardFromPayment, type CardSimulation } from "./square";
@@ -62,6 +63,7 @@ export const tookService = (payload: unknown): boolean =>
   ((typeof payload === "string" ? JSON.parse(payload) : payload) as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE";
 export const gaveConsent = (payload: unknown): boolean =>
   ((typeof payload === "string" ? JSON.parse(payload) : payload) as { registeredAgent?: { renewalCardConsent?: boolean } } | null)?.registeredAgent?.renewalCardConsent === true;
+export const hasRenewalCard = (row:{card_status:string|null;square_card_id:string|null;square_customer_id:string|null;payload:unknown}):boolean => row.card_status==='on_file'&&!!row.square_card_id&&!!row.square_customer_id&&gaveConsent(row.payload);
 
 /** Keeps the card the formation was paid with, for the renewals, when the
  *  order took our service and the client agreed. Failure holds fulfillment. */
@@ -108,9 +110,15 @@ export async function saveRenewalCard(db: Db, order: PaidOrderRow, paymentId: st
 interface RenewalOrder {ra_payment_target?:string|null;id:string;contact_name:string;contact_email:string;llc_name:string;ra_appointment_date:unknown;ra_renewal_date:unknown;ra_cancellation_requested_at:unknown;ra_replaced_at:unknown;ra_proof_received_at:unknown;ra_resignation_due:unknown;ra_ended_date:unknown;square_customer_id:string|null;square_card_id:string|null;card_last4:string|null;card_status:string|null;payload:unknown}
 interface RenewalRow {id:string;order_id:string;renewal_date:unknown;amount_cents:number;status:string;purpose:string;charge_due:unknown;retry_after:unknown;retries:number;notice_sent_at:unknown;billing_hold:boolean;lock_until:unknown;link_url:string|null}
 export async function runRenewals(today:string):Promise<{notices:number;charged:number;declined:number;cancelled:number;retried:number}> {
+ await runCheckoutRecovery();
  const db=await getDb(),out={notices:0,charged:0,declined:0,cancelled:0,retried:0};
- const orders=await db.query<RenewalOrder>("SELECT * FROM orders WHERE status='formed' AND ra_renewal_date IS NOT NULL AND payload->'registeredAgent'->>'choice'='SERVICE' AND ra_ended_date IS NULL AND ra_replaced_at IS NULL AND ra_resignation_submitted IS NULL");
+ // Reconcile persisted attempts before appointment eligibility. This pass can
+ // never create an attempt, including on resigned and ended appointments.
+ const pending=await db.query<{target_id:string}>("SELECT DISTINCT a.target_id FROM ra_payment_attempts a JOIN ra_renewals r ON r.id=a.target_id WHERE a.kind='renewal' AND a.status IN ('pending','approved','completed') AND r.status NOT IN ('charged','paid_by_link','cancelled') UNION SELECT ra_payment_target AS target_id FROM orders WHERE ra_payment_target IS NOT NULL");
+ for(const a of pending){try{await payAgentTarget('renewal',a.target_id,{resumeOnly:true,billingDate:today,actor:'daily job'});}catch(error){console.error('[renewal] reconciliation needs attention',a.target_id,error);}}
+ const orders=await db.query<RenewalOrder>("SELECT * FROM orders WHERE status='formed' AND ra_renewal_date IS NOT NULL AND payload->'registeredAgent'->>'choice'='SERVICE'");
  for(const o of orders) {
+  if((o.ra_ended_date||o.ra_replaced_at||(o as RenewalOrder & {ra_resignation_submitted?:unknown}).ra_resignation_submitted)&&!lateNoticeFee({...o,renewal_date:o.ra_renewal_date}))continue;
   const date=isoOf(o.ra_renewal_date)!;const cancel=o.ra_cancellation_requested_at?easternDateIso(new Date(String(o.ra_cancellation_requested_at))):null;
   const timely=!!cancel && cancel<=addDays(date,-RA_CANCEL_DAYS);
   let [row]=await db.query<RenewalRow>('SELECT * FROM ra_renewals WHERE order_id=$1 AND renewal_date=$2 ORDER BY purpose ASC LIMIT 1',[o.id,date]);
@@ -128,7 +136,7 @@ export async function runRenewals(today:string):Promise<{notices:number;charged:
   const [locked]=await db.query<RenewalRow>("UPDATE ra_renewals SET lock_until=now()+interval '2 minutes' WHERE id=$1 AND (lock_until IS NULL OR lock_until<now()) RETURNING *",[row.id]);
   if(!locked)continue; row=locked;
   try {
-   const hasCard=o.card_status==='on_file'&&!!o.square_card_id&&!!o.square_customer_id&&gaveConsent(o.payload);
+   const hasCard=hasRenewalCard(o);
    // Retire old notice-only holds without altering payment or cancellation rules.
    if(row.purpose==='renewal'&&row.billing_hold){
     await db.query('UPDATE ra_renewals SET billing_hold=false WHERE id=$1',[row.id]);
@@ -144,12 +152,10 @@ export async function runRenewals(today:string):Promise<{notices:number;charged:
    const recover=row.status==='charging';
    if(!first&&!retry&&!recover)continue;
    await db.query("UPDATE ra_renewals SET status='charging' WHERE id=$1 AND status NOT IN ('charged','paid_by_link','cancelled')",[row.id]);
-   const result=await payAgentTarget('renewal',row.id,{cardId:o.square_card_id!,customerId:o.square_customer_id!,automatic:true,cardLast4:o.card_last4});
+   const result=await payAgentTarget('renewal',row.id,{cardId:o.square_card_id!,customerId:o.square_customer_id!,automatic:true,cardLast4:o.card_last4,billingDate:today,resumeOnly:recover});
    if(result.ok){out.charged++;if(retry)out.retried++;}
    else if(result.code!=='UNRESOLVED'&&result.code!=='PROCESSING') {
-    const attempt=row.retries+1,retryAfter=result.code==='INSUFFICIENT_FUNDS'&&attempt<2?addDays(today,2):null;
-    await db.query("UPDATE ra_renewals SET status='declined',retries=$2,retry_after=$3,decline_code=$4 WHERE id=$1 AND status='charging'",[row.id,attempt,retryAfter,result.code]);
-    await ensureAgentPaymentLink(db,row.id);await queueAgentCorrespondence(db,row.id,'decline',result.declinedCardLast4);await deliverAgentCorrespondence(row.id,today);out.declined++;if(retry)out.retried++;
+    if((await db.query<{status:string}>('SELECT status FROM ra_renewals WHERE id=$1',[row.id]))[0]?.status==='declined')out.declined++;if(retry)out.retried++;
    }
   } catch(e){console.error('[renewal] company needs attention',o.id,e);await db.query('UPDATE ra_renewals SET notice_error=$2 WHERE id=$1',[row.id,String(e).slice(0,300)]);}
   finally {await db.query('UPDATE ra_renewals SET lock_until=NULL WHERE id=$1',[row.id]);}
@@ -167,7 +173,7 @@ export async function fulfillPaidRenewal(renewalId:string,paymentId:string|null,
  // Payment eligibility was checked before authorization. Preserve the existing
  // fulfillment boundary when cancellation arrives during provider reconciliation;
  // resignation/replacement remain protected by the order reservation.
- const purpose=obligationPurpose({...row,ra_cancellation_requested_at:null});if(purpose==='unavailable')throw new Error('This service renewal is unavailable');
+ const purpose=obligationPurpose({...row,reconcilingPayment:true});if(purpose==='unavailable')throw new Error('This service renewal is unavailable');
  if(purpose==='service_fee'&&row.purpose!=='service_fee'){await db.query("UPDATE ra_renewals SET purpose='service_fee' WHERE id=$1",[renewalId]);row.purpose='service_fee';}
  if(!cardAlreadySaved && row.purpose==='renewal' && !await saveRenewalCard(db,{...row,id:row.order_id},paymentId,simulate))throw new Error('An eligible renewal card must be saved before renewal fulfillment');
  const renewalDate=isoOf(row.renewal_date)!;

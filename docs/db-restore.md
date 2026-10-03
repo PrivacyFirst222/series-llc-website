@@ -4,7 +4,7 @@ At 08:15 UTC the scheduled backup captures a consistent database snapshot.
 It includes clients, orders, service orders, document metadata, operating-agreement
 profiles and generations, library metadata, webhook history, Sunbiz sync state,
 contact messages, email history, renewal history, document-deletion records,
-staged-document cleanup intents and pending card-update attempts.
+staged-document cleanup intents, pending card-update attempts, payment-reconciliation records, the original launch notice cutoff and held-package records.
 The corresponding retained files (client documents, library files and order
 summaries) are copied to Dropbox and read back for verification. Only after all
 required files are accounted for is the completed snapshot published to private
@@ -59,7 +59,16 @@ job a completed snapshot.
    verifies the complete manifest and decryption keys, restores retained files
    and rows, and reapplies deletion decisions. It fails closed if the journal,
    a required file, or a key is unavailable. Verify client access and documents
-   before changing the production database configuration.
+   before changing the production database configuration. The restored target remains
+   inactive: application requests are refused and no client email is sent.
+6. For a real recovery, after verifying data and acknowledging any held packages,
+   run `bun run scripts/recovery-activate.ts https://YOUR-PRODUCTION-ORIGIN OPERATOR`.
+   The origin must exactly match PUBLIC_BASE_URL. Then switch production to this
+   target. Activation automatically attempts the required taxpayer-number notices.
+   A rehearsal must never run this activation command. Inspect notices.pending in
+   its result: missing mail credentials and provider failures leave notices pending,
+   and the existing five-minute continuation job retries them. A logged development
+   email cannot consume a real notice's eligibility.
 
 A restore cannot generally recover records created after the snapshot. The forward
 S-election replacement protocol described below can recover a later completed
@@ -125,8 +134,8 @@ version history is available. No historical sample backup is rewritten or delete
 ## Completed S-election replacement recovery
 
 The independent journal at the existing `/recovery/deletion-journal-v1.json` path
-accepts the legacy deletion-only format and a forward version 2 envelope containing
-package recovery records. Its revision-matched writes serialize replacement and
+accepts legacy deletion-only and version 2 envelopes, and a version 3 envelope containing
+package recovery records and the original launch notice cutoff. Its revision-matched writes serialize replacement and
 client-deletion decisions together. Older restore tools must not be used with the
 new envelope. The original deletion records remain authoritative.
 
@@ -134,7 +143,7 @@ Each new package records its intended primary and mirror identity before upload,
 verifies an encrypted mirror, and records the committed successor relationship
 before retiring its predecessor or acknowledging successful completion. The
 record includes owner/company/service associations, a plaintext content hash,
-and an explicit projection of non-secret metadata. Full questionnaire numbers
+and a validated completed-package metadata projection, including company EIN and shareholder SSN last four. Full shareholder taxpayer numbers
 and their encrypted questionnaire values are excluded. Completed PDF contents
 remain encrypted, including in the mirror.
 
@@ -149,12 +158,11 @@ instead of guessing. A source-side retry/cleanup can finalize a database-committ
 package; an aborted upload retains its independent cleanup identity.
 
 Before switching production to a restored database, verify that every recorded
-S-election replacement resolves to its latest retained encrypted package or a
-later actual client-deletion decision. A successful restore command alone does
+S-election replacement resolves to its latest retained encrypted package, a
+later actual client-deletion decision, or an explicitly acknowledged held package under the procedure below. A successful restore command alone does
 not prove this. Preserve all controlled-copy deletion records and exclude full
 questionnaire numbers. Missing historical replacement metadata cannot be recreated
-by guessing; stop and reconcile the affected package before using the restored
-database. Legacy tombstones do not identify a successor and retain their deletion
+by guessing; keep the affected package unavailable until reconciliation. Unrelated verified data may run only after explicit acknowledgment of the enumerated holds. Legacy tombstones do not identify a successor and retain their deletion
 effect. No historical test-copy cleanup is performed.
 
 If current package evidence or recoverable bytes are unavailable, the restore
@@ -166,3 +174,52 @@ to a fresh empty target after correcting the evidence; do not merge partial data
 Correspondence worker leases are cleared after restore. Unresolved payment
 reservations and pending provider request identities remain; restoration itself
 does not submit a payment or decide that an ambiguous provider request failed.
+
+## Explicit held-package recovery and operator commands
+
+Use `--hold-unresolved-packages` only when intentionally restoring verified unrelated data while preserving unresolved package identities, encrypted copies, ownership and deletion evidence. This option does not waive corruption or missing encryption keys. A new service created after the snapshot and an interrupted package operation are reported as those conditions, not as an unverified PDF. API activation is blocked until the exact current held manifest is acknowledged. Client access to held packages stays blocked afterwards.
+
+The supported list, acknowledgment, original-owner import and reconciliation commands, their evidence requirements, payment reconciliation, original-cutoff recovery and old-writer shutdown requirements are in [Operational procedures](release-repair-operations.md). Do not substitute database edits or invent missing ownership. Completed-package EIN and last-four metadata survive matching recovery; missing legacy metadata is identified as unavailable and does not trigger a false late-EIN notice.
+
+An obsolete incomplete backup restarts when an ordinary document is deleted/replaced, a library document changes or an order summary changes. Cleanup uses durable bounded batches and retains deletion obligations without an age cutoff. Continue checking pending/errors and completion; a successful invocation is not a statement that every historical cleanup obligation has disappeared.
+
+## Repeated recovery and manual packages
+
+Manual office S-election uploads use the same durable encrypted-package and
+ownership journal as generated packages. The manual completion still purges the
+active questionnaire taxpayer numbers. Restoring a snapshot taken while packages
+were held replays later committed/aborted decisions from the independent journal;
+it does not resurrect the snapshot's old holds. Client deletion retains priority.
+Missing committed cleanup records are reconstructed so a database loss cannot
+strand a superseded package in the portal. The recovery target's activation
+record is local to that target and is never copied from a backup.
+
+
+### Office correction history and journal version 4 (27 September 2026)
+
+The current writer uses recovery-journal version 4, including every controlled
+copy of an office document and its service identity. It reads versions 1–4.
+Do not roll back to a release that cannot read version 4: the previous reader
+refuses that journal, and deletion and backup work cannot proceed. Keep the
+current reader with any application rollback; never delete, downgrade or
+recreate the independent journal to get an older release to start.
+
+A superseded failed upload retires its own storage key and its
+`/OfficeOperations/<operation>/<slot>` backup. That decision is permanent even
+if an old database snapshot still contains the failed operation. Retiring a
+key does not delete another, current revision that shares its document ID.
+Client deletion covers all attempts belonging to the service. Cleanup retries
+also remove late writes. Preserve the independent journal when restoring.
+
+Published Articles corrections keep the previous Articles/Statement pair as
+hidden filing history. The new pair becomes current in one database statement;
+a failed correction leaves the previous pair current. Resume from the office
+control with the original corrected PDF, or explicitly replace a pending
+correction's input. A restore clears the abandoned worker lease and retains
+the order's pending-correction reservation. Correction notices are retried
+from the order drawer without repeating the correction. Provider acceptance
+is recorded separately from inbox delivery. The notice uses one provider
+idempotency key per correction; Resend retains those keys for 24 hours
+(https://resend.com/docs/dashboard/emails/idempotency-keys). A retry after an
+unconfirmed acceptance beyond that window can produce a duplicate notice;
+check the provider log before retrying such an old unconfirmed notice.

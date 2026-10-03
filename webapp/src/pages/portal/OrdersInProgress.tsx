@@ -1,3 +1,4 @@
+import { serviceQueryUrl } from "@/lib/serviceQueryUrl";
 import { AgreementSourcePicker } from "./AgreementSourcePicker";
 import type { AgreementSource } from "@/lib/agreementSource";
 // Orders the client has paid for and we have not yet delivered — placed
@@ -46,7 +47,6 @@ export function OrdersInProgress({
    *  is (Adam, 6 Sep 2026: it sat on top of the form and could not be closed). */
   onFormOpenChange?: (open: boolean) => void;
 }) {
-  const cq = company ? `?company=${company}` : "";
   const queryClient = useQueryClient();
   const [detailsFor, setDetailsFor] = useState<ServiceOrder | null>(null);
   // Before the LLC is formed, the detail buttons explain instead of collect.
@@ -117,7 +117,7 @@ export function OrdersInProgress({
 
   const servicesQuery = useQuery({
     queryKey: ["portal-services", company ?? null],
-    queryFn: () => api.get<ServicesData>(`/api/portal/services${cq}`),
+    queryFn: () => api.get<ServicesData>(serviceQueryUrl(company)),
   });
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["portal-services"] });
 

@@ -1,0 +1,61 @@
+{
+  "id": "chunk3-qualification-guard-2026-09-28",
+  "revision": 1,
+  "title": "FIX-06: preserve current approved Terms date assertion",
+  "model": "Codex",
+  "base": "a6e1e39e7cebfdceac62bf2ce18ccfbfc998f180",
+  "items": [
+    {
+      "id": "5",
+      "part": "all",
+      "scope": "Only the already approved Terms revision date assertion; retain Privacy date and all historical fixes. Owner go is recorded in chunk-3-post-qualification-implementation-2026-09-28/APPROVAL.json.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/src/content/terms.md",
+          "text": "Last updated: **September 27, 2026**"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/content/privacy.md",
+          "text": "Last updated: **September 21, 2026**"
+        }
+      ],
+      "replaces": {
+        "batch": "launch-guard-2026-09-25",
+        "revision": 1,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "present",
+            "file": "webapp/src/content/terms.md",
+            "text": "Last updated: **September 24, 2026**"
+          },
+          {
+            "kind": "present",
+            "file": "webapp/src/content/privacy.md",
+            "text": "Last updated: **September 21, 2026**"
+          }
+        ]
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "generated",
+      "control": true,
+      "why": "Record approved FIX-06 through existing replacement lifecycle."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Record approved FIX-06 through existing replacement lifecycle."
+    }
+  ],
+  "requiredChecks": [
+    "bun run docs/audit/guard.ts"
+  ]
+}

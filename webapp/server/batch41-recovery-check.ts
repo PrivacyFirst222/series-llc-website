@@ -1,3 +1,4 @@
+import {exactAssertions,recoveryExpected} from '../../docs/audit/expected-assertions';
 import {mkdtempSync,mkdirSync,rmSync,writeFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
@@ -15,7 +16,7 @@ export async function batch41RecoveryChecks(report:Report){
    writeFileSync(join(dir,mode+'.log'),out+'\n'+err);
    const line=out.split('\n').find(l=>l.startsWith('B41RECOVERY:')),parsed=line?JSON.parse(line.slice(12)):null;
    if(parsed)results.push(...parsed.results);details.push({mode,code,proof:parsed?.proof,results:parsed?.results,error:code?err:undefined});
-   if(parsed&&code!==0)for(const group of ['B1','B2'])results.push({group,name:mode+' child exits successfully',ok:false,detail:{code,error:err}});
+   if(parsed&&(code!==0||!exactAssertions(parsed.results,recoveryExpected[mode])))for(const group of ['B1','B2'])results.push({group,name:mode+' child exits successfully',ok:false,detail:{code,error:err}});
    if(!parsed){for(const group of ['B1','B2'])results.push({group,name:mode+' child completed',ok:false,detail:err});break;}
   }
   for(const group of ['B1','B2']){const rows=results.filter(r=>r.group===group);report(`batch41 ${group} ${group==='B1'?'filing revision recovery':'retained package recovery'}`,rows.length>0&&rows.every(r=>r.ok),{rows,phases:details,evidence:process.env.B41_KEEP_EVIDENCE?dir:undefined});}

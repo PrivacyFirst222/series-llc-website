@@ -42,7 +42,9 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Previous fix: 28 r2, release commit not recorded; 2 assertion(s) retained. Replacement attempt: 40 r4, work order 04bfe7e69b7b45937fcf9658127bcff2923e8d878df9876aa6b8d0a97ebfba0f.
   - Previous fix: 28 r2, release commit not recorded; 2 assertion(s) retained. Replacement attempt: 40 r5, work order f0d5dd81c188489c7a049de3669a163ddf6821f18c2a4cb97dbbf8bbeff67d81.
   - Previous fix: 28 r2, release commit not recorded; 2 assertion(s) retained. Replacement attempt: 40 r6, work order 1754a2702af6cfdca193b9a9ee92aa2e47116b552ca36485d1e5142016549926.
-  - Implemented protections: batch 40 revision 6, release commit not recorded, by Codex; protected by 2 assertion(s).
+  - Previous fix: 40 r6, release commit not recorded; 2 assertion(s) retained. Replacement attempt: launch-guard-2026-09-25 r1, work order fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90.
+  - Previous fix: launch-guard-2026-09-25 r1, release commit not recorded; 2 assertion(s) retained. Replacement attempt: chunk3-qualification-guard-2026-09-28 r1, work order 22df7f9dfacd371fae2431cbf82a12494c05f4622f6e3b85facf7f797e5170b5.
+  - Implemented protections: batch chunk3-qualification-guard-2026-09-28 revision 1, release commit not recorded, by Codex; protected by 2 assertion(s).
   - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
@@ -56,6 +58,8 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 superseded by approved replacement: prior fix 28 r2 at ; approved work order f0d5dd81c188489c7a049de3669a163ddf6821f18c2a4cb97dbbf8bbeff67d81
   - 2026-09-23 rejected r5: Standing revision authorization: declare exact approved Manual replacement so document preservation check can verify it.
   - 2026-09-23 superseded by approved replacement: prior fix 28 r2 at ; approved work order 1754a2702af6cfdca193b9a9ee92aa2e47116b552ca36485d1e5142016549926
+  - 2026-09-25 superseded by approved replacement: prior fix 40 r6 at ; approved work order fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90
+  - 2026-09-28 superseded by approved replacement: prior fix launch-guard-2026-09-25 r1 at ; approved work order 22df7f9dfacd371fae2431cbf82a12494c05f4622f6e3b85facf7f797e5170b5
 - **6. [A35]** — **dropped** — waits on Adam's ruling
   - Benefits "Side by side": "One state filing covers 10 series". Each series is its own filing. Ruling needed (a Benefits row was ruled correct on 15 Sep).
   - Codex (disputed): Benefits.tsx still contains "One state filing covers 10 series", but rulings.md expressly protects the Benefits Side by side row. The user prohibits flagging ruled wording.
@@ -2304,8 +2308,10 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Implemented protections (comments): batch 20 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
   - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
   - Part "unused-fields" — implemented: The unused board and drawer fields and the columns and subquery that feed them. An intentional work bundle: 190 (five board fields) and 191 (the drawer's services field) are distinct repairs done together.
-  - Implemented protections (unused-fields): batch 20 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
-  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
+  - Previous fix (unused-fields): 20 r1, release commit not recorded; 3 assertion(s) retained. Replacement attempt: launch-guard-2026-09-25 r1, work order fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90.
+  - Implemented protections (unused-fields): batch launch-guard-2026-09-25 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
+  - 2026-09-25 superseded by approved replacement: prior fix 20 r1 at ; approved work order fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90
   - Part "unused-helpers" — implemented: The two unused helpers in serviceOrders.helpers.ts.
   - Implemented protections (unused-helpers): batch 20 revision 1, release commit not recorded, by Codex; protected by 1 assertion(s).
   - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
@@ -2338,8 +2344,10 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: total_cents, paid_at, filed_at, ein_purchased and ein_outstanding each appear exactly once in the file (their declaration); the board renders none of them, and routes-admin.ts:215-223 computes ein_outstanding with a subquery for nothing. A79h counted three; there are five.
   - Replace with: Drop the five fields from BoardOrder and the matching columns/subquery from the /admin/orders SELECT, or use them.
   - Codex (duplicate): Same unused board fields already included in187/A79h (raw bucket4 explicitly lists all five); the narrower finding corrects the summary’s three-versus-five count.
-  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
-  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
+  - Previous fix: 20 r1, release commit not recorded; 3 assertion(s) retained. Replacement attempt: launch-guard-2026-09-25 r1, work order fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90.
+  - Implemented protections: batch launch-guard-2026-09-25 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
+  - 2026-09-25 superseded by approved replacement: prior fix 20 r1 at ; approved work order fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90
 - **191. [B94]** — **implemented** — housekeeping; same defect as 187 (unused-fields)
   - Office, the order drawer — code only — `webapp/src/pages/admin/OrderDetail.tsx:45`
   - Reads: services: { id: string; type: string; status: string; llc_name: string }[];
@@ -2347,8 +2355,10 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - True: `d.services` is never read; the drawer's service rows come from the `services` prop (:251, :834). The route still assembles the array.
   - Replace with: Drop the field from OrderDetailData and from the route's response.
   - Codex (duplicate): Same unused OrderDetailData.services already included in187/A79h raw bucket4; the component renders its services prop instead.
-  - Implemented protections: batch 20 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
-  - Implementation evidence: commit e63054181dd0b341f639d56ff5c4a6ac6329f253, batch 20 revision 1, package 7ec76c4ae8c1. This records implementation, not acceptance or publication.
+  - Previous fix: 20 r1, release commit not recorded; 3 assertion(s) retained. Replacement attempt: launch-guard-2026-09-25 r1, work order fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90.
+  - Implemented protections: batch launch-guard-2026-09-25 revision 1, release commit not recorded, by Codex; protected by 3 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
+  - 2026-09-25 superseded by approved replacement: prior fix 20 r1 at ; approved work order fff513454bfc75f103b969eb9ac8c6220366750ac7648a13e1eda140a2f18c90
 - **192. [B95]** — **implemented** — housekeeping; same defect as 187 (unused-helpers)
   - Office, service-order helpers — code only — `webapp/src/pages/admin/serviceOrders.helpers.ts:5`
   - Reads: export const money = (cents: number) => `$${(cents / 100).toFixed(2)}`; export const STATUS_STYLE: Record<string, string> = { … };

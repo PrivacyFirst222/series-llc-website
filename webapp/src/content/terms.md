@@ -1,4 +1,4 @@
-Last updated: **September 23, 2026**
+Last updated: **September 27, 2026**
 
 ### 1. The Parties
 These Terms of Service ("Terms") are a binding agreement between you and **FLORIDA PROTECTED SERIES, LLC - PS 1** ("Filing Services") and **FLORIDA PROTECTED SERIES, LLC - PS 2** ("Agent Services"), each a protected series of FLORIDA PROTECTED SERIES, LLC, a Florida limited liability company (the "Company"; each series a "Company party" and together the "Companies"). "We," "us," and "our" refer to the Company party providing the Service at issue.
@@ -73,7 +73,7 @@ You must notify us immediately of any change to your email address, mailing addr
 **(b) After preparation begins.** Our service fee is not refundable once we have begun preparing your documents, and in no event after submission to the Florida Department of State, Division of Corporations.
 **(c) After submission.** No portion of the service fee is refundable.
 **(d) Government fees.** Fees remitted to the State of Florida are never refundable by us.
-**(e) Registered agent service.** Changing registered agents during a paid service year does not entitle you to a refund. Otherwise, a renewal charge is refundable within 30 days if we have not yet received or posted any document for you in that term; after that it is non-refundable. No prorated refunds. The resignation charge covers state filing fees and processing, not a renewed service year.
+**(e) Registered agent service.** Changing registered agents during a paid service year does not entitle you to a refund. If you do not give cancellation notice at least 30 days before your renewal date, the annual renewal fee will be charged even if a replacement registered agent takes effect before that date. You are not entitled to a refund of that charge; we may agree to a refund in our discretion. For renewal charges outside that late-cancellation situation, a renewal charge is refundable within 30 days if we have not yet received or posted any document for you in that term; after that it is non-refundable. No prorated refunds. The resignation charge covers state filing fees and processing, not a renewed service year.
 **(f) Add-on services.** Each add-on service is refundable until we begin work on it. The S corporation election package is not refundable once you submit your details. We generate and deliver the completed package to your client portal when the required details and issued EIN are available.
 
 ### 12. Chargebacks
@@ -81,6 +81,8 @@ Chargebacks initiated after services are performed constitute a breach of these 
 
 ### 13. Client Portal; Documents
 The portal provides download access to documents we prepare or receive for you. It is download-only; we are not a document-storage service and do not warrant perpetual availability. Retain your own copies. We may suspend portal access for nonpayment or breach.
+
+We strive to maintain complete backups, but we do not guarantee that every document will remain available or can be recovered if lost, damaged, or deleted. We strongly encourage you to promptly download and securely retain your own copies of all documents made available through the portal, including corrected or replacement documents. Do not rely on the portal or our backups as your only copy.
 
 ### 14. Post-Formation Obligations Are Yours
 Forming an LLC creates ongoing obligations we do not perform unless you separately purchase them, including Florida annual reports, maintaining a registered agent, keeping records for each protected series, tax filings and elections, including the filing of any election package we prepare for you, and any federal beneficial ownership reporting that applies to your company. We do not monitor deadlines for you or file annual reports unless you have purchased that service. Failure to meet these obligations can result in penalties or administrative dissolution.

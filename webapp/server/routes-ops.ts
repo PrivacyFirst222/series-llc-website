@@ -1,3 +1,6 @@
+import {withDeadline} from './operation-deadline';
+import {deliverBackupAttention} from './backup-attention';
+import { runCheckoutRecovery } from './checkout-recovery';
 import { cleanupStagedDocuments } from './s-election-package-storage';
 // Split from app.ts on 29 Aug 2026 — one domain per file, code moved
 // verbatim (the two dev test flags became shared.testHooks so they stay
@@ -88,7 +91,7 @@ if (!env.SQUARE_ACCESS_TOKEN && !env.isProd) {
     } else {
       const isRenewal = await db.query("SELECT id FROM ra_renewals WHERE id = $1", [orderId]);
       if (isRenewal.length > 0) {const result=await payAgentTarget("renewal",orderId,{token:`offline-${card??"credit"}`});if(!result.ok)return c.json(err(result.message??"Payment failed",result.code??"FAILED"),400);}
-      else await fulfillPaidServiceOrder(orderId, "dev-payment");
+      else await fulfillPaidServiceOrder(orderId, `dev-payment-${orderId}`);
     }
     return c.json({ data: { ok: true } });
   });
@@ -188,11 +191,14 @@ if (!env.isProd) {
     ]);
     if (rows.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
     const { token, tokenHash } = newToken();
-    await db.query(
-      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, $3, $4)",
+    const issued = await db.query<{ account_version: string }>(
+      // Use the same revision contract as production issuers. Otherwise a
+      // wrong-purpose check can pass only because this fixture link is stale.
+      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at, account_version) SELECT $1, id, $3, $4, auth_version FROM clients WHERE id = $2 RETURNING account_version",
       [tokenHash, rows[0].id, purpose, new Date(Date.now() + 3600_000).toISOString()],
     );
-    return c.json({ data: { token } });
+    if (issued.length === 0) return c.json(err("Not found", "NOT_FOUND"), 404);
+    return c.json({ data: { token, accountVersion: String(issued[0].account_version) } });
   });
 
   // Dev-only: hand back the pending email-verification token so e2e can
@@ -258,6 +264,11 @@ if (!env.isProd) {
 /** Nightly: registered agent renewals (16 Sep 2026) — the notice 60 days
  *  out, the charge 15 days out, retries, and timely cancellations. Outside
  *  production a `today` query runs the job as of that date, for the checks. */
+app.get('/cron/payment-recovery', async (c) => {
+  if ((env.CRON_SECRET && c.req.header('authorization')!==`Bearer ${env.CRON_SECRET}`) || (!env.CRON_SECRET && env.isProd))return c.json(err('Not authorized','UNAUTHENTICATED'),401);
+  return c.json({data:await runCheckoutRecovery()});
+});
+
 app.get("/cron/ra-renewals", async (c) => {
   const auth = c.req.header("authorization") ?? "";
   const secret = env.CRON_SECRET;
@@ -340,12 +351,32 @@ app.get("/cron/backup-continue", async (c) => {
   const { backupProgress } = await import('./backup');
   const { mirrorStatus } = await import('./dropbox');
   const { retryDocumentDeletions } = await import('./document-retention');
-  await retryDocumentDeletions();
-  await cleanupStagedDocuments();
-  const backup = await runDbBackup({resumeOnly:true,budgetMs:90000});
-  const status = await mirrorStatus();
-  if (!status.complete) await runFileMirror({budgetMs:90000});
-  return c.json({data:{backup,progress:await backupProgress(),mirror:await mirrorStatus()}});
+  const started=Date.now(),cleanupDeadline=started+30000,backupWorkDeadline=started+120000,backupDeadline=started+150000,mirrorDeadline=started+240000,routeDeadline=started+270000;
+  const db=await getDb();
+  const {retryRecoveryNotices}=await import('./s-election-recovery');
+  const [saved]=await db.query<{cursor:string|null}>("SELECT cursor FROM backup_progress WHERE id='backup-ancillary'");
+  const jobs:(()=>Promise<unknown>)[]=[()=>retryDocumentDeletions({deadline:cleanupDeadline}),()=>cleanupStagedDocuments({deadline:cleanupDeadline}),()=>retryRecoveryNotices(db,{deadline:cleanupDeadline})];
+  let cursor=Number(saved?.cursor??0)%jobs.length;
+  for(let n=0;n<jobs.length&&Date.now()<cleanupDeadline;n++){
+   const next=(cursor+1)%jobs.length;
+   await db.query("INSERT INTO backup_progress(id,cursor) VALUES('backup-ancillary',$1) ON CONFLICT(id) DO UPDATE SET cursor=EXCLUDED.cursor",[String(next)]);
+   try{await withDeadline(cleanupDeadline,jobs[cursor]);}catch(e){if(!(e instanceof DOMException&&e.name==='TimeoutError'))console.error('[backup ancillary]',e);}
+   cursor=next;
+  }
+  let timedOut=false;
+  const bounded=async<T>(until:number,work:()=>Promise<T>):Promise<T|undefined>=>{
+   if(Date.now()>=until){timedOut=true;return undefined;}
+   try{return await withDeadline(until,work);}catch(e){if(!(e instanceof DOMException&&e.name==='TimeoutError'))throw e;timedOut=true;return undefined;}
+  };
+  let backup;
+  if(Date.now()<backupWorkDeadline)backup=await bounded(backupDeadline,()=>runDbBackup({resumeOnly:true,budgetMs:70000,workDeadline:backupWorkDeadline,deadline:backupDeadline,dispatchAttention:false}));
+  if(Date.now()<mirrorDeadline){const status=await bounded(mirrorDeadline,()=>mirrorStatus());if(!status?.complete)await bounded(mirrorDeadline,()=>runFileMirror({deadline:mirrorDeadline,cleanupDeadline}));}
+  await bounded(routeDeadline-10000,()=>deliverBackupAttention({deadline:routeDeadline-10000}));
+  const progress=await bounded(routeDeadline,()=>backupProgress());
+  const mirror=await bounded(routeDeadline,()=>mirrorStatus());
+  const deferred={complete:false,status:'pending',error:'Continuation deadline reached; automatic retry scheduled'};
+  return c.json({data:{backup,progress:progress??deferred,mirror:mirror??deferred,...(timedOut?{status:'pending'}:{})}});
+
 });
 
 }

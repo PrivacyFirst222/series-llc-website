@@ -1,9 +1,10 @@
+import {BackupAttentionBanner} from './OfficeRecoveryPanel';
 import { Button } from "@/components/ui/button";
 import { WAITING_FOR_CLIENT } from "./serviceOrders.helpers";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertCircle, Building2, Check, ChevronRight, Clock, ShieldCheck } from "lucide-react";
+import { Building2, Check, ChevronRight, Clock, ShieldCheck } from "lucide-react";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import OrderDetail from "./OrderDetail";
@@ -114,10 +115,10 @@ function Card({
           is completed. Everything else lives in the fulfill dialog, opened by
           clicking an open line. A series designation shows only while open —
           it has no other admin fulfill surface — and vanishes once done. */}
-      {services.some((s) => s.type !== "series" || serviceIsOpen(s)) ? (
+      {services.some((s) => s.type !== "series" || serviceIsOpen(s) || s.completion_available) ? (
         <div className="mt-2.5 flex flex-col gap-1 border-t border-border pt-2.5">
           {services
-            .filter((s) => s.type !== "series" || serviceIsOpen(s))
+            .filter((s) => s.type !== "series" || serviceIsOpen(s) || s.completion_available)
             .map((s) =>
               serviceIsOpen(s) ? (
                 <button
@@ -133,7 +134,7 @@ function Card({
                       : "— in progress"}
                   </span>
                 </button>
-              ) : s.type === "s-election" && s.has_secret ? (
+              ) : s.completion_available || (s.type === "s-election" && s.has_secret) ? (
                 // The client built this package from their own details. The
                 // office can still open it while those details are on file —
                 // to see the date they typed and correct it if the Articles
@@ -147,7 +148,7 @@ function Card({
                 >
                   <Check className="mt-0.5 h-3 w-3 shrink-0 text-trust" />
                   <span className="min-w-0 break-words">{serviceLabel(s, order.llc_name)}</span>
-                  <span className="shrink-0">— built by the client · view</span>
+                  <span className="shrink-0">{s.type === "s-election" && s.has_secret ? "— built by the client · view" : "— completed · view"}</span>
                 </button>
               ) : (
                 <div key={s.id} className="flex items-start gap-1.5 text-xs text-muted-foreground">
@@ -217,7 +218,6 @@ export default function OrderBoard({ enabled, view = "active" }: { enabled: bool
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [openId, setOpenId] = useState<string | null>(null);
-  const [showPending, setShowPending] = useState(false);
   const [viewing, setViewing] = useState<AdminServiceOrder | null>(null);
   const [search, setSearch] = useState("");
   const q = search.trim();
@@ -267,15 +267,14 @@ export default function OrderBoard({ enabled, view = "active" }: { enabled: bool
   }
   const servicesFor = (id: string) => byOrder.get(id) ?? [];
 
-  const pending = orders.filter((o) => o.work_stage === "pending");
   const isNew = orders.filter((o) => o.work_stage === "new");
   const withState = orders.filter((o) => o.work_stage === "state");
   const postFiling = orders.filter((o) => o.work_stage === "post-filing");
   const done = servicesQuery.isSuccess ? orders.filter((o) => o.work_stage === "completed") : [];
-  const oldestPending = pending.reduce<number>((m, o) => Math.max(m, ageInDays(o.created_at)), 0);
 
   return (
     <>
+      <BackupAttentionBanner/>
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <input
           type="search"
@@ -287,49 +286,12 @@ export default function OrderBoard({ enabled, view = "active" }: { enabled: bool
         />
         {ordersQuery.data ? (
           <span className="text-sm text-muted-foreground">
-            {total ? `Showing ${(currentPage - 1) * pageSize + 1}–${(currentPage - 1) * pageSize + shown} of ${total} ${view === "completed" ? "completed" : "active"} orders` : `No ${view === "completed" ? "completed" : "active"} orders${q ? " match your search" : ""}`}
+            {total ? `Showing ${(currentPage - 1) * pageSize + 1}–${(currentPage - 1) * pageSize + shown} of ${total} ${view === "completed" ? "completed orders" : "active orders"}` : `No ${view === "completed" ? "completed orders" : "active orders"}${q ? " match your search" : ""}`}
 
           </span>
         ) : null}
       </div>
 
-      {/* Not a column: an abandoned checkout is not work in progress, and there
-          will be far more of them than real orders. But an old one can also be
-          a payment Square took whose confirmation never reached us, so they are
-          never hidden — only folded. */}
-      {pending.length > 0 ? (
-        <button
-          type="button"
-          onClick={() => setShowPending((v) => !v)}
-          className="mt-4 flex w-full items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-left text-sm"
-        >
-          <AlertCircle
-            className={cn("h-4 w-4", oldestPending >= 5 ? "text-amber-600" : "text-muted-foreground")}
-          />
-          <span className="font-medium">{pending.length} pending payment</span>
-          <span className="text-muted-foreground">
-            oldest {oldestPending === 0 ? "today" : oldestPending === 1 ? "1 day" : `${oldestPending} days`} — abandoned checkouts, or a
-            payment whose confirmation never arrived
-          </span>
-          <ChevronRight className={cn("ml-auto h-4 w-4 transition", showPending && "rotate-90")} />
-        </button>
-      ) : null}
-
-      {showPending ? (
-        <div className="mt-2 flex flex-col gap-2 rounded-xl border border-border bg-secondary/30 p-3">
-          {pending.map((o) => (
-            <div key={o.id} className="flex items-center gap-3 rounded-lg bg-card px-3 py-2 text-sm">
-              <span className="font-medium">{o.llc_name}</span>
-              <span className="text-xs text-muted-foreground">
-                {o.contact_name} &lt;{o.contact_email}&gt;
-              </span>
-              <span className="ml-auto">
-                <AgeBadge createdAt={o.created_at} />
-              </span>
-            </div>
-          ))}
-        </div>
-      ) : null}
 
       {ordersQuery.isPending ? <p className="mt-4 text-sm" role="status">Loading orders…</p> : null}
       {ordersQuery.isSuccess && (view === "active" || servicesQuery.isSuccess) ? (

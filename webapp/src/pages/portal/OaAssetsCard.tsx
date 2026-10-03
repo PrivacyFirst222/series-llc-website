@@ -4,6 +4,7 @@
 // series by amount. The server computes Exhibit A from the same list and
 // refuses the same errors shown here.
 import { DollarInput } from "@/components/ui/dollar-input";
+import { PercentageInput } from "@/components/ui/percentage-input";
 import { CONTRIBUTOR_REVIEW } from "@/lib/oaContributors";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,9 @@ export function OaAssetsCard({ units, isMulti, seedSeries, assets, setAssets, on
   const unitCount = isMulti ? units.length : 1;
   const patchAsset = (i: number, p: Partial<AssetAnswer>) => setAssets(assets.map((a, k) => (k === i ? { ...a, ...p } : a)));
   const removeAsset = (i: number) => setAssets(assets.filter((_, k) => k !== i));
-  const addAsset = () => setAssets([...assets, { description: "", kind: "other", contributedBy: { mode: "equal" } }]);
+  const addAsset = () => {
+    setAssets([...assets, { id: crypto.randomUUID(), description: "", kind: "other", contributedBy: { mode: "equal" } }]);
+  };
   const problems = assetProblems(assets, unitCount, seedSeries.length);
   const problemFor = (i: number) => problems.filter((p) => p.startsWith(`Asset ${i + 1}:`)).map((p) => p.replace(/^Asset \d+: /, ""));
   return (
@@ -111,13 +114,13 @@ export function OaAssetsCard({ units, isMulti, seedSeries, assets, setAssets, on
                       {units.map((u, k) => (
                         <div key={u.kind === "couple" ? `c${u.ci}` : `m${u.index}`} className="flex items-center gap-2">
                           <span className="w-1/2 break-words">{u.label}</span>
-                          <Input
-                            inputMode="decimal"
+                          <PercentageInput
+                            onValidityChange={onMoneyValidity}
                             aria-label={`Share of asset ${i + 1} contributed by ${u.label}`}
-                            value={shares[k] === undefined ? "" : String(shares[k])}
-                            onChange={(e) => {
+                            value={shares[k]}
+                            onValueChange={(value) => {
                               const next = [...Array.from({ length: unitCount }, (_, j) => asset.contributedBy?.shares?.[j] ?? 0)];
-                              next[k] = e.target.value === "" ? 0 : Number(e.target.value);
+                              next[k] = value ?? 0;
                               patchAsset(i, { contributedBy: { ...asset.contributedBy, mode: "shares", shares: next } });
                             }}
                             className="w-24"

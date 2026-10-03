@@ -95,7 +95,9 @@ if (ledgerText === null) {
   process.exit(0);
 }
 const ledger: Ledger = loadLedger(ledgerText);
-refusals.push(...rulingCompletenessProblems(ledger, read));
+const completeness=rulingCompletenessProblems(ledger,read);
+refusals.push(...completeness);
+if(!completeness.length)notes.push(`current local ruling completeness compared ${ledger.rulings.filter(r=>(r.kind??'ruling')==='ruling').length} ledger ruling records in both directions against authenticated owner records`);
 
 /* 1 — against the last committed ledger; Adam's records are read here */
 const headText = git(["show", "HEAD:docs/audit/ledger.json"], { allowFail: true });
@@ -178,7 +180,7 @@ if (id) {
       if (!it || !part) { refusals.push(`${name}: not in the ledger`); continue; }
       if (it.verdict === "dropped") refusals.push(`${name}: was dropped — ${it.verdictReason}`);
       if (part.batch !== id) refusals.push(`${name}: not assigned to batch ${id} in the ledger — assignment is recorded before work starts`);
-      const claim = familyClaim(ledger, { item: bi.id, part: bi.part }, id, bi.replaces);
+      const claim = familyClaim(ledger, { item: bi.id, part: bi.part }, id, bi.replaces, batch.items);
       if (claim) refusals.push(`${name}: the same defect is already being worked on — ${claim}`);
       for (const o of others) {
         const ob = loadBatch(o);

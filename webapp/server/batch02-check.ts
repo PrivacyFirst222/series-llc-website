@@ -79,7 +79,7 @@ async function child() {
   const texts:string[]=[];
   if(built.ok){texts.push(await pdf(await req(`/portal/documents/${built.documentId}/download`)));texts.push(await pdf(await req(`/admin/services/${sel}/s-election-draft`,undefined,true)));await db.query("UPDATE service_orders SET fulfilled_at=now()-interval '15 days' WHERE id=$1",[sel]);await purgeExpiredSElections();const docs=await db.query<{id:string}>("SELECT id FROM documents WHERE order_id=$1 AND id=$2",[a,built.documentId]);if(docs[0])texts.push(await pdf(await req(`/portal/documents/${docs[0].id}/download`)));}
   report('batch02 N1.04: S-election copies use their own company address',texts.length===3&&texts.every(t=>t.includes('111 Alpha Avenue')&&!t.includes('999 Beta Boulevard')),{copies:texts.length,addresses:texts.map(t=>t.match(/.{0,20}(?:Alpha Avenue|Beta Boulevard).{0,40}/g))});
-  const mail=new FormData();mail.set('clientId',clientId);mail.set('kind','legal_mail');mail.set('title','Batch02 summons');mail.set('receivedOn',date);mail.set('notify','false');mail.set('file',new File(['%PDF-1.4 test\n%%EOF'],'mail.pdf',{type:'application/pdf'}));
+  const mail=new FormData();mail.set('submissionId',crypto.randomUUID());mail.set('clientId',clientId);mail.set('kind','legal_mail');mail.set('title','Batch02 summons');mail.set('receivedOn',date);mail.set('notify','false');mail.set('file',new File(['%PDF-1.4 test\n%%EOF'],'mail.pdf',{type:'application/pdf'}));
   const missing=await req('/admin/documents',mail,true);mail.set('orderId',a);const uploaded=await req('/admin/documents',mail,true);
   const mailDocs=(await json('/portal/documents')).data as {id:string;kind:string;order_id:string;company_name:string}[];const mailDoc=mailDocs.find(x=>x.kind==='legal_mail');
   report('batch02 146: legal mail uploads require and retain their company',missing.status===400&&uploaded.status===200&&mailDoc?.order_id===a&&mailDoc?.company_name==='Scope Alpha, LLC',{missing:missing.status,uploaded:uploaded.status,mailDoc});
@@ -87,7 +87,7 @@ async function child() {
   await db.query(`INSERT INTO documents(id,client_id,kind,title,storage_key,content_type,size_bytes)
     SELECT $1,client_id,'legal_mail','Legacy mail without recipient',storage_key,content_type,size_bytes FROM documents WHERE id=$2`,[orphanId,mailDoc?.id]);
   await req('/admin/file-mirror/run',{},true);
-  const mirror=fileURLToPath(new URL('../.dev-data/dropbox-mirror/',import.meta.url));
+  const mirror=process.env.DEV_MIRROR_DIR||fileURLToPath(new URL('../.dev-data/dropbox-mirror/',import.meta.url));
   const contains=(name:string)=>existsSync(join(mirror,name))&&readdirSync(join(mirror,name)).some(f=>f.startsWith(mailDoc?.id.slice(0,8)??'MISSING'));
   const orphanIn=(name:string)=>existsSync(join(mirror,name))&&readdirSync(join(mirror,name)).some(f=>f.startsWith(orphanId.slice(0,8)));
   report('batch02 225: legal mail mirror uses its recipient company',!!mailDoc&&contains('Scope Alpha, LLC')&&!contains('Scope Beta, LLC')&&orphanIn(email)&&!orphanIn('Scope Beta, LLC'),{legacyAccountFolder:orphanIn(email),alpha:contains('Scope Alpha, LLC'),beta:contains('Scope Beta, LLC')});

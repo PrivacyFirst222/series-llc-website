@@ -12,7 +12,8 @@ export function assetProblems(assets: AssetAnswer[], unitCount: number, seriesCo
     if (!(typeof asset.value === "number" && asset.value > 0)) out.push(`${label}: give an agreed value in dollars.`);
     if (unitCount > 1 && asset.contributedBy?.mode === "shares") {
       const shares = Array.from({ length: unitCount }, (_, i) => asset.contributedBy?.shares?.[i] ?? 0);
-      if (Math.abs(shares.reduce((a, b) => a + b, 0) - 100) > 0.01) out.push(`${label}: the shares must total 100.`);
+      if (shares.some(share => !Number.isFinite(share) || share < 0 || share > 100)) out.push(`${label}: enter a percentage from 0 to 100 for each contributor.`);
+      else if (Math.abs(shares.reduce((a, b) => a + b, 0) - 100) > 0.01) out.push(`${label}: the shares must total 100.`);
     }
     if (asset.kind === "cash") {
       const allocated = Array.from({ length: seriesCount }, (_, i) => asset.cashAllocations?.[i] ?? 0).reduce((a, b) => a + b, 0);
