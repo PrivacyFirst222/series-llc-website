@@ -112,7 +112,7 @@ jobs:
       # with our checks.
       - name: Fix-ledger regression and positive controls
         if: github.event_name == 'workflow_dispatch' && inputs.phase == 'qualification'
-        run: bun run docs/audit/repair-check.ts
+        run: FINAL_CONTROL_DISPATCH=1 bun run docs/audit/single-repository-controls.ts --out "$RUNNER_TEMP/single-repository-controls-${{ github.run_id }}-${{ github.run_attempt }}"
 
       - name: A customer buys every product variant
         if: github.event_name == 'workflow_dispatch' && inputs.phase == 'qualification'
