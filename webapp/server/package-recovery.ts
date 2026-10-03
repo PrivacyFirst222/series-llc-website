@@ -27,15 +27,24 @@ export function recoveryMetadata(details:Record<string,unknown>,version:1|2=2):R
  });
  return out;
 }
-/** The purge producer writes UTC timestamps with up to six fractional digits.
+/** Accept the scheduled purge's PostgreSQL timestamp text as well as UTC ISO.
+ * Validate calendar/zone fields before comparing; retain the original string.
  * Date.parse alone rounds microseconds and normalizes impossible calendar days. */
 function purgeInstant(value:unknown):bigint|null{
  if(typeof value!=='string')return null;
- const match=/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,6}))?Z$/.exec(value);
+ const utc=/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,6}))?Z$/.exec(value);
+ const postgres=/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})(?:\.(\d{1,6}))?([+-])(\d{2})(?::(\d{2})(?::(\d{2}))?)?$/.exec(value);
+ const match=utc??postgres;
  if(!match)return null;
- const seconds=Date.parse(match[1]+'Z');
- if(!Number.isFinite(seconds)||new Date(seconds).toISOString().slice(0,19)!==match[1])return null;
- return BigInt(seconds)*1000n+BigInt((match[2]??'').padEnd(6,'0'));
+ const local=match[1].replace(' ','T'),seconds=Date.parse(local+'Z');
+ if(!Number.isFinite(seconds)||new Date(seconds).toISOString().slice(0,19)!==local)return null;
+ let offset=0;
+ if(postgres){
+  const hours=Number(postgres[4]),minutes=Number(postgres[5]??0),zoneSeconds=Number(postgres[6]??0);
+  if(hours>15||minutes>59||zoneSeconds>59)return null;
+  offset=(hours*3600+minutes*60+zoneSeconds)*(postgres[3]==='-'?-1:1);
+ }
+ return BigInt(seconds)*1000n-BigInt(offset)*1000000n+BigInt((match[2]??'').padEnd(6,'0'));
 }
 export function selectPackageMetadata(record:PackageRecord,current:Record<string,unknown>):Record<string,unknown>{
  if(record.metadataVersion!==2)return current.documentId===record.id?recoveryMetadata(current):{...record.details,recoveryMetadataUnavailable:true};
