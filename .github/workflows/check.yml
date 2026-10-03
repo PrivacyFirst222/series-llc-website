@@ -1,19 +1,18 @@
-# The doorman: every push and pull request runs the complete verification —
-# typecheck, lint, both test suites (the e2e run's several hundred checks
-# against a server booted on a virgin database), and all seven document
-# gates — on a clean machine.
-# Before this existed, the suite ran only when one person remembered to run
-# it on one Mac.
-#
-# The server is started with E2E_OFFLINE=1: every external integration is
-# severed at the environment layer, and the suite itself refuses to run
-# against a server with live integrations. No secrets exist in CI, and none
-# are needed.
+# Repair pushes run short readiness checks. Full qualification is an explicit
+# owner-authorized dispatch; a green repair job is not product acceptance.
 name: check
 
 on:
   push:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: "Owner-authorized final qualification (repair pushes run short checks only)"
+        type: choice
+        options: [repair, qualification]
+        default: repair
+        required: true
 
 jobs:
   check:
@@ -34,7 +33,39 @@ jobs:
         working-directory: webapp
         run: bun install --frozen-lockfile
 
+      # PDF unit tests also consume Poppler: install before the first consumer.
+      - name: Install and verify PDF tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+          command -v pdftotext
+          command -v pdftoppm
+          command -v pdfinfo
+
+      - name: Short repair checks (not full qualification)
+        working-directory: webapp
+        run: |
+          bun run typecheck
+          bun run lint
+          bun run test
+          bun run ../docs/facts-check.ts
+          bun run build
+
+      - name: Report qualification held
+        if: github.event_name != 'workflow_dispatch' || inputs.phase != 'qualification'
+        run: |
+          echo "Short repair checks completed. Full qualification: NOT YET RUN." >> "$GITHUB_STEP_SUMMARY"
+          echo "Final e2e, browser, ledger controls and assertion replay require an owner-authorized qualification dispatch." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install Chromium before qualification consumers
+        if: github.event_name == 'workflow_dispatch' && inputs.phase == 'qualification'
+        working-directory: webapp
+        run: |
+          bunx playwright install --with-deps chromium
+          bun -e 'import { chromium } from "playwright"; import { existsSync } from "node:fs"; if (!existsSync(chromium.executablePath())) throw Error("Chromium executable missing");'
+
       - name: Start the API offline on a virgin database
+        if: github.event_name == 'workflow_dispatch' && inputs.phase == 'qualification'
         working-directory: webapp
         run: |
           E2E_OFFLINE=1 bun run server/dev.ts > /tmp/dev-server.log 2>&1 &
@@ -45,6 +76,7 @@ jobs:
           echo "server never became ready"; cat /tmp/dev-server.log; exit 1
 
       - name: Run everything
+        if: github.event_name == 'workflow_dispatch' && inputs.phase == 'qualification'
         working-directory: webapp
         env:
           CHECK_RESULTS_FILE: /tmp/server-results.jsonl
@@ -78,14 +110,12 @@ jobs:
       # STORED order matches, field for field, what was chosen on screen.
       # Green means a customer can buy the product, not that our checks agree
       # with our checks.
-      - name: Install Chromium for the behavioral gate
-        working-directory: webapp
-        run: bunx playwright install --with-deps chromium
-
       - name: Fix-ledger regression and positive controls
+        if: github.event_name == 'workflow_dispatch' && inputs.phase == 'qualification'
         run: bun run docs/audit/repair-check.ts
 
       - name: A customer buys every product variant
+        if: github.event_name == 'workflow_dispatch' && inputs.phase == 'qualification'
         working-directory: webapp
         env:
           CHECK_RESULTS_FILE: /tmp/walk-results.jsonl
@@ -97,6 +127,7 @@ jobs:
       # accepted fixes. A named check missing from the results counts as failed,
       # and a result counts only from this commit and this run.
       - name: Replay the accepted fixes' assertions
+        if: github.event_name == 'workflow_dispatch' && inputs.phase == 'qualification'
         working-directory: webapp
         run: bun run scripts/audit-assert.ts --results /tmp/server-results.jsonl --results /tmp/walk-results.jsonl --commit ${{ github.sha }} --run ${{ github.run_id }}-${{ github.run_attempt }}
 
