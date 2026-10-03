@@ -111634,6 +111634,7 @@ function registerPortalRoutes(app2) {
         memberSignatories: oa.members.map((m2) => ({ member: m2.name, signatories: m2.signatories, jointHolding: m2.jointHolding })),
         managerNames: oa.managerNames,
         memberManaged,
+        professional: oa.professional === true,
         specialTerms: body.data.specialTerms,
         contribution: body.data.contribution,
         entitySigners

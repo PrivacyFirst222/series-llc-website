@@ -1660,6 +1660,7 @@ app.post("/portal/series/consent", async (c) => {
       memberSignatories: oa.members.map(m => ({member:m.name, signatories:m.signatories, jointHolding:m.jointHolding})),
       managerNames: oa.managerNames,
       memberManaged,
+      professional: oa.professional === true,
       specialTerms: body.data.specialTerms,
       contribution: body.data.contribution,
       entitySigners,
