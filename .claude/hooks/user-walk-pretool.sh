@@ -23,6 +23,15 @@
 # open. Fails CLOSED: any error in this script blocks the call.
 
 INPUT=$(cat)
+# BEGIN OWNER-AUTHORIZED AUDIT SESSION BRIDGE
+if printf '%s' "$INPUT" | /Applications/Xcode.app/Contents/Developer/usr/bin/python3 '/Users/adam/Documents/FLPSLLC Website Review/review-enforcement-2026-09-24/audit_mode.py' session-hook --root '/Users/adam/Documents/Claude Projects/Series LLC Website' --name user-walk-pretool.sh --registry '/Users/adam/Documents/FLPSLLC Website Review/review-enforcement-2026-09-24/audit-mode-state'; then
+  exit 0
+else
+  _audit_dispatch_rc=$?
+  [ "$_audit_dispatch_rc" -eq 10 ] || exit 2
+fi
+# END OWNER-AUTHORIZED AUDIT SESSION BRIDGE
+
 
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then
   ROOT="$CLAUDE_PROJECT_DIR"
