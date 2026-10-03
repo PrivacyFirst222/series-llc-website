@@ -62,7 +62,7 @@ export async function clearDeletedOfficeHistory(storageKey:string):Promise<void>
  ) UPDATE documents SET meta=COALESCE(meta,'{}'::jsonb)-'historyRecovery'
  WHERE storage_key=$1 AND meta ? 'historyRecovery'`,[storageKey]);
 }
-async function registerDeletion(r:Deletion){
+export async function registerDeletion(r:Deletion){
  const db=await getDb();
  // One statement: a lost registration reply must not leave the portal row
  // visible, or leave regeneration enabled for a logically deleted document.
@@ -74,15 +74,26 @@ async function registerDeletion(r:Deletion){
  ), forgotten AS (
    UPDATE office_operations SET payload=jsonb_set(payload,'{historyRecovery}',${retainedHistorySql})
    WHERE ${hasDeletedHistorySql} RETURNING id
- ) UPDATE service_orders SET ein_secret=NULL,
-   details=COALESCE(details,'{}'::jsonb)||jsonb_build_object('documentDeletedAt',$6::text)
-   WHERE $5::text IS DISTINCT FROM 'superseded' AND details->>'documentId'=$2::text`,
+ ), affected_holds AS (
+   UPDATE recovery_holds SET status='deleted'
+   WHERE id=$2::uuid AND status='held' AND $5::text IS DISTINCT FROM 'superseded'
+   RETURNING id,service_id
+ ) UPDATE service_orders s SET
+   ein_secret=CASE WHEN s.details->>'documentId'=$2::text AND $5::text IS DISTINCT FROM 'superseded' THEN NULL ELSE s.ein_secret END,
+   details=(CASE WHEN s.details->>'documentId'=$2::text AND $5::text IS DISTINCT FROM 'superseded'
+     THEN COALESCE(s.details,'{}'::jsonb)||jsonb_build_object('documentDeletedAt',$6::text)
+     ELSE COALESCE(s.details,'{}'::jsonb) END)
+     - CASE WHEN EXISTS(SELECT 1 FROM affected_holds a WHERE a.service_id=s.id)
+       AND NOT EXISTS(SELECT 1 FROM recovery_holds h WHERE h.service_id=s.id AND h.status='held'
+         AND h.id NOT IN (SELECT id FROM affected_holds)) THEN 'recoveryHold' ELSE '__no_deleted_hold__' END
+   WHERE ($5::text IS DISTINCT FROM 'superseded' AND s.details->>'documentId'=$2::text)
+     OR EXISTS(SELECT 1 FROM affected_holds a WHERE a.service_id=s.id)`,
   [r.storageKey,r.documentId,r.mirrorPath,r.requestedAt,r.reason??null,r.requestedAt]);
 }
 export async function retryDocumentDeletions(options:{documentId?:string;documentIds?:string[];budgetMs?:number;limit?:number;deadline?:number}={}):Promise<{pending:number}>{
  const deadline=Math.min(options.deadline??Date.now()+(options.budgetMs??30000),activeDeadline());
- const db=await getDb();if(Date.now()<deadline)await cleanupSupersededOfficeFiles(db,{deadline});
  const ids=options.documentIds??(options.documentId?[options.documentId]:null);
+ const db=await getDb();if(!ids&&Date.now()<deadline)await cleanupSupersededOfficeFiles(db,{deadline});
  const limit=Math.max(1,Math.min(options.limit??50,100));
  if(!(await db.query("SELECT id FROM backup_progress WHERE id='deletion-journal'")).length)await ensureDeletionMirror(await deletionJournal());
  const journal=await readRecoveryJournal();
@@ -104,9 +115,9 @@ export async function retryDocumentDeletions(options:{documentId?:string;documen
   }catch(e){await db.query('UPDATE document_deletions SET completed_at=NULL,error=$2 WHERE storage_key=$1',[r.storageKey,String(e)]);}
   await db.query('INSERT INTO backup_progress(id,cursor) VALUES($1,$2) ON CONFLICT(id) DO UPDATE SET cursor=EXCLUDED.cursor',[cursorKey,r.storageKey]);
  }
- const [n]=await db.query<{n:string}>('SELECT count(*) AS n FROM document_deletions WHERE completed_at IS NULL');
+ const [n]=await db.query<{n:string}>('SELECT count(*) AS n FROM document_deletions WHERE completed_at IS NULL AND ($1::uuid[] IS NULL OR document_id=ANY($1::uuid[]))',[ids]);
  const known=new Set((await db.query<{storage_key:string}>('SELECT storage_key FROM document_deletions')).map(r=>r.storage_key));
- return {pending:Number(n.n)+journal.records.filter(r=>!known.has(r.storageKey)).length};
+ return {pending:Number(n.n)+journal.records.filter(r=>(!ids||ids.includes(r.documentId))&&!known.has(r.storageKey)).length};
 }
 
 /** Backfill pre-registry revisions from their retained operation history. The
