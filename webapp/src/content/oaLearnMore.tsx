@@ -264,8 +264,7 @@ export const LEARN_MORE: Record<string, LearnMoreScreen> = {
         <P>
           <strong className="text-foreground">Worth knowing:</strong> you can change or remove
           the designation later (a signed writing with two witnesses, delivered as your form
-          directs: to the manager in the manager-managed forms, to the administrative member in
-          the member-managed multi-member form, or kept with the company's records in the
+          directs: to the manager in the manager-managed forms, to the Administrative Member in a member-managed multi-member form (or to the Members acting by a Majority in Interest until one is designated), or kept with the company's records in the
           member-managed single-member form).
           A will does <em>not</em> override this designation. If you have a trust or a larger
           estate plan, tell your estate planner about this designation so the pieces work

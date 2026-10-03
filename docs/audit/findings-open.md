@@ -3086,10 +3086,15 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Colophons omit s. 711.50; two single-owner S forms list Code sections, six do not. Replace: list 711.50; Code sections in all or none.
   - **Codex rejected the proposed replacement:** Adding 711.50 is correct. “All or none” is not a complete replacement; choose one convention and enumerate the Code sections actually cited in each form.
   - Previous fix: 18 r2, release commit not recorded; 8 assertion(s) retained. Replacement attempt: 34 r1, work order 37ee730a48c64f58385e96780ecdd8f8ef9a7e1b9e85692578ff136f85cf27c6.
-  - Implemented protections: batch 34 revision 1, release commit not recorded, by Codex; protected by 8 assertion(s).
-  - Implementation evidence: commit c91b101b9652a14906270d1422f8cc771f71e706, batch 34 revision 1, package d58da0289ab7. This records implementation, not acceptance or publication.
+  - Previous fix: 34 r1, release commit not recorded; 8 assertion(s) retained. Replacement attempt: chunk45-final-wording-successors r2, work order 016d931c5f51caa834af390c25a82722e9006868b6b98459303fa30b75982f4c.
+  - Previous fix: 34 r1, release commit not recorded; 8 assertion(s) retained. Replacement attempt: chunk45-final-wording-successors r3, work order 5b26bf3d342fc68f97e5c74b625edb4154012187dcb1e2b951cbc2b2e76568fd.
+  - Implemented protections: batch chunk45-final-wording-successors revision 3, release commit not recorded, by Codex; protected by 8 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
   - 2026-09-22 superseded by approved replacement: prior fix 18 r2 at ; approved work order 37ee730a48c64f58385e96780ecdd8f8ef9a7e1b9e85692578ff136f85cf27c6
+  - 2026-10-03 superseded by approved replacement: prior fix 34 r1 at ; approved work order 016d931c5f51caa834af390c25a82722e9006868b6b98459303fa30b75982f4c
+  - 2026-10-03 rejected r2: Carry forward existing approved wording under reaffirmed owner instruction; technical work-order revision corrects facts.md control classification. Substantive words and all outcomes remain approved unchanged.
+  - 2026-10-03 superseded by approved replacement: prior fix 34 r1 at ; approved work order 5b26bf3d342fc68f97e5c74b625edb4154012187dcb1e2b951cbc2b2e76568fd
 - **236. [A87]** — **open**
   - Four multi-member forms say "single class" twice (2.13 and 4.1). Replace: keep 4.1.
   - Ruling, 2026-09-20: Batch 16 item 5: Reject. Keep as is.
@@ -3099,18 +3104,40 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
   - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
-- **238. [A89]** — **assigned**
+- **238. [A89]** — **implemented**
   - Instructions s. 3: Administrative Member "no authority to decide anything"; 5.8 lets a Majority in Interest confer authority. Replace as proposed.
   - **Codex rejected the proposed replacement:** “Replace as proposed” supplies no replacement. Use: “The Administrative Member handles ministerial tasks and has any additional authority this Agreement or a Majority in Interest confers.”
   - Previous fix: 15 r2, release commit not recorded; 3 assertion(s) retained. Replacement attempt: chunk45-final-repairs r1, work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e.
+  - Previous fix: 15 r2, release commit not recorded; 3 assertion(s) retained. Replacement attempt: chunk45-final-wording-successors r1, work order 5bdcc613d4f6f54644812a03338cef390bbc63d04886be52f9ffde584a2cba9c.
+  - Previous fix: 15 r2, release commit not recorded; 3 assertion(s) retained. Replacement attempt: chunk45-final-wording-successors r2, work order 016d931c5f51caa834af390c25a82722e9006868b6b98459303fa30b75982f4c.
+  - Previous fix: 15 r2, release commit not recorded; 3 assertion(s) retained. Replacement attempt: chunk45-final-wording-successors r3, work order 5b26bf3d342fc68f97e5c74b625edb4154012187dcb1e2b951cbc2b2e76568fd.
+  - Implemented protections: batch chunk45-final-wording-successors revision 3, release commit not recorded, by Codex; protected by 5 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
   - 2026-10-02 superseded by approved replacement: prior fix 15 r2 at ; approved work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e
-- **239. [A90]** — **assigned**
+  - 2026-10-03 rejected r1: Owner-approved AM07: unimplemented proposed wording superseded by the latest approved R07/R08/R10 wording
+  - 2026-10-03 superseded by approved replacement: prior fix 15 r2 at ; approved work order 5bdcc613d4f6f54644812a03338cef390bbc63d04886be52f9ffde584a2cba9c
+  - 2026-10-03 rejected r1: Owner reaffirmed carrying already-approved wording to related sections. Supersede incomplete work order r1 with r2; preserve all requirements and histories. No rejection of the approved substantive wording.
+  - 2026-10-03 superseded by approved replacement: prior fix 15 r2 at ; approved work order 016d931c5f51caa834af390c25a82722e9006868b6b98459303fa30b75982f4c
+  - 2026-10-03 rejected r2: Carry forward existing approved wording under reaffirmed owner instruction; technical work-order revision corrects facts.md control classification. Substantive words and all outcomes remain approved unchanged.
+  - 2026-10-03 superseded by approved replacement: prior fix 15 r2 at ; approved work order 5b26bf3d342fc68f97e5c74b625edb4154012187dcb1e2b951cbc2b2e76568fd
+- **239. [A90]** — **implemented**
   - Instructions and Manual: capital call "a majority of owners" (Majority in Interest); borrowing limit "written" consent (consent). Replace both.
   - **Codex rejected the proposed replacement:** Use “Members holding more than 50% of the Percentage Interests” for capital calls and “the consent of all Members” for borrowing; retain written notice of a capital call, which §6.2 actually requires.
   - Previous fix: 15 r2, release commit not recorded; 6 assertion(s) retained. Replacement attempt: chunk45-final-repairs r1, work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e.
+  - Previous fix: 15 r2, release commit not recorded; 6 assertion(s) retained. Replacement attempt: chunk45-final-wording-successors r1, work order 5bdcc613d4f6f54644812a03338cef390bbc63d04886be52f9ffde584a2cba9c.
+  - Previous fix: 15 r2, release commit not recorded; 6 assertion(s) retained. Replacement attempt: chunk45-final-wording-successors r2, work order 016d931c5f51caa834af390c25a82722e9006868b6b98459303fa30b75982f4c.
+  - Previous fix: 15 r2, release commit not recorded; 6 assertion(s) retained. Replacement attempt: chunk45-final-wording-successors r3, work order 5b26bf3d342fc68f97e5c74b625edb4154012187dcb1e2b951cbc2b2e76568fd.
+  - Implemented protections: batch chunk45-final-wording-successors revision 3, release commit not recorded, by Codex; protected by 13 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
   - 2026-10-02 superseded by approved replacement: prior fix 15 r2 at ; approved work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e
+  - 2026-10-03 rejected r1: Owner-approved AM07: unimplemented proposed wording superseded by the latest approved R07/R08/R10 wording
+  - 2026-10-03 superseded by approved replacement: prior fix 15 r2 at ; approved work order 5bdcc613d4f6f54644812a03338cef390bbc63d04886be52f9ffde584a2cba9c
+  - 2026-10-03 rejected r1: Owner reaffirmed carrying already-approved wording to related sections. Supersede incomplete work order r1 with r2; preserve all requirements and histories. No rejection of the approved substantive wording.
+  - 2026-10-03 superseded by approved replacement: prior fix 15 r2 at ; approved work order 016d931c5f51caa834af390c25a82722e9006868b6b98459303fa30b75982f4c
+  - 2026-10-03 rejected r2: Carry forward existing approved wording under reaffirmed owner instruction; technical work-order revision corrects facts.md control classification. Substantive words and all outcomes remain approved unchanged.
+  - 2026-10-03 superseded by approved replacement: prior fix 15 r2 at ; approved work order 5b26bf3d342fc68f97e5c74b625edb4154012187dcb1e2b951cbc2b2e76568fd
 - **240. [A91]** — **implemented**
   - Manual s. 6 step 3: unanimous consent "a rule your operating agreement cannot change"; 605.2107(1)(i) excepts the manner of approving establishment (repo statute notes). Ruling needed from the statute.
   - **Codex rejected the proposed replacement:** The finding asks for a ruling rather than providing replacement text. The concrete replacement in item249 is correct.
@@ -3152,9 +3179,14 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Codex (disputed): The actual Manual colophon at :536 includes the entire “605.2101–605.2802” range. Thus 605.2107, 605.2302, 605.2304 and 605.2402 are already included, contrary to four of the alleged twelve omissions. The missing individually named provisions are 605.0302, 605.04074, 605.0410, 605.0602, 605.0714, 605.1103, former212.031 and220.02.
   - **Codex rejected the proposed replacement:** Reconcile eight omitted individual citations, distinguish the repealed historical citation, and define whether ranges satisfy the colophon convention; do not report twelve absent sections.
   - Corrected after Codex's review: The colophon's range 605.2101-605.2802 already covers four of the twelve. Eight are missing: 605.0302, 605.04074, 605.0410, 605.0602, 605.0714, 605.1103, former 212.031, 220.02.
-  - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
-  - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
+  - Previous fix: 18 r2, release commit not recorded; 1 assertion(s) retained. Replacement attempt: chunk45-final-wording-successors r2, work order 016d931c5f51caa834af390c25a82722e9006868b6b98459303fa30b75982f4c.
+  - Previous fix: 18 r2, release commit not recorded; 1 assertion(s) retained. Replacement attempt: chunk45-final-wording-successors r3, work order 5b26bf3d342fc68f97e5c74b625edb4154012187dcb1e2b951cbc2b2e76568fd.
+  - Implemented protections: batch chunk45-final-wording-successors revision 3, release commit not recorded, by Codex; protected by 1 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
+  - 2026-10-03 superseded by approved replacement: prior fix 18 r2 at ; approved work order 016d931c5f51caa834af390c25a82722e9006868b6b98459303fa30b75982f4c
+  - 2026-10-03 rejected r2: Carry forward existing approved wording under reaffirmed owner instruction; technical work-order revision corrects facts.md control classification. Substantive words and all outcomes remain approved unchanged.
+  - 2026-10-03 superseded by approved replacement: prior fix 18 r2 at ; approved work order 5b26bf3d342fc68f97e5c74b625edb4154012187dcb1e2b951cbc2b2e76568fd
 - **247. [A98]** — **implemented**
   - Manual s. 5 "s. 6.1 of your agreement" (statute abbreviation); README "five" masters; two double blank lines. Replace: "§6.1"; "eight"; single blanks.
   - **Codex rejected the proposed replacement:** The citation and eight corrections are sound. Track whitespace separately as housekeeping; the item mixes reader-visible wording with source-only whitespace.
@@ -3605,7 +3637,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
   - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
-- **N2.22. [substantive]** — **assigned**
+- **N2.22. [substantive]** — **implemented**
   - Professional LLC operating agreement, Transfer on Death (§4.6), family transfers/admission and purpose — webapp/server/templates-oa-single.md:134 — `webapp/server/templates-oa-single.md:134`
   - Reads: **4.6 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50–711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. The Member, if an individual, may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
   - Claims: A professional LLC may admit any chosen beneficiary after agreement to be bound, without a professional-eligibility qualification.
@@ -3613,9 +3645,20 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Replace with: For a professional limited liability company, every transfer and admission under this Agreement, including a transfer on death, is subject to Chapter 621, Florida Statutes. A proposed recipient may be admitted only if eligible under s. 621.09(2), and no transfer may violate s. 621.11(2). The Company's business is limited as s. 621.08 requires, notwithstanding the general-purpose wording of Section 1.4.
   - Ruling, 2026-09-20: Batch 16 item 13 approved: professional-only Chapter 621 purpose, transfer, admission and TOD eligibility restrictions; retain permitted investments and cumulative S-corporation eligibility.
   - Previous fix: 27 r3, release commit not recorded; 19 assertion(s) retained. Replacement attempt: chunk45-final-repairs r1, work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e.
+  - Previous fix: 27 r3, release commit not recorded; 19 assertion(s) retained. Replacement attempt: chunk45-final-wording-successors r1, work order 5bdcc613d4f6f54644812a03338cef390bbc63d04886be52f9ffde584a2cba9c.
+  - Previous fix: 27 r3, release commit not recorded; 19 assertion(s) retained. Replacement attempt: chunk45-final-wording-successors r2, work order 016d931c5f51caa834af390c25a82722e9006868b6b98459303fa30b75982f4c.
+  - Previous fix: 27 r3, release commit not recorded; 19 assertion(s) retained. Replacement attempt: chunk45-final-wording-successors r3, work order 5b26bf3d342fc68f97e5c74b625edb4154012187dcb1e2b951cbc2b2e76568fd.
+  - Implemented protections: batch chunk45-final-wording-successors revision 3, release commit not recorded, by Codex; protected by 39 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
   - 2026-10-02 superseded by approved replacement: prior fix 27 r3 at ; approved work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e
+  - 2026-10-03 rejected r1: Owner-approved AM07: unimplemented proposed wording superseded by the latest approved R07/R08/R10 wording
+  - 2026-10-03 superseded by approved replacement: prior fix 27 r3 at ; approved work order 5bdcc613d4f6f54644812a03338cef390bbc63d04886be52f9ffde584a2cba9c
+  - 2026-10-03 rejected r1: Owner reaffirmed carrying already-approved wording to related sections. Supersede incomplete work order r1 with r2; preserve all requirements and histories. No rejection of the approved substantive wording.
+  - 2026-10-03 superseded by approved replacement: prior fix 27 r3 at ; approved work order 016d931c5f51caa834af390c25a82722e9006868b6b98459303fa30b75982f4c
+  - 2026-10-03 rejected r2: Carry forward existing approved wording under reaffirmed owner instruction; technical work-order revision corrects facts.md control classification. Substantive words and all outcomes remain approved unchanged.
+  - 2026-10-03 superseded by approved replacement: prior fix 27 r3 at ; approved work order 5b26bf3d342fc68f97e5c74b625edb4154012187dcb1e2b951cbc2b2e76568fd
 - **N2.23. [housekeeping]** — **implemented** — housekeeping
   - Statement generator, source comment — webapp/server/statement.ts:7 — `webapp/server/statement.ts:7`
   - Reads:  * carries every word; this fills its six slots and nothing else.

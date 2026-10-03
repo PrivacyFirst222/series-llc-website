@@ -110,10 +110,9 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - retired: `Instructions v2`
 
 ### Where a change of transfer-on-death beneficiary is delivered
-- value: `to the manager in the manager-managed forms; to the administrative member in the member-managed multi-member form; kept with the records in the member-managed single-member form`
-- where: docs/oa-instructions.md — `to the administrative member in the member-managed multi-member form`
-- where: webapp/src/content/oaLearnMore.tsx — `to the administrative member in
-          the member-managed multi-member form`
+- value: `to the manager in the manager-managed forms; to the Administrative Member in a member-managed multi-member form (or to the Members acting by a Majority in Interest until one is designated); kept with the records in the member-managed single-member form`
+- where: docs/oa-instructions.md — `to the Administrative Member in a member-managed multi-member form (or to the Members acting by a Majority in Interest until one is designated)`
+- where: webapp/src/content/oaLearnMore.tsx — `to the Administrative Member in a member-managed multi-member form (or to the Members acting by a Majority in Interest until one is designated)`
 - retired: `kept with the company's records when you are the only`
 
 ### The S corporation forms' limit on a death beneficiary

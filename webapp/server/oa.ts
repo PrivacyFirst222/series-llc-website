@@ -392,6 +392,10 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string;
   const isMemberManaged =
     inputs.version === "member" || inputs.version === "member-s" ||
     inputs.version === "member-single" || inputs.version === "member-single-s";
+  const managerNames = (inputs.managerNames ?? []).map((n) => n.trim()).filter(Boolean);
+  if (!isMemberManaged && managerNames.length === 0) {
+    throw new Error("OA: at least one manager is required");
+  }
   const co = inputs.companyName;
 
   // ---- back matter ----
@@ -409,12 +413,16 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string;
   if (inputs.amendedRestated) {
     s = replaceOnce(s, "# OPERATING AGREEMENT", alternatives.select("restated-title"), "restated title");
   }
-  if (inputs.professional || inputs.amendedRestated) {
+  if (inputs.professional || inputs.amendedRestated || (!isMemberManaged && managerNames.length > 1)) {
     const preamble = s.match(/^THIS OPERATING AGREEMENT[^\n]+/m)?.[0];
     if (!preamble) throw new Error("OA template marker missing: preamble");
-    const key = inputs.professional
-      ? (inputs.amendedRestated ? "restated-professional-preamble" : "professional-preamble")
-      : "restated-preamble";
+    const key = !isMemberManaged && managerNames.length > 1
+      ? (inputs.professional
+        ? (inputs.amendedRestated ? "plural-restated-professional-preamble" : "plural-professional-preamble")
+        : (inputs.amendedRestated ? "plural-restated-preamble" : "plural-preamble"))
+      : (inputs.professional
+        ? (inputs.amendedRestated ? "restated-professional-preamble" : "professional-preamble")
+        : "restated-preamble");
     s = replaceOnce(s, preamble, alternatives.select(key), "selected preamble");
   }
   if (inputs.professional) {
@@ -439,10 +447,8 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string;
   // than one of them. The appointment sentence and the signature block are built
   // from the list; s. 5.1's majority rule then governs every later reference to
   // "the Manager" without pluralising each one.
-  const managerNames = (inputs.managerNames ?? []).map((n) => n.trim()).filter(Boolean);
   // Member-managed masters name no Manager at all.
   if (!isMemberManaged) {
-    if (managerNames.length === 0) throw new Error("OA: at least one manager is required");
     // Both numbers are written out in the master and one is chosen here. Until
     // 17 August this sentence — "The initial Managers are X and Y." — was
     // composed in TypeScript, along with the signature label, the
@@ -505,6 +511,12 @@ export function assembleOa(inputs: OaInputs): { markdown: string; title: string;
       s = replaceSectionBody(s, /\*\*6\.2 Additional Capital Contributions\.[^\n]*\n[\s\S]*?(?=\n\*\*6\.3)/, "**6.2 Additional Capital Contributions.** [Reserved.]\n\n", "6.2 omit");
       s = replaceSectionBody(s, /\*\*6\.3 Failure to Contribute\.\*\*[\s\S]*?(?=\n\*\*6\.4)/, "**6.3 Failure to Contribute.** [Reserved.]\n\n", "6.3 omit");
       s = replaceSectionBody(s, /\(a\) \*\[include only if optional Section 6\.2[\s\S]*?\]\*[\s\S]*?; \(b\)/, "(a) [Reserved.]; (b)", "11.1(a) reserve");
+      s = replaceSectionBody(s, /\*\*6\.6 [^\n]*?\*\*[\s\S]*?(?=\n\*\*6\.7)/,
+        alternatives.select("capital-omitted-six") + "\n\n", "6.6 capital omitted");
+      s = replaceSectionBody(s, /\*\*14\.5 [^\n]*?\*\*[\s\S]*?(?=\n---|\n## )/,
+        alternatives.select("capital-omitted-fourteen") + "\n\n", "14.5 capital omitted");
+      s = replaceSectionBody(s, /\*\*15\.1 Amendments\.\*\*[\s\S]*?(?=\n\*\*15\.2)/,
+        alternatives.select("capital-omitted-fifteen") + "\n\n", "15.1 capital omitted");
     }
 
     // Competition alternative
