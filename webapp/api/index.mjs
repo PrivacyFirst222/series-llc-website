@@ -106000,13 +106000,14 @@ var templates_new_series_default = `# <!-- if:several -->UNANIMOUS WRITTEN CONSE
 
 ---
 
-<!-- if:several -->The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), acting by written consent without a meeting as permitted by the Company's operating agreement (the "Agreement"), adopt the following as of **[EFFECTIVE DATE]**:<!-- /if --><!-- if:sole -->The undersigned, being the sole member of **[COMPANY NAME], LLC**, a Florida protected series limited liability company (the "Company"), acting by written consent as permitted by the Company's operating agreement (the "Agreement"), adopts the following as of **[EFFECTIVE DATE]**:<!-- /if -->
+<!-- if:several -->The undersigned, being **all** of the members of **[COMPANY NAME], LLC**, a Florida <!-- if:professional -->professional <!-- /if -->protected series limited liability company (the "Company"), acting by written consent without a meeting as permitted by the Company's operating agreement (the "Agreement"), adopt the following as of **[EFFECTIVE DATE]**:<!-- /if --><!-- if:sole -->The undersigned, being the sole member of **[COMPANY NAME], LLC**, a Florida <!-- if:professional -->professional <!-- /if -->protected series limited liability company (the "Company"), acting by written consent as permitted by the Company's operating agreement (the "Agreement"), adopts the following as of **[EFFECTIVE DATE]**:<!-- /if -->
 
 **1. Approval of the new Protected Series.** Under s. 605.2201(1), Florida Statutes, a limited liability company may establish a protected series with the affirmative vote or consent of all of its members, and Section 3.1 of the Agreement requires that consent. <!-- if:several -->The Members, constituting all members of the Company, approve<!-- /if --><!-- if:sole -->The Member, being the sole member of the Company, approves<!-- /if --> the establishment of a protected series to be named:
 
 **[SERIES NAME]**
 
-**2. Purpose.** The purpose of the new Protected Series is any lawful purpose<!-- if:purpose -->, including, without limitation, [SERIES PURPOSE]<!-- /if -->.
+<!-- if:standard -->**2. Purpose.** The purpose of the new Protected Series is any lawful purpose<!-- if:purpose -->, including, without limitation, [SERIES PURPOSE]<!-- /if -->.<!-- /if -->
+<!-- if:professional -->**2. Purpose.** The purpose of the new Protected Series is to engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08, Florida Statutes.<!-- if:purpose --> This includes, within those limits, [SERIES PURPOSE].<!-- /if --><!-- /if -->
 
 **3. Ownership.** The new Protected Series is established without associated members. The Company owns all of its protected-series transferable interests, and no member of the Company holds any interest in it except indirectly, through that member's interest in the Company (ss. 605.2302(1), 605.2303(2), Fla. Stat.).
 
@@ -106031,7 +106032,8 @@ var templates_new_series_default = `# <!-- if:several -->UNANIMOUS WRITTEN CONSE
 
 | Item | Terms |
 |---|---|
-| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [SERIES PURPOSE]<!-- /if --> |
+<!-- if:standard -->| Purpose of this Protected Series | Any lawful purpose<!-- if:purpose -->, including, without limitation, [SERIES PURPOSE]<!-- /if --> |<!-- /if -->
+<!-- if:professional -->| Purpose of this Protected Series | Only the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08, Florida Statutes<!-- if:purpose -->; including, within those limits, [SERIES PURPOSE]<!-- /if --> |<!-- /if -->
 | Owner of this Protected Series | The Company. This Protected Series has no Associated Members (ss. 605.2302(1), 605.2303(2), Fla. Stat.). |
 <!-- if:managermanaged -->| Protected Series Manager | Same as Company Manager |
 <!-- /if --><!-- if:membermanaged --><!-- if:several -->| Managed by | The Members, as protected-series managers (s. 605.2304, Fla. Stat., as varied by Section 5.2 of the Agreement), acting by a Majority in Interest |
