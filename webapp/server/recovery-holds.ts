@@ -1,9 +1,9 @@
 import {createHash} from 'node:crypto';
 import type {Db} from './db';
 import {readRecoveryJournal,appendDeletionMirror} from './backup-deletions';
-import {verifyPackageCopy,commitPackageRecovery,abortPackageRecovery,type PackageRecord,recoveryMetadata} from './package-recovery';
+import {verifyPackageCopy,commitPackageRecovery,abortPackageRecovery,type PackageRecord,recoveryMetadata,selectPackageMetadata} from './package-recovery';
 import {replaceStoredFile} from './storage';
-import {retryDocumentDeletions,requestDocumentDeletion} from './document-retention';
+import {retryDocumentDeletions,requestDocumentDeletion,registerDeletion} from './document-retention';
 
 interface Hold {id:string;service_id:string;client_id:string;record:PackageRecord;reason:string;status:string;acknowledged_at:unknown}
 export async function heldPackageManifest(db:Db){
@@ -26,10 +26,15 @@ export async function reconcileHeldPackage(db:Db,id:string,evidence:HoldEvidence
  const [h]=await db.query<Hold>("SELECT * FROM recovery_holds WHERE id=$1 AND status='held'",[id]);if(!h)throw Error('Held package not found');
  const j=await readRecoveryJournal(),r=j.packages.find(p=>p.id===id);if(!r)throw Error('Independent package record missing');
  if(!evidence.operator?.trim()||!evidence.reference?.trim()||evidence.documentId!==r.id||evidence.serviceId!==r.serviceId||evidence.clientId!==r.clientId||evidence.companyId!==r.companyId||evidence.sha!==r.sha)throw Error('Evidence does not establish the exact held package identity');
+ let cleanupPending=0;
  if(evidence.decision==='client-deletion'){
   if(evidence.authority!=='verified-client-request')throw Error('A verified client deletion instruction is required');
   await appendDeletionMirror({storageKey:r.storageKey,documentId:r.id,mirrorPath:r.mirrorPath,requestedAt:new Date().toISOString(),reason:'client'});
-  await retryDocumentDeletions();
+  const journal=await readRecoveryJournal(),covered=new Set(journal.packages.filter(p=>p.serviceId===r.serviceId).map(p=>p.id));
+  covered.add(r.id);
+  // Every durable decision becomes terminal even if physical cleanup times out.
+  for(const decision of journal.records.filter(d=>covered.has(d.documentId)))await registerDeletion(decision);
+  cleanupPending=(await retryDocumentDeletions({documentIds:[...covered],budgetMs:20000})).pending;
  }else{
   if(evidence.authority!=='database-transaction')throw Error('Original database transaction evidence is required; package presence alone proves no commit');
   if(evidence.decision==='aborted-before-commit'){
@@ -43,19 +48,23 @@ export async function reconcileHeldPackage(db:Db,id:string,evidence:HoldEvidence
    const current=(owner.details??{}) as Record<string,unknown>;
    if(current.documentDeletedAt||current.documentId&&![r.id,r.priorDocumentId].includes(String(current.documentId)))throw Error('Current service document conflicts with held package');
    const bytes=await verifyPackageCopy(r);await replaceStoredFile(r.storageKey,bytes);
-   const details=r.metadataVersion===2?r.details:current.documentId===r.id?recoveryMetadata(current):{...r.details,recoveryMetadataUnavailable:true};
+   const details=selectPackageMetadata(r,current);
    const saved=await db.query(`WITH saved AS (INSERT INTO documents(id,client_id,order_id,kind,title,storage_key,content_type,size_bytes,meta,created_at,mirror_path)
-    VALUES($1,$2,$3,'package',$4,$5,'application/pdf',$6,$7,$8,$9) ON CONFLICT(id) DO UPDATE SET storage_key=EXCLUDED.storage_key WHERE documents.client_id=EXCLUDED.client_id AND documents.order_id IS NOT DISTINCT FROM EXCLUDED.order_id RETURNING id)
-    UPDATE service_orders SET status='fulfilled',fulfilled_at=$10,ein_secret=NULL,details=$11::jsonb||jsonb_build_object('documentId',saved.id) FROM saved WHERE service_orders.id=$12 RETURNING service_orders.id`,[r.id,r.clientId,r.companyId,r.title,r.storageKey,r.size,JSON.stringify({sensitive:true,serviceOrderId:r.serviceId,recoveryVersion:2}),r.createdAt,r.mirrorPath,r.fulfilledAt,JSON.stringify(details),r.serviceId]);
+    SELECT $1::uuid,$2::uuid,$3::uuid,'package',$4,$5,'application/pdf',$6::bigint,$7::jsonb,$8::timestamptz,$9
+    WHERE NOT EXISTS(SELECT 1 FROM document_deletions WHERE document_id=$1::uuid)
+    ON CONFLICT(id) DO UPDATE SET storage_key=EXCLUDED.storage_key WHERE documents.deleted_at IS NULL AND documents.client_id=EXCLUDED.client_id AND documents.order_id IS NOT DISTINCT FROM EXCLUDED.order_id RETURNING id)
+    UPDATE service_orders SET status='fulfilled',fulfilled_at=COALESCE(service_orders.fulfilled_at,$10::timestamptz),ein_secret=NULL,details=$11::jsonb||jsonb_build_object('documentId',saved.id) FROM saved WHERE service_orders.id=$12
+    AND NOT EXISTS(SELECT 1 FROM document_deletions WHERE document_id=$1::uuid) RETURNING service_orders.id`,[r.id,r.clientId,r.companyId,r.title,r.storageKey,r.size,JSON.stringify({sensitive:true,serviceOrderId:r.serviceId,recoveryVersion:2}),r.createdAt,r.mirrorPath,r.fulfilledAt,JSON.stringify(details),r.serviceId]);
    if(!saved.length)throw Error('Document ownership changed; the package remains held');
    await commitPackageRecovery(id,evidence);
    if(r.priorDocumentId)await requestDocumentDeletion(r.priorDocumentId,r.clientId,'superseded');
    await db.query("UPDATE staged_documents SET state='retired' WHERE id=$1 AND state='held'",[id]);
   }else throw Error('Unknown reconciliation decision');
  }
- await db.query("UPDATE recovery_holds SET status=$2,evidence=$3 WHERE id=$1 AND status='held'",[id,evidence.decision==='client-deletion'?'deleted':evidence.decision==='committed'?'reconciled':'aborted',JSON.stringify(evidence)]);
+ const transitioned=await db.query("UPDATE recovery_holds SET status=$2,evidence=$3 WHERE id=$1 AND status='held' RETURNING id",[id,evidence.decision==='client-deletion'?'deleted':evidence.decision==='committed'?'reconciled':'aborted',JSON.stringify(evidence)]);
+ if(evidence.decision==='committed'&&!transitioned.length)throw Error('The package was deleted during reconciliation; it has not been reattached');
  if(!(await db.query("SELECT id FROM recovery_holds WHERE service_id=$1 AND status='held'",[r.serviceId])).length)await db.query("UPDATE service_orders SET details=details-'recoveryHold' WHERE id=$1",[r.serviceId]);
- return {id,decision:evidence.decision};
+ return {id,decision:evidence.decision,cleanupPending};
 }
 
 /** Restore missing ownership rows only from an operator-verified original DB
@@ -73,7 +82,7 @@ export async function restoreHeldOwnerRecords(db:Db,id:string,input:{client?:Rec
  clean.service.ein_secret=null;
  clean.service.details={...recoveryMetadata((service.details??{}) as Record<string,unknown>),recoveryHold:true};
  // The package is attached only by the separately checked reconcile operation.
- clean.service.status='awaiting_info';clean.service.fulfilled_at=null;
+ clean.service.status='awaiting_info';clean.service.fulfilled_at=service.fulfilled_at??null;
  const rows:[string,Record<string,unknown>|undefined][]=[['clients',clean.client],['orders',clean.company],['service_orders',clean.service]];
  const prepared:{table:string;row:Record<string,unknown>;cols:string[]}[]=[];
  for(const [table,row] of rows){
