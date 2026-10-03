@@ -105851,7 +105851,7 @@ Keep a complete copy of the signed form for the company's records.
 
 ## STEP 4 \u2014 WATCH FOR THE IRS RESPONSE
 
-The IRS normally mails an acceptance letter (Notice CP261) within about 60 days. Keep it with your permanent records \u2014 banks and accountants will ask for it. If you have heard nothing after 90 days, call the IRS Business line at 800-829-4933.
+The IRS generally sends an acceptance or nonacceptance notice within about 60 days. Keep the notice with your permanent records. If you have not received a notice within two months of the date you faxed or mailed Form 2553, call the IRS Business line at 800-829-4933. The IRS instructions allow five months if box Q1 in Part II is checked; this package selects a calendar tax year and does not check Q1.
 
 ## IMPORTANT REMINDERS
 
