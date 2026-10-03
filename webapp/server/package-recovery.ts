@@ -27,6 +27,25 @@ export function recoveryMetadata(details:Record<string,unknown>,version:1|2=2):R
  });
  return out;
 }
+/** The purge producer writes UTC timestamps with up to six fractional digits.
+ * Date.parse alone rounds microseconds and normalizes impossible calendar days. */
+function purgeInstant(value:unknown):bigint|null{
+ if(typeof value!=='string')return null;
+ const match=/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,6}))?Z$/.exec(value);
+ if(!match)return null;
+ const seconds=Date.parse(match[1]+'Z');
+ if(!Number.isFinite(seconds)||new Date(seconds).toISOString().slice(0,19)!==match[1])return null;
+ return BigInt(seconds)*1000n+BigInt((match[2]??'').padEnd(6,'0'));
+}
+export function selectPackageMetadata(record:PackageRecord,current:Record<string,unknown>):Record<string,unknown>{
+ if(record.metadataVersion!==2)return current.documentId===record.id?recoveryMetadata(current):{...record.details,recoveryMetadataUnavailable:true};
+ const metadata={...record.details};
+ if(current.documentId===record.id){
+  const original=purgeInstant(metadata.purgedAt),later=purgeInstant(current.purgedAt);
+  if(later!==null&&(original===null||later>original))metadata.purgedAt=current.purgedAt;
+ }
+ return metadata;
+}
 export const packageRecoveryFailure=(company:string)=>new Error(`Recovery could not verify the current S-election package for ${company}. Do not switch production to this restored database until the package and its document records are reconciled. No client deletion has been inferred.`);
 export function validatePackageRecord(r:PackageRecord):void{
  if(!r||!r.id||!r.serviceId||!r.clientId||!r.storagePath||!r.storageKey||!r.mirrorPath||!r.sha||!r.title||!['intent','committed','aborted'].includes(r.state)||!Number.isFinite(Date.parse(r.createdAt))||!Number.isFinite(Date.parse(r.fulfilledAt))||(r.metadataVersion!==undefined&&r.metadataVersion!==2)||JSON.stringify(recoveryMetadata(r.details,r.metadataVersion??1))!==JSON.stringify(r.details))throw Error('Invalid package recovery record');
@@ -74,7 +93,9 @@ export async function cleanupAbortedPackages(serviceId?:string,limit=50):Promise
 }
 export async function verifyPackageCopy(r:PackageRecord):Promise<Buffer>{
  try{const data=await readMirror(r.mirrorPath);
-  if(!data||!isEncrypted(data)||hashBytes(unseal(data))!==r.sha)throw packageRecoveryFailure(r.company);
+  if(!data||!isEncrypted(data))throw packageRecoveryFailure(r.company);
+  const plaintext=unseal(data);
+  if(plaintext.length!==r.size||hashBytes(plaintext)!==r.sha)throw packageRecoveryFailure(r.company);
   return data;
  }catch{throw packageRecoveryFailure(r.company);}
 }
@@ -103,6 +124,22 @@ export async function recoverPackages(tables:Record<string,Record<string,unknown
  for(const id of checkpoint)if(!packages.some(p=>p.id===id))throw Error('Independent recovery journal is missing a recorded package');
  for(const doc of tables.documents)if((doc.meta as {recoveryVersion?:number}|null)?.recoveryVersion===2&&!packages.some(p=>p.id===doc.id))throw Error('Independent recovery journal is missing a recorded package');
  const ids=new Set(tables.service_orders.map(s=>String(s.id))),deleted=new Set(journal.records.map(d=>d.documentId));
+ // Validate known identities and every committed head before collecting a
+ // harmless hold. Post-snapshot rows may be absent; conflicting rows may not.
+ const groups=new Map<string,PackageRecord[]>();
+ for(const r of packages){
+  const group=groups.get(r.serviceId)??[];
+  if(group.some(p=>p.clientId!==r.clientId||p.companyId!==r.companyId))throw packageRecoveryFailure(r.company);
+  group.push(r);groups.set(r.serviceId,group);
+  const service=tables.service_orders.find(s=>s.id===r.serviceId),company=tables.orders.find(o=>o.id===r.companyId),doc=tables.documents.find(d=>d.id===r.id);
+  if(service&&(service.type!=='s-election'||service.client_id!==r.clientId||(service.formation_order_id??null)!==r.companyId||!tables.clients.some(c=>c.id===r.clientId)||(r.companyId&&!tables.orders.some(o=>o.id===r.companyId&&o.client_id===r.clientId)))||company&&company.client_id!==r.clientId||doc&&(doc.client_id!==r.clientId||(doc.order_id??null)!==r.companyId))throw packageRecoveryFailure(r.company);
+ }
+ for(const records of groups.values()){
+  const committed=records.filter(r=>r.state==='committed');
+  if(!committed.length)continue;
+  const prior=new Set(committed.map(r=>r.priorDocumentId));
+  if(committed.filter(r=>!prior.has(r.id)).length!==1)throw packageRecoveryFailure(committed[0].company);
+ }
  // Unresolved commits are deliberately not guessed, even if their service was
  // created after the snapshot. The independent intent still controls the copy.
  for(const r of packages)if(r.state==='intent'&&!deleted.has(r.id))await hold(r,'an interrupted package operation');
@@ -124,8 +161,8 @@ export async function recoverPackages(tables:Record<string,Record<string,unknown
    tables.documents=tables.documents.filter(d=>d.id!==latest.id);
    tables.documents.push({id:latest.id,client_id:latest.clientId,order_id:latest.companyId,kind:'package',title:latest.title,storage_key:latest.storageKey,content_type:'application/pdf',size_bytes:latest.size,meta:{sensitive:true,serviceOrderId:latest.serviceId,recoveryVersion:2},created_at:latest.createdAt,mirror_path:latest.mirrorPath,mirror_hash:null,mirrored_at:null});
    const prior=(row.details||{}) as Record<string,unknown>;
-   const metadata=latest.metadataVersion===2?latest.details:prior.documentId===latest.id?recoveryMetadata(prior):{...latest.details,recoveryMetadataUnavailable:true};
-   row.status='fulfilled';row.fulfilled_at=latest.fulfilledAt;row.questionnaire_updated_at=latest.createdAt;row.ein_secret=null;row.details={...metadata,documentId:latest.id};
+   const metadata=selectPackageMetadata(latest,prior);
+   row.status='fulfilled';row.fulfilled_at=row.fulfilled_at??latest.fulfilledAt;row.questionnaire_updated_at=latest.createdAt;row.ein_secret=null;row.details={...metadata,documentId:latest.id};
    files.push({storageKey:latest.storageKey,path:latest.mirrorPath,sha:latest.sha});
   }
   for(const record of records)if(!deleted.has(record.id)&&!tables.staged_documents.some(stage=>stage.id===record.id)){

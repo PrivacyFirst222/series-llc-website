@@ -52534,7 +52534,9 @@ async function cleanupAbortedPackages(serviceId, limit = 50) {
 async function verifyPackageCopy(r) {
   try {
     const data = await readMirror(r.mirrorPath);
-    if (!data || !isEncrypted(data) || hashBytes(unseal(data)) !== r.sha) throw packageRecoveryFailure(r.company);
+    if (!data || !isEncrypted(data)) throw packageRecoveryFailure(r.company);
+    const plaintext = unseal(data);
+    if (plaintext.length !== r.size || hashBytes(plaintext) !== r.sha) throw packageRecoveryFailure(r.company);
     return data;
   } catch {
     throw packageRecoveryFailure(r.company);
