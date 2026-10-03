@@ -1,5 +1,57 @@
 # Vibecode Workspace
 
+## Rule 1: Time is the single most valuable asset — do not waste it
+
+Adam, 2 Oct 2026: "make the number one rule to make sure all fixes are done as
+quickly and efficiently as possible.  Before approving any step, you must ask
+yourself if this step is absolutely necessary or if it provides a large enough
+benefit to justify wasting time.  Time is the single most valuable asset that
+you cannot waste.  Also before approving any fix whether there is an
+alternative way to do it quicker.   Also, with any test that takes more than 10
+minutes to complete, you have to flag it and get my approval it it may need to
+be done again"
+
+This rule ranks above every other rule in this file. It applies to my own work
+and to every plan, amendment, fix or test run by Codex or anyone else that I
+review or recommend.
+
+1. **Every fix is done as quickly and efficiently as possible.**
+2. **Necessity test, before approving any step.** Ask in writing: is this step
+   absolutely necessary? If not, is its benefit large enough to justify the
+   time it costs? If neither, cut it. A step with no written answer is not
+   approved.
+3. **Quicker-alternative test, before approving any fix.** Ask in writing:
+   is there a quicker way to get the same result? Name it, or say what was
+   considered and why none is quicker.
+4. **The 10-minute test flag.** Any test that takes more than 10 minutes is
+   flagged to Adam with its expected duration. If it may have to be run again
+   (it runs on code that can still change, or a later run repeats it), it
+   needs Adam's explicit approval before it starts. "Unattended" or
+   "overnight" does not make it free.
+5. **Time counts as all elapsed time.** Machine hours and calendar days count,
+   not just dollars and Adam's minutes. No long run on code that is still
+   being fixed. Finish all fixes, then test once.
+
+Every recommendation or review opens with these three sections, in this order.
+The recommendation comes last and is derived from them:
+
+- **Objectives.** Adam's stated objectives, pasted verbatim with date and
+  source, re-read at that moment rather than recalled. Each option is scored
+  against each one.
+- **Runs.** Every test run in each option, with its duration (machine time
+  included), whether the code it tests will still change, whether a later run
+  repeats it, and the necessity, quicker-alternative and 10-minute answers
+  above. Runs on changing code and repeated runs are marked as waste.
+- **Rule status.** For each rule relied on: did Adam approve that specific
+  rule, or is it Codex-written procedure that can be challenged? Procedure is
+  a proposal, not a constraint.
+
+This rule exists because of FAILURES.md P97–P102. On 1 Oct, Adam asked in
+writing to "Minimize total time, unnecessary work, repeated qualification".
+I recommended full campaigns on code that was still being fixed, called them
+"already required" and "free", and approved Codex's duplicate pre-freeze test
+sweep.
+
 ## Quote the source before you act, not after
 
 **Before changing anything, name the source that determines whether the change is
