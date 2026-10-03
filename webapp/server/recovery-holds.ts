@@ -63,7 +63,11 @@ export async function reconcileHeldPackage(db:Db,id:string,evidence:HoldEvidence
  }
  const transitioned=await db.query("UPDATE recovery_holds SET status=$2,evidence=$3 WHERE id=$1 AND status='held' RETURNING id",[id,evidence.decision==='client-deletion'?'deleted':evidence.decision==='committed'?'reconciled':'aborted',JSON.stringify(evidence)]);
  if(evidence.decision==='committed'&&!transitioned.length)throw Error('The package was deleted during reconciliation; it has not been reattached');
- if(!(await db.query("SELECT id FROM recovery_holds WHERE service_id=$1 AND status='held'",[r.serviceId])).length)await db.query("UPDATE service_orders SET details=details-'recoveryHold' WHERE id=$1",[r.serviceId]);
+ await db.query(`UPDATE service_orders s SET details=CASE
+  WHEN EXISTS(SELECT 1 FROM recovery_holds h WHERE h.service_id=s.id AND h.status='held')
+  THEN COALESCE(s.details,'{}'::jsonb)||jsonb_build_object('recoveryHold',true)
+  ELSE COALESCE(s.details,'{}'::jsonb)-'recoveryHold' END
+  WHERE s.id=$1`,[r.serviceId]);
  return {id,decision:evidence.decision,cleanupPending};
 }
 
