@@ -3099,18 +3099,18 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 2 assertion(s).
   - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
-- **238. [A89]** — **implemented**
+- **238. [A89]** — **assigned**
   - Instructions s. 3: Administrative Member "no authority to decide anything"; 5.8 lets a Majority in Interest confer authority. Replace as proposed.
   - **Codex rejected the proposed replacement:** “Replace as proposed” supplies no replacement. Use: “The Administrative Member handles ministerial tasks and has any additional authority this Agreement or a Majority in Interest confers.”
-  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 3 assertion(s).
-  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
+  - Previous fix: 15 r2, release commit not recorded; 3 assertion(s) retained. Replacement attempt: chunk45-final-repairs r1, work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
-- **239. [A90]** — **implemented**
+  - 2026-10-02 superseded by approved replacement: prior fix 15 r2 at ; approved work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e
+- **239. [A90]** — **assigned**
   - Instructions and Manual: capital call "a majority of owners" (Majority in Interest); borrowing limit "written" consent (consent). Replace both.
   - **Codex rejected the proposed replacement:** Use “Members holding more than 50% of the Percentage Interests” for capital calls and “the consent of all Members” for borrowing; retain written notice of a capital call, which §6.2 actually requires.
-  - Implemented protections: batch 15 revision 2, release commit not recorded, by Codex; protected by 6 assertion(s).
-  - Implementation evidence: commit 2d36183d239a1e378026bcb7e2923af35912854f, batch 15 revision 2, package a35edb38068b. This records implementation, not acceptance or publication.
+  - Previous fix: 15 r2, release commit not recorded; 6 assertion(s) retained. Replacement attempt: chunk45-final-repairs r1, work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e.
   - 2026-09-20 rejected r1: Reject revision 1; proceed with revision 2
+  - 2026-10-02 superseded by approved replacement: prior fix 15 r2 at ; approved work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e
 - **240. [A91]** — **implemented**
   - Manual s. 6 step 3: unanimous consent "a rule your operating agreement cannot change"; 605.2107(1)(i) excepts the manner of approving establishment (repo statute notes). Ruling needed from the statute.
   - **Codex rejected the proposed replacement:** The finding asks for a ruling rather than providing replacement text. The concrete replacement in item249 is correct.
@@ -3605,17 +3605,17 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Implemented protections: batch 18 revision 2, release commit not recorded, by Codex; protected by 1 assertion(s).
   - Implementation evidence: commit 8ec01904bfff8d6028fba5e85c818808517daef7, batch 18 revision 2, package a14f77d8a0f6. This records implementation, not acceptance or publication.
   - 2026-09-20 rejected r1: Reject Batch 18 revision 1; proceed with revision 2.
-- **N2.22. [substantive]** — **implemented**
+- **N2.22. [substantive]** — **assigned**
   - Professional LLC operating agreement, Transfer on Death (§4.6), family transfers/admission and purpose — webapp/server/templates-oa-single.md:134 — `webapp/server/templates-oa-single.md:134`
   - Reads: **4.6 Transfer on Death Designation.** The Membership Interest is "registered" with the Company within the meaning of s. 711.501(7), Florida Statutes. Exhibit A serves as the initial "registration in beneficiary form" under ss. 711.50–711.512, Florida Statutes, and reflects the Member's designation, if any, of the person or persons who will become the owner of the Membership Interest upon the Member's death. The Member, if an individual, may designate any person or entity as a beneficiary. A designation may name a backup beneficiary to take if the first beneficiary does not survive the Member. The Member may change, delete, or add a TOD designation by a signed writing, witnessed by two witnesses, delivered to the Manager; the change is effective upon receipt unless the Manager objects in writing within seven (7) days, and the Manager shall thereafter update Exhibit A (though updating is not required for effectiveness). A beneficiary who becomes the owner of the Membership Interest under this Section succeeds to the Membership Interest subject to this Agreement and is admitted as the Member upon delivery to the Company of a written agreement to be bound by this Agreement.
   - Claims: A professional LLC may admit any chosen beneficiary after agreement to be bound, without a professional-eligibility qualification.
   - True: oa.ts:389–397 changes only professional cover/preamble/recital; it leaves the ordinary admission and transfer clauses unchanged. 2026 §§621.09(2),621.11(2) restrict membership/transfers to eligible licensed individuals or professional entities;621.08 also limits the business purpose despite the ordinary §1.4 any-lawful-business wording. Entirechapter opened: https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0621/0621.html
   - Replace with: For a professional limited liability company, every transfer and admission under this Agreement, including a transfer on death, is subject to Chapter 621, Florida Statutes. A proposed recipient may be admitted only if eligible under s. 621.09(2), and no transfer may violate s. 621.11(2). The Company's business is limited as s. 621.08 requires, notwithstanding the general-purpose wording of Section 1.4.
   - Ruling, 2026-09-20: Batch 16 item 13 approved: professional-only Chapter 621 purpose, transfer, admission and TOD eligibility restrictions; retain permitted investments and cumulative S-corporation eligibility.
-  - Implemented protections: batch 27 revision 3, release commit not recorded, by Codex; protected by 19 assertion(s).
-  - Implementation evidence: commit e405da48435c3171430fe5021662017857fbc097, batch 27 revision 3, package 1b397eacf513. This records implementation, not acceptance or publication.
+  - Previous fix: 27 r3, release commit not recorded; 19 assertion(s) retained. Replacement attempt: chunk45-final-repairs r1, work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e.
   - 2026-09-21 rejected r1: proceed with revision 2
   - 2026-09-21 rejected r2: proceed with revision 3
+  - 2026-10-02 superseded by approved replacement: prior fix 27 r3 at ; approved work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e
 - **N2.23. [housekeeping]** — **implemented** — housekeeping
   - Statement generator, source comment — webapp/server/statement.ts:7 — `webapp/server/statement.ts:7`
   - Reads:  * carries every word; this fills its six slots and nothing else.

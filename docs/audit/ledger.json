@@ -17524,7 +17524,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -17563,40 +17563,61 @@
               "batch": "15",
               "revision": 2,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-10-02T17:30:33.851Z",
+              "event": "superseded by approved replacement",
+              "batch": "chunk45-final-repairs",
+              "revision": 1,
+              "note": "prior fix 15 r2 at ; approved work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e"
+            },
+            {
+              "at": "2026-10-02T17:30:33.851Z",
+              "event": "assigned",
+              "batch": "chunk45-final-repairs",
+              "revision": 1
             }
           ],
-          "batch": "15",
-          "fix": {
-            "batch": "15",
-            "revision": 2,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "replace",
-                "file": "docs/oa-instructions.md",
-                "before": "to handle ministerial tasks, with no authority to decide anything on the members' behalf.",
-                "after": "to handle ministerial tasks. The Administrative Member also has any additional authority expressly granted by the agreement or by owners holding a Majority in Interest; the role does not make that person a manager."
-              },
-              {
-                "kind": "replace",
-                "file": "docs/owners-manual.md",
-                "before": "(a paperwork role, not a decision-making one).",
-                "after": "(a paperwork role with any additional authority expressly granted by the agreement or by owners holding a Majority in Interest)."
-              },
-              {
-                "kind": "document",
-                "master": "docs/oa-instructions.md",
-                "word": "FPSLLC Operating Agreement Instructions - DRAFT.docx",
-                "masterPresent": [
-                  "The Administrative Member also has any additional authority expressly granted"
-                ],
-                "wordPresent": [
-                  "The Administrative Member also has any additional authority expressly granted"
+          "batch": "chunk45-final-repairs",
+          "supersessions": [
+            {
+              "prior": {
+                "batch": "15",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "replace",
+                    "file": "docs/oa-instructions.md",
+                    "before": "to handle ministerial tasks, with no authority to decide anything on the members' behalf.",
+                    "after": "to handle ministerial tasks. The Administrative Member also has any additional authority expressly granted by the agreement or by owners holding a Majority in Interest; the role does not make that person a manager."
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "docs/owners-manual.md",
+                    "before": "(a paperwork role, not a decision-making one).",
+                    "after": "(a paperwork role with any additional authority expressly granted by the agreement or by owners holding a Majority in Interest)."
+                  },
+                  {
+                    "kind": "document",
+                    "master": "docs/oa-instructions.md",
+                    "word": "FPSLLC Operating Agreement Instructions - DRAFT.docx",
+                    "masterPresent": [
+                      "The Administrative Member also has any additional authority expressly granted"
+                    ],
+                    "wordPresent": [
+                      "The Administrative Member also has any additional authority expressly granted"
+                    ]
+                  }
                 ]
-              }
-            ]
-          }
+              },
+              "priorStatus": "implemented",
+              "batch": "chunk45-final-repairs",
+              "revision": 1,
+              "hash": "78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e"
+            }
+          ]
         }
       ],
       "codex": {
@@ -17619,7 +17640,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -17658,58 +17679,79 @@
               "batch": "15",
               "revision": 2,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-10-02T17:30:33.851Z",
+              "event": "superseded by approved replacement",
+              "batch": "chunk45-final-repairs",
+              "revision": 1,
+              "note": "prior fix 15 r2 at ; approved work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e"
+            },
+            {
+              "at": "2026-10-02T17:30:33.852Z",
+              "event": "assigned",
+              "batch": "chunk45-final-repairs",
+              "revision": 1
             }
           ],
-          "batch": "15",
-          "fix": {
-            "batch": "15",
-            "revision": 2,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "replace",
-                "file": "docs/oa-instructions.md",
-                "before": "If included, a majority of owners can require everyone to chip in more money (pro rata),",
-                "after": "If included, owners holding more than 50% of the ownership interests held by members can require everyone to chip in more money (pro rata),"
-              },
-              {
-                "kind": "replace",
-                "file": "docs/owners-manual.md",
-                "before": "If you included it, a majority of owners can require everyone to contribute more money,",
-                "after": "If you included it, owners holding more than 50% of the ownership interests held by members can require everyone to contribute more money,"
-              },
-              {
-                "kind": "replace",
-                "file": "docs/owners-manual.md",
-                "before": "with the Manager, or with a majority of the owners — never with the creditor.",
-                "after": "with the Manager, or with owners holding a Majority in Interest — never with the creditor."
-              },
-              {
-                "kind": "replace",
-                "file": "docs/oa-instructions.md",
-                "before": "the dollar amount of debt that may be incurred without the written consent of every owner:",
-                "after": "the dollar amount of debt that may be incurred without the consent of every owner:"
-              },
-              {
-                "kind": "replace",
-                "file": "docs/owners-manual.md",
-                "before": "without the owners' written consent.",
-                "after": "without the consent of every owner."
-              },
-              {
-                "kind": "document",
-                "master": "docs/owners-manual.md",
-                "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
-                "masterPresent": [
-                  "owners holding more than 50% of the ownership interests held by members"
-                ],
-                "wordPresent": [
-                  "owners holding more than 50% of the ownership interests held by members"
+          "batch": "chunk45-final-repairs",
+          "supersessions": [
+            {
+              "prior": {
+                "batch": "15",
+                "revision": 2,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "replace",
+                    "file": "docs/oa-instructions.md",
+                    "before": "If included, a majority of owners can require everyone to chip in more money (pro rata),",
+                    "after": "If included, owners holding more than 50% of the ownership interests held by members can require everyone to chip in more money (pro rata),"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "docs/owners-manual.md",
+                    "before": "If you included it, a majority of owners can require everyone to contribute more money,",
+                    "after": "If you included it, owners holding more than 50% of the ownership interests held by members can require everyone to contribute more money,"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "docs/owners-manual.md",
+                    "before": "with the Manager, or with a majority of the owners — never with the creditor.",
+                    "after": "with the Manager, or with owners holding a Majority in Interest — never with the creditor."
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "docs/oa-instructions.md",
+                    "before": "the dollar amount of debt that may be incurred without the written consent of every owner:",
+                    "after": "the dollar amount of debt that may be incurred without the consent of every owner:"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "docs/owners-manual.md",
+                    "before": "without the owners' written consent.",
+                    "after": "without the consent of every owner."
+                  },
+                  {
+                    "kind": "document",
+                    "master": "docs/owners-manual.md",
+                    "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+                    "masterPresent": [
+                      "owners holding more than 50% of the ownership interests held by members"
+                    ],
+                    "wordPresent": [
+                      "owners holding more than 50% of the ownership interests held by members"
+                    ]
+                  }
                 ]
-              }
-            ]
-          }
+              },
+              "priorStatus": "implemented",
+              "batch": "chunk45-final-repairs",
+              "revision": 1,
+              "hash": "78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e"
+            }
+          ]
         }
       ],
       "codex": {
@@ -23430,7 +23472,7 @@
         {
           "key": "all",
           "scope": "The whole finding.",
-          "status": "implemented",
+          "status": "assigned",
           "waitsOn": [],
           "history": [
             {
@@ -23482,130 +23524,151 @@
               "batch": "27",
               "revision": 3,
               "note": "by Codex"
+            },
+            {
+              "at": "2026-10-02T17:30:33.852Z",
+              "event": "superseded by approved replacement",
+              "batch": "chunk45-final-repairs",
+              "revision": 1,
+              "note": "prior fix 27 r3 at ; approved work order 78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e"
+            },
+            {
+              "at": "2026-10-02T17:30:33.852Z",
+              "event": "assigned",
+              "batch": "chunk45-final-repairs",
+              "revision": 1
             }
           ],
-          "batch": "27",
-          "fix": {
-            "batch": "27",
-            "revision": 3,
-            "commit": "",
-            "doneBy": "Codex",
-            "assertions": [
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-single.md",
-                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
-                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+          "batch": "chunk45-final-repairs",
+          "supersessions": [
+            {
+              "prior": {
+                "batch": "27",
+                "revision": 3,
+                "commit": "",
+                "doneBy": "Codex",
+                "assertions": [
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-single.md",
+                    "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                    "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-single.md",
+                    "before": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
+                    "after": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-single-s.md",
+                    "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                    "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-single-s.md",
+                    "before": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
+                    "after": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-member-single.md",
+                    "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                    "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-member-single.md",
+                    "before": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
+                    "after": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-member-single-s.md",
+                    "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                    "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-member-single-s.md",
+                    "before": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
+                    "after": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-multi.md",
+                    "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                    "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-multi.md",
+                    "before": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS",
+                    "after": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-s.md",
+                    "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                    "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-s.md",
+                    "before": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS",
+                    "after": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-member.md",
+                    "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                    "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-member.md",
+                    "before": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS",
+                    "after": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-member-s.md",
+                    "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
+                    "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "webapp/server/templates-oa-member-s.md",
+                    "before": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS",
+                    "after": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "docs/owners-manual.md",
+                    "before": "anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule",
+                    "after": "anyone the member chooses, subject to the professional-owner eligibility requirements on the professional LLC forms and the eligible-shareholder rule on the S corporation forms"
+                  },
+                  {
+                    "kind": "replace",
+                    "file": "docs/oa-instructions.md",
+                    "before": "The beneficiary may be any person or entity, except on the S corporation forms, where the beneficiary must be an eligible S corporation shareholder (§9.3(b)); the owner making the designation may not.",
+                    "after": "The beneficiary may be any person or entity eligible under the applicable form: the professional LLC forms require eligibility under Chapter 621, and the S corporation forms also require an eligible S corporation shareholder (§9.3(b)). The owner making the designation must be an individual."
+                  },
+                  {
+                    "kind": "check",
+                    "suite": "server",
+                    "label": "batch16: professional eligibility is conditional and cumulative"
+                  }
+                ]
               },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-single.md",
-                "before": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
-                "after": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-single-s.md",
-                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
-                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-single-s.md",
-                "before": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
-                "after": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-member-single.md",
-                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
-                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-member-single.md",
-                "before": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
-                "after": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-member-single-s.md",
-                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
-                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-member-single-s.md",
-                "before": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION",
-                "after": "## EXHIBIT A — MEMBER; CONTRIBUTIONS; TOD DESIGNATION\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-multi.md",
-                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
-                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-multi.md",
-                "before": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS",
-                "after": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-s.md",
-                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
-                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-s.md",
-                "before": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS",
-                "after": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-member.md",
-                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
-                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-member.md",
-                "before": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS",
-                "after": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-member-s.md",
-                "before": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes.",
-                "after": "**1.4 Purposes and Powers.** The purpose of the Company, and of each Protected Series, is to engage in any lawful business, purpose, or activity for which limited liability companies may be organized under the Act, together with any additional purpose set forth in the Articles of Organization and, as to a Protected Series, any additional purpose set forth in its Series Exhibit. An additional purpose so stated is cumulative and does not limit the general purpose stated in this Section. The Company, and each Protected Series in its own name, shall have all powers conferred by the Act, including with respect to each Protected Series the power to enter into and enforce contracts; to acquire, own, hold, improve, lease, encumber, and convey real, personal, and intangible property; to grant liens and security interests in its Associated Assets; to open and maintain deposit and investment accounts; to sue and be sued; and to conduct its activities and affairs in its own name, all as contemplated by s. 605.2103, Florida Statutes. <!-- if:professional --> **Professional companies only.** Notwithstanding any other provision of this Agreement or any Series Exhibit, if the Company is organized as a professional limited liability company under Chapter 621, Florida Statutes, the Company and each Protected Series shall engage only in the professional services for which the Company was organized, together with investments and ownership of property permitted by s. 621.08. No Transfer of a Membership Interest or admission as a Member, including through a transfer-on-death designation, a permitted family Transfer, bankruptcy, or continuation after the last Member ceases to be a Member, is permitted unless the recipient is a professional corporation, professional limited liability company, or individual, each licensed or otherwise legally authorized to render the same specific professional services as those for which the Company was organized, as required by ss. 621.09(2) and 621.11(2). These requirements apply in addition to every other transfer and admission requirement of this Agreement, including any applicable S corporation shareholder eligibility requirement. <!-- /if -->"
-              },
-              {
-                "kind": "replace",
-                "file": "webapp/server/templates-oa-member-s.md",
-                "before": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS",
-                "after": "## EXHIBIT A — MEMBERS; PERCENTAGE INTERESTS; CONTRIBUTIONS; TOD DESIGNATIONS\n\n<!-- alternative:professional-exhibit-note \"**Professional companies only.** Any beneficiary must also satisfy the professional ownership and admission requirements in Section 1.4.\" -->"
-              },
-              {
-                "kind": "replace",
-                "file": "docs/owners-manual.md",
-                "before": "anyone the member chooses, subject on the S corporation forms to the eligible-shareholder rule",
-                "after": "anyone the member chooses, subject to the professional-owner eligibility requirements on the professional LLC forms and the eligible-shareholder rule on the S corporation forms"
-              },
-              {
-                "kind": "replace",
-                "file": "docs/oa-instructions.md",
-                "before": "The beneficiary may be any person or entity, except on the S corporation forms, where the beneficiary must be an eligible S corporation shareholder (§9.3(b)); the owner making the designation may not.",
-                "after": "The beneficiary may be any person or entity eligible under the applicable form: the professional LLC forms require eligibility under Chapter 621, and the S corporation forms also require an eligible S corporation shareholder (§9.3(b)). The owner making the designation must be an individual."
-              },
-              {
-                "kind": "check",
-                "suite": "server",
-                "label": "batch16: professional eligibility is conditional and cumulative"
-              }
-            ]
-          }
+              "priorStatus": "implemented",
+              "batch": "chunk45-final-repairs",
+              "revision": 1,
+              "hash": "78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e"
+            }
+          ]
         }
       ]
     },
@@ -38281,6 +38344,21 @@
         {
           "at": "2026-09-28T11:32:33.866Z",
           "event": "implemented"
+        }
+      ]
+    },
+    {
+      "id": "chunk45-final-repairs",
+      "revision": 1,
+      "frozenHash": "78cdc67acdde754d905f49beea78def6bc658a723dce45585402098ab48a6a1e",
+      "status": "authorized",
+      "model": "Codex",
+      "base": "a6e1e39e7cebfdceac62bf2ce18ccfbfc998f180",
+      "history": [
+        {
+          "at": "2026-10-02T17:30:33.852Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
         }
       ]
     }

@@ -3,8 +3,8 @@ import { randomBytes, createHash } from 'node:crypto';
 import { env } from './env';
 import { seal, unseal, isEncrypted } from './encryption';
 import { fileURLToPath } from 'node:url';
-import { join, dirname } from 'node:path';
-import { mkdir, writeFile, readFile, unlink, readdir } from 'node:fs/promises';
+import { join, dirname, basename, resolve } from 'node:path';
+import { mkdir, writeFile, readFile, unlink, readdir, rename, link } from 'node:fs/promises';
 export interface StoredFile { storageKey: string; sizeBytes: number }
 const root = () => process.env.DEV_STORAGE_DIR || fileURLToPath(new URL('../.dev-data/blob/', import.meta.url));
 const digest = (s: string) => createHash('sha256').update(s).digest('hex');
@@ -15,8 +15,23 @@ export async function putObject(path: string, bytes: Buffer, overwrite = false):
     return (await put(path, bytes, { access: 'private', contentType: 'application/octet-stream', addRandomSuffix: false, allowOverwrite: overwrite, token: env.BLOB_READ_WRITE_TOKEN, ...(Number.isFinite(activeDeadline())?{abortSignal:ioSignal()}: {}) })).url;
   }
   if (env.isProd) throw new Error('BLOB_READ_WRITE_TOKEN is required');
-  const p = join(root(), path); await mkdir(dirname(p), { recursive: true });
-  await writeFile(p, bytes, { flag: overwrite ? 'w' : 'wx' }); return `dev:${path}`;
+  const localRoot = resolve(root()), p = join(localRoot, path);
+  // Scratch is outside the object namespace but on the same filesystem.
+  // Readers never observe a file until its complete bytes are closed.
+  const scratchDir = join(dirname(localRoot), `.${basename(localRoot)}-pending`);
+  await mkdir(dirname(p), { recursive: true });
+  await mkdir(scratchDir, { recursive: true });
+  const scratch = join(scratchDir, randomBytes(24).toString('hex'));
+  try {
+    await writeFile(scratch, bytes, { flag: 'wx' });
+    checkDeadline();
+    if (overwrite) await rename(scratch, p);
+    else await link(scratch, p); // EEXIST retains an exclusive winner unchanged.
+    return `dev:${path}`;
+  } finally {
+    try { await unlink(scratch); }
+    catch (e) { if ((e as NodeJS.ErrnoException).code !== 'ENOENT') throw e; }
+  }
 }
 export async function readObject(key: string): Promise<Buffer | null> {
   checkDeadline();

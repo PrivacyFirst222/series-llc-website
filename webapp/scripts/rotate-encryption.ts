@@ -11,10 +11,21 @@ import { deletionJournal } from '../server/document-retention';
 import { officeRecoveryTables, verifiedOfficeBytes } from '../server/office-file-recovery';
 import { officeFileIdentities, collectOfficeRecoverySources } from '../server/office-recovery-sources';
 export async function rotateEncryption(db?:Db){
- db ||= await getDb();const {active}=encryptionKeys();let secrets=0,documents=0,copies=0;
+ db ||= await getDb();const {active}=encryptionKeys();let secrets=0,documents=0,copies=0,paymentTokens=0;
  const rows=await db.query<{id:string;ein_secret:string}>('SELECT id,ein_secret FROM service_orders WHERE ein_secret IS NOT NULL');
  for(const r of rows){const plain=decryptSecret(r.ein_secret),next=encryptSecret(plain);if(decryptSecret(next)!==plain)throw new Error('Secret verification failed');
    const wrote=await db.query('UPDATE service_orders SET ein_secret=$2 WHERE id=$1 AND ein_secret=$3 RETURNING id',[r.id,next,r.ein_secret]);if(!wrote.length)throw new Error('An order changed during rotation; retry');secrets++;}
+ for(const table of ['renewal_card_attempts','ra_payment_attempts'] as const){
+  const attempts=await db.query<{id:string;source_token:string}>(`SELECT id,source_token FROM ${table} WHERE source_token IS NOT NULL AND source_token<>'' ORDER BY id`);
+  for(const attempt of attempts){
+   let next:string;
+   try{const original=decryptSecret(attempt.source_token);next=encryptSecret(original);if(decryptSecret(next)!==original)throw Error('Token verification failed');}
+   catch{throw new Error('Payment request token cannot be verified; keep all old keys and retry rotation with the complete key ring');}
+   const wrote=await db.query(`UPDATE ${table} SET source_token=$2 WHERE id=$1 AND source_token=$3 RETURNING id`,[attempt.id,next,attempt.source_token]);
+   if(!wrote.length)throw new Error('A payment request changed during rotation; keep all old keys and retry');
+   paymentTokens++;
+  }
+ }
  await ensureDeletionMirror(await deletionJournal());
  const tables=await officeRecoveryTables(db),identities=officeFileIdentities(tables),journal=await readRecoveryJournal();
  const docs=await db.query<{id:string;storage_key:string}>("SELECT id,storage_key FROM documents WHERE deleted_at IS NULL AND meta->>'sensitive'='true'");
@@ -59,6 +70,6 @@ export async function rotateEncryption(db?:Db){
   }
  }
  const mirror=await runFileMirror();if(!mirror.complete)throw new Error('Rotation mirror is incomplete: keep all old keys and resume backup before retiring any key');
- return {secrets,documents,copies,active};
+ return {secrets,documents,copies,paymentTokens,active};
 }
-if(import.meta.main){if(!process.argv.includes('--maintenance-confirmed'))throw new Error('Stop document/order writes, keep all old keys, and use --maintenance-confirmed');console.log(JSON.stringify(await rotateEncryption()));}
+if(import.meta.main){if(!process.argv.includes('--maintenance-confirmed'))throw new Error('Stop payment/card/document/order writes, keep every key required by retained backups, and use --maintenance-confirmed');console.log(JSON.stringify(await rotateEncryption()));}

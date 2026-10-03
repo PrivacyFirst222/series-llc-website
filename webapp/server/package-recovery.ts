@@ -81,11 +81,19 @@ export async function verifyPackageCopy(r:PackageRecord):Promise<Buffer>{
 /** Project external committed successors onto the old snapshot before deleted
  * predecessors are filtered. Legacy tombstones never imply a successor. */
 export interface PackageHold {record:PackageRecord;reason:'a service created after this backup'|'an interrupted package operation'}
+export class PackageReconciliationRequired extends Error {
+ readonly code='PACKAGE_RECONCILIATION_REQUIRED';
+ readonly packages:{documentId:string;serviceId:string;clientId:string;companyId:string|null;company:string;reason:PackageHold['reason']}[];
+ constructor(holds:PackageHold[]){
+  super('This backup requires package reconciliation. Restore with --hold-unresolved-packages to preserve verified packages separately for reconciliation.');
+  this.name='PackageReconciliationRequired';
+  this.packages=holds.map(({record:r,reason})=>({documentId:r.id,serviceId:r.serviceId,clientId:r.clientId,companyId:r.companyId,company:r.company,reason})).sort((a,b)=>a.documentId.localeCompare(b.documentId));
+ }
+}
 export async function recoverPackages(tables:Record<string,Record<string,unknown>[]>,checkpoint:string[]=[],options:{holdUnresolved?:boolean}={}):Promise<{files:{storageKey:string;path:string;sha:string}[];aborted:PackageRecord[];holds:PackageHold[]}>{
  const journal=await readRecoveryJournal(),packages=journal.packages;
  const holds:PackageHold[]=[];
  const hold=async(record:PackageRecord,reason:PackageHold['reason'])=>{
-  if(!options.holdUnresolved)throw Error(`This backup cannot restore every S-election package automatically. ${record.company}: ${reason} needs reconciliation. Choose Restore with packages held for reconciliation to restore verified data and preserve the affected packages separately.`);
   // Missing bytes are possible before an interrupted upload. Existing bytes
   // must still authenticate; the explicit option never ignores corruption.
   const bytes=await readMirror(record.mirrorPath);
@@ -130,6 +138,9 @@ export async function recoverPackages(tables:Record<string,Record<string,unknown
  // Completed packages for post-snapshot services cannot be silently dropped:
  // owner/service rows needed for authorization cannot be invented from a PDF.
  for(const r of packages)if(r.state==='committed'&&!ids.has(r.serviceId)&&!deleted.has(r.id)&&!packages.some(p=>p.priorDocumentId===r.id&&p.state==='committed'))await hold(r,'a service created after this backup');
+ // Verification of every eligible package precedes this actionable refusal.
+ // In particular an unresolved intent cannot mask a damaged later copy.
+ if(holds.length&&!options.holdUnresolved)throw new PackageReconciliationRequired(holds);
  // A snapshot of a hold predates its later resolution. Replay the durable
  // package state; a new unresolved hold below still takes precedence.
  const unresolved=new Set(holds.map(h=>h.record.id));
