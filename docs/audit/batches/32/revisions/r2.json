@@ -1,0 +1,253 @@
+{
+  "id": "32",
+  "revision": 2,
+  "title": "Readable Word drafting choices and correct client PDF output",
+  "model": "Codex",
+  "base": "4754c5116dcc2a0105acd4a0adede646d3c6f41a",
+  "items": [
+    {
+      "id": "AUD-claude-reconciled-batch32-render-word-alternatives-glued",
+      "part": "all",
+      "scope": "Separate and label editable Word alternatives; preserve every drafting choice, legal sentence, table and indent.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/batch32-word-check.py",
+          "text": "render-word-alternatives-glued"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "../docs/batch32-word-check.py"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch32-render-2553-address-split",
+      "part": "all",
+      "scope": "Use structured principal address for Form2553 and cover letter, with lossless legacy fallback.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch32-documents-check.ts",
+          "text": "render-2553-address-split"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch32-documents-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch32-render-manual-double-page-numbers",
+      "part": "all",
+      "scope": "Preserve Manual pagination on portal download, including unnumbered cover/contents, while retaining licensing and encryption.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch32-documents-check.ts",
+          "text": "render-manual-double-page-numbers"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch32-documents-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch32-render-capital-equal-couple-wording",
+      "part": "all",
+      "scope": "Show exact equal fractions per ownership unit, identify joint units explicitly, preserve all calculations.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch32-documents-check.ts",
+          "text": "render-capital-equal-couple-wording"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch32-documents-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch32-render-wrap-line-starts-with-punctuation",
+      "part": "all",
+      "scope": "Keep closing punctuation with its preceding word across styled segments, measured within margins.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch32-documents-check.ts",
+          "text": "render-wrap-line-starts-with-punctuation"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch32-documents-check.ts"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/md-to-docx.py",
+      "mode": "code",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "docs/batch25-word-check.py",
+      "mode": "code",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "docs/batch32-word-check.py",
+      "mode": "code",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "webapp/scripts/batch32-documents-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "webapp/server/s-election.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "webapp/server/pdf-render.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "webapp/server/oa-capital.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "webapp/server/oa-capital.test.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "webapp/package.json",
+      "mode": "code",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "docs/audit/intakes/claude-reconciled-batch32.json",
+      "mode": "code",
+      "control": true,
+      "why": "Five approved Batch32 document-output fixes and regression evidence; no legal master wording changes."
+    },
+    {
+      "path": "docs/word/SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated from unchanged masters with labeled drafting alternatives."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated from unchanged masters with labeled drafting alternatives."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated from unchanged masters with labeled drafting alternatives."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated from unchanged masters with labeled drafting alternatives."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated from unchanged masters with labeled drafting alternatives."
+    },
+    {
+      "path": "docs/word/SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated from unchanged masters with labeled drafting alternatives."
+    },
+    {
+      "path": "docs/word/SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated from unchanged masters with labeled drafting alternatives."
+    },
+    {
+      "path": "docs/word/SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated from unchanged masters with labeled drafting alternatives."
+    },
+    {
+      "path": "docs/word/FPSLLC Amendment to Operating Agreement - FORM.docx",
+      "mode": "generated",
+      "why": "Regenerated from unchanged masters with labeled drafting alternatives."
+    },
+    {
+      "path": "docs/word/Series LLC Owners Manual - REVISED DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated from unchanged masters with labeled drafting alternatives."
+    },
+    {
+      "path": "docs/word/FPSLLC Statement of Authorized Representative - FORM.docx",
+      "mode": "generated",
+      "why": "Regenerated from unchanged masters with labeled drafting alternatives."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement Instructions - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated from unchanged masters with labeled drafting alternatives."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Normal API build."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Update two exact contribution-cell expectations to the owner-approved per-unit fractions; keep labels, row values and allocation checks."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": []
+}

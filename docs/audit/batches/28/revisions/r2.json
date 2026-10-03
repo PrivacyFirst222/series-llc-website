@@ -1,0 +1,513 @@
+{
+  "id": "28",
+  "revision": 2,
+  "title": "Office notices, registered-agent billing, card updates and recovery",
+  "model": "Codex Astra",
+  "base": "00663979fc6559eda50d3de9317f42a52de46953",
+  "items": [
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-restore-aborts-when-journal-lost",
+      "part": "all",
+      "scope": "Durably mirror every deletion decision independently of file deletion, and consult that journal even when the old file is still available. Require a trustworthy complete journal before recovery; reconcile snapshot plus later records and verify deleted documents stay unavailable. Merely checking .deleted when a file is missing fails the pending-deletion case.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A01"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-legal-mail-notice-lost-with-no-resend",
+      "part": "all",
+      "scope": "Add an authenticated office resend action keyed to document ID, preserve legal-mail context and current recipient, and retain delivery status keyed to that document. Reuse the existing stored document; report send acceptance truthfully.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A02"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-contact-form-fails-after-storing",
+      "part": "all",
+      "scope": "Acknowledge durable message receipt even when the separate office notification fails, and retain a visible retryable delivery failure for the office. Update the comment that currently promises acknowledgment only after both. Idempotency is useful if added, but no claim of exactly-once delivery is warranted.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A03"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-reader-5-office-nonpayment-resignation",
+      "part": "all",
+      "scope": "Allow the office to record an actual resignation with a documented Terms ground, required event dates and existing chronology safeguards. Do not gate every actual resignation on a timely-cancellation schedule. Separately resolve any automatic scheduling or fee rule.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A04"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-late-cancellation-charged-without-saying-so",
+      "part": "all",
+      "scope": "Show a charged renewal even when cancellation exists. Give an explicit current renewal/cancellation result using approved policy. Do not state cancellation guarantees another full service year irrespective of replacement or other termination events.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A05"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-reader-5-late-notice-omits-amount",
+      "part": "all",
+      "scope": "Schedule renewal notice attempts 70 days before renewal, retry daily, preserve the 60-day late-notice automatic-charge hold, include the fee in delayed notices, and apply the approved Terms reminder language without excusing required cancellation notice.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A06"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-reader-5-clients-tab-cancel-chip",
+      "part": "all",
+      "scope": "Derive cancellation summaries from company order records and identify the affected company; if keeping an account summary, use a clearly defined active/pending-company rule that handles a future appointment-end date.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A07"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-backup-rowcounts-count-deleted-documents",
+      "part": "all",
+      "scope": "Calculate completed counts after the final filters. Keep pending-job counts separately labeled as provisional if they are returned before completion.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A08"
+        }
+      ]
+    },
+    {
+      "id": "N1.15",
+      "part": "staged-cleanup",
+      "scope": "Clean up only the failed staged replacement; keep the existing usable package. Prove storage, insert and order-update failures separately.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A09"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-no-way-to-replace-the-renewal-card",
+      "part": "all",
+      "scope": "Allow authenticated clients to replace the selected company renewal card anytime, using Square STORE tokenization and CreateCard only, with consent, eligible-card checks, stable retry identity and concurrency protection; preserve the prior usable card on failure and never charge or reset the anniversary.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A10"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-runtime-B-undelivered-s-election-numbers-never-expire",
+      "part": "all",
+      "scope": "Purge undelivered S-election questionnaire taxpayer numbers after 90 days without a questionnaire update, preserve other answers and expose secure re-entry; preserve delivered 14-day editing cutoff and client-retained encrypted PDFs.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A11"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "part": "all",
+      "scope": "Keep the displayed Terms and Privacy revision dates accurate for the approved Batch28 policy changes.",
+      "replaces": {
+        "batch": "27",
+        "revision": 3,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "present",
+            "file": "webapp/src/content/terms.md",
+            "text": "Last updated: **September 20, 2026**"
+          },
+          {
+            "kind": "present",
+            "file": "webapp/src/content/privacy.md",
+            "text": "Last updated: **September 19, 2026**"
+          }
+        ]
+      },
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/src/content/terms.md",
+          "text": "Last updated: **September 21, 2026**"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/content/privacy.md",
+          "text": "Last updated: **September 21, 2026**"
+        }
+      ]
+    },
+    {
+      "id": "N1.15",
+      "part": "all",
+      "scope": "Replace the frozen source-block check with failure-path and successful replacement checks while preserving the prior Batch05 fix in its archive.",
+      "replaces": {
+        "batch": "05",
+        "revision": 1,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "present",
+            "file": "webapp/server/routes-portal.ts",
+            "text": "  const stored = await putFile(\n    `${title.replace(/[^\\w-]+/g, \"_\")}_${stampForFilename()}.pdf`,\n    buf,\n    \"application/pdf\",\n    true,\n  );\n  // The package belongs to the company the order was placed for (Adam,\n  // 7 Sep 2026): without it, it showed under every tab of the account.\n  const docRows = await db.query<{ id: string }>(\n    `INSERT INTO documents (client_id, order_id, kind, title, storage_key, content_type, size_bytes, meta)\n     VALUES ($1, $5, 'package', $2, $3, 'application/pdf', $4, $6) RETURNING id`,\n    [so.client_id, title, stored.storageKey, stored.sizeBytes, companyId, JSON.stringify({sensitive:true,serviceOrderId:so.id})],\n  );\n  merged.documentId = docRows[0].id;\n\n  // fulfilled_at starts the two-week clock, and a re-edit must not extend it.\n  await db.query(\n    `UPDATE service_orders\n        SET details = $1, ein_secret = $2, status = 'fulfilled',\n            fulfilled_at = COALESCE(fulfilled_at, now())\n      WHERE id = $3`,\n    [JSON.stringify(merged), encryptSecret(JSON.stringify(ssns)), so.id],\n  );\n  if (args.priorDocumentId) await requestDocumentDeletion(args.priorDocumentId, so.client_id);\n"
+          }
+        ]
+      },
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A09"
+        }
+      ]
+    },
+    {
+      "id": "100",
+      "part": "fact-ledger",
+      "scope": "Carry Adam\u2019s approved 70-day reminder schedule into the fact ledger while preserving the 60-day hold, all prices and all other timing protections.",
+      "replaces": {
+        "batch": "27",
+        "revision": 3,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "present",
+            "file": "docs/facts.md",
+            "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts \u2014 `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md \u2014 `currently $99`\n- where: webapp/src/content/terms.md \u2014 `60 days before your renewal date`\n- where: webapp/src/content/terms.md \u2014 `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md \u2014 `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md \u2014 `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md \u2014 `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts \u2014 `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts \u2014 `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts \u2014 `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts \u2014 `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md \u2014 `add a $50 series per property`\n- where: docs/owners-manual.md \u2014 `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
+          }
+        ]
+      },
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/facts.md",
+          "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder scheduled 70 days before renewal; automatic charging held if sent less than 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts \u2014 `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md \u2014 `currently $99`\n- where: webapp/src/content/terms.md \u2014 `70 days before your renewal date`\n- where: webapp/src/content/terms.md \u2014 `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md \u2014 `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md \u2014 `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md \u2014 `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts \u2014 `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts \u2014 `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts \u2014 `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts \u2014 `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md \u2014 `add a $50 series per property`\n- where: docs/owners-manual.md \u2014 `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
+        }
+      ]
+    },
+    {
+      "id": "194",
+      "part": "all",
+      "scope": "Update the old 60-day reminder assertion to the owner-approved 70-day schedule; cancellation remains 30 days before renewal. Preserve the old fix in its replacement archive.",
+      "replaces": {
+        "batch": "07",
+        "revision": 1,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "check",
+            "suite": "walk",
+            "label": "batch07 194: notice precedes cancellation deadline by thirty days"
+          }
+        ]
+      },
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A06"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/facts.md",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "docs/db-restore.md",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "docs/audit/intakes/claude-reconciled-batch28.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "docs/audit/migrations/003-batch28-staged-package.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/backup.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/restore.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/document-retention.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/dropbox.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/storage.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/db.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/ra-office.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/renewals.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/ra-checkout.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/renewal-card.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/square.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/email.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/office-notifications.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/routes-payments.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/routes-ops.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/s-election-recovery.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/batch28-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/scripts/batch28-portal-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/src/lib/agentBilling.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/src/pages/portal/UpdateRenewalCard.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/src/pages/admin/AdminDashboard.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/src/pages/admin/AgentServicePanel.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/src/pages/admin/LibrarySection.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/src/content/terms.md",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/src/content/privacy.md",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/package.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "control": true,
+      "why": "Approved Batch28 recovery, notice, billing and retention changes with regression checks and preserved prior records."
+    },
+    {
+      "path": "webapp/server/s-election-package-storage.ts",
+      "mode": "code",
+      "why": "Encapsulate the approved Batch28 storage failure and recovery paths."
+    },
+    {
+      "path": "webapp/server/backup-deletions.ts",
+      "mode": "code",
+      "why": "Encapsulate the approved Batch28 storage failure and recovery paths."
+    },
+    {
+      "path": "webapp/server/batch07-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Update the existing reminder timing fixture to the approved 70-day schedule; retain all its other checks."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": [
+    "renewal: 61 days out, no notice yet",
+    "renewal: 60 days out, the notice goes and the renewal is recorded",
+    "batch07 194: notice precedes cancellation deadline by thirty days"
+  ],
+  "testSupport": [
+    "webapp/server/batch28-check.ts",
+    "webapp/scripts/batch28-portal-check.ts"
+  ]
+}

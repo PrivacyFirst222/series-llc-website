@@ -1,0 +1,88 @@
+[
+  {
+    "file": "entity-consent.pdf",
+    "beforePages": 4,
+    "afterPages": 4,
+    "selectedPages": [
+      2
+    ],
+    "textPreserved": true,
+    "withinMargins": true
+  },
+  {
+    "file": "long-exhibit.pdf",
+    "beforePages": 38,
+    "afterPages": 38,
+    "selectedPages": [
+      20,
+      28
+    ],
+    "textPreserved": true,
+    "withinMargins": true
+  },
+  {
+    "file": "ordinary-consent.pdf",
+    "beforePages": 3,
+    "afterPages": 3,
+    "selectedPages": [
+      1
+    ],
+    "textPreserved": true,
+    "withinMargins": true
+  },
+  {
+    "file": "pdf-1-ordinary.pdf",
+    "beforePages": 26,
+    "afterPages": 26,
+    "selectedPages": [
+      20,
+      22
+    ],
+    "textPreserved": true,
+    "withinMargins": true
+  },
+  {
+    "file": "pdf-1-professional.pdf",
+    "beforePages": 26,
+    "afterPages": 26,
+    "selectedPages": [
+      20,
+      22
+    ],
+    "textPreserved": true,
+    "withinMargins": true
+  },
+  {
+    "file": "pdf-4-ordinary.pdf",
+    "beforePages": 26,
+    "afterPages": 26,
+    "selectedPages": [
+      20,
+      22
+    ],
+    "textPreserved": true,
+    "withinMargins": true
+  },
+  {
+    "file": "pdf-4-professional.pdf",
+    "beforePages": 26,
+    "afterPages": 26,
+    "selectedPages": [
+      20,
+      22
+    ],
+    "textPreserved": true,
+    "withinMargins": true
+  },
+  {
+    "file": "pdf-6-professional.pdf",
+    "beforePages": 26,
+    "afterPages": 26,
+    "selectedPages": [
+      20,
+      22
+    ],
+    "textPreserved": true,
+    "withinMargins": true
+  }
+]

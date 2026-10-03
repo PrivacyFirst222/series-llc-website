@@ -1,0 +1,374 @@
+{
+  "schema": 1,
+  "run": "claude-reconciled-batch33",
+  "commit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+  "completedAt": "2026-09-22T22:16:37.119233+00:00",
+  "manifestSha": "aab042ff3b30a62b4468e13fecfd67acee95c6d9564920648b6af576b8043200",
+  "auditSha": "d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1",
+  "findings": [
+    {
+      "key": "reader-2-walk-accepts-retired-submit-label",
+      "where": "The browser walk, the final button click in every run (and the refused-signature click at :721)",
+      "file": "webapp/scripts/behavioral.ts",
+      "line": 741,
+      "reads": "await page.locator(\"main button\").filter({ hasText: /^(Continue to payment|Submit intake)$/ }).first().click();",
+      "claims": "Clicks the form's final button.",
+      "truth": "The regex still accepts 'Submit intake', the label prior item 77 retired (FloridaLLCFormationForm.tsx:739 now reads 'Continue to payment'). The walk would therefore pass unchanged if the old label came back; only batch09-walk.ts:28 asserts the exact new label.",
+      "replacement": "await page.locator(\"main button\").filter({ hasText: /^Continue to payment$/ }).first().click();  (same at :721)",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "reader-2-finding-walk-expectations",
+        "reader-2-prior-77"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 2,
+      "reader": "reader-2",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-2-walk-placeholder-cannot-fail",
+      "where": "The browser walk, run A's back-walk block",
+      "file": "webapp/scripts/behavioral.ts",
+      "line": 687,
+      "reads": "expect((await page.locator(\"#client-first-name\").inputValue().catch(() => \"\").then((v) => v)) !== \"GONE\", `${run.key}: placeholder`, null);",
+      "claims": "Counted as one of the walk's checks.",
+      "truth": "The first-name box can never hold the literal string \"GONE\", so the expectation is always true; it adds one passing check to the count (checks++ at :131) without testing anything. The intended check \u2014 that the typed name survives the back-walk \u2014 is not made here (the forward replay at :689-690 relies on validation passing, not on the value).",
+      "replacement": "expect((await page.locator(\"#client-first-name\").inputValue()) === \"Casey\", `${run.key}: back-walk keeps the client's typed first name`, await page.locator(\"#client-first-name\").inputValue());",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "reader-2-finding-walk-expectations"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 2,
+      "reader": "reader-2",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "runtime-B-walk-label-year-from-formation",
+      "where": "Behavioral walk, the renewal-date assertion on the portal's agent card",
+      "file": "webapp/scripts/behavioral.ts",
+      "line": 1035,
+      "reads": "        expect(new RegExp(`renews on [A-Z][a-z]+ \\\\d{1,2}, ${nextYear}`).test(dash) && !/renews annually/.test(dash), \"renewal: the portal's agent card names the renewal date a year from formation\", dash.match(/registered agent service is active[^.]*\\./)?.[0]);",
+      "claims": "The renewal date is a year from formation.",
+      "truth": "Terms 9(c) and ra-office.ts:37 set it a year from the recorded appointment; the walk records the appointment as today (behavioral.ts:998) and forms the company the same day, so the label cannot distinguish the two rules and describes the wrong one. Runtime: appointment 2024-02-29 \u2192 renewal 2025-02-28 \u2192 after the charge 2026-02-28 (renewal-cancel-and-replacement.md step 1).",
+      "replacement": "\"renewal: the portal's agent card names the renewal date a year from the recorded appointment\"",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "runtime-B-test-expectations"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 2,
+      "reader": "reader-2",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-5-e2e-stale-renewal-comments",
+      "where": "Server check suite \u2014 the comments introducing the registered-agent renewal section",
+      "file": "webapp/server/e2e.ts",
+      "line": 3764,
+      "reads": "// The registered-agent renewal date is set at formation for a client who",
+      "claims": "The renewal date is set at formation, and (line 3814) the notice goes '45 days out'.",
+      "truth": "The checks beneath do the opposite: :3791 records the appointment through /admin/orders/:id/agent before forming, :3803 expects the renewal date one year from that appointment, :3823-3829 run the job at 61 and 60 days out and expect the notice at 60 (RA_NOTICE_DAYS = 60, Terms 9(d)). The comments at :3764-3766 and :3814 describe the pre-Batch-07 behaviour (formation-day date, 45-day notice) that priors 194 and 212 replaced; a reader of the suite is told the wrong rule.",
+      "replacement": "// The registered-agent renewal date is the anniversary of the appointment the office\n// records (Batch 07); it is shown to the client and named in the cancellation email.\n\u2026 and at 3814: //      payment, the notice 60 days out, the charge 15 days out, a decline",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "reader-5-e2e",
+        "reader-5-renewals"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 5,
+      "reader": "reader-5",
+      "link": {
+        "rep": "reader-5-e2e-stale-renewal-comments",
+        "note": "the runtime-B item is contained in reader-5's (reviewer-F)"
+      },
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-5-ein-pending-per-client-unused",
+      "where": "Office, Service orders list (GET /admin/services) \u2014 the ein_pending column",
+      "file": "webapp/server/routes-admin.ts",
+      "line": 1054,
+      "reads": "(so.type = 's-election' AND EXISTS (",
+      "claims": "An S election order is 'ein_pending' when the client has an open EIN order.",
+      "truth": "Lines 1054-1058 match any open EIN order on the same client_id, not the same company or target (the defect shape Batch 02 fixed for sElectionPaid at :1094-1097), and nothing reads it: ServiceOrdersSection.tsx:54 only declares `ein_pending: boolean` and git grep finds no other use in webapp/src. The office screens use details.einPending instead (:192, :221). Dead, and wrong if ever used.",
+      "replacement": "Delete lines 1054-1058 and the `ein_pending: boolean;` field at ServiceOrdersSection.tsx:54; or, if wanted, scope it: `(so.type = 's-election' AND EXISTS (SELECT 1 FROM service_orders e WHERE e.client_id = so.client_id AND e.formation_order_id = so.formation_order_id AND e.type = 'ein' AND COALESCE(e.details->>'target','company') = 'company' AND e.status NOT IN ('fulfilled', 'cancelled'))) AS ein_pending,`",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "reader-5-routes-admin"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 5,
+      "reader": "reader-5",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-5-gift-card-branch-dead",
+      "where": "Registered agent renewal notice email \u2014 the no-card paragraph's prepaid-card wording",
+      "file": "webapp/server/email.ts",
+      "line": 113,
+      "reads": "${opts.giftCard ? \"An eligible card is required\" : \"No eligible card is on file\"}",
+      "claims": "The notice can say 'An eligible card is required' when the card on file was a prepaid card.",
+      "truth": "The only caller, renewals.ts:126, passes `giftCard:false` unconditionally, so the first branch never prints; the giftCard parameter (:108) is dead since Batch 07 made a prepaid card refuse the purchase (ra-checkout.ts:56-64) and Batch 20 removed the gift-card email (prior 220). A card_status of 'gift_card' (renewals.ts:86) can no longer reach a formed order with our service.",
+      "replacement": "Drop the parameter: in email.ts:108 remove `giftCard: boolean;`, at :113 print `No eligible card is on file,` and in renewals.ts:126 remove `giftCard:false,`.",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "reader-5-email",
+        "reader-5-renewals",
+        "reader-5-ra-office"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 5,
+      "reader": "reader-5",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-5-migration9-comment-renewal-date",
+      "where": "Server database migrations \u2014 the comment above migration 9",
+      "file": "webapp/server/db.ts",
+      "line": 420,
+      "reads": "// record, and the registered-agent renewal date is stored when the company is",
+      "claims": "The renewal date is stored when the company is formed.",
+      "truth": "Since Batch 07 the date is stored when the office records the appointment (ra-office.ts:37, appointment + 1 year); the formation upload only copies it when an appointment date already exists (routes-admin.ts:809-817, 'The office records the actual appointment separately; never infer it from upload time'). The comment sits outside the frozen statement strings, so it can be corrected without touching the applied migration's checksum.",
+      "replacement": "// record, and the registered-agent renewal date column (set when the office records\n// our appointment \u2014 the anniversary of the appointment date) so the portal and the\n// cancellation email can show it.",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "reader-5-db",
+        "reader-5-ra-office",
+        "reader-5-routes-admin"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 5,
+      "reader": "reader-5",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-5-notes-agent-fee-sentence",
+      "where": "Chapter 605 reading notes, Administration section, the s. 605.2203(1) bullet",
+      "file": "webapp/server/chapter-605-notes.md",
+      "line": 123,
+      "reads": "One agent covers everything. Supports charging no\n  separate registered agent designation fee.",
+      "claims": "The statute supports charging no separate registered agent designation fee.",
+      "truth": "Read on its own the sentence contradicts the current calculator, which the same file records at :273-275: 'now split the new-company fee into $100 for Articles under (2) plus $25 for the agent designation under (7)' (pricing.ts:75-81 prints 'FL state fee \u2014 registered agent designation'). The bullet's point is s. 605.2203(1) \u2014 one agent serves every protected series, so no designation fee is charged per series. The missing words 'per series' turn a correct note into one that reads as the retired 'No fee to designate a registered agent' instruction.",
+      "replacement": "One agent covers everything. Supports charging no\n  separate per-series registered agent designation fee (the company's own $25 designation fee under s. 605.0213(7) still applies).",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "reader-5-notes-605",
+        "reader-5-renewals"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 5,
+      "reader": "reader-5",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-5-pricing-comment-mailing-only",
+      "where": "Server pricing constants \u2014 the comment on S_ELECTION_WINDOW_DAYS",
+      "file": "webapp/server/pricing.ts",
+      "line": 25,
+      "reads": "election deadline for preparation, signing, and mailing. */",
+      "claims": "The client mails the Form 2553 package.",
+      "truth": "Batch 13's owner decision (facts.md:185) is 'Clients fax or mail Form 2553 themselves', and the package instructions and emails were changed to say 'faxing or mailing' (email.ts:385, :496, :513; prior 203). The comment still describes mailing only.",
+      "replacement": "election deadline for preparation, signing, and faxing or mailing. */",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "reader-5-renewals",
+        "reader-5-email",
+        "reader-5-decisions"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 5,
+      "reader": "reader-5",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "statutes-0702-stale-note",
+      "where": "Internal reading notes (webapp/server/chapter-605-notes.md), s. 605.0702 entries",
+      "file": "webapp/server/chapter-605-notes.md",
+      "line": 482,
+      "reads": "and sale of interests.\" Our Article 13 buy-sell IS such a provision, but it",
+      "claims": "Article 13 of the masters 'does not say so or cite s. 605.0702' (and line 546: 'Our Article 13 qualifies but never says so').",
+      "truth": "At commit 4a344e2 all four multi-member masters carry s. 13.x(f): 'This Section is a deadlock sale provision within the meaning of s. 605.0702(2), Florida Statutes, providing for a purchase and sale of interests. Delivery of a Buy-Sell Offer under subsection (b) initiates this deadlock sale provision as of the date of delivery.' (templates-oa-member-s.md:346, templates-oa-member.md:332, templates-oa-multi.md:330, templates-oa-s.md:344). The note's 'drafting opportunity' has been taken; the note is stale. Evidence: evidence/statutes/605.0702-claims.md.",
+      "replacement": "Replace lines 482-484 with: 'Our Article 13 buy-sell IS such a provision, and s. 13.x(f) of each multi-member master now says so and fixes the initiation date (delivery of the Buy-Sell Offer).' Replace line 546 with: '**Our Article 13 qualifies and says so (s. 13.x(f)).**'",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "statutes-605-0702",
+        "statutes-605-0702-claims"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 5,
+      "reader": "reader-5",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-6-agent-signature-shadowed-messages",
+      "where": "Order form, Registered agent acceptance screen \u2014 the message for a blank acceptance name or blank electronic signature",
+      "file": "webapp/server/validation.ts",
+      "line": 280,
+      "reads": "      if (!(data.registeredAgentElectronicSignature ?? \"\").trim()) {\n        ctx.addIssue({ code: z.ZodIssueCode.custom, path: [\"registeredAgentElectronicSignature\"], message: \"Electronic signature required\" });\n      }",
+      "claims": "A blank electronic signature is answered 'Electronic signature required'.",
+      "truth": "Line 276 has already added 'Your electronic signature must match the registered agent name exactly: <name>' on the same path for the blank value, and FloridaLLCFormationForm.tsx:476-477 keeps the first issue per field; the same holds for 'Name required' at :270 versus :275. In the browser stepValidation.ts:254-258 overwrites the required message with the match message. So the two 'required' sentences are never shown; the client sees the match sentence, which is correct but makes :269-270 and :280-282 dead.",
+      "replacement": "Delete lines 280-282 (and 269-270), or guard the match checks with `else if` after the blank checks so each blank answers 'required' and each non-matching answer 'must match exactly'. Mirror the choice in stepValidation.ts:250-258.",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "reader-6-f-shadowed-messages"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 6,
+      "reader": "reader-6",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-6-ra-cancel-route-comment",
+      "where": "Server, the registered-agent cancellation route's docstring (no screen)",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 2556,
+      "reads": "/** Online cancellation of registered agent service \u2014 required by \u00a7501.165\n *  because the service is accepted online. Recording the request is the\n *  \u00a79(g)(i) notice; the agency itself ends only when proof of a successor\n *  designation arrives (handled by hand from the admin notification). */",
+      "claims": "The Terms have a \u00a79(g)(i), and our agency ends only when proof of a successor designation arrives.",
+      "truth": "Terms 9(g) (terms.md:54) has no (i) sub-item, and it and 10(e) (terms.md:65) with Ruling 28 say that if replacement proof is missing by the renewal date we submit our resignation on that date and charge $99 \u2014 the agency also ends by resignation, and the daily job (renewals.ts:114) schedules it. The comment describes the pre-Batch-07 policy.",
+      "replacement": "/** Online cancellation of registered agent service \u2014 required by s. 501.165 because the service is accepted online. Recording the request is the Terms 9(g) notice; the agency ends when replacement proof arrives or, if none by the renewal date, when our resignation takes effect (Terms 9(g), 10(e); renewals.ts). */",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "reader-6-f-ra-cancel-comment",
+        "reader-6-rulings"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 6,
+      "reader": "reader-6",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-6-vercel-entry-bundle-comment",
+      "where": "Server, the Vercel function source header comment (no screen)",
+      "file": "webapp/server/vercel-entry.ts",
+      "line": 1,
+      "reads": "// Source for the Vercel function. `bun run build:api` bundles this (and every\n// dependency) into api/[[...route]].mjs \u2014 the deployed function is fully\n// self-contained, so runtime dependency resolution can never fail.",
+      "claims": "The API bundle is written to api/[[...route]].mjs.",
+      "truth": "package.json:13 build:api writes `--outfile=api/index.mjs`; vercel.json:2-6 rewrites /api/:path* to /api/index and :42-46 configures the function `api/index.mjs`; the api folder holds index.mjs only. The comment names a file that does not exist (the project CLAUDE.md carries the same stale name).",
+      "replacement": "// Source for the Vercel function. `bun run build:api` bundles this (and every\n// dependency) into api/index.mjs \u2014 the deployed function is fully\n// self-contained, so runtime dependency resolution can never fail.",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "reader-6-f-vercel-entry"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 6,
+      "reader": "reader-6",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-6-webhook-signature-compare",
+      "where": "Server, Square webhook signature check (no screen)",
+      "file": "webapp/server/square.ts",
+      "line": 231,
+      "reads": "return expected === opts.signatureHeader;",
+      "claims": "The signature is verified.",
+      "truth": "It is, but with a plain string comparison: `expected === opts.signatureHeader` returns as soon as bytes differ, so the comparison time depends on how many leading characters match. Square's own guidance and node:crypto provide timingSafeEqual for HMAC checks. No functional failure today; hygiene.",
+      "replacement": "const a = Buffer.from(expected); const b = Buffer.from(opts.signatureHeader); return a.length === b.length && timingSafeEqual(a, b);  (import { timingSafeEqual } from \"node:crypto\")",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "reader-6-f-webhook-compare"
+      ],
+      "review": {
+        "reviewer": "Codex at 3a72f468f54a1ca96de23ddf5587f327fda09e32",
+        "priorCompared": true,
+        "replacement": "correct",
+        "evidence": "Reopened current source; Adam approved all 14 Batch33 proposals with Go. Approve all. Historical text retained; scope carries corrected 70-day timing and narrower security-hardening finding."
+      },
+      "bucket": 6,
+      "reader": "reader-6",
+      "link": null,
+      "presentedAs": "new"
+    }
+  ]
+}

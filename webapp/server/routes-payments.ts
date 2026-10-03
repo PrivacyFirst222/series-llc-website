@@ -1,3 +1,5 @@
+import { checkCheckout, paymentAlert, deliverPaymentAlerts } from './checkout-recovery';
+import { notifyContact } from './office-notifications';
 import { agentCheckoutLink, payAgentTarget } from "./ra-checkout";
 // Split from app.ts on 29 Aug 2026 — one domain per file, code moved
 // verbatim (the two dev test flags became shared.testHooks so they stay
@@ -69,11 +71,11 @@ export async function fulfillPaidOrder(orderId: string, squarePaymentId: string 
       INSERT INTO clients (email, name)
       SELECT contact_email, contact_name FROM target WHERE client_id IS NULL
       ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email
-      RETURNING id, password_hash
+      RETURNING id, password_hash, auth_version, email
     ), account AS (
-      SELECT id, password_hash FROM account_created
+      SELECT id, password_hash, auth_version, email FROM account_created
       UNION ALL
-      SELECT c.id, c.password_hash FROM target JOIN clients c ON c.id = target.client_id
+      SELECT c.id, c.password_hash, c.auth_version, c.email FROM target JOIN clients c ON c.id = target.client_id
     ), services AS (
       INSERT INTO service_orders
         (client_id, type, status, llc_name, details, amount_cents, formation_order_id, paid_at, square_payment_id)
@@ -92,9 +94,9 @@ export async function fulfillPaidOrder(orderId: string, squarePaymentId: string 
           AND (kind.type <> 'ein' OR s.details->>'target' = 'company'))
       RETURNING id
     ), welcome_link AS (
-      INSERT INTO auth_tokens(token_hash, client_id, purpose, expires_at)
-      SELECT $4, account.id, 'set_password', $5::timestamptz FROM account
-      WHERE account.password_hash IS NULL RETURNING token_hash
+      INSERT INTO auth_tokens(token_hash, client_id, purpose, expires_at, account_version)
+      SELECT $4, account.id, 'set_password', $5::timestamptz, account.auth_version FROM account, target
+      WHERE account.password_hash IS NULL AND account.email=target.contact_email RETURNING token_hash
     ), done AS (
       UPDATE orders SET client_id = account.id, fulfillment_completed_at = now()
       FROM target, account WHERE orders.id = target.id
@@ -150,11 +152,10 @@ export async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaym
   const rows = await db.query<{
     id: string; client_id: string; type: string; status: string; llc_name: string; details: unknown; amount_cents: number;
   }>(
-    `UPDATE service_orders SET status = $1, paid_at = now(), square_payment_id = $2
-      WHERE id = $3 AND status = 'pending_payment'
-      RETURNING id, client_id, type, status, llc_name, details, amount_cents`,
-    [nextStatus, squarePaymentId, serviceOrderId],
+    `SELECT * FROM record_service_payment($3,$2,$1)`,
+    [nextStatus, squarePaymentId ?? `dev-service-${serviceOrderId}`, serviceOrderId],
   );
+  await deliverPaymentAlerts();
   if (rows.length === 0) return;
   const so = rows[0];
   const details = (typeof so.details === "string" ? JSON.parse(so.details) : so.details) as {
@@ -182,7 +183,7 @@ export async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaym
       needsInfo: so.type === "ein" || so.type === "s-election",
       portalUrl: `${env.PUBLIC_BASE_URL}/portal`,
     });
-    sendMail({ to: client.email, ...mail }).catch((e) => console.error("[service] client email failed:", e));
+    await sendMail({ to: client.email, ...mail }).catch((e) => console.error("[service] client email failed:", e));
     if (env.ADMIN_NOTIFY_EMAIL) {
       const notice = serviceOrderAdminEmail({
         type: so.type,
@@ -192,7 +193,7 @@ export async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaym
         amountCents: so.amount_cents,
         adminUrl: `${env.PUBLIC_BASE_URL}/admin`,
       });
-      sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...notice, replyTo: client.email }).catch((e) =>
+      await sendMail({ to: env.ADMIN_NOTIFY_EMAIL, ...notice, replyTo: client.email }).catch((e) =>
         console.error("[service] admin email failed:", e),
       );
     }
@@ -323,7 +324,7 @@ app.post("/orders", async (c) => {
         `The name "${p.name}" is unavailable — ${
           p.verdict === "taken"
             ? "an existing Florida company already has it"
-            : "it belongs to a recently dissolved company, and Florida protects it for up to a year"
+            : "it matches a recently inactive company and our service conservatively treats it as unavailable"
         }. Please choose a different name.`,
         "NAME_UNAVAILABLE",
       ),
@@ -407,6 +408,8 @@ app.post("/orders", async (c) => {
 });
 
 app.get("/orders/:id/status", async (c) => {
+  if (!z.string().uuid().safeParse(c.req.param("id")).success) return c.json(err("Order not found", "NOT_FOUND"),404);
+  await checkCheckout("order",c.req.param("id"));
   const db = await getDb();
   // Unauthenticated by design — the confirmation page polls it with only the
   // order id from the Square redirect. It answers with the minimum that page
@@ -436,7 +439,10 @@ app.post("/square/webhook", async (c) => {
     rawBody,
     notificationUrl: `${env.PUBLIC_BASE_URL}/api/square/webhook`,
   });
-  if (!ok) return c.json(err("Bad signature", "BAD_SIGNATURE"), 401);
+  if (!ok) {
+    await paymentAlert("webhook-signature", "Square notification signatures are being rejected. Check the configured webhook address and signature key; invalid requests are never accepted as payments.");
+    return c.json(err("Bad signature", "BAD_SIGNATURE"), 401);
+  }
 
   const event = JSON.parse(rawBody) as {
     event_id?: string;
@@ -609,21 +615,21 @@ app.post("/orders/:id/resend-welcome", async (c) => {
   if (orders.length === 0 || !orders[0].paid_at || !orders[0].client_id) {
     return c.json({ data: { ok: true, sent: false } });
   }
-  const clients = await db.query<{ id: string; password_hash: string | null }>(
-    "SELECT id, password_hash FROM clients WHERE id = $1",
+  const clients = await db.query<{ id: string; password_hash: string | null; email:string }>(
+    "SELECT id, password_hash, email FROM clients WHERE id = $1",
     [orders[0].client_id],
   );
   if (clients.length > 0 && !clients[0].password_hash) {
     const { token, tokenHash } = newToken();
     await db.query(
-      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at) VALUES ($1, $2, 'set_password', $3)",
-      [tokenHash, clients[0].id, new Date(Date.now() + 7 * 86400_000).toISOString()],
+      "INSERT INTO auth_tokens (token_hash, client_id, purpose, expires_at, account_version) SELECT $1,id,'set_password',$3,auth_version FROM clients WHERE id=$2 AND email=$4",
+      [tokenHash, clients[0].id, new Date(Date.now() + 7 * 86400_000).toISOString(), clients[0].email],
     );
     const resendPayload = (typeof orders[0].payload === "string" ? JSON.parse(orders[0].payload) : orders[0].payload) as { filingPath?: string } | null;
     const manualReady = await ensureOwnersManual().then(() => true, (e) => { console.error("[manual] initial publication failed:", e); return false; });
     const mail = welcomeEmail(orders[0].contact_name, `${env.PUBLIC_BASE_URL}/portal/set-password?token=${token}`, resendPayload?.filingPath === "CONVERT", (resendPayload as { registeredAgent?: { choice?: string } } | null)?.registeredAgent?.choice === "SERVICE", manualReady);
     try {
-      await sendMail({ to: orders[0].contact_email, ...mail });
+      await sendMail({ to: clients[0].email, ...mail });
     } catch (e) {
       console.error("[resend-welcome] failed:", e);
       return c.json(err("Could not send the email. Please try again.", "EMAIL_FAILED"), 503);
@@ -637,7 +643,7 @@ app.post("/orders/:id/resend-welcome", async (c) => {
 // The public contact form. Until 30 Aug 2026 this form SENT NOTHING — it
 // told the visitor a specialist would reply within a business day, then
 // discarded the message (P51). Now: stored (and so backed up nightly),
-// emailed to the notify address, and acknowledged only after both.
+// acknowledged once stored; the office notification is a separate retryable step.
 const contactSchema = z.object({
   name: z.string().trim().min(1).max(200).refine(hasFirstAndLast, FIRST_AND_LAST),
   email: z.string().trim().email().max(320),
@@ -654,19 +660,13 @@ app.post("/contact", async (c) => {
   }
   const { name, email, message } = body.data;
   const db = await getDb();
-  await db.query(
-    "INSERT INTO contact_messages (name, email, message) VALUES ($1, $2, $3)",
+  const [saved] = await db.query<{id:string}>(
+    "INSERT INTO contact_messages (name, email, message, notice_status) VALUES ($1, $2, $3, 'pending') RETURNING id",
     [name, email, message],
   );
-  if (env.ADMIN_NOTIFY_EMAIL) {
-    const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    await sendMail({
-      to: env.ADMIN_NOTIFY_EMAIL,
-      subject: `Contact form: ${name}`,
-      replyTo: email,
-      html: `<p><strong>${esc(name)}</strong> &lt;${esc(email)}&gt; wrote:</p><p>${esc(message).replace(/\n/g, "<br>")}</p>`,
-    });
-  }
+  // The visitor's message is already durable. A notification outage must not
+  // ask them to submit it again. The office can retry the recorded message.
+  await notifyContact(saved.id).catch(e=>console.error('[contact] notification pending',e));
   return c.json({ data: { ok: true } });
 });
 

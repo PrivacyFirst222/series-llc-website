@@ -12,7 +12,7 @@
 ## [COMPANY NAME], LLC
 ### A FLORIDA PROTECTED SERIES LIMITED LIABILITY COMPANY
 
-**(Manager-Managed — S Corporation)**
+**(Manager-Managed — Multiple Members / S Corporation)**
 
 ---
 
@@ -136,7 +136,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 ## ARTICLE 4 — MEMBERS; VOTING; MEMBER DUTIES
 
-**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes.
+**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages or fractions of the whole, as set forth on Exhibit A; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes.
 
 **4.2 No Series-Level Ownership.** No Member is an Associated Member of any Protected Series, and no Member holds a protected-series transferable interest. Each Protected Series is wholly owned by the Company as provided in Section 3.6. Every Member's economic rights in every Protected Series arise solely through the Member's Percentage Interest in the Company, so that all Members participate in every Protected Series identically and in proportion to their Percentage Interests at all times.
 
@@ -200,7 +200,7 @@ NOW, THEREFORE, the Members adopt the following as the operating agreement of th
 
 **5.7 Compensation; Reimbursement; Shared Expenses.** The Manager shall serve without salary unless a Majority in Interest consents in writing to compensation. The Manager and each Protected Series Manager shall be reimbursed for reasonable expenses properly incurred on behalf of the Company or the applicable Protected Series. Costs and expenses that benefit the Company and one or more Protected Series (including formation and filing fees, registered agent fees, accounting, insurance, and administrative overhead) shall be allocated among the Company and the Protected Series benefited on a reasonable and consistent basis determined by the Manager — by specific attribution where practicable and otherwise pro rata or by such other reasonable formula as the Manager adopts — and the allocation shall be recorded in the records maintained under Article 8.
 
-**5.8 Statement of Authority.** With the consent of all Members required by Section 5.4(i), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.
+**5.8 Statement of Authority.** With the consent of all Members required by Section 5.4(i), the Manager may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.
 
 **5.9 Competition; Other Activities of the Manager. [SELECT THE SAME ALTERNATIVE AS SECTION 4.7]**
 
@@ -529,6 +529,6 @@ By: _____________________________
 
 ---
 
-*Form document — [COMPANY NAME], LLC Operating Agreement (Manager-Managed / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. §365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*
+*Form document — [COMPANY NAME], LLC Operating Agreement (Manager-Managed, Multiple Members / S Corporation), v1 draft. Statutory citations in this form: ss. 48.062, 605.0102, 605.0302, 605.0502, 605.0503, 605.0702, 605.2101, 605.2103, 605.2107, 605.2201, 605.2301, 605.2302, 605.2303, 605.2304, 605.2401, 605.2602, 605.2605, 605.2607, 605.2802, 605.04074, 605.04091, 711.50, 711.501, 711.512, Fla. Stat.; 11 U.S.C. §365; In re Soderstrom, 484 B.R. 874 (M.D. Fla. 2013). Internal Revenue Code sections: 1361, 1362, 1366, 1377, 1378.*
 
 *[TITLE] of [COMPANY NAME], LLC — generated by MyFloridaSeriesLLC · Master [EDITION]*

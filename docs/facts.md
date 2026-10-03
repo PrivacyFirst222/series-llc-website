@@ -90,12 +90,15 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - retired: `single statutory channel provided in s. 605.2604`
 
 ### The board's column names
-- value: `New Orders · With The State · Complete`
+- value: `New Orders · With The State · Post-Filing Items`; fully delivered orders appear in the `Completed Orders` tab (Adam, 22 September 2026).
 - where: webapp/src/pages/admin/OrderBoard.tsx — `"New Orders"`
 - where: webapp/src/pages/admin/OrderBoard.tsx — `"With The State"`
-- where: webapp/src/pages/admin/OrderBoard.tsx — `"Complete"`
-- where: webapp/server/routes-admin.ts — `formed: "Complete"`
-- retired: `formed: "Formed"`
+- where: webapp/src/pages/admin/OrderBoard.tsx — `"Post-Filing Items"`
+- where: webapp/src/pages/admin/OrderBoard.tsx — `"Completed Orders"`
+- where: webapp/src/pages/admin/AdminDashboard.tsx — `<TabsTrigger value="completed">Completed Orders</TabsTrigger>`
+- where: webapp/server/routes-admin.ts — `formed: "Formed"`
+- retired: `title="Complete"` in webapp/src/pages/admin/OrderBoard.tsx
+- retired: `formed: "Complete"` in webapp/server/routes-admin.ts
 
 ### The edition label on every generated document
 - value: `First Edition — August 2026`
@@ -269,11 +272,11 @@ scanned set; add ` in <path prefix>` to confine the ban to matching files.
 - Adam rejected Batch 16 review items 4, 5 and 9: preserve manager-amendment wording (232), repeated single-class wording (236), and agency wording (N2.02).
 
 ### Registered-agent annual price and renewal timing (Adam, Batch 07)
-- value: `First year included from effective appointment; $99 annually thereafter. Reminder 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`
+- value: `First year included from effective appointment; $99 annually thereafter. Reminder scheduled 70 days before renewal; missing or late reminders do not block authorized renewal charging; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`
 - where: webapp/server/pricing.ts — `RA_RENEWAL_FEE_CENTS = 99_00`
 - where: webapp/src/pages/Pricing.tsx — `p: "$99 / yr"`
 - where: webapp/src/content/terms.md — `currently $99`
-- where: webapp/src/content/terms.md — `60 days before your renewal date`
+- where: webapp/src/content/terms.md — `70 days before your renewal date`
 - where: webapp/src/content/terms.md — `fifteen (15) days before your renewal date`
 - where: webapp/src/content/terms.md — `at least thirty (30) days before your renewal date`
 - where: webapp/src/content/terms.md — `at least 30 days' notice before any increase`

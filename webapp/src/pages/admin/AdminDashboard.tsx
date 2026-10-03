@@ -1,7 +1,7 @@
 import { cardStatusWords } from "@/lib/agentBilling";
 import { AgentServicePanel } from "./AgentServicePanel";
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Upload, Eye, FileText, ArrowDown, ArrowUp, ArrowUpDown, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ import { api, ApiError } from "@/lib/api";
 import OrderBoard from "./OrderBoard";
 import { LibrarySection } from "./LibrarySection";
 
+interface AgentBalance {reconcilingPayment?:boolean;id:string;purpose:string;status:string;amount_cents:number;date:string;charged_at:string|null;link_url:string|null;notice_error?:string|null}
 interface AdminClient {
   id: string;
   email: string;
@@ -36,17 +37,15 @@ interface AdminClient {
   document_count: number;
   ra_llcs: string[];
   /** Per agent company: the card kept for the renewal and the latest renewal (16 Sep 2026). */
-  ra_cards?: { billing_hold?:boolean;notice_error?:string|null;purpose?:string;order_id?:string; consent?:boolean; resignation_due?:string|null; resignation_submitted?:string|null; llc_name: string; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note: string | null; last_status: string | null; last_date: string | null }[];
+  ra_cards?: { balances?:AgentBalance[]; replaced_at?:string|null;ended_date?:string|null; billing_hold?:boolean;notice_error?:string|null;purpose?:string;order_id?:string; consent?:boolean; resignation_due?:string|null; resignation_submitted?:string|null; llc_name: string; card_status: string | null; card_last4: string | null; card_brand: string | null; card_note: string | null; last_status: string | null; last_date: string | null }[];
   companies: { id: string; llc_name: string; contact_name?: string; has_summary?: boolean }[];
 }
 
 const cardWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
   c.card_status === "on_file" ? `${c.card_brand ? c.card_brand.charAt(0) + c.card_brand.slice(1).toLowerCase() : "card"} ${c.card_last4 ?? ""}`.trim()
   : cardStatusWords(c.card_status,c.card_note);
-const renewalWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
-  c.billing_hold ? "Automatic charge held — notice sent late; client may pay voluntarily"
-  : c.notice_error ? "Notice failed — automatic charge held; next job retries notice"
-  : !c.last_status ? "—"
+const renewalStatusWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
+  !c.last_status ? "—"
   : c.last_status === "charged" ? `charged ${c.last_date ?? ""}`
   : c.last_status === "paid_by_link" ? `paid by link ${c.last_date ?? ""}`
   : c.last_status === "declined" ? `declined ${c.last_date ?? ""}`
@@ -54,8 +53,16 @@ const renewalWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =
   : c.last_status === "link_sent" ? `link sent for ${c.last_date ?? ""}`
   : c.last_status === "cancelled" ? `cancelled ${c.last_date ?? ""}`
   : c.last_status;
-/** A row that needs a hand: a decline, or a company with no card to charge. */
-const raNeedsHand = (cl: AdminClient): boolean => (cl.ra_cards ?? []).some((c) => c.billing_hold || c.notice_error || c.last_status === "declined" || c.last_status === "notice_pending" || c.card_status !== "on_file" || Boolean(c.resignation_due && !c.resignation_submitted));
+const balanceWords = (b:AgentBalance):string => {
+ const label=b.purpose==='resignation'?'Resignation charge':b.purpose==='service_fee'?'Outstanding service fees':'Renewal';
+ const amount=`$${(b.amount_cents/100).toFixed(b.amount_cents%100?2:0)}`;
+ const state=['charged','paid_by_link'].includes(b.status)?`Paid ${b.charged_at?new Date(b.charged_at).toLocaleDateString('en-US',{timeZone:'America/New_York'}):b.date}`:b.reconcilingPayment?'payment result not yet confirmed':b.status==='declined'?'payment declined':`unpaid${b.link_url?'; payment link available':''}`;
+ return `${label}: ${amount} — ${state}${b.notice_error?' — notice failed':''}`;
+};
+const renewalWords = (c: NonNullable<AdminClient["ra_cards"]>[number]): string =>
+  c.balances?.length ? c.balances.filter(b=>b.status!=="cancelled"&&b.purpose!=="unavailable").map(balanceWords).join("\n") : renewalStatusWords(c) + (c.notice_error ? " — notice failed" : "");
+/** A row that needs a hand: a notice failure, decline, or missing card. */
+const raNeedsHand = (cl: AdminClient): boolean => (cl.ra_cards ?? []).some((c) => c.balances?.some(b=>b.notice_error||(!["charged","paid_by_link","cancelled"].includes(b.status)&&b.purpose!=="unavailable"&&(b.reconcilingPayment||b.status==="declined"||b.date<new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"})))) || Boolean(c.resignation_submitted&&!c.ended_date) || c.notice_error || c.last_status === "declined" || c.card_status !== "on_file" || Boolean(c.resignation_due && !c.resignation_submitted));
 
 interface EmailRow {
   id: string;
@@ -242,25 +249,54 @@ function ViewPortalButton({ client }: { client: AdminClient }) {
 const day = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
 
+interface NoticeRow {id:string;title?:string;kind?:string;name?:string;email?:string;message?:string;notice_status:string|null;notice_error:string|null;notice_recipient?:string|null}
+function NoticeList({clientId}:{clientId?:string}){
+ const [message,setMessage]=useState('');
+ const url=clientId?`/api/admin/clients/${clientId}/documents`:'/api/admin/contact-messages';
+ const q=useQuery({queryKey:['office-notices',clientId||'contact'],queryFn:()=>api.get<NoticeRow[]>(url)});
+ const resend=useMutation({mutationFn:(id:string)=>api.post<{notified:boolean}>(clientId?`/api/admin/documents/${id}/resend-notice`:`/api/admin/contact-messages/${id}/resend`,{}),onSuccess:r=>{setMessage(r.notified?'Email accepted by provider.':'Email was not sent. The record remains available for retry.');void q.refetch();},onError:(e:Error)=>setMessage(e.message)});
+ const rows=(q.data||[]).filter(r=>!clientId||r.kind==='legal_mail'||!!r.notice_status);
+ return <div className="space-y-3">{q.isPending?<p>Loading…</p>:q.isError?<p role="alert">Could not load notices. <Button onClick={()=>void q.refetch()}>Retry</Button></p>:!rows.length?<p>No {clientId?'document notices':'contact messages'}.</p>:rows.map(r=><article key={r.id} className="rounded border p-3"><h3>{r.title||`${r.name} — ${r.email}`}</h3>{r.message?<p className="whitespace-pre-wrap">{r.message}</p>:null}<p className="text-sm">Email: {r.notice_status==='sent'?`accepted by provider${r.notice_recipient?' for '+r.notice_recipient:''}`:r.notice_status==='failed'?'failed':r.notice_status==='sending'?'awaiting confirmation':'not recorded'}</p>{r.notice_error?<p className="text-destructive text-sm">{r.notice_error}</p>:null}<Button size="sm" variant="outline" disabled={resend.isPending} onClick={()=>resend.mutate(r.id)}>{clientId?'Resend notice':'Retry office notification'}</Button></article>)}{message?<p role="status">{message}</p>:null}</div>;
+}
+function LegalMailNotices({client}:{client:AdminClient}){
+ const [open,setOpen]=useState(false);
+ return <Dialog open={open} onOpenChange={setOpen}><DialogTrigger asChild><Button variant="outline" size="sm">Document notices</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>Document notices — {client.name||client.email}</DialogTitle><DialogDescription>Retry the notice for the existing document without uploading it again.</DialogDescription></DialogHeader><div className="max-h-[60vh] overflow-auto">{open?<NoticeList clientId={client.id}/>:null}</div></DialogContent></Dialog>;
+}
+
+class OfficeUploadError extends Error {
+  constructor(message: string, public code: string | undefined, public status: number) { super(message); }
+}
+
 function UploadDialog({ client }: { client: AdminClient }) {
   const queryClient = useQueryClient();
+  const receiptKey=`office-upload-v1:${client.id}`;
+  const [receipt,setReceipt]=useState<null|{id:string;title?:string;kind?:'package'|'legal_mail';receivedOn?:string;notify?:boolean;orderId?:string}>(()=>{
+    try{const value=JSON.parse(sessionStorage.getItem(receiptKey)||'null');return value&&typeof value.id==='string'?value:null;}catch{return null;}
+  });
   const [open, setOpen] = useState<boolean>(false);
-  const [title, setTitle] = useState<string>("");
-  const [kind, setKind] = useState<"package" | "legal_mail">("package");
+  const [title, setTitle] = useState<string>(receipt?.title??"");
+  const [kind, setKind] = useState<"package" | "legal_mail">(receipt?.kind??"package");
   /** The day legal mail was received (Adam, 14 Sep 2026): required, and the
    *  date the client's email names. */
-  const [receivedOn, setReceivedOn] = useState<string>("");
-  const [notify, setNotify] = useState<boolean>(true);
+  const [receivedOn, setReceivedOn] = useState<string>(receipt?.receivedOn??"");
+  const [notify, setNotify] = useState<boolean>(receipt?.notify??true);
   const [file, setFile] = useState<File | null>(null);
+  const [fileInputVersion, setFileInputVersion] = useState(0);
   // Packages and legal mail identify one company; a sole company is preselected.
   const companies = client.companies ?? [];
-  const [orderId, setOrderId] = useState<string>(companies.length === 1 ? companies[0].id : "");
+  const [orderId, setOrderId] = useState<string>(receipt?.orderId??(companies.length === 1 ? companies[0].id : ""));
   const needsCompany = companies.length !== 1;
 
   const upload = useMutation({
     mutationFn: async () => {
       if (!file) throw new Error("Choose a file");
+      // Persist before dispatch. If the tab cannot save the receipt, do not
+      // upload with a retry identity that a reload would lose.
+      const pending=JSON.parse(sessionStorage.getItem(receiptKey)||'null') as {id:string}|null;
+      const attempt={id:pending?.id??crypto.randomUUID(),title,kind,receivedOn,notify,orderId};
+      sessionStorage.setItem(receiptKey,JSON.stringify(attempt));setReceipt(attempt);
       const form = new FormData();
+      form.set("submissionId",attempt.id);
       form.set("clientId", client.id);
       form.set("kind", kind);
       form.set("title", title);
@@ -274,16 +310,19 @@ function UploadDialog({ client }: { client: AdminClient }) {
         credentials: "include",
       });
       if (!res.ok) {
-        const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
-        throw new Error(body?.error?.message ?? "The upload did not go through. Try again.");
+        const body = (await res.json().catch(() => null)) as { error?: { message?: string; code?: string } } | null;
+        throw new OfficeUploadError(body?.error?.message ?? "The upload did not go through. Try again.", body?.error?.code, res.status);
       }
-      return (await res.json().catch(() => null)) as { data?: { notified?: boolean } } | null;
+      const body=await res.json() as {data?:{id?:string;notified?:boolean;noticeStatus?:string|null}};
+      if(body.data?.id!==attempt.id)throw new Error('The upload result could not be confirmed. Retry the same file.');
+      return body;
     },
     onSuccess: (body) => {
       // What the route reports, not what the box said (14 Sep 2026).
       const sent = body?.data?.notified === true;
       const wanted = notify || kind === "legal_mail";
-      toast({ title: "Document uploaded", description: wanted ? (sent ? "The client was emailed." : "The email to the client could not be sent.") : undefined });
+      toast({ title: "Document uploaded", description: wanted ? (sent ? "The client was emailed." : body.data?.noticeStatus==='pending'||body.data?.noticeStatus==='sending' ? "The notification is pending. Check the document notice status; use Resend notice if needed." : "The email to the client could not be sent. Use Resend notice to retry the email.") : undefined });
+      sessionStorage.removeItem(receiptKey);setReceipt(null);
       queryClient.invalidateQueries({ queryKey: ["admin-clients"] });
       setOpen(false);
       setTitle("");
@@ -293,7 +332,7 @@ function UploadDialog({ client }: { client: AdminClient }) {
       setKind("package");
       setReceivedOn("");
     },
-    onError: (e: Error) => toast({ duration: Infinity, title: "Upload failed", description: e.message }),
+    onError: (e: Error) => toast({ duration: Infinity, title: e instanceof OfficeUploadError && e.status === 503 && e.code === 'RECOVERY_UNAVAILABLE' ? 'Upload not confirmed' : 'Upload failed', description: e.message }),
   });
 
   return (
@@ -309,6 +348,10 @@ function UploadDialog({ client }: { client: AdminClient }) {
           <DialogTitle>Upload for {client.name || client.email}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
+          {receipt?<div className="space-y-2"><p role="status" className="text-sm">This tab has a pending upload. Reattach the original PDF to retry it. For a different document or changed information, choose New upload.</p><Button type="button" variant="outline" disabled={upload.isPending} onClick={()=>{
+            try{const next={id:crypto.randomUUID()};sessionStorage.setItem(receiptKey,JSON.stringify(next));setReceipt(next);upload.reset();setFile(null);setFileInputVersion(v=>v+1);setTitle('');setKind('package');setReceivedOn('');setNotify(true);setOrderId(companies.length===1?companies[0].id:'');}
+            catch{toast({duration:Infinity,title:'Upload not started',description:'This tab cannot save an upload receipt. Enable browser storage before uploading.'});}
+          }}>New upload</Button></div>:null}
           <div className="space-y-2">
             <Label htmlFor="doc-title">Document title</Label>
             <Input
@@ -363,6 +406,7 @@ function UploadDialog({ client }: { client: AdminClient }) {
             <Label htmlFor="doc-file">File</Label>
             <Input
               id="doc-file"
+              key={fileInputVersion}
               type="file"
               accept="application/pdf,.pdf"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
@@ -559,9 +603,9 @@ function ClientsTable({
               <tr key={cl.id} data-testid="client-row" className={variant === "ra" && raNeedsHand(cl) ? "bg-amber-50 dark:bg-amber-950/20" : undefined}>
                 <td className="px-3 py-3">
                   <span className="font-medium" data-testid="client-name">{displayName(cl)}</span>
-                  {variant !== "ra" && cl.ra_cancellation_requested_at ? (
+                  {variant !== "ra" && cl.ra_cancellation_requested_at && (cl.ra_llcs ?? []).some(name => name.includes("cancellation requested")) ? (
                     <span className="ml-2 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
-                      RA cancel requested {day(cl.ra_cancellation_requested_at)}
+                      {(cl.ra_llcs||[]).filter(name=>name.includes("cancellation requested")).join("; ")}
                     </span>
                   ) : null}
                   <div className="text-xs text-muted-foreground">{cl.email}</div>
@@ -571,12 +615,12 @@ function ClientsTable({
                 ) : null}
                 {variant === "ra" ? (
                   <td className="px-3 py-3 text-xs" data-testid="ra-card-cell">
-                    {(cl.ra_cards ?? []).length === 0 ? "—" : (cl.ra_cards ?? []).map((c) => <div key={c.llc_name}>{(cl.ra_cards ?? []).length > 1 ? `${c.llc_name}: ` : ""}{cardWords(c)}<div>Renewal permission: {c.consent === true ? "Agreed" : c.consent === false ? "Not agreed" : "Not recorded"}</div>{c.resignation_due && !c.resignation_submitted ? <strong>Resignation due {c.resignation_due.slice(0,10)}</strong> : null}{c.order_id ? <details><summary className="cursor-pointer underline">Manage appointment</summary><AgentServicePanel orderId={c.order_id}/></details> : null}</div>)}
+                    {(cl.ra_cards ?? []).length === 0 ? "—" : (cl.ra_cards ?? []).map((c) => <div key={c.llc_name}>{(cl.ra_cards ?? []).length > 1 ? `${c.llc_name}: ` : ""}{cardWords(c)}<div>Renewal permission: {c.consent === true ? "Agreed" : c.consent === false ? "Not agreed" : "Not recorded"}</div>{c.resignation_submitted ? <strong>Resignation submitted {c.resignation_submitted.slice(0,10)}</strong> : null}{c.resignation_due && !c.resignation_submitted ? <strong>Resignation due {c.resignation_due.slice(0,10)}</strong> : null}{c.order_id ? <details><summary className="cursor-pointer underline">Manage appointment</summary><AgentServicePanel orderId={c.order_id}/></details> : null}</div>)}
                   </td>
                 ) : null}
                 {variant === "ra" ? (
                   <td className="px-3 py-3 text-xs" data-testid="ra-renewals-cell">
-                    {(cl.ra_cards ?? []).length === 0 ? "—" : (cl.ra_cards ?? []).map((c) => <div key={c.llc_name}>{(cl.ra_cards ?? []).length > 1 ? `${c.llc_name}: ` : ""}{renewalWords(c)}</div>)}
+                    {(cl.ra_cards ?? []).length === 0 ? "—" : (cl.ra_cards ?? []).map((c) => <div key={c.llc_name} className="whitespace-pre-line">{(cl.ra_cards ?? []).length > 1 ? `${c.llc_name}: ` : ""}{renewalWords(c)}</div>)}
                   </td>
                 ) : null}
                 {/* Every paid company under this account, with the name given
@@ -612,7 +656,7 @@ function ClientsTable({
                     <ViewPortalButton client={cl} />
                     <EmailsDialog client={cl} />
                     <ChangeEmailDialog client={cl} />
-                    <UploadDialog client={cl} />
+                    <UploadDialog client={cl} /><LegalMailNotices client={cl} />
                   </div>
                 </td>
               </tr>
@@ -626,6 +670,9 @@ function ClientsTable({
 }
 
 export default function AdminDashboard() {
+  const [search] = useSearchParams();
+  const backupProblem = search.get("backupProblem");
+  const recoverySearch = backupProblem && /^[a-f0-9]{64}$/.test(backupProblem) ? "?backupProblem=" + backupProblem : "";
 
   const authQuery = useQuery({
     queryKey: ["admin-me"],
@@ -640,7 +687,15 @@ export default function AdminDashboard() {
   });
 
   if (authQuery.isError) {
-    return <Navigate to={"/admin/login"} replace />;
+    if (authQuery.error instanceof ApiError && authQuery.error.status === 401) {
+      return <Navigate to={"/admin/login" + recoverySearch} replace />;
+    }
+    return (
+      <section className="container-wide section-y" role="alert">
+        We couldn’t load the office. Please try again.{" "}
+        <Button disabled={authQuery.isFetching} onClick={() => void authQuery.refetch()}>Retry</Button>
+      </section>
+    );
   }
   if (authQuery.isLoading) {
     return (
@@ -654,6 +709,12 @@ export default function AdminDashboard() {
   // ra_llcs may be missing on a response cached before the field existed —
   // never let a stale cache blank the page.
   const raClients = clients.filter((cl) => (cl.ra_llcs ?? []).length > 0);
+  const clientsState = clientsQuery.isError ? (
+    <div role="alert">
+      We couldn’t load the client list. Please try again.{" "}
+      <Button disabled={clientsQuery.isFetching} onClick={() => void clientsQuery.refetch()}>Retry</Button>
+    </div>
+  ) : clientsQuery.isPending ? <p>Loading clients…</p> : null;
 
   return (
     <section className="container-wide section-y">
@@ -666,30 +727,35 @@ export default function AdminDashboard() {
           <TabsTrigger value="library">Reference Library</TabsTrigger>
           <TabsTrigger value="ra-clients">Registered Agent Clients</TabsTrigger>
           <TabsTrigger value="clients">Clients</TabsTrigger>
+          <TabsTrigger value="completed">Completed Orders</TabsTrigger><TabsTrigger value="contacts">Contact messages</TabsTrigger>
         </TabsList>
 
         <TabsContent value="formations">
           <OrderBoard enabled={authQuery.isSuccess} />
         </TabsContent>
 
-        <TabsContent value="library">
+        <TabsContent value="completed">
+          <OrderBoard enabled={authQuery.isSuccess} view="completed" />
+        </TabsContent>
+
+        <TabsContent value="contacts"><h2 className="font-display text-xl">Contact messages</h2><NoticeList /></TabsContent><TabsContent value="library">
           <LibrarySection enabled={authQuery.isSuccess} />
         </TabsContent>
 
         <TabsContent value="ra-clients">
-          <ClientsTable
+          {clientsState ?? <ClientsTable
             clients={raClients}
             variant="ra"
             emptyText="No registered agent clients yet — clients appear here when a paid order takes our registered agent service."
-          />
+          />}
         </TabsContent>
 
         <TabsContent value="clients">
-          <ClientsTable
+          {clientsState ?? <ClientsTable
             clients={clients}
             variant="all"
             emptyText="Clients appear here after their first paid order."
-          />
+          />}
         </TabsContent>
       </Tabs>
     </section>

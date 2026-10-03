@@ -21,11 +21,18 @@ sys.dont_write_bytecode = True
 
 ROOT = Path(__file__).resolve().parents[1]
 W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+_shared_spec=importlib.util.spec_from_file_location("word_text_check", ROOT/"docs/word-text-check.py")
+shared=importlib.util.module_from_spec(_shared_spec);_shared_spec.loader.exec_module(shared)
 BASELINE = "2559e18f5094b70c8eba1eb64e3c3519aa609f3e"
 
 
 def text(element):
-    return "".join(t.text or "" for t in element.iter(W + "t"))
+    # Ignore only the separately styled drafting annotations introduced by
+    # Batch32; compare every original cell/indent character without them.
+    return "".join(t.text or "" for r in element.iter(W + "r")
+                   if r.find(W + "rPr/" + W + "rStyle") is None or
+                   r.find(W + "rPr/" + W + "rStyle").get(W + "val") != "DraftingChoice"
+                   for t in r.iter(W + "t"))
 
 
 def plain(value):
@@ -37,7 +44,7 @@ def expected_tables(md):
     # line still ends a table. Inline choices remain present in editable forms.
     tables, rows = [], []
     for raw in md.splitlines():
-        line = re.sub(r"<!--.*?-->", "", raw).strip()
+        line = re.sub(r"<!--.*?-->", " ", raw).strip()
         if not line and "<!--" in raw:
             continue
         if line.startswith("|"):
@@ -52,7 +59,7 @@ def expected_tables(md):
 
 
 def actual_tables(root):
-    return [[[text(cell) for cell in row.findall(W + "tc")]
+    return [[[re.sub(r"\s+", " ", text(cell)).strip() for cell in row.findall(W + "tc")]
              for row in table.findall(W + "tr")]
             for table in root.iter(W + "tbl")]
 
@@ -113,6 +120,7 @@ def main():
 
     check("all twelve published Word mappings checked", len(mapping) == 12, len(mapping))
     generator_unchanged = True
+    baseline_generator = None
     if using_default_generator and work_order:
         try:
             before_generator = subprocess.check_output(
@@ -120,11 +128,22 @@ def main():
             generator_unchanged = before_generator == default_generator.read_bytes()
         except subprocess.CalledProcessError:
             generator_unchanged = False
-        check("Word generator unchanged from the governing batch base",
-              generator_unchanged,
-              {"batch": work_order["id"], "revision": work_order["revision"], "base": reference})
+        if not generator_unchanged:
+            # Load the actual base converter. Comparing two outputs of the new
+            # converter would not prove that its new labels preserve old text.
+            baseline_generator = before_generator
+        check("Word generator baseline available for independent preservation check",
+              generator_unchanged or baseline_generator is not None,
+              {"batch": work_order["id"], "base": reference, "unchanged": generator_unchanged})
     with tempfile.TemporaryDirectory(prefix="batch25-word-") as temporary:
         tmp = Path(temporary)
+        old_generator = generator
+        if baseline_generator is not None:
+            old_path = tmp / "base-generator.py"
+            old_path.write_bytes(baseline_generator)
+            old_spec = importlib.util.spec_from_file_location("base_word_generator", old_path)
+            old_generator = importlib.util.module_from_spec(old_spec)
+            old_spec.loader.exec_module(old_generator)
         for source, filename in mapping:
             md = (ROOT / source).read_text()
             output = tmp / filename
@@ -135,9 +154,10 @@ def main():
                 mismatches = [name for name in parts if name not in kept.namelist() or fresh.read(name) != kept.read(name)]
                 check(source + " tracked Word contains the current generator output",
                       not mismatches and parts == sorted(kept.namelist()), mismatches)
+            check(source + " drafting label boundaries", not shared.label_boundaries(actual), shared.label_boundaries(actual))
             expected = expected_tables(md)
             tables = actual_tables(actual)
-            check(source + " complete table cell matrix", tables == expected,
+            check(source + " complete table cell matrix", [[[shared.collapsed(c) for c in row] for row in t] for t in tables] == [[[shared.collapsed(c) for c in row] for row in t] for t in expected],
                   {"expectedRows": [len(t) for t in expected], "actualRows": [len(t) for t in tables]})
             expected_indent = [plain(line.split("[[indent]]", 1)[1])
                                for line in md.splitlines() if line.startswith("[[indent]]")]
@@ -173,10 +193,10 @@ def main():
                 expected_source.parent.mkdir(parents=True, exist_ok=True)
                 expected_source.write_text(expected_md)
                 expected_word = tmp / ("expected-" + filename)
-                generator.build(str(expected_source), str(expected_word))
+                old_generator.build(str(expected_source), str(expected_word))
                 expected_content = content(docxml(expected_word))
                 check(source + " all baseline text and drafting choices retained",
-                      source_exact and generator_unchanged and content(actual) == expected_content,
+                      source_exact and shared.paragraphs(actual) == shared.paragraphs(docxml(expected_word)),
                       {"base": reference, "expectedChars": len(expected_content),
                        "afterChars": len(content(actual))})
             else:

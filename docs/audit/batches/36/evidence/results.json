@@ -1,0 +1,253 @@
+{
+  "proof": {
+    "data": {
+      "offline": true,
+      "externals": {
+        "database": false,
+        "square": false,
+        "blob": false,
+        "resend": false,
+        "dropbox": false,
+        "smarty": false,
+        "sunbiz": false
+      }
+    }
+  },
+  "rows": [
+    {
+      "label": "old unfinished orders survive more than 200 newer completed orders",
+      "ok": true,
+      "detail": {
+        "orders": [
+          {
+            "id": "f8d32861-6a15-4d5c-b488-be053e62e07c",
+            "client_id": "8c52eb03-d65f-450d-ba7c-1392dcaaeb32",
+            "contact_name": "Office Fixture",
+            "contact_email": "office@example.test",
+            "package": "NEW",
+            "llc_name": "Legacy Latest LLC",
+            "status": "formed",
+            "service_fee_cents": 0,
+            "state_fees_cents": 0,
+            "created_at": "2026-05-01T00:00:00-05:00",
+            "formed_at": "2026-05-02T00:00:00-05:00",
+            "series_count": 0,
+            "cert_status_purchased": false,
+            "certified_copy_purchased": false,
+            "cert_status_uploaded": false,
+            "certified_copy_uploaded": false,
+            "ra_service": false,
+            "services_owed": true,
+            "new_work": true,
+            "work_stage": "new"
+          },
+          {
+            "id": "e0fde585-989d-481c-9b4b-d6ad2ec02eef",
+            "client_id": "8c52eb03-d65f-450d-ba7c-1392dcaaeb32",
+            "contact_name": "Office Fixture",
+            "contact_email": "office@example.test",
+            "package": "NEW",
+            "llc_name": "Post Filing EIN LLC",
+            "status": "formed",
+            "service_fee_cents": 0,
+            "state_fees_cents": 0,
+            "created_at": "2026-01-01T00:00:00-05:00",
+            "formed_at": "2026-02-01T00:00:00-05:00",
+            "series_count": 0,
+            "cert_status_purchased": false,
+            "certified_copy_purchased": false,
+            "cert_status_uploaded": false,
+            "certified_copy_uploaded": false,
+            "ra_service": false,
+            "services_owed": true,
+            "new_work": false,
+            "work_stage": "post-filing"
+          },
+          {
+            "id": "8e70a3cd-f2cf-459f-8418-8b5b8d8eca28",
+            "client_id": "8c52eb03-d65f-450d-ba7c-1392dcaaeb32",
+            "contact_name": "Office Fixture",
+            "contact_email": "office@example.test",
+            "package": "NEW",
+            "llc_name": "Old Unfiled LLC",
+            "status": "paid",
+            "service_fee_cents": 0,
+            "state_fees_cents": 0,
+            "created_at": "2026-01-01T00:00:00-05:00",
+            "formed_at": null,
+            "series_count": 0,
+            "cert_status_purchased": false,
+            "certified_copy_purchased": false,
+            "cert_status_uploaded": false,
+            "certified_copy_uploaded": false,
+            "ra_service": false,
+            "services_owed": false,
+            "new_work": false,
+            "work_stage": "new"
+          },
+          {
+            "id": "8c2e9688-6090-4560-8451-87b1ff23cd8a",
+            "client_id": "8c52eb03-d65f-450d-ba7c-1392dcaaeb32",
+            "contact_name": "Office Fixture",
+            "contact_email": "office@example.test",
+            "package": "NEW",
+            "llc_name": "Awaiting State LLC",
+            "status": "filed",
+            "service_fee_cents": 0,
+            "state_fees_cents": 0,
+            "created_at": "2026-01-01T00:00:00-05:00",
+            "formed_at": null,
+            "series_count": 0,
+            "cert_status_purchased": false,
+            "certified_copy_purchased": false,
+            "cert_status_uploaded": false,
+            "certified_copy_uploaded": false,
+            "ra_service": false,
+            "services_owed": false,
+            "new_work": false,
+            "work_stage": "state"
+          },
+          {
+            "id": "60f0afe3-09b8-4cc2-85c0-0a54bd49ac85",
+            "client_id": "8c52eb03-d65f-450d-ba7c-1392dcaaeb32",
+            "contact_name": "Office Fixture",
+            "contact_email": "office@example.test",
+            "package": "NEW",
+            "llc_name": "Certificate Owed LLC",
+            "status": "formed",
+            "service_fee_cents": 0,
+            "state_fees_cents": 0,
+            "created_at": "2026-01-01T00:00:00-05:00",
+            "formed_at": "2026-02-01T00:00:00-05:00",
+            "series_count": 0,
+            "cert_status_purchased": true,
+            "certified_copy_purchased": false,
+            "cert_status_uploaded": false,
+            "certified_copy_uploaded": false,
+            "ra_service": false,
+            "services_owed": false,
+            "new_work": false,
+            "work_stage": "post-filing"
+          },
+          {
+            "id": "335907c8-888e-4e27-8cec-4a0c934f64ab",
+            "client_id": "8c52eb03-d65f-450d-ba7c-1392dcaaeb32",
+            "contact_name": "Office Fixture",
+            "contact_email": "office@example.test",
+            "package": "NEW",
+            "llc_name": "Returning Customer LLC",
+            "status": "formed",
+            "service_fee_cents": 0,
+            "state_fees_cents": 0,
+            "created_at": "2026-01-01T00:00:00-05:00",
+            "formed_at": "2026-02-01T00:00:00-05:00",
+            "series_count": 0,
+            "cert_status_purchased": false,
+            "certified_copy_purchased": false,
+            "cert_status_uploaded": false,
+            "certified_copy_uploaded": false,
+            "ra_service": false,
+            "services_owed": true,
+            "new_work": true,
+            "work_stage": "new"
+          }
+        ],
+        "total": 6,
+        "page": 1,
+        "shown": 6,
+        "pageSize": 50
+      }
+    },
+    {
+      "label": "filing and post-filing queues distinguish remaining work",
+      "ok": true,
+      "detail": {
+        "f8d32861-6a15-4d5c-b488-be053e62e07c": "new",
+        "e0fde585-989d-481c-9b4b-d6ad2ec02eef": "post-filing",
+        "8e70a3cd-f2cf-459f-8418-8b5b8d8eca28": "new",
+        "8c2e9688-6090-4560-8451-87b1ff23cd8a": "state",
+        "60f0afe3-09b8-4cc2-85c0-0a54bd49ac85": "post-filing",
+        "335907c8-888e-4e27-8cec-4a0c934f64ab": "new"
+      }
+    },
+    {
+      "label": "completed history filtered before pagination",
+      "ok": true,
+      "detail": {
+        "total": 207,
+        "shown": 50
+      }
+    },
+    {
+      "label": "all completed pages reachable with no duplicate cards",
+      "ok": true,
+      "detail": {
+        "unique": 207
+      }
+    },
+    {
+      "label": "out-of-range page clamps to last page",
+      "ok": true
+    },
+    {
+      "label": "search stays within selected queue",
+      "ok": true
+    },
+    {
+      "label": "legacy service company does not move with search or page",
+      "ok": true
+    },
+    {
+      "label": "service query only returns selected company",
+      "ok": true
+    },
+    {
+      "label": "invalid page view company and unsigned access refused",
+      "ok": true
+    },
+    {
+      "label": "real certificate upload moves completed company out of active queue",
+      "ok": true
+    },
+    {
+      "label": "actual office shows three active columns and completed tab",
+      "ok": true
+    },
+    {
+      "label": "completed tab has working pagination",
+      "ok": true
+    },
+    {
+      "label": "search reaches older completed orders",
+      "ok": true
+    },
+    {
+      "label": "completed order retains detail access",
+      "ok": true
+    },
+    {
+      "label": "completed tab fits narrow screen",
+      "ok": true
+    },
+    {
+      "label": "real browser fulfillment moves company automatically to Completed Orders",
+      "ok": true
+    },
+    {
+      "label": "service failure cannot present unchecked completed cards",
+      "ok": true
+    },
+    {
+      "label": "service retry recovers completed view",
+      "ok": true
+    },
+    {
+      "label": "browser has no runtime error or external request",
+      "ok": true,
+      "detail": {
+        "errors": [],
+        "blocked": []
+      }
+    }
+  ]
+}

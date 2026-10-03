@@ -40,9 +40,9 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import {
   ROOT, BATCHES, git, gitOk, loadLedger, loadBatch, frozenHashOf, productFiles, ledgerRegressions, frozenFileProblems, linkProblems, replayStatic,
-  isRecordPath, isControlPath, count, defectGroup, familyClaim, unmetWaits, checkLabels, readAt, type Ledger, type BatchFile,
+  isRecordPath, isControlPath, count, defectGroup, familyClaim, unmetWaits, checkLabels, readAt, rulingCompletenessProblems, type Ledger, type BatchFile,
 } from "./ledger-lib";
-import { renderList } from "./ledger-print";
+import { renderList, listRenderVersion } from "./ledger-print";
 
 const staged = process.argv.includes("--staged");
 const againstArg = process.argv.includes("--against") ? process.argv[process.argv.indexOf("--against") + 1] ?? "" : null;
@@ -69,8 +69,8 @@ if (againstArg !== null) {
     refusals.push(...frozenFileProblems(after, readA));
     const files = git(["ls-tree", "-r", "--name-only", afterRev]).split("\n").filter((f) => /^(webapp\/(src|server|index\.html|vercel\.json)|docs\/)/.test(f) && /\.(tsx?|md|json|html)$/.test(f) && !/\.test\.tsx?$|^webapp\/server\/e2e\.ts$|^docs\/(audit|source|word)\//.test(f) && !(/^docs\//.test(f) && !/\.md$/.test(f)));
     refusals.push(...replayStatic(after, readA, files));
-    if (readA("docs/audit/findings-open.md") !== renderList(after)) refusals.push("docs/audit/findings-open.md differs from the ledger at that commit");
-    notes.push(`compared the ledger at ${afterRev.slice(0, 7)} with the ledger at ${beforeRev.slice(0, 7)}${beforeText ? "" : " (none there: every record is new)"}; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here`);
+    if (readA("docs/audit/findings-open.md") !== renderList(after, listRenderVersion(readA("docs/audit/ledger-print.ts")))) refusals.push("docs/audit/findings-open.md differs from the ledger at that commit");
+    notes.push(`compared the ledger at ${afterRev.slice(0, 7)} with the ledger at ${beforeRev.slice(0, 7)}${beforeText ? "" : " (none there: every record is new)"}; Adam's acceptance, rejection, ruling and migration records are on his Mac and were not checked here; completeness against his external ruling records was not checked`);
   } else notes.push(`no ledger at ${afterRev.slice(0, 7)}`);
   done();
   console.log("guard: ok");
@@ -95,6 +95,9 @@ if (ledgerText === null) {
   process.exit(0);
 }
 const ledger: Ledger = loadLedger(ledgerText);
+const completeness=rulingCompletenessProblems(ledger,read);
+refusals.push(...completeness);
+if(!completeness.length)notes.push(`current local ruling completeness compared ${ledger.rulings.filter(r=>(r.kind??'ruling')==='ruling').length} ledger ruling records in both directions against authenticated owner records`);
 
 /* 1 — against the last committed ledger; Adam's records are read here */
 const headText = git(["show", "HEAD:docs/audit/ledger.json"], { allowFail: true });
@@ -177,12 +180,12 @@ if (id) {
       if (!it || !part) { refusals.push(`${name}: not in the ledger`); continue; }
       if (it.verdict === "dropped") refusals.push(`${name}: was dropped — ${it.verdictReason}`);
       if (part.batch !== id) refusals.push(`${name}: not assigned to batch ${id} in the ledger — assignment is recorded before work starts`);
-      const claim = familyClaim(ledger, { item: bi.id, part: bi.part }, id);
+      const claim = familyClaim(ledger, { item: bi.id, part: bi.part }, id, bi.replaces, batch.items);
       if (claim) refusals.push(`${name}: the same defect is already being worked on — ${claim}`);
       for (const o of others) {
         const ob = loadBatch(o);
         const oi = ledger.batches.find((x) => x.id === o && x.revision === ob.revision);
-        if (oi && oi.status !== "rejected" && oi.status !== "released" && ob.items.some((x) => x.id === bi.id && x.part === bi.part)) refusals.push(`${name}: already claimed by batch ${o}`);
+        if (oi && oi.status !== "rejected" && oi.status !== "released" && !(part.supersessions ?? []).some(s => s.prior.batch === o && s.prior.revision === ob.revision) && ob.items.some((x) => x.id === bi.id && x.part === bi.part)) refusals.push(`${name}: already claimed by batch ${o}`);
       }
       for (const w of unmetWaits(ledger, it, part)) refusals.push(`${name}: waits on ${w.startsWith("ruling:") ? `Adam's ruling on item ${w.slice(7)}` : `item ${w}`}`);
       if (bi.assertions.length === 0) refusals.push(`${name}: no assertion — a deletion records what must stay absent; an empty list does not switch verification off`);

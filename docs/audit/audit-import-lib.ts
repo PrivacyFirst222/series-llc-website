@@ -1,7 +1,7 @@
 /** Checked additions only. Existing findings, decisions and fixes remain immutable. */
 import { hash, safeId, sha, type Finding } from "./audit-session-lib";
-import type { Item, Ledger } from "./ledger-lib";
-export interface Intake { schema: 1; run: string; commit: string; completedAt: string; manifestSha: string; auditSha: string; findings: Finding[] }
+import type { Item, Ledger, AuditAdjudication } from "./ledger-lib";
+export interface Intake { schema: 1; run: string; commit: string; completedAt: string; manifestSha: string; auditSha: string; findings: Finding[]; adjudications?: AuditAdjudication[] }
 export interface ImportRef { path: string; sha: string }
 export const fingerprint = (f: Finding) => hash(JSON.stringify([f.file, f.reads, f.claims]));
 export function intakeItems(r: Intake, path: string): Item[] {
@@ -13,17 +13,24 @@ export function intakeItems(r: Intake, path: string): Item[] {
 }
 export function importProblems(before: Ledger, after: Ledger, read: (path: string)=>string|null, strict: boolean): {problems:string[]; allowed:Set<string>} {
   const problems:string[]=[],allowed=new Set<string>();
+  if(JSON.stringify((after.auditAdjudications??[]).slice(0,(before.auditAdjudications??[]).length))!==JSON.stringify(before.auditAdjudications??[])) problems.push("audit adjudications were rewritten");
+  const expectedAdjudications:AuditAdjudication[]=[];
   const old=before.auditImports??[], refs=after.auditImports??[];
   if(JSON.stringify(refs.slice(0,old.length))!==JSON.stringify(old)) problems.push("audit import history was rewritten");
   if(strict && refs.length>old.length) problems.push("new audit intake needs review; never a records-only publication");
-  const seenPaths=new Set<string>(),seenRuns=new Set<string>(),seenDefects=new Set<string>(),seenIds=new Set<string>();
+  const seenPaths=new Set<string>(),seenRuns=new Set<string>(),seenDefects=new Set<string>(),seenIds=new Set<string>(), findingKeys=new Set<string>();
   for(const ref of refs) {
     if(!/^docs\/audit\/intakes\/[A-Za-z0-9_-]+\.json$/.test(ref.path) || !sha(ref.sha) || seenPaths.has(ref.path)) {problems.push("invalid/duplicate audit import reference");continue;} seenPaths.add(ref.path);
     const text=read(ref.path);if(!text || hash(text)!==ref.sha){problems.push(`audit intake missing/changed: ${ref.path}`);continue;}
     let r:Intake;try{r=JSON.parse(text);}catch{problems.push(`invalid audit intake JSON: ${ref.path}`);continue;}
     if(r.schema!==1 || !safeId(r.run) || seenRuns.has(r.run) || !/^[a-f0-9]{40}$/.test(r.commit) || !sha(r.manifestSha) || !sha(r.auditSha) || !Number.isFinite(Date.parse(r.completedAt)) || !Array.isArray(r.findings) || !r.findings.length) {problems.push(`invalid/duplicate audit intake: ${ref.path}`);continue;} seenRuns.add(r.run);
+    for(const a of r.adjudications??[]) {
+      if(!safeId(a.sourceId)||a.verdict!=="disputed"||a.replacementVerdict!=="unsafe as a blanket cleanup"||a.codeRemovalApproved!==false||!a.reason?.trim()||!a.source?.trim()||expectedAdjudications.some(x=>x.sourceId===a.sourceId))problems.push(`invalid/duplicate informational adjudication in ${ref.path}`);
+      expectedAdjudications.push(a);
+    }
     let valid=true;
     for(const f of r.findings){
+      findingKeys.add(f.key);
       if(!safeId(f.key)||f.relation!=="new"||!["where","file","reads","claims","truth","replacement"].every(k=>typeof (f as unknown as Record<string,unknown>)[k]==="string" && String((f as unknown as Record<string,unknown>)[k]).trim()) || !Number.isSafeInteger(f.line)||f.line<1||!["substantive","wording","housekeeping"].includes(f.severity)||!f.review?.priorCompared||!f.review.reviewer?.trim()||!f.review.evidence?.trim()||!["correct","needs owner ruling"].includes(f.review.replacement)) {problems.push(`invalid verified finding in ${ref.path}`);valid=false;continue;}
       const fp=fingerprint(f);if(seenDefects.has(fp)){problems.push(`duplicate imported defect ${f.key}`);valid=false;}seenDefects.add(fp);
     }
@@ -43,5 +50,7 @@ export function importProblems(before: Ledger, after: Ledger, read: (path: strin
       allowed.add(item.id);
     }
   }
+  for(const a of expectedAdjudications)if(findingKeys.has(a.sourceId))problems.push(`adjudicated source cannot also be imported as an open repair: ${a.sourceId}`);
+  if(JSON.stringify(after.auditAdjudications??[])!==JSON.stringify(expectedAdjudications))problems.push("audit adjudications differ from checked intakes");
   return {problems,allowed};
 }

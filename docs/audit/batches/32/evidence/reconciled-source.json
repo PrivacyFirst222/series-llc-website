@@ -1,0 +1,324 @@
+[
+  {
+    "number": 8,
+    "key": "render-word-alternatives-glued",
+    "disposition": "current-repair-proposal",
+    "reviewTopic": "render-word-alternatives-glued",
+    "original": {
+      "key": "render-word-alternatives-glued",
+      "where": "The Word masters in docs/word (all eight agreements, the amendment form and the Statement form) \u2014 every one:/many:/if: alternative and every entity signature block",
+      "file": "docs/md-to-docx.py",
+      "line": 339,
+      "reads": "    md = re.sub(r\"<!--.*?-->\", \"\", md, flags=re.S)",
+      "claims": "Stripping the HTML comments leaves a clean Word rendering of the master.",
+      "truth": "The comments are the markers that separate alternative wordings, so the Word documents print BOTH alternatives back to back with no space or note between them, and the [[indent]] token is printed verbatim. Read off the .docx text (evidence/render/word/*.docx.txt) and the rendered pages: the amendment (page 1) reads 'by the undersigned sole member (the \"Member\")the undersigned members (each a \"Member\" and collectively the \"Members\"), and is acknowledged by the undersigned ManagerManagers.', 'the undersigned hashave executed', 'the datedate(s)', 'MEMBER:MEMBERS:', 'ACKNOWLEDGED AND AGREED BY MANAGER:ACKNOWLEDGED AND AGREED BY MANAGERS:'; every manager-managed agreement reads 'The initial Manager is [MANAGER NAMES].The initial Managers are [MANAGER NAMES].' (s. 5.1) and 'Adopted effective [DATE] by the Company, acting through its Manager:Adopted effective [DATE] by the Company, acting through its Managers:'; the Statement form prints item 5 twice in a row ('\u2026chapter 605, Florida Statutes.All ownership of the Company rests with its members, and all authority \u2026 rests with its manager or managers\u2026'); and '[[indent]][PRINTED NAME]' / '[[indent]][TITLE]' appear in every entity signature block. The repeat-marker table rows of Exhibit A also print as literal pipe text ('| [MEMBER NAME] as [HOLDING] | [MEMBER ADDRESS] | \u2026') under a one-row header table. The zip of each .docx confirms the text (unzip -p \u2026 word/document.xml). A reviewer or client reading the Word master cannot tell where one alternative ends and the other begins.",
+      "replacement": "In md-to-docx.py, before stripping comments, resolve the markers the way the generator does for a blank master: render `<!-- one:X -->A<!-- /one --><!-- many:X -->B<!-- /many -->` as 'A [or: B]' (or on two lines with a bracketed note), render `<!-- if:X -->\u2026<!-- /if -->` blocks with a bracketed '[if X:]' lead-in, drop the `[[indent]]` token (indent the paragraph instead), and treat the lines inside `<!-- repeat -->` blocks as table rows so they join the table above them.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "render-word-3e3310142d63",
+        "render-word-c84b337e29e4",
+        "render-word-eab2e6542ae0",
+        "render-word-0f122c7833da",
+        "render-word-f464fd6da5e6",
+        "render-word-1d613f3a18a5",
+        "render-word-ec531ae5100f",
+        "render-word-184eaac6d8d3",
+        "render-word-8a823388bd88",
+        "render-word-cff1475ccdc5"
+      ],
+      "review": {
+        "reviewer": "reviewer-G",
+        "evidence": "reviewer-G-render-word-alternatives-glued (note) and reviewer-G-word-report: docs/md-to-docx.py read whole (:14-31 docstring, :339, :385-389), oa.ts:207-213/:318-336, docs/README.md:25-38/:188, docs/source originals (single wording, no alternatives) opened; marker counts per master taken. I ran md-to-docx.py at the commit in my worktree on the amendment, multi and statement masters and read word/document.xml: every glued pair the reader quotes, [[indent]] verbatim (4/6/2), six pipe-text rows after one-row tables in multi, item 5 twice in the statement. Ledger 261/262/265 are neighbours only; new confirmed. The mechanical fixes (resolve markers, drop [[indent]], join repeat rows) are right; the bracket convention for alternatives in a form Adam reads is left open by the replacement itself and is his to choose.",
+        "replacement": "needs owner ruling",
+        "priorCompared": true
+      },
+      "bucket": 3,
+      "reader": "reader-3",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "render-word-alternatives-glued",
+      "verdict": "partly-confirmed-current",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "currentLocation": "docs/md-to-docx.py:345",
+      "currentEvidence": [
+        "Batch25 repaired repeat-block table continuity at345-347,407-423 and [[indent]] at388-395. Committed word/REPORT.md reports52/52 checks and full source-table comparisons; new read-only OOXML extraction of all12 tracked Word outputs found zero [[indent]] tokens.",
+        "Adjacent alternatives still concatenate. Same new extraction found amendment hashave, MEMBER:MEMBERS:, and manager-managed masters Manager:Adopted and [MANAGER NAMES].The initial Managers. These remain visible text in committed Word artifacts.",
+        "Batch25 intentionally preserved legal text/drafting choices; preserving choices does not establish that unlabelled glued alternatives are readable. This review does not claim a newly rendered visual inspection."
+      ],
+      "verificationLevel": "source / existing runtime evidence / newly reproduced artifact extraction",
+      "runtimeRerun": false,
+      "historicalAssessment": "Core surviving issue is supported, but the historical finding includes repaired subparts or overbroad factual/replacement claims identified below.",
+      "replacementVerdict": "partly superseded; remaining alternative convention needs a concrete proposal",
+      "plainEnglishRepair": "Keep the repaired table and indentation behavior. Present both permitted alternatives with explicit boundaries/labels in the editable masters, preserving every alternative and legal sentence. Do not silently choose a completed-client variant.",
+      "canonicalDuplicate": "render-word-alternatives-glued",
+      "priorItem": {
+        "id": "AUD-post-batches-2026-09-20-4a344e2-WORD-EXHIBIT-TABLE-ROWS / WORD-INDENT-CONTROL-LEAK",
+        "part": "fixed subparts",
+        "batch": "25"
+      },
+      "ownerDecisionNeeded": true,
+      "ownerDecisionReason": "Choosing how alternate legal drafting text should be presented is an unresolved document-design choice; Batch25 authorized preservation, not a new convention.",
+      "primarySources": []
+    },
+    "evidence": [
+      "Batch25 repaired repeat-block table continuity at345-347,407-423 and [[indent]] at388-395. Committed word/REPORT.md reports52/52 checks and full source-table comparisons; new read-only OOXML extraction of all12 tracked Word outputs found zero [[indent]] tokens.",
+      "Adjacent alternatives still concatenate. Same new extraction found amendment hashave, MEMBER:MEMBERS:, and manager-managed masters Manager:Adopted and [MANAGER NAMES].The initial Managers. These remain visible text in committed Word artifacts.",
+      "Batch25 intentionally preserved legal text/drafting choices; preserving choices does not establish that unlabelled glued alternatives are readable. This review does not claim a newly rendered visual inspection."
+    ],
+    "proposal": "Keep the repaired table and indentation behavior. Present both permitted alternatives with explicit boundaries/labels in the editable masters, preserving every alternative and legal sentence. Do not silently choose a completed-client variant.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 27,
+    "key": "render-2553-address-split",
+    "disposition": "current-repair-proposal",
+    "reviewTopic": "render-2553-address-split",
+    "original": {
+      "key": "render-2553-address-split",
+      "where": "Client portal, S corporation election package \u2014 IRS Form 2553 page 1 (Name and address block) and the cover letter letterhead",
+      "file": "webapp/server/s-election.ts",
+      "line": 97,
+      "reads": "function splitAddress(addr: string): { street: string; cityStateZip: string } {\n  const parts = addr.split(\",\").map((s) => s.trim()).filter(Boolean);\n  if (parts.length >= 2) {\n    return { street: parts.slice(0, parts.length - 2).join(\", \") || parts[0], cityStateZip: parts.slice(-2).join(\", \") };\n  }",
+      "claims": "The principal address is split into the form's street line and its 'City or town, state, and ZIP code' line.",
+      "truth": "The principal address handed to the package comes from oaSeed (routes-portal.ts:99\u2013101), which joins it as address1, address2, 'City, ST', zip \u2014 the city and state are ONE comma part and the zip another, so the last two parts are 'FL' and '33139'. On the generated Form 2553 (evidence/render/pdf-s-election-package.pdf page 4, image pages/pdf-s-election-package/p-4.png; same on pdf-s-election-package-nine page 4) the street line reads '100 Ocean Drive, Suite 400, Miami' and the city line reads 'FL, 33139' \u2014 the city is on the wrong line and the IRS's city box has no city. The cover letters (page 3 of both packages) show the same split: '100 Ocean Drive, Suite 400, Miami' over 'FL, 33139'.",
+      "replacement": "Split on the last THREE comma parts when the third-from-last is a city and the second-from-last is a two-letter state: `const parts = addr.split(\",\").map((s) => s.trim()).filter(Boolean); if (parts.length >= 3 && /^[A-Z]{2}$/.test(parts[parts.length - 2])) return { street: parts.slice(0, -3).join(\", \"), cityStateZip: `${parts[parts.length - 3]}, ${parts[parts.length - 2]} ${parts[parts.length - 1]}` };` \u2014 or pass the structured principalOfficeAddress (address1, address2, city, state, zip) from the order payload instead of a joined string.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "render-pdf-s-election-package",
+        "render-pdf-s-election-package-nine"
+      ],
+      "review": {
+        "reviewer": "reviewer-H",
+        "evidence": "reviewer-H-render-2553-address-split, reviewer-H-probe-before, reviewer-H-probe-after. Reopened s-election.ts:95-103, :117-122, :251-256 and the seed join at routes-portal.ts:99-102 (address1, address2, city+ST, zip joined with commas, so the last two parts are ST and zip). Read page 3 (letter) and page 4 (Form 2553) of both packages: street line '100 Ocean Drive, Suite 400, Miami', city line 'FL, 33139'. Reproduced through buildSElectionPackage without a server; with the proposed three-part split applied, the letterhead and the form read '100 Ocean Drive, Suite 400' / 'Miami, FL 33139', and addresses without a suite, without a zip, or typed as 'city, ST zip' still split correctly. The intake state is a two-letter code (US_STATES select; the form rule compares state !== 'FL'). Ledger N1.04 and N2.19 are different address defects; new confirmed.",
+        "replacement": "correct",
+        "priorCompared": true
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "render-2553-address-split",
+      "verdict": "confirmed-current",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "currentLocation": "webapp/server/s-election.ts:97",
+      "currentEvidence": [
+        "oaSeed joins street,suite,city,state,zip into a comma-delimited string at routes-portal.ts:101-103; current splitAddress takes last two parts100.",
+        "New in-memory execution of extracted current splitAddress returned street=\"100 Ocean Drive, Suite 400, Miami\" and cityStateZip=\"FL, 33139\". City is on the wrong line.",
+        "No newly generated PDF; field assignment source and historical PDF evidence distinguish source-level reproduction from rendered verification."
+      ],
+      "verificationLevel": "source / newly reproduced pure local expression",
+      "runtimeRerun": false,
+      "historicalAssessment": "The stated core mechanism or wording gap survives in current source; detailed historical runtime results were not rerun.",
+      "replacementVerdict": "structured-address option preferred; heuristic needs fallbacks",
+      "plainEnglishRepair": "Carry structured street/suite/city/state/ZIP into Form2553 and letterhead. If retaining legacy strings, parse the known three-part city/state/ZIP suffix without breaking city, ST ZIP or incomplete/foreign legacy addresses.",
+      "canonicalDuplicate": "render-2553-address-split",
+      "priorItem": null,
+      "ownerDecisionNeeded": false,
+      "ownerDecisionReason": "No new owner decision identified for the stated repair; ordinary review of a concrete change still applies.",
+      "primarySources": []
+    },
+    "evidence": [
+      "oaSeed joins street,suite,city,state,zip into a comma-delimited string at routes-portal.ts:101-103; current splitAddress takes last two parts100.",
+      "New in-memory execution of extracted current splitAddress returned street=\"100 Ocean Drive, Suite 400, Miami\" and cityStateZip=\"FL, 33139\". City is on the wrong line.",
+      "No newly generated PDF; field assignment source and historical PDF evidence distinguish source-level reproduction from rendered verification."
+    ],
+    "proposal": "Carry structured street/suite/city/state/ZIP into Form2553 and letterhead. If retaining legacy strings, parse the known three-part city/state/ZIP suffix without breaking city, ST ZIP or incomplete/foreign legacy addresses.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 28,
+    "key": "render-manual-double-page-numbers",
+    "disposition": "current-repair-proposal",
+    "reviewTopic": "render-manual-double-page-numbers",
+    "original": {
+      "key": "render-manual-double-page-numbers",
+      "where": "Client portal, Reference Library, the Owner's Manual PDF the client downloads \u2014 every body page's footer",
+      "file": "webapp/server/pdf-render.ts",
+      "line": 535,
+      "reads": "function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo): void {\n  const pages = doc.getPages();\n  const total = pages.length;\n  const text = sanitize(`Copyright FLORIDA PROTECTED SERIES, LLC - PS 1${wm.note ? \", \" + wm.note.replace(/\\s+\\u2014\\s+/g, \", \") : \"\"}`);",
+      "claims": "stampExistingPdf (pdf-render.ts:672\u2013681) stamps the published manual with the license footer and a page number, producing a readable footer on every page.",
+      "truth": "manual-pdf.ts:388\u2013404 already draws 'Page n of 35' at x = PAGE_W \u2212 MARGIN \u2212 w, y = 40 on every body page (numbered from the first body page, cover and contents unnumbered), and stampFooters then draws 'Page N of 37' (numbered from the cover) at the same position. In the downloaded manual (evidence/render/pdf-owners-manual.pdf, pages 3\u201337) the two numbers overprint: pdftotext of page 3 reads 'Page / Page31 of / of 37 / 35', and the images show a smeared footer on every body page. The CONTENTS page (manual's own numbering: 'HOW TO USE THIS MANUAL \u2026 1') no longer matches the only legible number, 'of 37'. Page images: evidence/render/pages/pdf-owners-manual/p-03.png \u2026 p-37.png.",
+      "replacement": "In stampExistingPdf, do not draw a page number when the document already carries its own: either pass a flag from the library route (the manual renders its own footer) so stampFooters draws only the copyright line for that document, or, in stampFooters, skip the `Page N of total` draw when `opts.title` is the manual's title. Simplest: `export async function stampExistingPdf(opts: { bytes; watermark; title; pageNumbers?: boolean })` and in stampFooters `if (pageNumbers !== false) p.drawText(pn, \u2026)`; the library download passes `pageNumbers: false`.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "render-pdf-owners-manual"
+      ],
+      "review": {
+        "reviewer": "reviewer-H",
+        "evidence": "reviewer-H-render-manual-double-page-numbers, reviewer-H-probe-before, reviewer-H-probe-after. Reopened pdf-render.ts:535-550 and :671-681, manual-pdf.ts:388-399 and routes-portal.ts:1801-1822 at the commit: both draw a page number at x = 612-72-w, y = 40. Listed the footer text of all 37 pages of evidence/render/pdf-owners-manual.pdf (p3-p37 each carry two overprinted numbers; p3 reads 'Page|Page31 of|of 37|35') and cropped p3 at 200 dpi (evidence/reviewer-H/manual-p3-footer-03.png). Reproduced by pure function: renderManualPdf + stampExistingPdf gives the same overprint; with the proposed pageNumbers flag applied in my worktree the stamped copy shows one number per page (Page 1 of 35 on p3, Page 35 of 35 on p37, none on cover/contents), matching the CONTENTS page. No ledger item or ruling on the manual footer; new confirmed.",
+        "replacement": "correct",
+        "priorCompared": true
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "render-manual-double-page-numbers",
+      "verdict": "confirmed-current",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "currentLocation": "webapp/server/pdf-render.ts:619",
+      "currentEvidence": [
+        "Current manual-pdf.ts:431-439 draws body-relative page numbering at y40, right margin72. Current stampFooters:630-632 draws cover-inclusive numbering at the same y40/right margin; stampExistingPdf:763 always calls it.",
+        "Portal library download routes-portal.ts:1831-1835 has no page-number suppression. Batch25 fixed Manual table pagination but not this double stamp; its37-page raw Manual check is not a stamped-download check.",
+        "Current source proves the overlapping draw operations. No new PDF rendering performed."
+      ],
+      "verificationLevel": "source",
+      "runtimeRerun": false,
+      "historicalAssessment": "The stated core mechanism or wording gap survives in current source; detailed historical runtime results were not rerun.",
+      "replacementVerdict": "correct with explicit caller-controlled option",
+      "plainEnglishRepair": "Add a pageNumbers option and suppress only the added pagination for an already-numbered Manual download. Keep copyright/license stamp and existing body/TOC numbering. Verify the actual stamped client download, including unnumbered cover/contents.",
+      "canonicalDuplicate": "render-manual-double-page-numbers",
+      "priorItem": null,
+      "ownerDecisionNeeded": false,
+      "ownerDecisionReason": "No new owner decision identified for the stated repair; ordinary review of a concrete change still applies.",
+      "primarySources": []
+    },
+    "evidence": [
+      "Current manual-pdf.ts:431-439 draws body-relative page numbering at y40, right margin72. Current stampFooters:630-632 draws cover-inclusive numbering at the same y40/right margin; stampExistingPdf:763 always calls it.",
+      "Portal library download routes-portal.ts:1831-1835 has no page-number suppression. Batch25 fixed Manual table pagination but not this double stamp; its37-page raw Manual check is not a stamped-download check.",
+      "Current source proves the overlapping draw operations. No new PDF rendering performed."
+    ],
+    "proposal": "Add a pageNumbers option and suppress only the added pagination for an already-numbered Manual download. Keep copyright/license stamp and existing body/TOC numbering. Verify the actual stamped client download, including unnumbered cover/contents.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 57,
+    "key": "render-capital-equal-couple-wording",
+    "disposition": "current-repair-proposal",
+    "reviewTopic": "render-capital-equal-couple-wording",
+    "original": {
+      "key": "render-capital-equal-couple-wording",
+      "where": "Operating agreement questionnaire \u2192 generated agreement, Exhibit A, 'Contributed assets' table, 'Contributed by' column, when a married couple (one ownership unit) and another owner contribute an asset equally",
+      "file": "webapp/server/oa-capital.ts",
+      "line": 82,
+      "reads": "          : `${joinNames(unitNames)}, equally`;",
+      "claims": "The column names who contributed the asset and in what proportion.",
+      "truth": "A couple's unit name is 'Sam Ortiz and Riley Ortiz'; joinNames of two units yields 'Sam Ortiz and Riley Ortiz and Casey Member, Jr., equally' (evidence/render/pdf-5-ordinary.pdf page 20 and pdf-6-ordinary.pdf page 21; text in pdf-5-ordinary.txt), which reads as three people contributing a third each, while the computation (and the 'Initial contribution to the Company' column: $660,003 for the couple, $629,997 for Casey) is one half per unit. The shares-mode wording on the next row, 'Sam Ortiz and Riley Ortiz (66.67%) and Casey Member, Jr. (33.33%)', is unambiguous.",
+      "replacement": "Print each unit's share in equal mode whenever there is more than one unit: replace line 82 with `: joinNames(unitNames.map((n) => `${n} (${Number((100 / units).toFixed(2))}%)`))` so the row reads 'Sam Ortiz and Riley Ortiz (50%) and Casey Member, Jr. (50%)'.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "render-pdf-5-ordinary",
+        "render-pdf-6-ordinary"
+      ],
+      "review": {
+        "reviewer": "reviewer-H",
+        "evidence": "reviewer-H-render-capital-equal-couple-wording, reviewer-H-probe-before, reviewer-H-probe-after. Reopened oa-capital.ts whole (139 lines; line 82 as quoted, the equal branch after per-unit shares of 100/units at :73). The row is on pdf-5-ordinary page 19 and pdf-6-ordinary page 20 (the finding says 20 and 21): 'Contributed by' reads 'Sam Ortiz and Riley Ortiz and Casey Member, Jr., equally' while the member table shows $660,003 and $629,997 per unit. computeCapital reproduces the string; with line 82 replaced it prints 'Sam Ortiz and Riley Ortiz (50%) and Casey Member, Jr. (50%)' and 'A (33.33%), B (33.33%), and C (33.33%)' for three units, contributions unchanged. No ledger item; new confirmed. The replacement is accurate, but it rewrites wording printed in Exhibit A of the signed agreement that implements Adam's 12 Sep 2026 design ('all owners equally, or by share'), so the words are his to approve.",
+        "replacement": "needs owner ruling",
+        "priorCompared": true
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "render-capital-equal-couple-wording",
+      "currentFile": "webapp/server/oa-capital.ts",
+      "currentLine": 82,
+      "currentLocation": "webapp/server/oa-capital.ts:82",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "historicalStatus": "Quoted historical source persists in the current candidate; verdict below accounts for owner rulings and unintegrated approved changes.",
+      "verificationLevel": "newly reproduced",
+      "evidence": [
+        "New pure current computeCapital probe: units [Sam Ortiz and Riley Ortiz, Casey Member Jr.] with $100 equal asset produces \u201cSam Ortiz and Riley Ortiz and Casey Member, Jr., equally\u201d but contributions [$50,$50]. Source :73/:82 verifies unit calculation versus ambiguous prose. Historical PDF-5 text shows same wording. Proposed 50% labels solve the couple case; 33.33% each is rounded and must not imply exact total of 100."
+      ],
+      "verdict": "confirmed-current",
+      "replacementVerdict": "correct-with-rounding-limit",
+      "proposedFix": "Identify each ownership unit\u2019s share when printing equal contributions, preserving computation. For thirds and similar fractions make clear displayed percentages are rounded, or use exact equal-unit fractions.",
+      "canonicalDuplicateOrPrior": null,
+      "ownerDecisionNeeded": true,
+      "ownerDecisionReason": "The clearer printed Exhibit A wording is new and should be included in the proposed revision.",
+      "limitations": "No whole suite or live service was run. Historical runtime evidence is not a current runtime certification.",
+      "probeResult": {
+        "function": "current computeCapital",
+        "inputs": "$100 asset, equal mode, units Sam Ortiz and Riley Ortiz / Casey Member Jr.",
+        "by": "Sam Ortiz and Riley Ortiz and Casey Member, Jr., equally",
+        "memberContributions": [
+          "$50",
+          "$50"
+        ],
+        "errors": []
+      }
+    },
+    "evidence": [
+      "New pure current computeCapital probe: units [Sam Ortiz and Riley Ortiz, Casey Member Jr.] with $100 equal asset produces \u201cSam Ortiz and Riley Ortiz and Casey Member, Jr., equally\u201d but contributions [$50,$50]. Source :73/:82 verifies unit calculation versus ambiguous prose. Historical PDF-5 text shows same wording. Proposed 50% labels solve the couple case; 33.33% each is rounded and must not imply exact total of 100."
+    ],
+    "proposal": "Identify each ownership unit\u2019s share when printing equal contributions, preserving computation. For thirds and similar fractions make clear displayed percentages are rounded, or use exact equal-unit fractions.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 59,
+    "key": "render-wrap-line-starts-with-punctuation",
+    "disposition": "current-repair-proposal",
+    "reviewTopic": "render-wrap-line-starts-with-punctuation",
+    "original": {
+      "key": "render-wrap-line-starts-with-punctuation",
+      "where": "Statement of Authorized Representative PDF, opening paragraph, third line (and any paragraph where a bold name ends exactly at the right margin)",
+      "file": "webapp/server/pdf-render.ts",
+      "line": 153,
+      "reads": "      if (curW + w > width && cur.length > 0 && word.trim() !== \"\") {",
+      "claims": "Words wrap at the right margin.",
+      "truth": "The wrapper splits every segment on whitespace, so a segment that begins with punctuation (', a Florida limited liability company' after the bold company name) yields a first 'word' of ','; when the bold name fills the line, that ',' is wrapped to the next line and the Statement reads 'Render Statement Members, LLC' / ', a Florida limited liability company (the \"Company\")' (evidence/render/pdf-statement.pdf page 1; image pages/pdf-statement/p-1.png; text pdf-statement.txt line 5). The manager-managed copy happened to fit ('Render Statement Managers,' / 'LLC, a Florida\u2026').",
+      "replacement": "Never break before a token that is only punctuation: in wrapSegs, when `word` matches /^[,.;:)]+$/ append it to the current line even if it overflows (or merge it with the previous word before measuring): `if (curW + w > width && cur.length > 0 && word.trim() !== \"\" && !/^[,.;:)]+$/.test(word)) {`.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "render-pdf-statement"
+      ],
+      "review": {
+        "reviewer": "reviewer-H",
+        "evidence": "reviewer-H-render-wrap-line-starts-with-punctuation, reviewer-H-probe-before, reviewer-H-probe-after. Reopened pdf-render.ts:143-173 (words split on whitespace, so a segment beginning with a comma yields a bare comma token) and :223-252; the master's paragraph has the bold name followed by ', a Florida'. pdf-statement.pdf page 1 line 5 begins ', a Florida limited liability company' (image p-1.png and my 200 dpi crop). Re-rendered the Statement through assembleStatement + renderMarkdownPdf: reproduced; with the proposed guard the comma stays on line 4 (pdftotext -bbox: the 'LLC,' box ends at x 540.78 against the 540 margin, a 0.78 pt overhang; the justifier never stretches a line past its width). No ledger item; new confirmed.",
+        "replacement": "correct",
+        "priorCompared": true
+      },
+      "bucket": 7,
+      "reader": "reader-7",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "render-wrap-line-starts-with-punctuation",
+      "currentFile": "webapp/server/pdf-render.ts",
+      "currentLine": 153,
+      "currentLocation": "webapp/server/pdf-render.ts:153",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "historicalStatus": "Quoted historical source persists in the current candidate; verdict below accounts for owner rulings and unintegrated approved changes.",
+      "verificationLevel": "newly reproduced",
+      "evidence": [
+        "Current pdf-render:143\u2013173 still splits style segments then whitespace and wraps a standalone comma independently. Historical pdf-statement text begins the continuation line with a comma. Batch 25 changes signature grouping, not this wrap condition. Proposed regex suppresses wrapping for a few punctuation tokens but can overflow margins, ignores other closing marks, and does not solve combined punctuation-word tokens. Current pure wrapper probe confirms a comma can begin a new line."
+      ],
+      "verdict": "confirmed-current",
+      "replacementVerdict": "partial-not-robust",
+      "proposedFix": "Keep closing punctuation with its preceding styled word during wrapping, measuring the combined group and moving the word with punctuation when needed; avoid solving it by arbitrary margin overflow.",
+      "canonicalDuplicateOrPrior": null,
+      "ownerDecisionNeeded": false,
+      "ownerDecisionReason": "Renderer layout fix; preserve legal text.",
+      "limitations": "No whole suite or live service was run. Historical runtime evidence is not a current runtime certification.",
+      "probeResult": {
+        "function": "current wrapSegs",
+        "method": "Direct pure function call with deterministic one-unit glyph widths, width 3; bold ABC followed by regular comma-a-company",
+        "lines": [
+          "ABC",
+          ", a ",
+          "company"
+        ],
+        "limitation": "Proves wrapper branch; not a new rendered PDF or actual font measurement."
+      }
+    },
+    "evidence": [
+      "Current pdf-render:143\u2013173 still splits style segments then whitespace and wraps a standalone comma independently. Historical pdf-statement text begins the continuation line with a comma. Batch 25 changes signature grouping, not this wrap condition. Proposed regex suppresses wrapping for a few punctuation tokens but can overflow margins, ignores other closing marks, and does not solve combined punctuation-word tokens. Current pure wrapper probe confirms a comma can begin a new line."
+    ],
+    "proposal": "Keep closing punctuation with its preceding styled word during wrapping, measuring the combined group and moving the word with punctuation when needed; avoid solving it by arbitrary margin overflow.",
+    "allRepairsRequireAdamReview": true
+  }
+]

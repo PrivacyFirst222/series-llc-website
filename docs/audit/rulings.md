@@ -119,3 +119,51 @@ Adam. A new ruling is added the day it is given.
 - Ruling N2.26: "Batch 12: Adam approved the proposed fix and then said Go. Approved scope: Update the FinCEN rule and source reference to the verified final rule; no Florida filing change. Exact wording: FinCEN’s final rule, effective August 14, 2026, retained the exemption for U.S.-formed companies. A Florida LLC formed in Florida does not file a federal beneficial ownership report under that rule, and its owners do not submit one for that company. / FinCEN final rule (effective Aug. 14, 2026; fincen.gov/boi)"
 
 - Ruling N2.27: "Batch 16 item 14: Use this exact paragraph and update the manual and instructions: The Members acknowledge that this Agreement imposes continuing managerial and governance obligations and is intended to be an executory contract. Under 11 U.S.C. § 365(c)(1) and applicable Florida law (including Chapter 605 and this Agreement), a trustee or debtor in possession may not assume or assign a debtor Member’s governance or management rights, or cause a substitute to be admitted as a Member, without the prior written consent of the other Members. Nothing in this Section limits the estate’s interest in a Member’s transferable (economic) interest to the extent permitted by applicable law."
+
+- Ruling 90: "Keep the conservative inactive-name block; describe a recently inactive record without claiming the record proves dissolution. Apply consistently to the client and server explanations."
+
+- Ruling AUD-claude-reconciled-batch30-reader-6-amendment-latest-generation: "Approved Batch30 proposal: explicitly select the company agreement, show its parties and confirm its effective date; stop if the required agreement is unavailable. Go. Approve all."
+
+- Ruling AUD-claude-reconciled-batch30-runtime-A-consent-from-draft: "Approved Batch30 proposal: select an agreement supplying current members/managers, display and confirm them, preserve entity and joint signatures. Go. Approve all."
+
+- Ruling N2.07: "Batch 31 review item 5: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling N2.09: "Batch 31 review item 10: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling AUD-claude-reconciled-batch31-reader-1-benefits-deed-unconditional: "Batch 31 review item 1: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md."
+
+- Ruling AUD-claude-reconciled-batch31-reader-2-series-established-on-effect-not-filing: "Batch 31 review item 2: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md."
+
+- Ruling AUD-claude-reconciled-batch31-reader-3-consent-department-wording: "Batch 31 review item 3: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling AUD-claude-reconciled-batch31-reader-1-faq-0905-generalized: "Batch 31 review item 4: Adam rejected the proposed change and instructed “Leave as is”. Retain the current wording shown in Batch31 batch.md."
+
+- Ruling AUD-claude-reconciled-batch31-compare-A-instructions-handle-taxes-differently: "Batch 31 review item 6: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling AUD-claude-reconciled-batch31-compare-A-manual-nothing-left-to-add: "Batch 31 review item 7: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling AUD-claude-reconciled-batch31-render-oa-4-1-percentages-vs-fractions: "Batch 31 review item 8: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling AUD-claude-reconciled-batch31-statutes-0302-series-property: "Batch 31 review item 9: Adam approved the displayed proposal, then said “Go”. Implement the exact approved replacements in Batch31 batch.md and preserve the earlier protections."
+
+- Ruling 8: "Batch 11 review item 5: Adam directs that the existing wording remain unchanged: \"5.  There is a $25 state fee to appoint a resident agent.  Leave as is\". No fix is authorized for this finding."
+
+- Ruling 242: "Batch 11 review item 17: \"17.  Just state our fee.  Add a $50 series.  No need to mention state fees\". Use \"add a $50 series per property\" and state Maria's first three are included in the service package; do not add a state-fee breakdown to those examples."
+
+- Ruling 15: "Batch 12 review item 1: Adam rejected the proposed one-EIN wording change and directed that the existing wording stay unchanged."
+
+- Ruling 22: "Batch 12 review item 2: Adam rejected the proposed tax-return comparison change and directed that the existing wording stay unchanged."
+
+- Ruling 34: "Batch 12 review item 4: Adam rejected the proposed shareholder-residency acknowledgment change and directed that the existing wording stay unchanged."
+
+- Ruling 38: "Batch 12 review item 5: Adam rejected the proposed diagram tax-filing wording change and directed that the existing wording stay unchanged."
+
+- Ruling 139: "Batch 12 review item 8: Adam rejected the proposed operating-agreement questionnaire help change and directed that the existing wording stay unchanged."
+
+- Ruling N2.14: "Batch 12 review item 12: Adam rejected the proposed uneven-distributions explanation and heading changes and directed that the existing wording stay unchanged."
+
+- Ruling 232: "Batch 16 item 4: Reject. Keep as is."
+
+- Ruling 236: "Batch 16 item 5: Reject. Keep as is."
+
+- Ruling N2.02: "Batch 16 item 9: Rejected. Leave as is."

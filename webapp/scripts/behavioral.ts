@@ -1,3 +1,4 @@
+import { freshSite } from "./fresh-site";
 import { batch14Walk } from "./batch14-walk";
 import { batch13Walk } from "./batch13-walk";
 import { batch12Walk } from "./batch12-walk";
@@ -36,7 +37,7 @@ import { buildPayload } from "../src/components/forms/florida-llc/buildPayload";
 import { memberRowIsBlank } from "../src/components/forms/florida-llc/validation";
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
 import { normalizeEntityName } from "../src/components/forms/florida-llc/nameSimilarity";
-import { startIsolatedStack, buildSite } from "./isolated-stack";
+import { startIsolatedStack } from "./isolated-stack";
 import { existsSync, writeFileSync, appendFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { tmpdir } from "node:os";
@@ -436,8 +437,12 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     expect((run.path === "convert") === /Enter your agent[’']s name and (?:Florida street )?address exactly as the Division has them on file/i.test(await page.locator("main").innerText()), `${run.key}: the own-agent choice tells a conversion the agent must match the record`, run.path);
     // By id: the choice card's own label CONTAINS phrases like "Florida
     // street address", so label lookup finds the card's hidden radio.
-    await page.locator("#ra-first-name").fill("Casey");
-    await page.locator("#ra-last-name").fill("Gatecheck");
+    if (run.path === "convert") {
+      await page.locator("#ra-first-name").fill("Casey");
+      await page.locator("#ra-last-name").fill("Gatecheck");
+    } else {
+      expect(await page.locator("#ra-first-name").inputValue() === "Casey" && await page.locator("#ra-last-name").inputValue() === "Gatecheck", `${run.key}: personal agent identity follows the applicant`, await page.locator("#ra-first-name").inputValue());
+    }
     await page.locator("#ra-street").fill("200 Biscayne Blvd");
     await page.locator("#ra-city").fill("Miami");
     await page.locator("#ra-zip").fill("33131");
@@ -684,9 +689,17 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
       await page.waitForTimeout(350);
     }
     expect((await stepHeading(page)).includes("Eligibility"), `${run.key}: back-walk reaches the first step`, await stepHeading(page));
-    expect((await page.locator("#client-first-name").inputValue().catch(() => "").then((v) => v)) !== "GONE", `${run.key}: placeholder`, null);
+    let checkedSavedName = false;
     let fwd = 0;
-    while (!(await stepHeading(page)).includes("Certification") && fwd++ < 25) await advance(page);
+    while (!(await stepHeading(page)).includes("Certification") && fwd++ < 25) {
+      if ((await stepHeading(page)).includes("Your information")) {
+        const savedName = await page.locator("#client-first-name").inputValue();
+        expect(savedName === "Casey", `${run.key}: back-walk preserves the saved first name`, savedName);
+        checkedSavedName = true;
+      }
+      await advance(page);
+    }
+    expect(checkedSavedName, `${run.key}: back-walk checked the client information step`);
     expect((await stepHeading(page)).includes("Certification"), `${run.key}: forward replay reaches Certify with every answer intact`, await stepHeading(page));
   }
 
@@ -718,7 +731,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
     // refused and the step stays; the exact name clears it.
     const sig3 = page.getByLabel(/electronic signature/i).first();
     if (await sig3.isVisible().catch(() => false)) {
-      await page.locator("main button").filter({ hasText: /^(Continue to payment|Submit intake)$/ }).first().click();
+      await page.locator("main button").filter({ hasText: /^Continue to payment$/ }).first().click();
       await page.waitForTimeout(1500);
       expect(!captured && /Certif/i.test(await stepHeading(page).catch(() => "")), `${run.key}: submitting is refused while the signature does not match the name`, await stepHeading(page).catch(() => "(navigated)"));
       await sig3.fill("Casey Gatecheck");
@@ -738,7 +751,7 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
   // Submit navigates to the (fake) checkout, so the page leaves the SPA —
   // success is the CAPTURED accepted POST, not any heading. A submit that
   // instead bounces to an earlier step is a real finding: dump its errors.
-  await page.locator("main button").filter({ hasText: /^(Continue to payment|Submit intake)$/ }).first().click();
+  await page.locator("main button").filter({ hasText: /^Continue to payment$/ }).first().click();
   for (let i = 0; i < 40 && !captured; i++) await page.waitForTimeout(500);
   if (!captured) {
     const where = await stepHeading(page).catch(() => "(page navigated)");
@@ -766,8 +779,7 @@ function jsonDiff(expected: unknown, actual: unknown, path = ""): string[] {
 async function main(): Promise<void> {
   // Reuse the review runner's owned-process proof and throwaway database.
   // HTTP 200 alone cannot establish that this run started the answering API.
-  if (!existsSync("dist/index.html")) await buildSite(process.cwd(), resolve("dist"), false);
-  else console.log("(using existing dist/ — run `bun run behavioral` to rebuild first)");
+  await freshSite(process.cwd());
   const stack = await startIsolatedStack({ serveDir: resolve("dist") });
   API = stack.api;
   WEB_PORT = Number(new URL(stack.web).port);
@@ -964,7 +976,7 @@ async function main(): Promise<void> {
       fd.set("articles", pdf("articles"));
       fd.append("psd", pdf("psd"));
       fd.append("psdSeries", JSON.stringify(seriesNames));
-      await fetch(`${API}/api/admin/orders/${dOrderId}/agent`,{method:"POST",headers:{Cookie:adminCookie,"Content-Type":"application/json"},body:JSON.stringify({action:"appointment",date:new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"})})});
+      await fetch(`${API}/api/admin/orders/${dOrderId}/agent`,{method:"POST",headers:{Cookie:adminCookie,"Content-Type":"application/json"},body:JSON.stringify({action:"appointment",date:"2026-03-20"})});
       const formed = await fetch(`${API}/api/admin/orders/${dOrderId}/formation-documents`, { method: "POST", headers: { Cookie: adminCookie }, body: fd });
       expect(formed.status === 200, "actions: run D's company is formed through the admin API", await formed.text().catch(() => ""));
 
@@ -1000,8 +1012,7 @@ async function main(): Promise<void> {
         // A formed company on our agent service shows its renewal date
         // (Adam, 14 Sep 2026: "stored and shown in the portal").
         const dash = await page.locator("main").innerText();
-        const nextYear = String(new Date().getFullYear() + 1);
-        expect(new RegExp(`renews on [A-Z][a-z]+ \\d{1,2}, ${nextYear}`).test(dash) && !/renews annually/.test(dash), "renewal: the portal's agent card names the renewal date a year from formation", dash.match(/registered agent service is active[^.]*\./)?.[0]);
+        expect(dash.includes("renews on March 20, 2027") && !/renews annually/.test(dash), "renewal: the portal's agent card names the renewal date a year from the recorded appointment", dash.match(/registered agent service is active[^.]*\./)?.[0]);
       }
       // The S election is not the client's to act on until the office has
       // entered the formation date (Form 2553 timing gate, 6 Sep 2026): the
@@ -1048,7 +1059,7 @@ async function main(): Promise<void> {
       await page.waitForTimeout(800);
       const einForm = page.locator('[role="dialog"]').first();
       const rpHeading = await einForm.locator('[data-testid="responsible-party-heading"]').innerText().catch(() => "");
-      expect(/typically the LLC's manager/.test(rpHeading), "EIN form: the responsible party heading says it is typically the manager", rpHeading);
+      expect(rpHeading === "Responsible party", "EIN form: the responsible party heading is neutral", rpHeading);
       expect(!/IRS records/.test(await einForm.innerText()), "EIN form: no 'must match IRS records' anywhere on the form");
       // Every phone box takes the shape as typed and hints it without
       // letters (Adam, 7 Sep 2026).
@@ -1798,13 +1809,17 @@ async function main(): Promise<void> {
       // The agreement being amended is identified by its effective date,
       // prefilled from the one on file and confirmed by the client (Adam,
       // 12 Sep 2026).
+      const sourceSelect = page.getByLabel("Operating agreement supplying the names");
+      await sourceSelect.locator('option').nth(1).waitFor({state:'attached'});
+      const selectedSource = await sourceSelect.locator('option').nth(1).getAttribute('value');
+      await sourceSelect.selectOption(selectedSource!);
       const dateBox = page.locator('main input[aria-label="Effective date of the operating agreement"]');
       const prefilled = await dateBox.inputValue().catch(() => "");
       const onFile = await page.locator('[data-testid="agreement-on-file"]').innerText().catch(() => "");
       expect(/^\d{4}-\d{2}-\d{2}$/.test(prefilled), "AMEND: the agreement's effective date is prefilled from the agreement on file", prefilled);
-      expect(/Most recently generated agreement on file: Operating Agreement \(No\. \d+\), effective [A-Z][a-z]+ \d{1,2}, \d{4}\./.test(onFile), "AMEND: the line beneath names the agreement on file and its date", onFile);
+      expect(/Selected agreement: Operating Agreement \(No\. \d+\), effective [A-Z][a-z]+ \d{1,2}, \d{4}\./.test(onFile), "AMEND: the line beneath names the agreement on file and its date", onFile);
       expect(/legal consequences you do not intend/.test(notice) && /reviewed by an attorney before it is signed/.test(notice), "AMEND: the page warns of unintended legal consequences and urges attorney review", notice);
-      expect(/Most recently generated agreement on file:/.test(await page.locator("main").innerText()), "AMEND: the page names the agreement it amends");
+      expect(/Selected agreement:/.test(await page.locator("main").innerText()), "AMEND: the page names the agreement it amends");
       await shot(page, "amend-page");
       const createBtn = page.locator("main button").filter({ hasText: /^Create amendment/ }).first();
       expect(await createBtn.isDisabled(), "AMEND: Create waits until changes are typed");
@@ -1817,6 +1832,8 @@ async function main(): Promise<void> {
       // sent the typed state, and an untouched prefill was refused as invalid).
       await page.reload();
       await page.waitForSelector('main input[aria-label="Effective date of the operating agreement"]');
+      await sourceSelect.locator('option').nth(1).waitFor({state:'attached'});
+      await sourceSelect.selectOption(selectedSource!);
       await page.waitForTimeout(800);
       expect((await dateBox.inputValue()) === prefilled, "AMEND: after a reload the agreement's date is prefilled again and left untouched", await dateBox.inputValue());
       await page.locator('main textarea[aria-label="Changes to the agreement"]').fill("Section 4.2 is amended to read: \"Each Member votes in proportion to the Member's Percentage Interest.\"\nSection 9.4 is deleted.");
@@ -2806,13 +2823,13 @@ await batch07Walk(browser, `http://localhost:${WEB_PORT}`, (ok,label,detail)=>ba
 {const r=batch07Results.get("batch07 171: unknown card status is distinct from absent consent");expect(r?.ok===true,"batch07 171: unknown card status is distinct from absent consent",r?.detail);batch07Results.delete("batch07 171: unknown card status is distinct from absent consent");}
 {const r=batch07Results.get("batch07 172: cancellation status belongs to the company");expect(r?.ok===true,"batch07 172: cancellation status belongs to the company",r?.detail);batch07Results.delete("batch07 172: cancellation status belongs to the company");}
 {const r=batch07Results.get("batch07 184: card failures have useful explanations");expect(r?.ok===true,"batch07 184: card failures have useful explanations",r?.detail);batch07Results.delete("batch07 184: card failures have useful explanations");}
-{const r=batch07Results.get("batch07 194: notice precedes cancellation deadline by thirty days");expect(r?.ok===true,"batch07 194: notice precedes cancellation deadline by thirty days",r?.detail);batch07Results.delete("batch07 194: notice precedes cancellation deadline by thirty days");}
+{const r=batch07Results.get("batch28 194: scheduled notice precedes cancellation deadline by forty days");expect(r?.ok===true,"batch28 194: scheduled notice precedes cancellation deadline by forty days",r?.detail);batch07Results.delete("batch28 194: scheduled notice precedes cancellation deadline by forty days");}
 {const r=batch07Results.get("batch07 195: payment attempts are counted and idempotent");expect(r?.ok===true,"batch07 195: payment attempts are counted and idempotent",r?.detail);batch07Results.delete("batch07 195: payment attempts are counted and idempotent");}
 {const r=batch07Results.get("batch07 199: no false retry promises");expect(r?.ok===true,"batch07 199: no false retry promises",r?.detail);batch07Results.delete("batch07 199: no false retry promises");}
 {const r=batch07Results.get("batch07 196: receipts describe payments accurately");expect(r?.ok===true,"batch07 196: receipts describe payments accurately",r?.detail);batch07Results.delete("batch07 196: receipts describe payments accurately");}
 {const r=batch07Results.get("batch07 208: replacement uploads preserve dates");expect(r?.ok===true,"batch07 208: replacement uploads preserve dates",r?.detail);batch07Results.delete("batch07 208: replacement uploads preserve dates");}
 {const r=batch07Results.get("batch07 212: appointment effective date starts the service year");expect(r?.ok===true,"batch07 212: appointment effective date starts the service year",r?.detail);batch07Results.delete("batch07 212: appointment effective date starts the service year");}
-{const r=batch07Results.get("batch07 N1.12: failed notices remain pending and block automatic charging");expect(r?.ok===true,"batch07 N1.12: failed notices remain pending and block automatic charging",r?.detail);batch07Results.delete("batch07 N1.12: failed notices remain pending and block automatic charging");}
+{const r=batch07Results.get("batch40 N1.12: failed notices remain unsent without blocking renewal charging");expect(r?.ok===true,"batch40 N1.12: failed notices remain unsent without blocking renewal charging",r?.detail);batch07Results.delete("batch40 N1.12: failed notices remain unsent without blocking renewal charging");}
 {const r=batch07Results.get("batch07 4: Terms allocate services consistently");expect(r?.ok===true,"batch07 4: Terms allocate services consistently",r?.detail);batch07Results.delete("batch07 4: Terms allocate services consistently");}
 {const r=batch07Results.get("batch07 29: general Terms protect both service providers");expect(r?.ok===true,"batch07 29: general Terms protect both service providers",r?.detail);batch07Results.delete("batch07 29: general Terms protect both service providers");}
 for(const [label,r] of batch07Results) expect(r.ok,label,r.detail);
@@ -2918,6 +2935,21 @@ for(const [label,r]of batch05Results)expect(r.ok,label,r.detail);
       finally { await page.close(); }
     }
     expect(correct, "batch19 65: progress matches reachable screens and resumes at certification", observations);
+  }
+
+  // Batch41 owns separate offline apps/data; no parent test fixtures are shared.
+  for (const [script,prefix,label] of [
+    ["batch41-office-walk.ts","B41OFFICE:","batch41 office identity search and certificate refresh"],
+    ["batch41-billing-walk.ts","B41BILLING:","batch41 agent balances and checkout states"],
+  ]) {
+    const child = Bun.spawn([process.execPath, decodeURIComponent(new URL(script, import.meta.url).pathname)], {stdout:"pipe",stderr:"pipe"});
+    const [out,error,code] = await Promise.all([new Response(child.stdout).text(),new Response(child.stderr).text(),child.exited]);
+    const lines=out.split("\n").filter(line=>line.startsWith(prefix));
+    let result:{rows?:{ok:boolean}[]}|null=null;
+    try {if(lines.length===1)result=JSON.parse(lines[0].slice(prefix.length));}catch{
+      // Malformed child results fail the check below.
+    }
+    expect(code===0&&!!result?.rows?.length&&result.rows.every(r=>r.ok),label,{code,result,error:code?error:undefined});
   }
 
   } finally {

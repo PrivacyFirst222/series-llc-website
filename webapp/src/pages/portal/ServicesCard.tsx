@@ -1,3 +1,4 @@
+import { serviceQueryUrl } from "@/lib/serviceQueryUrl";
 import { formatDate } from "@/lib/datetime";
 import type { JointKind } from "@/lib/jointOwner";
 import { useState } from "react";
@@ -122,7 +123,7 @@ export function ServicesCard({ company }: { company?: string | null }) {
 
   const servicesQuery = useQuery({
     queryKey: ["portal-services", company ?? null],
-    queryFn: () => api.get<ServicesData>(`/api/portal/services${cq}`),
+    queryFn: () => api.get<ServicesData>(serviceQueryUrl(company)),
   });
 
   const orderSeries = useMutation({

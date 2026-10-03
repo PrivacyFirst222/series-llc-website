@@ -244,7 +244,7 @@ export async function checkName(input: string): Promise<NameVerdict> {
         status: active ? "Active" : "Inactive",
         reason: active
           ? conflictReason(input, r.name)
-          : `${conflictReason(input, r.name)}; recently dissolved — the name may still be protected (s. 605.0715, Fla. Stat.)`,
+          : `${conflictReason(input, r.name)}; recently inactive — our service conservatively treats this name as unavailable`,
         detailUrl: detailUrl(r.name),
       });
       if (active) verdict = "taken";

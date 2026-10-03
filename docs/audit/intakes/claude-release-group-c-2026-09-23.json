@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "run": "claude-release-group-c-2026-09-23",
+  "commit": "fd77a1c19e47e25245db4992050d353514432c86",
+  "completedAt": "2026-09-23T12:26:49.695682+00:00",
+  "manifestSha": "6628985cbb2c3420ad879a2f7fa94448c3e79a5261d56ec6ddc88262831a60cc",
+  "auditSha": "80e078d9d145f3bea59111a17562a9bc9d2a88c87dc906372e55d7d7c912d59a",
+  "findings": [
+    {
+      "key": "item-25",
+      "relation": "new",
+      "where": "Decision records: preserve the eleven existing rulings in the repository",
+      "file": "docs/audit/batches/27/batch.md",
+      "line": 1,
+      "reads": "# Batch 27 \u2014 recover approved Batches 11, 12 and 16",
+      "claims": "Eleven decisions are in the external ruling file but absent from the repository\u2019s ruling entries. A future auditor can reopen matters you already settled.",
+      "truth": "All eleven external records were reopened. Items: 8, 15, 22, 34, 38, 139, N2.14, 232, 236, N2.02 and 242. No repeat ruling is requested. Sources: RR-RECON-01-rulings-only-outside-the-repo",
+      "replacement": "Copy the exact authenticated records through the existing ruling mechanism; regenerate the list. Identify the ten retained decisions and the approved example wording without altering those choices or inventing new acceptance events.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group C",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-26",
+      "relation": "new",
+      "where": "Tracking display: distinguish protected retained wording from a repair",
+      "file": "docs/audit/ledger-print.ts",
+      "line": 33,
+      "reads": "  out.push(\"A status reads: open \u2192 assigned (to a batch) \u2192 implemented \u2192 accepted (by Adam, by exact commit) \u2192 released.\");",
+      "claims": "Three items you rejected appear simply implemented because the work implemented assertions that protect the unchanged wording.",
+      "truth": "Batch 31 rulings on deed wording, effective-date wording and the FAQ filing description remain binding. Sources: RR-RECON-02-ledger-says-implemented-for-what-adam-rejected",
+      "replacement": "Show an explicit owner-retained disposition alongside the existing technical lifecycle status. Preserve the assertions. Prefer a reviewed disposition annotation over adding a new lifecycle state throughout every gate.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group C",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-27",
+      "relation": "new",
+      "where": "Tracking history: attach verifiable implementation commits",
+      "file": "docs/audit/batch.ts",
+      "line": 108,
+      "reads": "    part.status = \"implemented\";",
+      "claims": "The generated list prints an empty commit for implemented fixes. The command intentionally fills that field only at release, so this is more than a forgotten value.",
+      "truth": "Preserves the distinction between implemented, accepted and released. Sources: RR-RECON-03-ledger-records-no-implementing-commit",
+      "replacement": "Add append-only implementation receipts referencing the already-created commit, work-order hash and package. Display that separately from release. Verify ancestry and scope; do not try to store a commit\u2019s own hash inside itself or rewrite old protected fix objects.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group C",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-28",
+      "relation": "new",
+      "where": "Audit history: retain the reason a proposed cleanup was rejected",
+      "file": "docs/audit/ledger.json",
+      "line": 1,
+      "reads": "{",
+      "claims": "One Claude finding about legacy fallback code was adjudicated outside the repository and never received an internal record.",
+      "truth": "This records the cross-review\u2019s decision; it does not approve the rejected cleanup or pretend Adam made a new ruling. Sources: RR-RECON-05-one-claude-record-has-no-record-in-the-candidate",
+      "replacement": "Import an informational adjudication with the original source ID and the existing reason the blanket removal was unsafe. Leave the fallback code intact. Use the checked intake/migration path, not a manual edit of the generated list.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group C",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-29",
+      "relation": "new",
+      "where": "Combined-release tracking: record which earlier batches shipped together",
+      "file": "docs/audit/batch.ts",
+      "line": 118,
+      "reads": "  const { acc, why } = standingAcceptance(commit, b.id, b.revision);",
+      "claims": "The current released command requires acceptance for a particular batch. A single combined release would otherwise leave earlier included batches looking unshipped.",
+      "truth": "Adam chose publication together at the end. This is a control change requiring review, not permission to weaken the release gate. Sources: RR-REL-05",
+      "replacement": "Add a reviewed combined-release receipt that links the final accepted commit/package to the exact included batch revisions and active parts. Verify work-order hashes, preserved/superseded fixes and each batch\u2019s required checks before inclusion; verify remote/deployment/document evidence after publication. Keep individual acceptance history truthful. Do not fabricate separate historical acceptances or require thirty sequential releases.",
+      "severity": "housekeeping",
+      "review": {
+        "reviewer": "Codex reconciliation, owner approved Group C",
+        "evidence": "Sealed release reconciliation; source reopened at Batch37 candidate. Mutation evidence follows in Batch38.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    }
+  ],
+  "adjudications": [
+    {
+      "sourceId": "reader-6-oa-legacy-null-branches",
+      "verdict": "disputed",
+      "reason": "Two clauses query oa_generations, but the third at1757 queries documents.kind=amendment. Migration4 backfills oa_generations once and has no NOT NULL guarantee. Its scalar lookup leaves null when no paid order exists. Migration5 only backfills package documents, so it cannot establish that legacy NULL amendment rows are impossible. Source therefore does not support the claim that all three alternatives are dead.",
+      "replacementVerdict": "unsafe as a blanket cleanup",
+      "source": "Cross-review at 4b6d0d54297f169def1729bf789dd8bdbfc2d5d0; original Claude run claude-post-batches-2026-09-20; RECONCILED.json finding 77",
+      "codeRemovalApproved": false
+    }
+  ]
+}

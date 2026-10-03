@@ -20,6 +20,7 @@ import os
 import re
 import sys
 import zipfile
+import xml.etree.ElementTree as ET
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SOURCE_DIR = os.path.join(HERE, "source")
@@ -177,11 +178,26 @@ def build_baseline():
     return 0
 
 
+def authored_layout(path):
+    """Formatting only, not legal text; an explicitly approved product baseline."""
+    W="{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    def xml(e): return ET.tostring(e,encoding="unicode") if e is not None else ""
+    with zipfile.ZipFile(path) as z:
+        body=ET.fromstring(z.read("word/document.xml"))
+        styles=ET.fromstring(z.read("word/styles.xml"))
+        return {"defaults":xml(styles.find(W+"docDefaults")),
+                "sections":[xml(x) for x in body.iter(W+"sectPr")],
+                "paragraphs":[{"paragraph":xml(p.find(W+"pPr")),
+                  "runs":sorted(set(xml(r.find(W+"rPr")) for r in p.findall(W+"r") if r.find(W+"t") is not None))}
+                  for p in body.iter(W+"p")]}
+
+
 def check(paths):
     if not os.path.exists(BASELINE):
         print("no baseline — run: python3 docs/format-check.py --baseline", file=sys.stderr)
         return 1
     base = json.load(open(BASELINE))
+    authored=json.load(open(os.path.join(HERE,"authored-form-format.json")))
     failed = []
     for path in paths:
         name = os.path.basename(path)
@@ -202,13 +218,16 @@ def check(paths):
             if re.search(r'<w:widowControl w:val="(0|false)"',
                          zipfile.ZipFile(path).read("word/document.xml").decode("utf8", "replace")):
                 absolute.append("widow control: explicitly disabled somewhere")
+            product=authored["forms"].get(name)
+            if product is not None and authored_layout(path)!=product["layout"]:
+                absolute.append("typography/layout differs from the approved product baseline (not an original-source baseline)")
             if absolute:
                 failed.append(name)
                 print(f"FAIL  {name} — no baseline, but:")
                 for a in absolute:
                     print(f"        {a}")
             else:
-                print(f"PART  {name} — no baseline entry; pagination checked, formatting not")
+                print(f"ok    {name} — approved product typography/layout baseline; no independent original" if product is not None else f"PART  {name} — no baseline entry; pagination checked, formatting not")
             continue
         r, br = ratios(m), b["ratios"]
         problems = []
@@ -285,7 +304,7 @@ def check(paths):
             )
     if failed:
         print(
-            f"\n{len(failed)} document(s) lost formatting against docs/source/. "
+            f"\n{len(failed)} document(s) failed original-source or approved-product formatting checks. "
             "Nothing was written. Fix the generator or the master, then run again.",
             file=sys.stderr,
         )

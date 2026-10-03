@@ -1,0 +1,127 @@
+{
+  "code": 0,
+  "rows": [
+    {
+      "label": "B02",
+      "ok": true,
+      "detail": {
+        "same": [
+          [
+            "ALPHA BETA",
+            "ALPHA BETA"
+          ],
+          [
+            "RENTAL",
+            "RENTAL"
+          ],
+          [
+            "BLUE LAKE",
+            "BLUE LAKE"
+          ],
+          [
+            "HARBOR",
+            "HARBOR"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "personal-agent-ui",
+      "ok": true
+    },
+    {
+      "label": "B03",
+      "ok": true
+    },
+    {
+      "label": "B05",
+      "ok": true
+    },
+    {
+      "label": "name-result-ui",
+      "ok": true
+    },
+    {
+      "label": "B06",
+      "ok": true
+    },
+    {
+      "label": "B07",
+      "ok": true
+    },
+    {
+      "label": "B04",
+      "ok": true
+    },
+    {
+      "label": "browser-isolation",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "label": "B09",
+      "ok": true,
+      "detail": {
+        "words": "{\"desiredLlcName\":\"Unavailable — this name matches a recently inactive company. Our service conservatively treats it as unavailable. Please choose a different name.\"}"
+      }
+    },
+    {
+      "label": "B01",
+      "ok": true,
+      "detail": {
+        "agentSchemaOk": true,
+        "refused": 400,
+        "other": 400,
+        "accepted": 200,
+        "acceptedBody": {
+          "data": {
+            "orderId": "3a6c45f9-b012-40ab-a6a7-8296f0429da5",
+            "checkoutUrl": "http://localhost:8000/order/confirmed?ref=3a6c45f9-b012-40ab-a6a7-8296f0429da5&dev=1",
+            "totalCents": 76900
+          }
+        },
+        "storedAcknowledgments": {
+          "notLegalAdvice": false,
+          "publicRecordNotice": false,
+          "nameSearchAcknowledgment": true,
+          "isFloridaDomesticEntityOnly": true,
+          "registeredAgentNotSameAsLlc": true,
+          "termsOfServiceAcknowledgment": true,
+          "addressAccuracyAcknowledgment": true,
+          "sElectionFilingAcknowledgment": true,
+          "lawfulPurposeNameAcknowledgment": true,
+          "registeredAgentAcceptanceCheckbox": true,
+          "governmentAffiliationAcknowledgment": true,
+          "registeredAgentResidencyAcknowledgment": true,
+          "authorizedRepresentativeSignatureCheckbox": true,
+          "registeredAgentExistingRecordAcknowledgment": false,
+          "registeredAgentPhysicalAddressAcknowledgment": true,
+          "registeredAgentSeriesAgreementAcknowledgment": true,
+          "registeredAgentSignatureAuthorizationCheckbox": true
+        }
+      }
+    },
+    {
+      "label": "B08",
+      "ok": true,
+      "detail": {
+        "invalid": 400,
+        "afterInvalid": 0,
+        "good": 200,
+        "goodBody": {
+          "data": {
+            "generationId": "991217b3-a085-4460-a566-40c0a49f470d",
+            "documentId": "9a4ecae9-31e1-44d7-84fa-9adae3095fbf",
+            "title": "Operating Agreement — Member-Managed Single-Member (Disregarded Entity) (No. 1) — Numbering LLC",
+            "version": "member-single"
+          }
+        },
+        "afterGood": 1,
+        "limited": 429,
+        "afterLimited": 1
+      }
+    }
+  ],
+  "out": "B29:{\"label\":\"B02\",\"ok\":true,\"detail\":{\"same\":[[\"ALPHA BETA\",\"ALPHA BETA\"],[\"RENTAL\",\"RENTAL\"],[\"BLUE LAKE\",\"BLUE LAKE\"],[\"HARBOR\",\"HARBOR\"]]}}\nB29:{\"label\":\"personal-agent-ui\",\"ok\":true}\nB29:{\"label\":\"B03\",\"ok\":true}\nB29:{\"label\":\"B05\",\"ok\":true}\nB29:{\"label\":\"name-result-ui\",\"ok\":true}\nB29:{\"label\":\"B06\",\"ok\":true}\nB29:{\"label\":\"B07\",\"ok\":true}\nB29:{\"label\":\"B04\",\"ok\":true}\nB29:{\"label\":\"browser-isolation\",\"ok\":true,\"detail\":[]}\nB29:{\"label\":\"B09\",\"ok\":true,\"detail\":{\"words\":\"{\\\"desiredLlcName\\\":\\\"Unavailable — this name matches a recently inactive company. Our service conservatively treats it as unavailable. Please choose a different name.\\\"}\"}}\nB29:{\"label\":\"B01\",\"ok\":true,\"detail\":{\"agentSchemaOk\":true,\"refused\":400,\"other\":400,\"accepted\":200,\"acceptedBody\":{\"data\":{\"orderId\":\"3a6c45f9-b012-40ab-a6a7-8296f0429da5\",\"checkoutUrl\":\"http://localhost:8000/order/confirmed?ref=3a6c45f9-b012-40ab-a6a7-8296f0429da5&dev=1\",\"totalCents\":76900}},\"storedAcknowledgments\":{\"notLegalAdvice\":false,\"publicRecordNotice\":false,\"nameSearchAcknowledgment\":true,\"isFloridaDomesticEntityOnly\":true,\"registeredAgentNotSameAsLlc\":true,\"termsOfServiceAcknowledgment\":true,\"addressAccuracyAcknowledgment\":true,\"sElectionFilingAcknowledgment\":true,\"lawfulPurposeNameAcknowledgment\":true,\"registeredAgentAcceptanceCheckbox\":true,\"governmentAffiliationAcknowledgment\":true,\"registeredAgentResidencyAcknowledgment\":true,\"authorizedRepresentativeSignatureCheckbox\":true,\"registeredAgentExistingRecordAcknowledgment\":false,\"registeredAgentPhysicalAddressAcknowledgment\":true,\"registeredAgentSeriesAgreementAcknowledgment\":true,\"registeredAgentSignatureAuthorizationCheckbox\":true}}}\nB29:{\"label\":\"B08\",\"ok\":true,\"detail\":{\"invalid\":400,\"afterInvalid\":0,\"good\":200,\"goodBody\":{\"data\":{\"generationId\":\"991217b3-a085-4460-a566-40c0a49f470d\",\"documentId\":\"9a4ecae9-31e1-44d7-84fa-9adae3095fbf\",\"title\":\"Operating Agreement — Member-Managed Single-Member (Disregarded Entity) (No. 1) — Numbering LLC\",\"version\":\"member-single\"}},\"afterGood\":1,\"limited\":429,\"afterLimited\":1}}\n",
+  "err": ""
+}

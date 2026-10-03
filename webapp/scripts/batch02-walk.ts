@@ -6,18 +6,18 @@ import {mkdirSync} from 'node:fs';
 type Check=(ok:boolean,label:string,detail?:unknown)=>void;
 export async function batch02Walk(browser:Browser,web:string,check:Check){
  const name='Scope Alpha, LLC',series=`${name}, PS Store`;
- const service={id:'ein1',type:'ein',status:'in_progress',llc_name:name,client_id:'client1',formation_order_id:'co1',amount_cents:9500,created_at:'2026-09-01',paid_at:'2026-09-01',fulfilled_at:null,has_secret:true,ein_pending:false,client_email:'scope@example.test',client_name:'Alice Example',details:{target:'series',seriesName:series,responsibleName:'Alice Example',memberCount:1}};
+ const service={id:'ein1',type:'ein',status:'in_progress',llc_name:name,client_id:'client1',formation_order_id:'co1',board_order_id:'co1',amount_cents:9500,created_at:'2026-09-01',paid_at:'2026-09-01',fulfilled_at:null,has_secret:true,ein_pending:false,client_email:'scope@example.test',client_name:'Alice Example',details:{target:'series',seriesName:series,responsibleName:'Alice Example',memberCount:1}};
  const company={orderId:'co1',llcName:name,formed:true,formedAt:'2026-09-01',registeredAgentChoice:'SELF'};
  const page=await browser.newPage();page.setDefaultTimeout(6000);
  const screenshot=async(suffix:string)=>{if(process.env.SHOT_DIR){mkdirSync(process.env.SHOT_DIR,{recursive:true});await page.screenshot({path:`${process.env.SHOT_DIR}/batch02-${suffix}.png`,fullPage:true});}};
  let portalTarget='series',uploadBody='';
  await guardedRoute(page,'**/api/**',async route=>{
    const u=new URL(route.request().url()); const json=(data:unknown)=>route.fulfill({contentType:'application/json',body:JSON.stringify({data})});
-   if(u.pathname==='/api/admin/documents'&&route.request().method()==='POST'){uploadBody=route.request().postDataBuffer()?.toString()??'';return json({notified:true});}
+   if(u.pathname==='/api/admin/documents'&&route.request().method()==='POST'){uploadBody=route.request().postDataBuffer()?.toString()??'';const id=uploadBody.match(/name="submissionId"\r?\n\r?\n([^\r\n]+)/)?.[1];return json({id,notified:true});}
    if(u.pathname==='/api/admin/clients')return json([{id:'client1',name:'Alice Example',email:'scope@example.test',created_at:'2026-09-01',orders:[],companies:[{id:'co1',llc_name:name},{id:'co2',llc_name:'Scope Beta, LLC'}],documents:[]}]);
    if(u.pathname==='/api/admin/me')return json({ok:true});
    if(u.pathname==='/api/auth/me')return json({name:'Alice Example',email:'scope@example.test'});
-   if(u.pathname==='/api/admin/orders')return json({orders:[{id:'co1',client_id:'client1',llc_name:name,contact_name:'Alice Example',contact_email:'scope@example.test',status:'formed',total_cents:0,created_at:'2026-09-01',paid_at:'2026-09-01',formed_at:'2026-09-01',series_count:1}],total:1,shown:1});
+   if(u.pathname==='/api/admin/orders')return json({orders:[{id:'co1',work_stage:'post-filing',client_id:'client1',llc_name:name,contact_name:'Alice Example',contact_email:'scope@example.test',status:'formed',total_cents:0,created_at:'2026-09-01',paid_at:'2026-09-01',formed_at:'2026-09-01',series_count:1}],total:1,shown:1,page:1,pageSize:50});
    if(u.pathname==='/api/admin/services')return json([service]);
    if(u.pathname==='/api/admin/services/ein1')return json({...service,tin:'123456789',sElectionPaid:false});
    if(u.pathname==='/api/portal/companies')return json([company,{...company,orderId:'co2',llcName:'Scope Beta, LLC'}]);
@@ -30,7 +30,7 @@ export async function batch02Walk(browser:Browser,web:string,check:Check){
   const row=page.getByTestId('assistant-order').locator('li').filter({hasText:'Legal name'});await row.waitFor();const text=await row.innerText();
   check(text.includes(series),'batch02 N3.05: office EIN answers name the series applicant',text);
   const tax=await page.getByTestId('assistant-order').locator('li').filter({hasText:'Tax classification'}).innerText();
-  check(tax.includes('Confirm this series'),'batch02 office series tax treatment requires confirmation',tax);await screenshot('office-ein');
+  check(tax.includes('Disregarded entity')&&!tax.includes('S corporation'),'batch02 office series tax treatment is disregarded',tax);await screenshot('office-ein');
  }catch(e){check(false,'batch02 N3.05: office EIN answers name the series applicant',String(e));}
  try{
   const texts:string[]=[];for(const target of ['series','company']){portalTarget=target;await page.goto(`${web}/portal?company=co1`);await page.reload();await page.getByRole('button',{name:'Provide details securely',exact:true}).click();texts.push(await page.getByRole('dialog').innerText());await screenshot(`portal-ein-${target}`);}

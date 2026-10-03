@@ -1,0 +1,116 @@
+{
+  "id": "36",
+  "revision": 3,
+  "title": "Completed Orders tab and Post-Filing Items workflow",
+  "model": "Codex",
+  "base": "1aa316bf63254673db2ac5370a76573e518aeaec",
+  "items": [
+    {
+      "id": "AUD-owner-office-board-2026-09-22-completed-orders",
+      "part": "all",
+      "scope": "Show New Orders, With The State and Post-Filing Items on the active board; put fully delivered orders in searchable, paginated Completed Orders; new purchases return as green New Orders.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch36 office workflow"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/src/pages/admin/OrderBoard.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved office workflow, pagination and regression tests."
+    },
+    {
+      "path": "webapp/src/pages/admin/AdminDashboard.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved office workflow, pagination and regression tests."
+    },
+    {
+      "path": "webapp/src/pages/admin/serviceOrders.helpers.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved office workflow, pagination and regression tests."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved office workflow, pagination and regression tests."
+    },
+    {
+      "path": "webapp/server/admin-board.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved office workflow, pagination and regression tests."
+    },
+    {
+      "path": "webapp/server/batch36-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved office workflow, pagination and regression tests."
+    },
+    {
+      "path": "webapp/scripts/batch36-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved office workflow, pagination and regression tests."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved office workflow, pagination and regression tests."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved office workflow, pagination and regression tests."
+    },
+    {
+      "path": "docs/audit/intakes/owner-office-board-2026-09-22.json",
+      "mode": "code",
+      "control": true,
+      "why": "Owner-approved office workflow, pagination and regression tests."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "why": "Normal generated output."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Normal generated output."
+    },
+    {
+      "path": "docs/facts.md",
+      "mode": "code",
+      "control": true,
+      "why": "Replace retired board-column rule with the owner-approved Post-Filing Items column and Completed Orders tab."
+    },
+    {
+      "path": "webapp/scripts/batch05-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Update controlled board response fixtures and navigation for the approved workflow while preserving date, fulfillment, error and pagination checks."
+    },
+    {
+      "path": "webapp/scripts/batch10-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Update controlled board response fixtures and navigation for the approved workflow while preserving date, fulfillment, error and pagination checks."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/server/batch36-check.ts",
+    "webapp/scripts/batch36-walk.ts"
+  ]
+}

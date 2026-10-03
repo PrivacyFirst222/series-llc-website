@@ -1,0 +1,17 @@
+{
+  "before": {
+    "retainedLabels": 0,
+    "blankCommitLines": 420,
+    "rulings": 65,
+    "receipts": 0,
+    "adjudications": 0
+  },
+  "after": {
+    "retainedLabels": 3,
+    "blankCommitLines": 0,
+    "rulings": 76,
+    "receipts": 39,
+    "adjudications": 1
+  },
+  "interpretation": "Before/after display and missing-record reproduction only. New receipt/gate controls have separate negative tests; no historical runtime reproduction claimed for new commands."
+}

@@ -22,24 +22,44 @@ export interface SessionInfo {
   viewingAsAdmin: boolean;
 }
 
-export async function createSession(
-  c: Context,
-  opts: { clientId?: string; isAdmin?: boolean; viewingAsAdmin?: boolean; hours?: number },
-): Promise<void> {
-  const db = await getDb();
-  const { token, tokenHash } = newToken();
-  const expires = new Date(Date.now() + (opts.hours ? opts.hours * 3600_000 : SESSION_DAYS * 86400_000));
-  await db.query(
-    "INSERT INTO sessions (token_hash, client_id, is_admin, viewing_as_admin, expires_at) VALUES ($1, $2, $3, $4, $5)",
-    [tokenHash, opts.clientId ?? null, opts.isAdmin ?? false, opts.viewingAsAdmin ?? false, expires.toISOString()],
-  );
-  setCookie(c, opts.isAdmin ? ADMIN_COOKIE : CLIENT_COOKIE, token, {
+export function sessionCredentials(hours?: number) {
+  return { ...newToken(), expires: new Date(Date.now() + (hours ? hours * 3600_000 : SESSION_DAYS * 86400_000)) };
+}
+
+export function setSessionCookie(c: Context, credentials: ReturnType<typeof sessionCredentials>, isAdmin = false) {
+  setCookie(c, isAdmin ? ADMIN_COOKIE : CLIENT_COOKIE, credentials.token, {
     httpOnly: true,
     secure: env.isProd,
     sameSite: "Lax",
     path: "/",
-    expires,
+    expires: credentials.expires,
   });
+}
+
+export async function createSession(
+  c: Context,
+  opts: { clientId?: string; isAdmin?: boolean; viewingAsAdmin?: boolean; hours?: number; verifiedPasswordHash?: string },
+): Promise<boolean> {
+  const db = await getDb();
+  const credentials = sessionCredentials(opts.hours);
+  if (opts.clientId) {
+    // Recheck the credential verified by login at the final write. Also stamp
+    // its password revision: an insert racing a change cannot revive access.
+    const rows = await db.query(`INSERT INTO sessions
+      (token_hash, client_id, is_admin, viewing_as_admin, expires_at, password_version)
+      SELECT $1, id, $3, $4, $5, password_version FROM clients
+      WHERE id=$2 AND ($6::text IS NULL OR password_hash=$6) RETURNING token_hash`,
+    [credentials.tokenHash, opts.clientId, opts.isAdmin ?? false, opts.viewingAsAdmin ?? false,
+      credentials.expires.toISOString(), opts.verifiedPasswordHash ?? null]);
+    if (!rows.length) return false;
+  } else {
+    await db.query(
+      "INSERT INTO sessions (token_hash, client_id, is_admin, viewing_as_admin, expires_at) VALUES ($1, $2, $3, $4, $5)",
+      [credentials.tokenHash, null, opts.isAdmin ?? false, opts.viewingAsAdmin ?? false, credentials.expires.toISOString()],
+    );
+  }
+  setSessionCookie(c, credentials, opts.isAdmin);
+  return true;
 }
 
 async function lookup(c: Context, cookieName: string): Promise<SessionInfo | null> {
@@ -48,7 +68,10 @@ async function lookup(c: Context, cookieName: string): Promise<SessionInfo | nul
   const db = await getDb();
   const tokenHash = hashToken(token);
   const rows = await db.query<{ client_id: string | null; is_admin: boolean; viewing_as_admin: boolean }>(
-    "SELECT client_id, is_admin, viewing_as_admin FROM sessions WHERE token_hash = $1 AND expires_at > now()",
+    `SELECT s.client_id, s.is_admin, s.viewing_as_admin FROM sessions s
+      LEFT JOIN clients c ON c.id=s.client_id
+      WHERE s.token_hash=$1 AND s.expires_at>now()
+        AND (s.client_id IS NULL OR s.password_version=c.password_version)`,
     [tokenHash],
   );
   if (rows.length === 0) return null;

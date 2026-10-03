@@ -1,6 +1,6 @@
 import { RA_CARD_CONSENT } from "@/lib/agentBilling";
-import { useState } from "react";
-import { AGENT_RESIDENCY, AGENT_EXISTING_RECORD } from "../registeredAgent";
+import { useEffect, useState } from "react";
+import { AGENT_RESIDENCY, AGENT_EXISTING_RECORD, personalAgentMatches } from "../registeredAgent";
 import { ShieldCheck, UserRound } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,9 @@ interface StepProps {
 export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
   const choice = data.registeredAgentChoice;
   const existing = data.filingPath === "CONVERT";
+  useEffect(() => {
+    if (!existing && choice === "SELF" && !personalAgentMatches(data)) patch({ registeredAgentType: "INDIVIDUAL", registeredAgentBusinessEntityName: "", registeredAgentFirstName: data.clientFirstName.trim(), registeredAgentLastName: data.clientLastName.trim(), registeredAgentSuffix: data.clientSuffix ?? "" });
+  }, [existing, choice, data, patch]);
   const [addressError, setAddressError] = useState<string>();
   const poBoxError =
     isPoBox(data.registeredAgentStreetAddress1) ||
@@ -126,6 +129,7 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
 
       {choice === "SELF" ? (
         <>
+          {!existing ? <p className="text-sm text-muted-foreground">Your name comes from the Client information step. Return to that step if it needs correcting.</p> : null}
           {data.registeredAgentType !== "ENTITY" && [data.clientFirstName, data.clientLastName].every((s) => s.trim()) ? (
             <Button
               type="button"
@@ -172,6 +176,7 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
             >
               <Input
                 id="ra-first-name"
+                readOnly={!existing}
                 value={data.registeredAgentFirstName ?? ""}
                 onChange={(e) => patch({ registeredAgentFirstName: e.target.value })}
               />
@@ -184,6 +189,7 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
             >
               <Input
                 id="ra-last-name"
+                readOnly={!existing}
                 value={data.registeredAgentLastName ?? ""}
                 onChange={(e) => patch({ registeredAgentLastName: e.target.value })}
               />
@@ -191,6 +197,7 @@ export function StepRegisteredAgent({ data, patch, errors }: StepProps) {
             <FieldShell label="Suffix (optional)" htmlFor="ra-suffix">
               <Input
                 id="ra-suffix"
+                readOnly={!existing}
                 value={data.registeredAgentSuffix ?? ""}
                 onChange={(e) => patch({ registeredAgentSuffix: e.target.value })}
                 placeholder="Jr, Sr, III…"

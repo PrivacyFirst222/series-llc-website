@@ -18,7 +18,9 @@ export function englishTextProblems(value: unknown, path = ""): Record<string, s
   }
   return result;
 }
+/** Distinguishes a local input rejection from an unavailable server. */
+export class InputValidationError extends Error {}
 export function assertEnglishText(value: unknown): void {
   const errors = englishTextProblems(value);
-  if (Object.keys(errors).length) throw new Error(`${ENGLISH_TEXT_ERROR} Fields: ${Object.keys(errors).join(", ")}`);
+  if (Object.keys(errors).length) throw new InputValidationError(`${ENGLISH_TEXT_ERROR} Fields: ${Object.keys(errors).join(", ")}`);
 }

@@ -1,0 +1,311 @@
+{
+  "id": "40",
+  "revision": 2,
+  "title": "Group D: entity-specific authority guidance and owner-directed renewal billing",
+  "model": "Codex",
+  "base": "09d1cd374b45a3a154b6abfecc11935b153defb7",
+  "items": [
+    {
+      "id": "AUD-claude-release-group-d-2026-09-23-item-30",
+      "part": "all",
+      "scope": "Approved Manual clarification only; agreements unchanged; optional filing and practical-procedure qualification preserved.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/owners-manual.md",
+          "text": "If you choose to file a statement of authority, identify the entity that holds the property. A statement concerning property held by the company identifies the company; a statement concerning property held by a protected series identifies that protected series. The company-form instructions below should not be used for a series filing without confirming the Division\u2019s filing requirements for that series."
+        },
+        {
+          "kind": "document",
+          "master": "docs/owners-manual.md",
+          "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+          "masterPresent": [
+            "If you choose to file a statement of authority, identify the entity that holds the property. A statement concerning property held by the company identifies the company; a statement concerning property held by a protected series identifies that protected series. The company-form instructions below should not be used for a series filing without confirming the Division\u2019s filing requirements for that series."
+          ],
+          "wordPresent": [
+            "If you choose to file a statement of authority, identify the entity that holds the property. A statement concerning property held by the company identifies the company; a statement concerning property held by a protected series identifies that protected series. The company-form instructions below should not be used for a series filing without confirming the Division\u2019s filing requirements for that series."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-release-group-d-2026-09-23-item-31",
+      "part": "all",
+      "scope": "Adam revised item 2: missing or late reminders must not block authorized renewal charging; preserve cancellation, consent, idempotency and due-date protections. Update Terms, emails, office labels and regression tests.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/src/content/terms.md",
+          "text": "A missing or late renewal reminder does not postpone renewal, prevent us from charging your authorized payment method for the renewal fee, or extend your cancellation or replacement deadlines."
+        },
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch40 renewal reminders do not gate billing"
+        }
+      ]
+    },
+    {
+      "id": "100",
+      "part": "fact-ledger",
+      "scope": "Replace only the former notice-based billing restriction under Adam's explicit revised policy; preserve remaining protections.",
+      "replaces": {
+        "batch": "28",
+        "revision": 2,
+        "commit": "",
+        "doneBy": "Codex Astra",
+        "assertions": [
+          {
+            "kind": "present",
+            "file": "docs/facts.md",
+            "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder scheduled 70 days before renewal; automatic charging held if sent less than 60 days before renewal; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts \u2014 `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md \u2014 `currently $99`\n- where: webapp/src/content/terms.md \u2014 `70 days before your renewal date`\n- where: webapp/src/content/terms.md \u2014 `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md \u2014 `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md \u2014 `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md \u2014 `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts \u2014 `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts \u2014 `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts \u2014 `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts \u2014 `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md \u2014 `add a $50 series per property`\n- where: docs/owners-manual.md \u2014 `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
+          }
+        ]
+      },
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "docs/facts.md",
+          "text": "### Registered-agent annual price and renewal timing (Adam, Batch 07)\n- value: `First year included from effective appointment; $99 annually thereafter. Reminder scheduled 70 days before renewal; missing or late reminders do not block authorized renewal charging; cancellation notice at least 30 days before renewal; automatic charge 15 days before renewal; at least 30 days notice of a rate increase. No refund for changing agents midyear. Timely cancellation without replacement proof by renewal triggers the separately approved $99 resignation charge, not another service year.`\n- where: webapp/server/pricing.ts \u2014 `RA_RENEWAL_FEE_CENTS = 99_00`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$99 / yr\"`\n- where: webapp/src/content/terms.md \u2014 `currently $99`\n- where: webapp/src/content/terms.md \u2014 `70 days before your renewal date`\n- where: webapp/src/content/terms.md \u2014 `fifteen (15) days before your renewal date`\n- where: webapp/src/content/terms.md \u2014 `at least thirty (30) days before your renewal date`\n- where: webapp/src/content/terms.md \u2014 `at least 30 days' notice before any increase`\n- where: webapp/src/content/terms.md \u2014 `Changing registered agents during a paid service year does not entitle you to a refund.`\n\n### Optional service prices\n- value: `EIN $50; S corporation election package $95; Certificate of Status $15; certified copy of Articles $40.`\n- where: webapp/server/pricing.ts \u2014 `EIN_FEE_CENTS = 50_00`\n- where: webapp/server/pricing.ts \u2014 `S_ELECTION_FEE_CENTS = 95_00`\n- where: webapp/server/pricing.ts \u2014 `CERT_STATUS_FEE_CENTS = 15_00`\n- where: webapp/server/pricing.ts \u2014 `CERTIFIED_COPY_FEE_CENTS = 40_00`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$50 / EIN\"`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$95\"`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$15\"`\n- where: webapp/src/pages/Pricing.tsx \u2014 `p: \"$40\"`\n\n### Manual's short series-price examples (Adam, Batch 11)\n- value: `Show the $50 additional-series price without a breakdown in Sections 4 and 28; first three series included in the service package.`\n- where: docs/owners-manual.md \u2014 `add a $50 series per property`\n- where: docs/owners-manual.md \u2014 `PS 1, PS 2, PS 3 (her first three series are included in the service package)`"
+        }
+      ]
+    },
+    {
+      "id": "194",
+      "part": "all",
+      "scope": "Replace only the former notice-based billing restriction under Adam's explicit revised policy; preserve remaining protections.",
+      "replaces": {
+        "batch": "28",
+        "revision": 2,
+        "commit": "",
+        "doneBy": "Codex Astra",
+        "assertions": [
+          {
+            "kind": "check",
+            "suite": "server",
+            "label": "batch28 A06"
+          }
+        ]
+      },
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A06"
+        }
+      ]
+    },
+    {
+      "id": "N1.12",
+      "part": "all",
+      "scope": "Replace only the former notice-based billing restriction under Adam's explicit revised policy; preserve remaining protections.",
+      "replaces": {
+        "batch": "07",
+        "revision": 1,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "check",
+            "suite": "walk",
+            "label": "batch07 N1.12: failed notices remain pending and block automatic charging"
+          }
+        ]
+      },
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "walk",
+          "label": "batch40 N1.12: failed notices remain unsent without blocking renewal charging"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch28-reader-5-late-notice-omits-amount",
+      "part": "all",
+      "scope": "Replace only the former notice-based billing restriction under Adam's explicit revised policy; preserve remaining protections.",
+      "replaces": {
+        "batch": "28",
+        "revision": 2,
+        "commit": "",
+        "doneBy": "Codex Astra",
+        "assertions": [
+          {
+            "kind": "check",
+            "suite": "server",
+            "label": "batch28 A06"
+          }
+        ]
+      },
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch28 A06"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/server/renewals.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Approved Group D change and directly related evidence or regression assertion."
+    },
+    {
+      "path": "webapp/server/email.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Approved Group D change and directly related evidence or regression assertion."
+    },
+    {
+      "path": "webapp/server/batch07-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group D change and directly related evidence or regression assertion."
+    },
+    {
+      "path": "webapp/server/batch28-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group D change and directly related evidence or regression assertion."
+    },
+    {
+      "path": "webapp/server/batch40-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group D change and directly related evidence or regression assertion."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group D change and directly related evidence or regression assertion."
+    },
+    {
+      "path": "webapp/src/lib/agentBilling.ts",
+      "mode": "code",
+      "control": false,
+      "why": "Approved Group D change and directly related evidence or regression assertion."
+    },
+    {
+      "path": "webapp/src/pages/admin/AdminDashboard.tsx",
+      "mode": "code",
+      "control": false,
+      "why": "Approved Group D change and directly related evidence or regression assertion."
+    },
+    {
+      "path": "webapp/src/content/terms.md",
+      "mode": "code",
+      "control": false,
+      "why": "Approved Group D change and directly related evidence or regression assertion."
+    },
+    {
+      "path": "docs/owners-manual.md",
+      "mode": "code",
+      "control": false,
+      "why": "Approved Group D change and directly related evidence or regression assertion."
+    },
+    {
+      "path": "docs/facts.md",
+      "mode": "code",
+      "control": false,
+      "why": "Approved Group D change and directly related evidence or regression assertion."
+    },
+    {
+      "path": "docs/audit/intakes/claude-release-group-d-2026-09-23.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group D change and directly related evidence or regression assertion."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Group D change and directly related evidence or regression assertion."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "why": "Existing generated output"
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Existing generated output"
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing generated output"
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing generated output"
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing generated output"
+    },
+    {
+      "path": "docs/word/FPSLLC Statement of Authorized Representative - FORM.docx",
+      "mode": "generated",
+      "why": "Existing generated output"
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing generated output"
+    },
+    {
+      "path": "docs/word/SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing generated output"
+    },
+    {
+      "path": "docs/word/SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing generated output"
+    },
+    {
+      "path": "docs/word/SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing generated output"
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement Instructions - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing generated output"
+    },
+    {
+      "path": "docs/word/SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing generated output"
+    },
+    {
+      "path": "docs/word/Series LLC Owners Manual - REVISED DRAFT.docx",
+      "mode": "generated",
+      "why": "Existing generated output"
+    },
+    {
+      "path": "docs/word/FPSLLC Amendment to Operating Agreement - FORM.docx",
+      "mode": "generated",
+      "why": "Existing generated output"
+    }
+  ],
+  "requiredChecks": [
+    "tracking",
+    "combined-release"
+  ],
+  "testSupport": [
+    "webapp/server/batch40-check.ts",
+    "webapp/server/batch07-check.ts",
+    "webapp/server/batch28-check.ts"
+  ],
+  "removedChecks": [
+    "batch07 N1.12: failed notices remain pending and block automatic charging"
+  ]
+}

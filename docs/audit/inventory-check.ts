@@ -20,7 +20,7 @@ const env={...process.env,FPSLLC_BATCH:"",GIT_AUTHOR_NAME:"inventory fixture",GI
 const run=(...args:string[])=>execFileSync(args[0],args.slice(1),{cwd:temp,env,encoding:"utf8",stdio:["ignore","pipe","pipe"],maxBuffer:64*1024*1024}).trim();
 try {
   mkdirSync(join(temp,"docs/audit"),{recursive:true});mkdirSync(join(temp,"webapp/src/components/ui"),{recursive:true});mkdirSync(join(temp,"webapp/server"),{recursive:true});
-  for(const f of ["inventory.ts","audit-session.ts","audit-session-lib.ts","ledger-lib.ts","audit-import-lib.ts"])
+  for(const f of ["inventory.ts","audit-session.ts","audit-session-lib.ts","ledger-lib.ts","evidence.ts","audit-import-lib.ts"])
     copyFileSync(join(ROOT,"docs/audit",f),join(temp,"docs/audit",f));
   writeFileSync(join(temp,"docs/audit/future-control.py"),"# Mandatory audit control fixture\n");
   const policy={version:2,uiWidgets:"include-all"};

@@ -3808,3 +3808,44 @@ The observable failure was a scope mismatch: the maintenance task used the isola
 ### FIXED BY
 
 In progress under Adam's explicit instruction: consolidate both histories and existing hook edits into the GitHub-connected repository, verify preservation, retire the second active checkout, and record a standing prohibition on new clones, repositories or worktrees. Existing sealed historical evidence remains unchanged. No release acceptance or deployment is inferred.
+
+
+## 2026-09-26 — Stage 3 office repair coverage
+
+### THE FAILURE
+Adam: “Fix the fucking problems”. The prior office repairs left the series and S-election false-completion paths unresolved and introduced incomplete deletion of corrected file revisions. Another audit and repair round was required.
+
+### WHY IT HAPPENED
+The verification decisions treated the shared file helper as coverage for all delivery paths and treated preservation of correction history separately from later deletion. Grouping refusal-only retry failures with false-success failures hid their different consequences. The exact internal reason for making those choices is not known; this entry does not invent one.
+
+## 2026-09-27 — Stage4 office reconciliation
+
+### THE FAILURE
+
+Adam's words: "Fucking fix them you asshole"
+
+My Stage4 report proposed one launch blocker. Reconciliation confirmed three: hosted-key file recovery, revival of a superseded unpublished letter after restore, and the missing published Statement-number correction. My own Stage4 results recorded the Statement problem without including it in the repair list.
+
+### WHY IT HAPPENED
+
+My report compiler treated the published-Statement scenario as an observed note instead of comparing its result with the correct-delivery requirement. The deletion tests used delivered revision identity as their boundary, leaving a never-delivered attempt outside that identity. Those observable decisions explain the coverage/reporting gaps; I cannot establish a further internal cause from the records.
+
+### FIXED BY
+
+Implement the three reconciled approved repairs and retain the failed-attempt restore, hosted-key recovery and published-pair correction scenarios as executable regressions.
+
+## 2026-10-02 — Launch repair work was not checkpointed in Git
+
+### THE FAILURE
+
+Adam: "So how do we fix the git you fucking asshole?  Youre number one job is to make sure the git is properly maintained"
+
+The website repository has 80 modified tracked files and 69 untracked files, an empty staging area, and a latest commit dated September 23. Most changes already existed at the saved baseline for the current batch. Four product files have preliminary current-batch edits; those repairs are not complete or accepted. No lost file or quantified loss of time is established by this inspection.
+
+### WHY IT HAPPENED
+
+The recorded preservation workflow bound candidate files and test evidence to fingerprints without also requiring a Git checkpoint at each work boundary. That allowed preservation outside Git to coexist with an increasingly stale Git history. The available records do not establish why each earlier commit was omitted; this entry does not invent that cause. The repository also contains an inherited instruction assigning Git management to Vibecode, which does not override Adam's explicit instruction here to maintain this repository.
+
+### FIXED BY
+
+Local checkpoints d348f0f291c1 and f41c3952514e preserve the independently verified pre-current-batch baseline and the unfinished current edits/bookkeeping, respectively. All 1,552 baseline paths and all 1,554 current candidate paths were checked against their commit trees; all 149 originally changed paths were preserved. The working tree is clean, website candidate bytes are unchanged, and the original history, patch, new files and manifests are saved in chunk45-final-implementation-2026-10-02/git-checkpoints/20261003T021209Z outside the repository. Existing hook suspension and disabled pushes remain unchanged. No product test, year simulation, campaign, acceptance, deployment or release was performed. The workspace instructions now require truthful local checkpoints at meaningful work boundaries and before handoff; this bookkeeping repair does not complete the unfinished product repairs or approve AM-06.

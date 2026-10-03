@@ -1,0 +1,17 @@
+{
+  "id": "003-batch28-staged-package",
+  "title": "Record the independently identified staged-package cleanup remaining beside the preserved Batch05 replacement ordering fix",
+  "date": "2026-09-21",
+  "items": {
+    "N1.15": {
+      "split": [
+        {
+          "key": "staged-cleanup",
+          "scope": "Remove only an unsuccessful newly staged S-election replacement, preserving the existing usable package and recorded Batch05 repair.",
+          "waitsOn": []
+        }
+      ],
+      "note": "Batch05 all and its history/assertions remain unchanged. Cross-review A09 is additional failure cleanup."
+    }
+  }
+}

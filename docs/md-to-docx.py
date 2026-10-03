@@ -116,6 +116,17 @@ def esc(s):
 
 def runs(text, P, sz=None, bold=False, italic=False, accent=False):
     """Markdown inline -> w:r elements, carrying bold, italic and the accent."""
+    if DRAFT_START in text:
+        output = []
+        for part in re.split(r"(\x01[^\x02]*\x02)", text):
+            if not part:
+                continue
+            if part.startswith(DRAFT_START):
+                label_runs = runs(part[1:-1], P, sz=sz, italic=True)
+                output.append(label_runs.replace("<w:rPr>", '<w:rPr><w:rStyle w:val="DraftingChoice"/>'))
+            else:
+                output.append(runs(part, P, sz=sz, bold=bold, italic=italic, accent=accent))
+        return "".join(output)
     sz = sz or P["body_sz"]
     color = P.get("accent") if accent else None
     out = []
@@ -328,6 +339,78 @@ def contents(headings, P):
     return "".join(out)
 
 
+# Labels are separate OOXML runs, so review tools can prove that deleting ONLY
+# drafting labels restores every original legal character and table cell.
+DRAFT_START, DRAFT_END = "\x01", "\x02"
+
+
+def drafting_choices(md):
+    labels = {
+        "professional": "Professional company", "purpose": "Additional series purpose",
+        "holding": "Joint holding", "couple": "Married couple", "unit": "Joint ownership unit",
+        "person": "Individual signer", "entity": "Entity signer",
+        "memberperson": "Individual member", "memberentity": "Entity member",
+        "managed": "Manager-managed company", "membermanaged": "Member-managed company",
+        "managermanaged": "Manager-managed company", "restated": "Amended and restated agreement",
+        "typed": "Amendment text entered below", "attached": "Amendment attached as Exhibit A",
+    }
+    token = re.compile(r"<!--\s*(?:(one|many|if):([a-z]+)|/(one|many|if))\s*-->")
+    matches = list(token.finditer(md))
+    stack, spans = [], {}
+    for match in matches:
+        if match.group(1):
+            stack.append(match)
+        else:
+            if not stack or stack[-1].group(1) != match.group(3):
+                raise ValueError("Unbalanced drafting choice: " + match.group(0))
+            start = stack.pop()
+            spans[start.start()] = (start, match)
+    if stack:
+        raise ValueError("Unclosed drafting choice")
+
+    def annotation(text):
+        return DRAFT_START + text + DRAFT_END
+
+    def render(lo, hi):
+        out, cursor = [], lo
+        while cursor < hi:
+            entry = next((spans[m.start()] for m in matches
+                          if cursor <= m.start() < hi and m.start() in spans), None)
+            if entry is None:
+                out.append(md[cursor:hi]); break
+            start, end = entry
+            out.append(md[cursor:start.start()])
+            kind, subject = start.group(1), start.group(2)
+            if kind in ("one", "many"):
+                label = ("One " + subject) if kind == "one" else ("Multiple " + subject + "s")
+            else:
+                if subject not in labels:
+                    raise ValueError("Unlabelled drafting condition: " + subject)
+                label = "If " + labels[subject][0].lower() + labels[subject][1:]
+            raw = md[start.end():end.start()]
+            body = render(start.end(), end.start())
+            table = md[md.rfind("\n", 0, start.start()) + 1:start.start()].lstrip().startswith("|")
+            if table:
+                label = {"holding": "If joint", "couple": "If spouses", "purpose": "If additional purpose"}.get(subject, label)
+            block = not table and ("\n" in raw or len(re.sub(r"<!--.*?-->", "", raw, flags=re.S)) > 100)
+            if block:
+                out.append("\n\n" + annotation("[" + label + ":]") + "\n" + body.strip() +
+                           "\n" + annotation("[End " + label[0].lower() + label[1:] + ".]") + "\n\n")
+            else:
+                # Spaces separate annotations, but must not change the optional clause.
+                # Attach leading punctuation to the label boundary without an extra gap.
+                preceding = "".join(out)
+                leading = "" if not preceding or preceding[-1].isspace() else " "
+                clause = body.strip()
+                label_gap = "" if clause[:1] in ",;:.!?" else " "
+                following = md[end.end():end.end()+1]
+                trailing = "" if not following or following.isspace() or following in ".,;:!?" else " "
+                out.append(leading + annotation("[" + label + ":" + label_gap) + clause + annotation("]") + trailing)
+            cursor = end.end()
+        return "".join(out)
+    return render(0, len(md))
+
+
 def body_xml(md, P):
     header = None
     m = re.search(r"<!--\s*page-header:\s*(.+?)\s*-->", md)
@@ -342,9 +425,21 @@ def body_xml(md, P):
     # repeat:member/asset controls cut a table off immediately after its header.
     # The sentinel also handles multiline comments without removing any text
     # between adjacent inline alternatives in these editable drafting forms.
-    commented = re.sub(r"<!--.*?-->", "\x00", md, flags=re.S)
+    commented = re.sub(r"<!--.*?-->", "\x00", drafting_choices(md), flags=re.S)
     lines = ["\x00" if "\x00" in line and not line.replace("\x00", "").strip()
              else line.replace("\x00", "") for line in commented.split("\n")]
+
+    # The Manual's Section 13 example is one signature, including its final
+    # explanatory note. Keep that specific contiguous quote group together;
+    # ordinary quoted prose elsewhere must remain free to span pages.
+    sample_signature_keep_next = set()
+    if P is PROFILES["manual"]:
+        for start, line in enumerate(lines):
+            if line.strip() == "The signature block that does it right:":
+                end = start + 1
+                while end < len(lines) and lines[end].strip().startswith("> "):
+                    end += 1
+                sample_signature_keep_next.update(range(start + 1, end - 1))
 
     # Headings, collected first so [[contents]] can be built from them.
     headings = []
@@ -354,6 +449,7 @@ def body_xml(md, P):
             headings.append((len(h.group(1)), h.group(2).strip()))
 
     out, i = [], 0
+    signature_choice_start = None
     if tp:
         out.append(title_page(tp, P))
     seen_rule = False
@@ -369,6 +465,24 @@ def body_xml(md, P):
         emitted_at = len(out)
 
         line = lines[i].rstrip()
+        if line.startswith(DRAFT_START) and line.endswith(DRAFT_END):
+            signature_labels = ("If individual signer", "If entity signer", "If individual member", "If entity member")
+            if any(line == DRAFT_START + "[" + label + ":]" + DRAFT_END for label in signature_labels):
+                signature_choice_start = len(out)
+            if any(line == DRAFT_START + "[End " + label.lower() + ".]" + DRAFT_END for label in signature_labels):
+                if signature_choice_start is not None:
+                    for pi in range(signature_choice_start, len(out)):
+                        if out[pi].startswith("<w:p") and "<w:keepNext/>" not in out[pi]:
+                            out[pi] = out[pi].replace("<w:pPr>", "<w:pPr><w:keepNext/>", 1)
+                signature_choice_start = None
+            if "[End " in line and out and out[-1].startswith("<w:p"):
+                # A closing label belongs to the preceding paragraph, never
+                # alone on a new page. Preserve that paragraph's other rules.
+                if "<w:keepNext/>" not in out[-1]:
+                    out[-1] = out[-1].replace("<w:pPr>", "<w:pPr><w:keepNext/>", 1)
+            out.append(para(line, P, justify=True, after=80, keep_next="[End " not in line))
+            i += 1
+            continue
         stripped = line.strip()
 
         if not stripped or stripped == "\x00":
@@ -464,7 +578,7 @@ def body_xml(md, P):
             out.append(
                 para(body, P, sz=P["small_sz"], after=80, keep_lines=True,
                      ind_left=P["quote_ind"], ind_right=P["quote_ind"],
-                     keep_next=introduces(body))
+                     keep_next=i in sample_signature_keep_next or introduces(body))
             )
             i += 1
             continue
@@ -551,6 +665,8 @@ def styles_xml(P):
         "</w:pPr></w:pPrDefault></w:docDefaults>"
         '<w:style w:type="paragraph" w:default="1" w:styleId="Normal">'
         '<w:name w:val="Normal"/></w:style>'
+        '<w:style w:type="character" w:styleId="DraftingChoice"><w:name w:val="Drafting Choice"/>'
+        '<w:rPr><w:i/></w:rPr></w:style>'
         + heads
         + '<w:style w:type="paragraph" w:styleId="ListBullet"><w:name w:val="List Bullet"/>'
         '<w:basedOn w:val="Normal"/><w:pPr><w:keepLines/>'

@@ -33,8 +33,10 @@ async function routes() {
  const invalidDate=await generate({...answers,firstOrAmended:'amended',priorAgreement:'external',priorAgreementDate:'2026-02-30'});
  const empty=await generate({...answers,managers:[]}), incomplete=await generate({...answers,managers:[{name:'Management LLC',isEntity:true}]}), duplicate=await generate({...answers,managers:[{name:'Same Person'},{name:'Same Person'}]});
  const removed=await generate({...answers,managers:answers.managers.slice(1)});
- const consent=await req('/portal/series/consent',{company:co,seriesName:'Fourteen, LLC Protected Series 4',seriesNumber:'4',purpose:'',effectiveDate:'2026-09-20'});
+ const consentAgreement=crypto.randomUUID();await db.query("INSERT INTO oa_generations(id,client_id,order_id,template_version,amended_restated,inputs,generation_number) VALUES($1,$2,$3,'test',false,$4,9)",[consentAgreement,client,co,JSON.stringify(removed.inputs)]);
+ const consent=await req('/portal/series/consent' ,{generationId:consentAgreement,partiesConfirmed:true,company:co,seriesName:'Fourteen, LLC Protected Series 4',seriesNumber:'4',purpose:'',effectiveDate:'2026-09-20'});
  let consentText='';if(consent.body.data?.documentId){const pdf=await app.request('/api/portal/documents/'+consent.body.data.documentId+'/download',{headers:{Cookie:`fpsllc_session=${token.token}`}});const bytes=new Uint8Array(await pdf.arrayBuffer());evidence('saved-managers-consent.pdf',bytes);const text=Bun.spawnSync(['pdftotext','-layout','-','-'],{stdin:bytes});if(text.exitCode)throw Error('pdftotext failed');consentText=text.stdout.toString();}
+ await db.query('DELETE FROM oa_generations WHERE id=$1',[consentAgreement]);
  const servicesS=await req('/portal/services?company='+co);
  await db.query("UPDATE oa_generations SET inputs=jsonb_set(inputs,'{version}','\"single\"') WHERE id=$1",[prior]);
  const servicesOrdinary=await req('/portal/services?company='+co);
@@ -60,6 +62,7 @@ export async function batch14Walk(browser:Browser,web:string,check:Check) {
  if(path==='/api/auth/me')return send({name:'Jane Owner',email:'fourteen@example.test'});
  if(path==='/api/portal/companies')return send([{orderId:'c14',llcName:'Fourteen LLC',formed:true,registeredAgentChoice:'SELF'}]);
  if(path==='/api/portal/oa/answers'){saved=route.request().postDataJSON();return send({ok:true,rev:++rev});}
+ if(path==='/api/portal/oa/sources')return send([{id:'selected14',company:'c14',number:1,effectiveDate:'January 2, 2025',effectiveDateIso:'2025-01-02',sElection,members:[{name:'Jane Owner'}],managers:[{name:'Original Manager'}]}]);
  if(path==='/api/portal/oa')return send({seed:{llcName:'Fourteen LLC',filingPath:'CONVERT',managementStructure:'MANAGER_MANAGED',managerNames:['Original Manager'],managerEntities:[false],members:[{name:'Jane Owner',address:'101 Main St'}],series:[],principalAddress:'101 Main St'},version:'single',multiOwner:false,memberManaged:false,blocked:false,todayEastern:'2026-09-20',templateVersion:'test',answers:saved,rev,generations:gens});
  if(path==='/api/portal/documents')return send(gens.map(g=>({id:g.document_id,title:'Operating Agreement',kind:'package',created_at:g.created_at,content_type:'application/pdf',size_bytes:1024})));
  if(path==='/api/portal/services')return send({llcName:'Fourteen LLC',dev:true,oaSElection:sElection,members:[{name:'Jane Owner',address:'101 Main St'}],llcFormed:true,todayEastern:'2026-09-20',einCompanyOrdered:false,sElection:{eligible:false,reason:'already_ordered'},series:[],pricing:{seriesCents:5000,einCents:5000,sElectionCents:9500,certStatusCents:2000,certifiedCopyCents:5000},orders:[{id:'series14',type:'series',status:'in_progress',llc_name:'Fourteen LLC',details:{seriesName:'Fourteen LLC Protected Series 4'},amount_cents:5000,fulfilled_at:'2026-09-20'}]});
@@ -87,11 +90,12 @@ export async function batch14Walk(browser:Browser,web:string,check:Check) {
  emit('generation status labels',[oaText,portalText].every(t=>t.includes('Most recently generated')&&t.includes('Earlier generated copy')&&t.includes('Generation order does not determine which agreement is legally in effect.')),{oaText,portalText});
  emit('regeneration navigation',portalText.includes('using the Update / regenerate button under Operating agreement.')&&portalText.includes('correcting an unused draft'));
  await p.getByRole('button',{name:'Consent & Series Exhibit',exact:true}).click();
+ await p.getByLabel('Operating agreement supplying the names').selectOption('selected14');
  const dialog=p.getByRole('dialog'), sText=await dialog.innerText();
  emit('full series identifier',await p.locator('input[name="seriesNumber"]').inputValue()==='4'&&await p.locator('input[name="seriesName"]').inputValue()==='Fourteen LLC Protected Series 4');
  emit('prepare consent action',await p.getByRole('button',{name:'Prepare the consent',exact:true}).count()===1);
  if(process.env.SHOT_DIR){await p.waitForTimeout(400);await p.getByRole('dialog').screenshot({path:join(process.env.SHOT_DIR,'s-consent-dialog.png')});}
- sElection=false;await p.reload();await p.getByRole('button',{name:'Consent & Series Exhibit',exact:true}).click();const ordinaryText=await p.getByRole('dialog').innerText();
+ sElection=false;await p.reload();await p.getByRole('button',{name:'Consent & Series Exhibit',exact:true}).click();await p.getByLabel('Operating agreement supplying the names').selectOption('selected14');const ordinaryText=await p.getByRole('dialog').innerText();
  emit('S agreement warning',sText.includes('Article 9 (the tax rules protecting the S election)')&&!ordinaryText.includes('Article 9')&&ordinaryText.includes('Article 8 (records)')&&rt.servicesS===true&&rt.servicesOrdinary===false&&rt.servicesOther===true,{sText,ordinaryText,s:rt.servicesS,ordinary:rt.servicesOrdinary,other:rt.servicesOther});
  await p.goto(web+'/portal/amend?company=c14');await p.waitForTimeout(200);emit('amendment browser title',await p.title()==='Amendment to Operating Agreement — MyFloridaSeriesLLC.com',await p.title());
  } catch(e){for(const label of ['adoption choice','editable agreement managers','generation status labels','regeneration navigation','full series identifier','prepare consent action','S agreement warning','amendment browser title'])emit(label,false,String(e));}finally{await p.close();}

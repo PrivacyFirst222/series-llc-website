@@ -1,0 +1,182 @@
+{
+  "id": "launch-guard-2026-09-24",
+  "revision": 1,
+  "title": "Recognize approved Terms date and certificate-source labels without weakening prior protections",
+  "model": "Codex",
+  "base": "a6e1e39e7cebfdceac62bf2ce18ccfbfc998f180",
+  "items": [
+    {
+      "id": "5",
+      "part": "all",
+      "scope": "Preserve the existing protection while recognizing the already approved Terms revision date.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/src/content/terms.md",
+          "text": "Last updated: **September 24, 2026**"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/content/privacy.md",
+          "text": "Last updated: **September 21, 2026**"
+        }
+      ],
+      "replaces": {
+        "batch": "40",
+        "revision": 6,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "present",
+            "file": "webapp/src/content/terms.md",
+            "text": "Last updated: **September 23, 2026**"
+          },
+          {
+            "kind": "present",
+            "file": "webapp/src/content/privacy.md",
+            "text": "Last updated: **September 21, 2026**"
+          }
+        ]
+      }
+    },
+    {
+      "id": "187",
+      "part": "unused-fields",
+      "scope": "Preserve removal of unused fields while recognizing the approved card/portal certificate source field. No product behavior or historical acceptance is changed by this work order.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "ein_outstanding"
+        },
+        {
+          "kind": "absent",
+          "text": "ein_purchased"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/admin/OrderDetail.tsx",
+          "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string; source: \"card\" | \"portal\" }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+        }
+      ],
+      "replaces": {
+        "batch": "20",
+        "revision": 1,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "absent",
+            "text": "ein_outstanding"
+          },
+          {
+            "kind": "absent",
+            "text": "ein_purchased"
+          },
+          {
+            "kind": "present",
+            "file": "webapp/src/pages/admin/OrderDetail.tsx",
+            "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+          }
+        ]
+      }
+    },
+    {
+      "id": "190",
+      "part": "all",
+      "scope": "Preserve removal of unused fields while recognizing the approved card/portal certificate source field. No product behavior or historical acceptance is changed by this work order.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "ein_outstanding"
+        },
+        {
+          "kind": "absent",
+          "text": "ein_purchased"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/admin/OrderDetail.tsx",
+          "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string; source: \"card\" | \"portal\" }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+        }
+      ],
+      "replaces": {
+        "batch": "20",
+        "revision": 1,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "absent",
+            "text": "ein_outstanding"
+          },
+          {
+            "kind": "absent",
+            "text": "ein_purchased"
+          },
+          {
+            "kind": "present",
+            "file": "webapp/src/pages/admin/OrderDetail.tsx",
+            "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+          }
+        ]
+      }
+    },
+    {
+      "id": "191",
+      "part": "all",
+      "scope": "Preserve removal of unused fields while recognizing the approved card/portal certificate source field. No product behavior or historical acceptance is changed by this work order.",
+      "assertions": [
+        {
+          "kind": "absent",
+          "text": "ein_outstanding"
+        },
+        {
+          "kind": "absent",
+          "text": "ein_purchased"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/admin/OrderDetail.tsx",
+          "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string; source: \"card\" | \"portal\" }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+        }
+      ],
+      "replaces": {
+        "batch": "20",
+        "revision": 1,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "absent",
+            "text": "ein_outstanding"
+          },
+          {
+            "kind": "absent",
+            "text": "ein_purchased"
+          },
+          {
+            "kind": "present",
+            "file": "webapp/src/pages/admin/OrderDetail.tsx",
+            "text": "interface OrderDetailData {\n  id: string;\n  clientId: string | null;\n  /** A conversion designates series for a company already on file. */\n  filingPath: \"NEW\" | \"CONVERT\";\n  existingLlcName: string;\n  sunbizDocumentNumber: string;\n  llcName: string;\n  alternateNames: string[];\n  status: string;\n  contactName: string;\n  contactEmail: string;\n  createdAt: string;\n  filedAt: string | null;\n  formedAt: string | null;\n  rejectedAt: string | null;\n  groups: FilingGroup[];\n  seriesFiledAt: string | null;\n  copiedFields: Record<string, boolean>;\n  series: { name: string; covered: boolean }[];\n  documents: { id: string; kind: string; title: string; createdAt: string }[];\n  hasArticles: boolean;\n  /** The client appointed us to sign the Articles: the Statement of\n   *  Authorized Representative is made when the Articles go up, and the\n   *  upload needs the Florida document number to name the company. */\n  articlesSignedByUs: boolean;\n  certStatusPurchased: boolean;\n  certifiedCopyPurchased: boolean;\n  hasCertStatus: boolean;\n  hasCertifiedCopy: boolean;\n  /** The company's Florida document number, once the office typed it. */\n  documentNumber: string;\n  /** The order took our registered agent service. */\n  raService: boolean;\n  raRenewalDate: string | null;\n}"
+          }
+        ]
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "generated",
+      "control": true,
+      "why": "Record explicit replacement history only after the exact work order is approved."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Regenerate from the resulting ledger."
+    }
+  ],
+  "requiredChecks": []
+}

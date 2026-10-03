@@ -120,8 +120,9 @@ s. 14.1 on s. 605.2501(2) — neither is in the non-variable list.
 
 - **s. 605.2203(1)** — "The registered agent in this state for a series limited
   liability company is the registered agent in this state for each protected
-  series of that company." One agent covers everything. Supports charging no
-  separate registered agent designation fee.
+  series of that company." One agent covers the company and its protected
+  series. Our pricing adds no additional registered agent designation fee for each protected series;
+  the company-level appointment fee remains in the calculator.
 - **s. 605.2203(4)–(5)** — ceasing to be agent for the company ends the agency
   for every series, and vice versa.
 - **s. 605.2206(1)–(2)** — the annual report under s. 605.0212 must name each
@@ -497,9 +498,11 @@ on Online Sunshine, not inferred from Chapter 605 alone.
   resolution of such deadlock instead of the court entering an order of judicial
   dissolution or an order directing the purchase of petitioner's interest under
   s. 605.0706." (2)(b) defines the term to include "a redemption or a purchase
-  and sale of interests." Our Article 13 buy-sell IS such a provision, but it
-  does not say so or cite s. 605.0702 — adding that, and making the timing
-  explicit, would let the client point at the statute. **Drafting opportunity.**
+  and sale of interests." All four multi-member masters identify Section 13.2
+  as a deadlock sale provision in subsection (f), cite s. 605.0702(2), and state
+  that delivery of a Buy-Sell Offer under subsection (b) initiates it as of
+  the date of delivery. This records the existing drafting; it does not
+  determine how the statute applies to a particular dispute.
 - **s. 605.0702(1)(b)5** — deadlock is a ground for judicial dissolution only
   where the members cannot break it AND irreparable injury is threatened or
   suffered.

@@ -1,0 +1,186 @@
+{
+  "rows": [
+    {
+      "label": "batch28 browser receipt and stored card survive cancellation",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser late cancellation names annual fee",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser consent required",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser mobile dialog fits viewport",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser uncertain save preserves old card message",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser retry reuses attempt and token",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser saved card refreshes without payment",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser second company has its own card",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser decline permits fresh attempt in selected company",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser setup failure is explicit",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser setup retry works",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser Square SDK uses STORE without charge amount",
+      "ok": true,
+      "detail": {
+        "intent": "STORE",
+        "customerInitiated": true,
+        "sellerKeyedIn": false
+      }
+    },
+    {
+      "label": "batch28 browser failed contact remains visible",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser contact retry uses existing record",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser legal mail retry uses document without upload",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser failed contact lookup is not empty list",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser failed contact lookup can recover",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser actual route persists selected company card without charge",
+      "ok": true,
+      "detail": {
+        "order": {
+          "square_card_id": "dev-card-523de268-193d-4767-af6c-74bd2fea8e30",
+          "ra_renewal_date": "2030-06-01T00:00:00.000Z"
+        },
+        "payments": []
+      }
+    },
+    {
+      "label": "batch28 browser resignation needs supporting record",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser resignation submits selected ground and date",
+      "ok": true
+    },
+    {
+      "label": "batch28 browser no runtime errors",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "label": "batch28 browser no unhandled API request",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "label": "batch28 browser no external request",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "posts": [
+    {
+      "path": "/api/portal/companies/company-0/renewal-card",
+      "body": {
+        "attemptId": "d6f0fc13-873f-415d-843f-259b92693bdb",
+        "source": "offline-credit",
+        "consent": true
+      }
+    },
+    {
+      "path": "/api/portal/companies/company-0/renewal-card",
+      "body": {
+        "attemptId": "d6f0fc13-873f-415d-843f-259b92693bdb",
+        "source": "offline-credit",
+        "consent": true
+      }
+    },
+    {
+      "path": "/api/portal/companies/company-1/renewal-card",
+      "body": {
+        "attemptId": "880688b6-8685-45e6-9aef-6454132282d8",
+        "source": "offline-credit",
+        "consent": true
+      }
+    },
+    {
+      "path": "/api/portal/companies/company-1/renewal-card",
+      "body": {
+        "attemptId": "5738bbe9-706e-4f5b-a595-aedeab25701c",
+        "source": "offline-credit",
+        "consent": true
+      }
+    },
+    {
+      "path": "/api/portal/companies/company-0/renewal-card",
+      "body": {
+        "attemptId": "169e6029-2461-451a-88c3-5aeee7a6b233",
+        "source": "fixture-sdk-token",
+        "consent": true
+      }
+    },
+    {
+      "path": "/api/admin/contact-messages/contact/resend",
+      "body": {}
+    },
+    {
+      "path": "/api/admin/documents/mail/resend-notice",
+      "body": {}
+    },
+    {
+      "path": "/api/admin/orders/company-0/agent",
+      "body": {
+        "action": "submitted",
+        "date": "2026-09-21",
+        "note": "Unpaid invoice retained in office record",
+        "reason": "nonpayment"
+      }
+    }
+  ],
+  "errors": [],
+  "unexpected": [],
+  "proof": {
+    "data": {
+      "offline": true,
+      "externals": {
+        "database": false,
+        "square": false,
+        "blob": false,
+        "resend": false,
+        "dropbox": false,
+        "smarty": false,
+        "sunbiz": false
+      }
+    }
+  }
+}

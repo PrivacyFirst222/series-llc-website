@@ -54,6 +54,11 @@ const parts = b.items.map((bi) => {
 const idx = () => l.batches.find((x) => x.id === b.id && x.revision === b.revision);
 const name = ({ bi }: { bi: { id: string; part: string } }) => `item ${bi.id}${bi.part === "all" ? "" : ` (${bi.part})`}`;
 
+if (["implemented", "released", "reject"].includes(cmd)) {
+  for (const x of parts) if (x.part.batch !== b.id || (x.part.fix && x.part.fix.revision !== b.revision))
+    die(`${name(x)} is owned by another batch; a superseded predecessor cannot change its successor or archived state`);
+}
+
 if (cmd === "authorize") {
   if (idx()) die(`batch ${b.id} revision ${b.revision} is already authorized; a changed batch is the next revision`);
   const prev = l.batches.find((x) => x.id === b.id && x.revision === b.revision - 1);
@@ -67,12 +72,12 @@ if (cmd === "authorize") {
     const { bi, it, part } = x;
     if (it.verdict === "dropped") die(`${name(x)} was dropped: ${it.verdictReason}`);
     if (bi.replaces) {
-      if (part.status !== "released" || !part.fix || JSON.stringify(bi.replaces) !== JSON.stringify(part.fix)) die(`${name(x)}: replacement does not name the exact released fix`);
+      if (!["implemented", "released"].includes(part.status) || !part.fix || JSON.stringify(bi.replaces) !== JSON.stringify(part.fix)) die(`${name(x)}: replacement does not name the exact implemented or released fix`);
       if (!hasReplacementApproval(b)) die(`${name(x)}: no owner approval names this exact replacement work order (Approve replacement ${b.id}, revision ${b.revision})`);
       if (part.fix.batch === b.id) die(`${name(x)}: a replacement uses a new batch id; the released batch remains final`);
     }
     if (!bi.replaces && part.status !== "open" && part.batch !== b.id) die(`${name(x)} is ${part.status} in batch ${part.batch} — it cannot be claimed twice`);
-    const claim = familyClaim(l, { item: bi.id, part: bi.part }, b.id);
+    const claim = familyClaim(l, { item: bi.id, part: bi.part }, b.id, bi.replaces, b.items);
     if (claim) die(`${name(x)} is the same defect as work already under way — ${claim}. A defect is claimed once, whatever numbers it was seen under`);
     for (const w of unmetWaits(l, it, part)) die(`${name(x)} waits on ${w.startsWith("ruling:") ? `Adam's ruling on item ${w.slice(7)}` : `item ${w}`}`);
     if (bi.assertions.length === 0) die(`${name(x)} has no assertion`);
@@ -84,7 +89,7 @@ if (cmd === "authorize") {
   }
   for (const { bi, part } of parts) {
     if (bi.replaces) {
-      part.supersessions = [...(part.supersessions ?? []), { prior: structuredClone(bi.replaces), batch: b.id, revision: b.revision, hash: frozenHashOf(b) }];
+      part.supersessions = [...(part.supersessions ?? []), { prior: structuredClone(bi.replaces), priorStatus: part.status as "implemented" | "released", batch: b.id, revision: b.revision, hash: frozenHashOf(b) }];
       part.history.push({ at: now(), event: "superseded by approved replacement", batch: b.id, revision: b.revision, note: `prior fix ${bi.replaces.batch} r${bi.replaces.revision} at ${bi.replaces.commit}; approved work order ${frozenHashOf(b)}` });
       delete part.fix;
     }
@@ -140,9 +145,9 @@ if (cmd === "authorize") {
     part.history.push({ at: now(), event: `rejected r${b.revision}`, batch: b.id, revision: b.revision, note });
     const previous = part.supersessions?.at(-1);
     if (previous && previous.batch === b.id && previous.revision === b.revision) {
-      part.status = "released"; part.batch = previous.prior.batch; part.fix = structuredClone(previous.prior);
+      part.status = previous.priorStatus ?? "released"; part.batch = previous.prior.batch; part.fix = structuredClone(previous.prior);
     } else { part.status = "open"; delete part.batch; delete part.fix; }
   }
   x.status = "rejected"; x.history.push({ at: now(), event: EVENT.rejected, note: `Adam's record of ${rec.at.slice(0, 16)} (${rec.source})${note ? `: ${note}` : ""}` });
-  finish(`batch ${b.id} r${b.revision} rejected on Adam's record of ${rec.at.slice(0, 16)} — nothing in it is released; ${parts.filter(x => x.part.status === "open").length} item(s) back to open; ${parts.filter(x => x.part.status === "released").length} prior released fix(es) restored`);
+  finish(`batch ${b.id} r${b.revision} rejected on Adam's record of ${rec.at.slice(0, 16)} — nothing in it is released; ${parts.filter(x => x.part.status === "open").length} item(s) back to open; ${parts.filter(x => ["implemented", "released"].includes(x.part.status)).length} prior fix(es) restored to their archived states`);
 } else die("usage: authorize | implemented | released | reject | ruling");

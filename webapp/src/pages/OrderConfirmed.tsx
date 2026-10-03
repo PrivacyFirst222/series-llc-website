@@ -98,6 +98,12 @@ export default function OrderConfirmed() {
               <Link to="/portal/login">Sign in to your portal</Link>
             </Button>
           </>
+        ) : statusQuery.isError ? (
+          <div role="alert">
+            <AlertCircle className="mx-auto h-12 w-12 text-muted-foreground" />
+            <p className="mt-4">We couldn’t check your payment status. Please try again.</p>
+            <Button className="mt-4" disabled={statusQuery.isFetching} onClick={() => void statusQuery.refetch()}>Retry</Button>
+          </div>
         ) : paid ? (
           <>
             <CheckCircle2 className="mx-auto h-12 w-12 text-trust" />

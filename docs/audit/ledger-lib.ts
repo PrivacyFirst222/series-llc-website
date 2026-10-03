@@ -1,3 +1,4 @@
+import {packageSourceProblems,type SourceEvidence} from "./evidence";
 /**
  * The fix ledger's shared parts (17 Sep 2026, FAILURES.md P88–P92; reviewed by
  * Codex before each revision was built).
@@ -93,7 +94,7 @@ export interface Part {
   waitsOn: string[];
   history: HistoryEntry[];
   fix?: Fix;
-  /** Append-only attempts to replace a released fix. Rejection restores prior
+  /** Append-only attempts to replace an implemented or released fix. Rejection restores prior
    * but keeps this entry and the part's whole history. */
   supersessions?: Supersession[];
   /** Set when this part is a second sighting of another item's part: the
@@ -103,6 +104,8 @@ export interface Part {
 
 export interface Supersession {
   prior: Fix;
+  /** Omitted in historical archives, which always referred to released fixes. */
+  priorStatus?: "implemented" | "released";
   batch: string;
   revision: number;
   hash: string;
@@ -148,7 +151,17 @@ export interface ReleaseRecord { git: { at: string; remoteMain: string; commit: 
 export type BatchStatus = "authorized" | "implemented" | "accepted" | "released" | "rejected";
 export interface BatchIndex { id: string; revision: number; frozenHash: string; status: BatchStatus; model: string; base: string; history: HistoryEntry[]; release?: ReleaseRecord }
 
-export interface Ledger { auditImports?: ImportRef[]; version: 1 | 2; builtFrom: string[]; items: Item[]; rulings: Ruling[]; batches: BatchIndex[] }
+export interface OwnerDisposition { item: string; part: string; disposition: "owner-retained"; ruling: Ruling }
+export interface ImplementationReceipt { batch: string; revision: number; commit: string; workOrderSha: string; packageId: string; packageSha: string; at: string }
+export interface CombinedBatch { batch: string; revision: number; workOrderSha: string; parts: {item: string; part: string; state: "preserved" | "superseded"; fixSha: string; successor?: {batch: string; revision: number; fixSha: string}}[]; requiredChecks: string[] }
+export interface CombinedManifest { base: string; commit: string; batches: CombinedBatch[] }
+export interface CombinedReleaseReceipt { at: string; commit: string; packageId: string; packageSha: string; manifest: CombinedManifest; remoteMain: string; deployment: {id: string; url: string; commit: string; state: "READY"; target: "production"; projectId: string; aliases: string[]; observedAt: string}; documents: SiteFile[] }
+export interface AuditAdjudication { sourceId: string; verdict: "disputed"; reason: string; replacementVerdict: "unsafe as a blanket cleanup"; source: string; codeRemovalApproved: false }
+export interface Ledger {
+  dispositions?: OwnerDisposition[];
+  implementations?: ImplementationReceipt[];
+  combinedReleases?: CombinedReleaseReceipt[];
+  auditAdjudications?: AuditAdjudication[]; auditImports?: ImportRef[]; version: 1 | 2; builtFrom: string[]; items: Item[]; rulings: Ruling[]; batches: BatchIndex[] }
 
 export interface BatchFile {
   id: string;
@@ -384,7 +397,11 @@ function supersessionProblems(l: Ledger, item: string, part: string, s: Superses
   const parse = (id: string, revision: number): BatchFile | null => { try { const t = read(`docs/audit/batches/${id}/revisions/r${revision}.json`); return t ? JSON.parse(t) : null; } catch { return null; } };
   const ob = parse(s.prior.batch, s.prior.revision), nb = parse(s.batch, s.revision);
   const oldPart = ob?.items.find(x => x.id === item && x.part === part), newPart = nb?.items.find(x => x.id === item && x.part === part);
-  if (!old || old.status !== "released" || old.release?.git.commit !== s.prior.commit || old.model !== s.prior.doneBy || !same(oldPart?.assertions, s.prior.assertions)) out.push(`${name}: archived prior fix is not the released work order`);
+  const priorStatus = s.priorStatus ?? "released";
+  const validPrior = priorStatus === "released"
+    ? old?.status === "released" && old.release?.git.commit === s.prior.commit
+    : priorStatus === "implemented" && (old?.status === "implemented" || (old?.status === "released" && next?.status === "rejected")) && s.prior.commit === "";
+  if (!validPrior || !old || !ob || frozenHashOf(ob) !== old.frozenHash || old.model !== s.prior.doneBy || !same(oldPart?.assertions, s.prior.assertions)) out.push(`${name}: archived prior fix is not its frozen ${priorStatus} work order`);
   if (!next || next.id === old?.id || next.frozenHash !== s.hash || !nb || frozenHashOf(nb) !== s.hash || !same(newPart?.replaces, s.prior) || !newPart?.assertions.length) out.push(`${name}: exact prior fix and new work order are not bound by the retained snapshot`);
   if (nb && external === "required" && !hasReplacementApproval(nb)) out.push(`${name}: no owner approval names this exact replacement work order`);
   return out;
@@ -405,6 +422,7 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
   const out: string[] = [];
   const read = opts.read ?? readTree;
   const external = opts.external ?? "required";
+  out.push(...trackingRegressions(before, after, { ...opts, read, external }));
   if (!isPrefix(before.rulings, after.rulings)) out.push("rulings were rewritten (they are append-only)");
   const newRulings = isPrefix(before.rulings, after.rulings) ? after.rulings.slice(before.rulings.length) : [];
 
@@ -468,37 +486,61 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
       const priorAttempts = bp.supersessions ?? [], attempts = ap.supersessions ?? [];
       if (!isPrefix(priorAttempts, attempts)) out.push(`${name}: supersession archive was rewritten`);
       const appendedAttempts = isPrefix(priorAttempts, attempts) ? attempts.slice(priorAttempts.length) : [];
-      // Replay exact attempts across the compared commits. A cancelled
-      // attempt retains its archive but returns to the same released fix.
-      const completedBeforeReplacement = bp.fix && bp.status === "implemented" && owner && nextOwner?.status === "released" && nextOwner.release
-        && isPrefix(owner.history, nextOwner.history) && replayEvents(owner.status, nextOwner.history.slice(owner.history.length).map(h => h.event)) === "released"
-        && ap.history.slice(bp.history.length).some(h => h.event === "released" && h.batch === owner.id && h.revision === owner.revision);
-      let cursor = completedBeforeReplacement ? { ...bp.fix!, commit: nextOwner!.release!.git.commit } : bp.fix;
-      let cursorBatch = bp.batch, cursorStatus: PartStatus = completedBeforeReplacement ? "released" : bp.status;
-      let replaced = appendedAttempts.length > 0 && cursorStatus === "released" && !!cursor;
-      for (const attempt of appendedAttempts) {
-        const target = after.batches.find(x => x.id === attempt.batch && x.revision === attempt.revision);
-        const events = ap.history.slice(bp.history.length);
-        if (!target || cursorStatus !== "released" || !same(attempt.prior, cursor)
-          || before.batches.some(x => x.id === target.id && x.revision === target.revision)
-          || supersessionProblems(after, b.id, bp.key, attempt, read, external).length
-          || !events.some(h => h.event === "superseded by approved replacement" && h.batch === target.id && h.revision === target.revision)) { replaced = false; break; }
-        if (target.status === "rejected") {
-          if (!events.some(h => h.event === `rejected r${target.revision}` && h.batch === target.id && h.revision === target.revision)) replaced = false;
-          continue;
-        }
-        cursorBatch = target.id;
-        cursorStatus = target.status === "authorized" ? "assigned" : target.status as PartStatus;
-        const work = JSON.parse(read(`docs/audit/batches/${target.id}/revisions/r${target.revision}.json`)!) as BatchFile;
-        const entry = work.items.find(x => x.id === b.id && x.part === bp.key)!;
-        cursor = target.status === "authorized" ? undefined : { batch: target.id, revision: target.revision, commit: target.release?.git.commit ?? "", doneBy: target.model, assertions: entry.assertions };
+      // Replay every lifecycle event, including a first fix made after the
+      // comparison baseline. Never infer that fix from the replacement archive:
+      // its assignment, implementation and frozen work order must establish it.
+      const events = ap.history.slice(bp.history.length);
+      let cursor = bp.fix;
+      let cursorBatch = bp.batch, cursorStatus: PartStatus = bp.status;
+      let cursorRevision = bp.fix?.revision ?? owner?.revision;
+      let replacementPending: Supersession | undefined;
+      let attemptIndex = 0;
+      let replaced = appendedAttempts.length > 0;
+      for (const h of replaced ? events : []) {
+        const target = after.batches.find(x => x.id === h.batch && x.revision === h.revision);
+        let work: BatchFile | undefined;
+        try { const text = target && read(`docs/audit/batches/${target.id}/revisions/r${target.revision}.json`); work = text ? JSON.parse(text) : undefined; } catch { /* refused below */ }
+        const entry = work?.items.find(x => x.id === b.id && x.part === bp.key);
+        if (!target || !work || !entry || work.id !== target.id || work.revision !== target.revision || frozenHashOf(work) !== target.frozenHash) { replaced = false; break; }
+        const owns = cursorBatch === target.id && cursorRevision === target.revision;
+        if (h.event === "superseded by approved replacement") {
+          const attempt = appendedAttempts[attemptIndex++];
+          if (replacementPending || !attempt || attempt.batch !== target.id || attempt.revision !== target.revision
+            || !["implemented", "released"].includes(cursorStatus) || !cursor
+            || (attempt.priorStatus ?? "released") !== cursorStatus || !same(attempt.prior, cursor)
+            || before.batches.some(x => x.id === target.id && x.revision === target.revision)
+            || supersessionProblems(after, b.id, bp.key, attempt, read, external).length) { replaced = false; break; }
+          replacementPending = attempt;
+        } else if (h.event === "assigned") {
+          if (replacementPending) {
+            if (replacementPending.batch !== target.id || replacementPending.revision !== target.revision || !same(entry.replaces, cursor)) { replaced = false; break; }
+          } else if (cursorStatus !== "open" || cursor || entry.replaces) { replaced = false; break; }
+          replacementPending = undefined;
+          cursor = undefined; cursorStatus = "assigned"; cursorBatch = target.id; cursorRevision = target.revision;
+        } else if (h.event === "implemented") {
+          if (replacementPending || !owns || cursorStatus !== "assigned" || !target.history.some(e => e.event === EVENT.implemented)) { replaced = false; break; }
+          cursor = { batch: target.id, revision: target.revision, commit: "", doneBy: target.model, assertions: entry.assertions };
+          cursorStatus = "implemented";
+        } else if (h.event === `rejected r${target.revision}`) {
+          if (replacementPending || !owns || !["assigned", "implemented"].includes(cursorStatus) || target.status !== "rejected") { replaced = false; break; }
+          const restore = attempts.find(s => s.batch === target.id && s.revision === target.revision);
+          cursor = restore ? structuredClone(restore.prior) : undefined;
+          cursorStatus = restore ? (restore.priorStatus ?? "released") : "open";
+          cursorBatch = cursor?.batch; cursorRevision = cursor?.revision;
+        } else if (h.event === "accepted by Adam" || h.event === "released") {
+          if (replacementPending || !owns || !cursor || target.status !== "released" || !target.release
+            || (h.event === "accepted by Adam" ? cursorStatus !== "implemented" : !["implemented", "accepted"].includes(cursorStatus))) { replaced = false; break; }
+          cursorStatus = h.event === "released" ? "released" : "accepted";
+          if (cursorStatus === "released") cursor = { ...cursor, commit: target.release.git.commit };
+        } else { replaced = false; break; }
       }
-      replaced = replaced && cursorStatus === ap.status && cursorBatch === ap.batch && same(cursor, ap.fix);
+      replaced = replaced && !replacementPending && attemptIndex === appendedAttempts.length
+        && cursorStatus === ap.status && cursorBatch === ap.batch && same(cursor, ap.fix);
       if (appendedAttempts.length && !replaced) out.push(`${name}: invalid replacement transition or archived prior fix`);
       if (replaced && opts.strict && (bp.status !== ap.status || bp.batch !== ap.batch || !same(bp.fix, ap.fix))) out.push(`${name}: replacement needs acceptance; never records-only publication`);
       const restore = bp.supersessions?.at(-1);
       const restored = restore && owner && restore.batch === owner.id && restore.revision === owner.revision
-        && ap.status === "released" && same(ap.fix, restore.prior) && ap.batch === restore.prior.batch;
+        && ap.status === (restore.priorStatus ?? "released") && same(ap.fix, restore.prior) && ap.batch === restore.prior.batch;
       const rejected = owner && nextOwner && !FINAL_STATES.includes(owner.status) && nextOwner.status === "rejected"
         && isPrefix(owner.history, nextOwner.history) && replayEvents(owner.status, nextOwner.history.slice(owner.history.length).map(h => h.event)) === "rejected"
         && ((ap.status === "open" && !ap.fix && !ap.batch && !restore) || restored)
@@ -544,7 +586,7 @@ export function ledgerRegressions(before: Ledger, after: Ledger, opts: Regressio
     }
     const previous = before.items.find(i => i.id === it.id)?.parts.find(q => q.key === p.key);
     const lastAttempt = p.supersessions?.at(-1);
-    const restoration = lastAttempt && p.status === "released" && same(p.fix, lastAttempt.prior)
+    const restoration = lastAttempt && p.status === (lastAttempt.priorStatus ?? "released") && same(p.fix, lastAttempt.prior)
       && after.batches.some(b => b.id === lastAttempt.batch && b.revision === lastAttempt.revision && b.status === "rejected")
       && p.history.slice(previous?.history.length ?? 0).some(h => h.event === `rejected r${lastAttempt.revision}` && h.batch === lastAttempt.batch && h.revision === lastAttempt.revision);
     if (previous?.status !== p.status && !restoration) {
@@ -648,8 +690,13 @@ export function defectGroup(l: Ledger, ref: PartRef): { item: Item; part: Part }
   return out;
 }
 /** Another batch already working on this defect, if any. */
-export function familyClaim(l: Ledger, ref: PartRef, myBatch: string): string | null {
+export function familyClaim(l: Ledger, ref: PartRef, myBatch: string, replacing?: Fix, replacements: BatchFile["items"] = []): string | null {
   for (const { item, part } of defectGroup(l, ref)) {
+    if (replacing && item.id === ref.item && part.key === ref.part && same(part.fix, replacing) && part.status === "implemented") continue;
+    // A joint replacement names each linked part's own prior fix. Merely
+    // sharing a defect or an old batch never authorizes replacing a peer.
+    const declared = replacements.find(x => x.id === item.id && x.part === part.key);
+    if (replacing && declared?.replaces && part.status === "implemented" && same(part.fix, declared.replaces)) continue;
     if (part.batch && part.batch !== myBatch && (part.status === "assigned" || part.status === "implemented")) return `item ${item.id}${part.key === "all" ? "" : ` (${part.key})`} is ${part.status} in batch ${part.batch}`;
   }
   return null;
@@ -667,7 +714,7 @@ export function unmetWaits(l: Ledger, item: Item, part: Part): string[] {
   const mi = l.items.find((i) => i.id === main.item), mp = partOf(l, main.item, main.part);
   const all = [...new Set([...item.waitsOn, ...part.waitsOn, ...(mi?.waitsOn ?? []), ...(mp?.waitsOn ?? [])])];
   return all.filter((w) => {
-    if (!w.startsWith("ruling:")) return !(l.items.find((i) => i.id === w)?.parts.every((p) => p.status === "released") ?? false);
+    if (!w.startsWith("ruling:")) return !(l.items.find((i) => i.id === w)?.parts.every((p) => p.status === "released" || combinedPartPublished(l, w, p)) ?? false);
     const target = w.slice(7);
     return !l.rulings.some((r) => rulingKind(r) === "ruling" && r.item === target && (
       r.part === undefined
@@ -769,6 +816,53 @@ export function hasRulingRecord(r: Ruling): boolean {
   return rulingRecords().some((x) => x.kind === "ruling" && x.item === r.item && (x.part ?? "") === (r.part ?? "") && (x.text ?? "").trim() === r.text.trim());
 }
 
+/** Current local commit/release gates check completeness, not just additions.
+ * Historical comparisons and CI deliberately do not call this function: they
+ * cannot pretend today's external decisions existed in an earlier snapshot. */
+export function rulingCompletenessProblems(
+  ledger: Ledger,
+  read: (path: string) => string | null = readTree,
+  records?: RulingRecord[],
+): string[] {
+  if (records === undefined && !existsSync(RULINGS_FILE)) {
+    return ledger.rulings.some(r => rulingKind(r) === "ruling")
+      ? ["authenticated owner ruling records unavailable; current local completeness was not checked"] : [];
+  }
+  const out: string[] = [];
+  if(records===undefined){
+    records=[];
+    const raw=rd(RULINGS_FILE).split('\n');
+    for(let i=0;i<raw.length;i++){
+      if(!raw[i].trim())continue;
+      try{
+        const value=JSON.parse(raw[i]);
+        if(!value||typeof value!=='object'||!['ruling','migration','replacement'].includes(value.kind)||(value.kind==='ruling'&&(typeof value.item!=='string'||typeof value.text!=='string')))throw Error('malformed');
+        records.push(value);
+      }catch{return [`authenticated owner ruling records unreadable at line ${i+1}; current local completeness was not checked`];}
+    }
+  }
+  const authenticated=records.filter(r=>r.kind==='ruling');
+  if(!authenticated.length&&ledger.rulings.some(r=>rulingKind(r)==='ruling'))out.push('authenticated owner ruling records contain no rulings; current local completeness was not checked');
+  for(const ruling of ledger.rulings.filter(r=>rulingKind(r)==='ruling')){
+    if(!authenticated.some(r=>r.item===ruling.item&&(r.part??'')===(ruling.part??'')&&r.text===ruling.text))out.push(`ruling on item ${ruling.item}${ruling.part?` (${ruling.part})`:''}: ledger exact text has no matching authenticated owner record`);
+  }
+  const lines = new Set((read("docs/audit/rulings.md") ?? "").split("\n"));
+  for (const record of records) {
+    if (record.kind !== "ruling") continue;
+    const name = `ruling on item ${record.item}${record.part ? ` (${record.part})` : ""}`;
+    const item = ledger.items.find(i => i.id === record.item);
+    if (!item || (record.part && ![...item.parts, ...(item.retiredParts ?? [])].some(p => p.key === record.part))) {
+      out.push(`${name}: authenticated ruling has no matching retained item/part`);
+    }
+    if (!ledger.rulings.some(r => rulingKind(r) === "ruling" && r.item === record.item
+      && (r.part ?? "") === (record.part ?? "") && r.text === record.text)) {
+      out.push(`${name}: authenticated exact text is missing from the current ledger`);
+    }
+    if (!lines.has(rulingLine(record))) out.push(`${name}: authenticated canonical line is missing from docs/audit/rulings.md`);
+  }
+  return out;
+}
+
 /** Adam's standing acceptance of exactly this FULL commit — or why there is
  *  none. A later rejection of the same batch and revision cancels it. An
  *  acceptance names one review package; one without a package identity
@@ -787,6 +881,8 @@ export function standingAcceptance(commitFull: string, batch?: string, revision?
 
 export interface SiteFile { path: string; sha: string }
 export interface ReviewPackage {
+  combined?: CombinedManifest;
+  sourceEvidence?: SourceEvidence[];
   batch: string; revision: number; base: string; commit: string; packageId: string; diffSha: string; createdAt: string; runId: string;
   /** null for a full run; the names of the checks a partial run was limited to. */
   partial: string[] | null;
@@ -829,6 +925,9 @@ export function resolvePackage(q: { acceptance?: Acceptance; batch?: string; rev
  *  manifest — nothing added, missing or changed since the review. */
 export function packageProblems(x: { dir: string; pkg: ReviewPackage }): string[] {
   const out: string[] = [];
+  const orderText = readAt(x.pkg.commit)(`docs/audit/batches/${x.pkg.batch}/revisions/r${x.pkg.revision}.json`);
+  if (x.pkg.combined || (orderText && (JSON.parse(orderText) as BatchFile).requiredChecks.includes("combined-release"))) out.push(...combinedProblems(x.pkg));
+  if(x.pkg.required.includes("source-evidence"))out.push(...packageSourceProblems(x.dir,x.pkg.sourceEvidence ?? []));
   if (x.pkg.partial !== null) out.push(`package ${x.pkg.packageId} is PARTIAL or has no explicit full-run marker — partial must be null`);
   if (!Array.isArray(x.pkg.site) || x.pkg.site.length === 0) { out.push(`package ${x.pkg.packageId} has no nonempty site manifest`); return out; }
   const seen = new Set<string>();
@@ -869,3 +968,162 @@ export { partOf, existsSync, join };
 
 /** One physical line; JSON escaping preserves newlines and all decision text. */
 export const rulingLine = (r: { item?: string; part?: string; text?: string }): string => `- Ruling ${r.item}${r.part ? `, part ${r.part}` : ""}: ${JSON.stringify(r.text ?? "")}`;
+
+/* Group C tracking records: evidence is additive; lifecycle and owner decisions stay separate. */
+const trackingHash = (value: unknown): string => sha256(JSON.stringify(value));
+const trackingDate = (value: string): boolean => typeof value === "string" && Number.isFinite(Date.parse(value));
+const trackingCommit = (value: string): boolean => /^[a-f0-9]{40}$/.test(value);
+function committedLedger(commit: string): Ledger {
+  if (!trackingCommit(commit) || !gitOk(["cat-file","-e",`${commit}^{commit}`])) throw Error(`tracking: unavailable commit ${commit}`);
+  const text = readAt(commit)("docs/audit/ledger.json");
+  if (!text) throw Error(`tracking: no ledger at ${commit}`);
+  return loadLedger(text);
+}
+function trackingBatch(l: Ledger, batch: string, revision: number, read: (p:string)=>string|null): {index:BatchIndex; order:BatchFile} {
+  const index = l.batches.find(b => b.id === batch && b.revision === revision);
+  if (!index || !["implemented","released"].includes(index.status)) throw Error(`tracking: ${batch} r${revision} is not implemented`);
+  const text = read(`docs/audit/batches/${batch}/revisions/r${revision}.json`);
+  if (!text) throw Error(`tracking: missing work order ${batch} r${revision}`);
+  const order = JSON.parse(text) as BatchFile;
+  if (order.id !== batch || order.revision !== revision || frozenHashOf(order) !== index.frozenHash) throw Error(`tracking: work order mismatch ${batch} r${revision}`);
+  return {index,order};
+}
+/** The complete range, reconstructed from committed records, never a handpicked list. */
+export function combinedManifest(base: string, commit: string): CombinedManifest {
+  const before = committedLedger(base), after = committedLedger(commit);
+  if (!gitOk(["merge-base","--is-ancestor",base,commit])) throw Error("combined release: base is not an ancestor");
+  const batches:CombinedBatch[] = [];
+  for (const b of after.batches) {
+    if (!["implemented","released"].includes(b.status)) continue;
+    const prior = before.batches.find(x => x.id === b.id && x.revision === b.revision);
+    if (prior && ["implemented","released"].includes(prior.status) && prior.frozenHash === b.frozenHash) continue;
+    const {order} = trackingBatch(after,b.id,b.revision,readAt(commit));
+    if (!gitOk(["merge-base","--is-ancestor",order.base,commit])) throw Error(`combined release: nonancestor base for ${b.id}`);
+    const parts:CombinedBatch["parts"] = order.items.map(bi => {
+      const item = after.items.find(i => i.id === bi.id);
+      const part = item?.parts.find(p => p.key === bi.part);
+      if (!part) throw Error(`combined release: missing part ${bi.id}:${bi.part}`);
+      const active = activeFix(part);
+      const sameOwner = (f:Fix|undefined) => f?.batch === b.id && f?.revision === b.revision;
+      const priorFix = part.supersessions?.map(s => s.prior).find(sameOwner);
+      const fix = sameOwner(active) ? active : priorFix;
+      if (!fix || !same(fix.assertions,bi.assertions) || fix.doneBy !== order.model) throw Error(`combined release: fix/work order mismatch ${bi.id}:${bi.part}`);
+      if (!active || !["implemented","released"].includes(part.status)) throw Error(`combined release: unfinished successor ${bi.id}:${bi.part}`);
+      const state = sameOwner(active) ? "preserved" : "superseded";
+      return {item:bi.id,part:bi.part,state,fixSha:trackingHash(fix),...(state === "superseded" ? {successor:{batch:active.batch,revision:active.revision,fixSha:trackingHash(active)}} : {})};
+    });
+    batches.push({batch:b.id,revision:b.revision,workOrderSha:b.frozenHash,parts,requiredChecks:[...new Set([...MANDATORY_CHECKS,...order.requiredChecks])].sort()});
+  }
+  return {base,commit,batches};
+}
+/** Check union is determined from frozen orders, not supplied by a package. Historical
+ * red probes remain evidence for their own batch; the final candidate replays active assertions. */
+export function combinedProblems(pkg: ReviewPackage): string[] {
+  const out:string[]=[];
+  try {
+    const expected = combinedManifest(pkg.base,pkg.commit);
+    if (!same(pkg.combined,expected)) out.push("combined release: manifest is missing or differs from the complete committed range");
+    const required = new Set(expected.batches.flatMap(b => b.requiredChecks));
+    for (const name of required) {
+      const checks = pkg.checks.filter(c => c.name === name);
+      if (checks.length !== 1 || checks[0].exit !== 0 || checks[0].skipped || !pkg.required.includes(name)) out.push(`combined release: required check ${name} missing, duplicated, skipped or failed`);
+    }
+    const ledger = committedLedger(pkg.commit);
+    out.push(...frozenFileProblems(ledger,readAt(pkg.commit)));
+    const files = git(["ls-tree","-r","--name-only",pkg.commit]).split("\n").filter(p =>
+      /^(webapp\/(src|server)\/|docs\/)/.test(p) && /\.(tsx?|md|json|html)$/.test(p)
+      && !/(^|\/)(node_modules|dist|\.dev-data|audit|source|word|ui)\//.test(p)
+      && !/\.test\.tsx?$/.test(p) && p !== "webapp/server/e2e.ts" && (!p.startsWith("docs/") || p.endsWith(".md")));
+    files.push("webapp/index.html","webapp/vercel.json");
+    out.push(...replayStatic(ledger,readAt(pkg.commit),files));
+  } catch(e) {out.push(String(e));}
+  return out;
+}
+function implementationProblems(r:ImplementationReceipt, ledger:Ledger): string[] {
+  const out:string[]=[];
+  try {
+    if (!trackingDate(r.at) || !/^[a-f0-9]{64}$/.test(r.packageSha) || !r.packageId) throw Error("tracking: malformed implementation receipt");
+    const old = committedLedger(r.commit);
+    if (!gitOk(["merge-base","--is-ancestor",r.commit,"HEAD"])) throw Error("tracking: implementation commit is not an ancestor of this checkout");
+    const {index,order} = trackingBatch(old,r.batch,r.revision,readAt(r.commit));
+    const current = ledger.batches.find(b => b.id === r.batch && b.revision === r.revision);
+    if (!current || r.workOrderSha !== index.frozenHash || current.frozenHash !== index.frozenHash) throw Error("tracking: implementation work order mismatch");
+    if (!gitOk(["merge-base","--is-ancestor",order.base,r.commit])) throw Error("tracking: work order base is not an ancestor");
+    for (const bi of order.items) {
+      const p = old.items.find(i => i.id === bi.id)?.parts.find(p => p.key === bi.part);
+      if (!p?.fix || p.fix.batch !== r.batch || p.fix.revision !== r.revision || !["implemented","released"].includes(p.status) || !same(p.fix.assertions,bi.assertions)) throw Error(`tracking: commit does not implement ${bi.id}:${bi.part}`);
+    }
+    // The recorded package is for the actual batch implementation, not an unrelated
+    // descendant that happened to retain the same fix objects.
+    const changes = git(["diff","--name-only","--no-renames",order.base,r.commit]).split("\n").filter(Boolean);
+    for (const path of changes) if (!isRecordPath(path) && !path.startsWith(`docs/audit/batches/${r.batch}/`) && !order.files.some(f => f.path === path)) throw Error(`tracking: implementation outside work order: ${path}`);
+  } catch(e) {out.push(String(e));}
+  return out;
+}
+export function renderTrackingImplementation(packageId:string):ImplementationReceipt {
+  const found=resolvePackage({packageId}); if ("error" in found) throw Error(found.error);
+  const {pkg}=found;
+  const l=committedLedger(pkg.commit), {index}=trackingBatch(l,pkg.batch,pkg.revision,readAt(pkg.commit));
+  const r:ImplementationReceipt={batch:pkg.batch,revision:pkg.revision,commit:pkg.commit,workOrderSha:index.frozenHash,packageId,packageSha:sha256(readFileSync(join(found.dir,"package.json"))),at:now()};
+  const bad=[...implementationProblems(r,loadLedger()),...implementationPackageProblems(r)];
+  if(bad.length)throw Error(bad.join("\n"));return r;
+}
+function implementationPackageProblems(r:ImplementationReceipt):string[] {
+  const found=resolvePackage({packageId:r.packageId,batch:r.batch,revision:r.revision,commit:r.commit});
+  if("error" in found)return[found.error];
+  const bad=packageProblems(found);
+  if(sha256(readFileSync(join(found.dir,"package.json")))!==r.packageSha)bad.push("tracking: implementation package changed");
+  const {order}=trackingBatch(committedLedger(r.commit),r.batch,r.revision,readAt(r.commit));
+  const required=new Set([...MANDATORY_CHECKS,...order.requiredChecks,...found.pkg.required]);
+  if(order.items.some(i=>i.assertions.some(a=>a.kind==="check")))required.add("red-before-fix");
+  for(const name of required){const rows=found.pkg.checks.filter(c=>c.name===name);if(rows.length!==1||rows[0].exit!==0||rows[0].skipped)bad.push(`tracking: implementation check ${name} not passed`);}
+  return bad;
+}
+export function trackingRegressions(before:Ledger,after:Ledger,opts:RegressionOpts={}):string[] {
+  const out:string[]=[];
+  const external=opts.external??"required";
+  for(const key of ["dispositions","implementations","combinedReleases"] as const) {
+    if(!isPrefix(before[key]??[],after[key]??[]))out.push(`tracking: ${key} is append-only`);
+  }
+  const seen=new Set<string>();
+  for(const d of after.dispositions??[]) {
+    const key=`${d.item}:${d.part}`;
+    if(seen.has(key))out.push(`tracking: duplicate disposition ${key}`);seen.add(key);
+    if(d.disposition!=="owner-retained"||!after.items.find(i=>i.id===d.item)?.parts.some(p=>p.key===d.part)||!after.rulings.some(r=>same(r,d.ruling))||d.ruling.item!==d.item||(d.ruling.part&&d.ruling.part!==d.part)||(d.ruling.kind??"ruling")!=="ruling")out.push(`tracking: disposition lacks its exact recorded ruling: ${key}`);
+  }
+  if(opts.strict&&(after.dispositions??[]).length>(before.dispositions??[]).length)out.push("tracking: a new retained disposition requires review; never records only");
+  const receipts=new Set<string>();
+  for(const r of after.implementations??[]) {
+    const key=`${r.batch}:${r.revision}:${r.packageId}`;if(receipts.has(key))out.push("tracking: duplicate implementation receipt");receipts.add(key);
+    out.push(...implementationProblems(r,after));
+    if(external==="required"&&!(before.implementations??[]).some(x=>same(x,r)))out.push(...implementationPackageProblems(r));
+  }
+  const releases=new Set<string>();
+  for(const r of after.combinedReleases??[]) {
+    if(releases.has(r.packageId))out.push("tracking: duplicate combined release");releases.add(r.packageId);
+    try {
+      if(!trackingDate(r.at)||!/^[a-f0-9]{64}$/.test(r.packageSha)||!trackingCommit(r.remoteMain)||!gitOk(["merge-base","--is-ancestor",r.commit,r.remoteMain])||!gitOk(["merge-base","--is-ancestor",r.commit,"HEAD"]))throw Error("tracking: combined release has invalid identity or ancestry");
+      if(!same(r.manifest,combinedManifest(r.manifest.base,r.commit)))throw Error("tracking: combined receipt omits or changes an included batch");
+      if(r.deployment.commit!==r.commit||r.deployment.state!=="READY"||r.deployment.target!=="production"||!r.deployment.projectId||!Array.isArray(r.deployment.aliases)||!r.deployment.aliases.length||r.deployment.aliases.some(a=>typeof a!=="string"||!a)||!r.deployment.id||!r.deployment.url||!trackingDate(r.deployment.observedAt))throw Error("tracking: missing deployment proof");
+      const docs=git(["ls-tree","-r","--name-only",r.commit,"docs/word"]).split("\n").filter(p=>p.endsWith(".docx")).map(path=>({path,sha:sha256(gitBytes(`${r.commit}:${path}`) as Buffer)}));
+      if(!same([...r.documents].sort((a,b)=>a.path.localeCompare(b.path)),docs.sort((a,b)=>a.path.localeCompare(b.path))))throw Error("tracking: missing or changed published document proof");
+      if(external==="required"&&!(before.combinedReleases??[]).some(x=>same(x,r))) {
+        const acc=standingAcceptance(r.commit).acc;
+        if(!acc||acc.packageId!==r.packageId)throw Error("tracking: combined release has no standing acceptance");
+        const found=resolvePackage({acceptance:acc});if("error" in found)throw Error(found.error);
+        if(sha256(readFileSync(join(found.dir,"package.json")))!==r.packageSha)throw Error("tracking: combined package changed");
+        out.push(...packageProblems(found),...combinedProblems(found.pkg));
+        const file=join(HOME,"publications.jsonl");
+        const observed=existsSync(file)?readFileSync(file,"utf8").split("\n").filter(Boolean).map(x=>JSON.parse(x)):[];
+        if(!observed.some(x=>same(x,r)))throw Error("tracking: no external verified publication observation matches this receipt");
+      }
+    }catch(e){out.push(String(e));}
+  }
+  return out;
+}
+
+/** A later replacement must not inherit its predecessor's publication claim. */
+export function combinedPartPublished(l:Ledger,item:string,part:Part):boolean {
+  const fix=activeFix(part);
+  return !!fix && (l.combinedReleases??[]).some(r=>r.manifest.batches.some(b=>b.batch===fix.batch&&b.revision===fix.revision&&b.parts.some(p=>p.item===item&&p.part===part.key&&p.state==="preserved"&&p.fixSha===trackingHash(fix))));
+}

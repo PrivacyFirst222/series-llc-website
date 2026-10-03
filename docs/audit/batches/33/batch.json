@@ -1,0 +1,341 @@
+{
+  "id": "33",
+  "revision": 1,
+  "title": "Reliable checks, internal cleanup and Square signature hardening",
+  "model": "Codex",
+  "base": "3a72f468f54a1ca96de23ddf5587f327fda09e32",
+  "items": [
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-2-walk-accepts-retired-submit-label",
+      "part": "all",
+      "scope": "Require the approved Continue to payment label in common and batch walks.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/behavioral.ts",
+          "text": "hasText: /^Continue to payment$/"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-2-walk-placeholder-cannot-fail",
+      "part": "all",
+      "scope": "Check the actual saved first name on the client step during forward replay.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/behavioral.ts",
+          "text": "back-walk preserves the saved first name"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-runtime-B-walk-label-year-from-formation",
+      "part": "all",
+      "scope": "Describe renewal from recorded agent appointment, not formation.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/behavioral.ts",
+          "text": "renewal date a year from the recorded appointment"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-5-e2e-stale-renewal-comments",
+      "part": "all",
+      "scope": "Correct internal test comments to appointment and the approved 70-day notice.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/e2e.ts",
+          "text": "payment, the notice 70 days out"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-5-ein-pending-per-client-unused",
+      "part": "all",
+      "scope": "Remove unused account-wide EIN pending query and interface field.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch33-check.ts",
+          "text": "unused account-wide EIN flag removed"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch33-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-5-gift-card-branch-dead",
+      "part": "all",
+      "scope": "Remove unused renewal-email giftCard parameter while preserving card eligibility elsewhere.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch33-check.ts",
+          "text": "renewal notice preserves no-card wording"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch33-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-5-migration9-comment-renewal-date",
+      "part": "all",
+      "scope": "Clarify current renewal basis without changing historical migration SQL.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/db.ts",
+          "text": "Current renewals are based on the recorded agent appointment date."
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-5-notes-agent-fee-sentence",
+      "part": "all",
+      "scope": "Qualify internal note as per protected series; retain company appointment fee.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/chapter-605-notes.md",
+          "text": "additional registered agent designation fee for each protected series"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-5-pricing-comment-mailing-only",
+      "part": "all",
+      "scope": "Add faxing to internal filing-method comment.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/pricing.ts",
+          "text": "preparation, signing, and faxing or mailing."
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-statutes-0702-stale-note",
+      "part": "all",
+      "scope": "Replace obsolete drafting recommendation with description of existing 13.2(f).",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/chapter-605-notes.md",
+          "text": "All four multi-member masters identify Section 13.2"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-6-agent-signature-shadowed-messages",
+      "part": "all",
+      "scope": "Required errors for empty names/signatures, mismatch only for nonblank unequal values, both validators.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/scripts/batch33-check.ts",
+          "text": "blank agent fields show only required errors"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch33-check.ts"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-6-ra-cancel-route-comment",
+      "part": "all",
+      "scope": "Update internal cancellation description to replacement and effective resignation.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/routes-portal.ts",
+          "text": "Submitting a resignation is distinct from its taking effect."
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-6-vercel-entry-bundle-comment",
+      "part": "all",
+      "scope": "Correct generated API filename documentation.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/vercel-entry.ts",
+          "text": "dependency) into api/index.mjs"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch33-reader-6-webhook-signature-compare",
+      "part": "all",
+      "scope": "Length-check and constant-time compare Square signatures; preserve HMAC and key/header behavior.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/square.ts",
+          "text": "timingSafeEqual(expectedBytes, suppliedBytes)"
+        },
+        {
+          "kind": "present",
+          "file": "webapp/package.json",
+          "text": "scripts/batch33-check.ts"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/scripts/batch06-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/scripts/batch08-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/scripts/batch09-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/scripts/batch33-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/src/pages/admin/ServiceOrdersSection.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/server/email.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/server/renewals.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/server/db.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/server/chapter-605-notes.md",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/server/pricing.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/server/validation.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/server/vercel-entry.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/server/square.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/package.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "docs/audit/intakes/claude-reconciled-batch33.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch33 scope and regression checks."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Normal server bundle."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": [
+    "${run.key}: placeholder",
+    "renewal: the portal's agent card names the renewal date a year from formation"
+  ]
+}

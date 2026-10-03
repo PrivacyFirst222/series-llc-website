@@ -1,0 +1,127 @@
+{
+  "1": [],
+  "2": [],
+  "3": [
+    {
+      "kind": "replace",
+      "file": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "before": "Exactly as filed with the Department.",
+      "after": "Exactly as filed with the Florida Division of Corporations."
+    }
+  ],
+  "4": [],
+  "5": [
+    {
+      "kind": "replace",
+      "file": "docs/oa-instructions.md",
+      "before": "Under §8.5(b) of your agreement, any asset you fail to associate with a series defaults to the company, where it is exposed to the company's creditors.",
+      "after": "Under §8.5(b) of your agreement, any asset you fail to associate with a series defaults to the company, where it is exposed to the company's creditors. Missing records can leave an asset non-associated; the default rule does not replace the identifying, acquisition, and transfer information the statute requires."
+    }
+  ],
+  "6": [
+    {
+      "kind": "replace",
+      "file": "docs/oa-instructions.md",
+      "before": "If you start with the single-member form and later add an owner, adopt the multi-member form at that time — the two forms handle taxes, voting, and creditor protection differently, and the single-member form is not built for two owners.",
+      "after": "If you start with the single-member form and later add an owner, adopt the multi-member form at that time. The forms handle voting and creditor protection differently, and the single-member form is not built for two owners. A disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner joins."
+    }
+  ],
+  "7": [
+    {
+      "kind": "replace",
+      "file": "docs/owners-manual.md",
+      "before": "**In the single-owner forms:** admission of an additional member. Those forms have no transfer article, because Chapter 605 already makes a transfer permissible, gives a transferee distributions and nothing else, and binds a transferee who never signs — there was nothing left for the agreement to add",
+      "after": "**In the single-owner forms:** Article 10 addresses admission of an additional member. Transfer provisions also appear elsewhere in the agreement, including Section 9.3’s shareholder-eligibility restrictions in the S corporation forms and Section 1.4’s ownership requirements for professional companies."
+    }
+  ],
+  "8": [
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-multi.md",
+      "before": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes.",
+      "after": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages or fractions of the whole, as set forth on Exhibit A; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes."
+    },
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-s.md",
+      "before": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes.",
+      "after": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages or fractions of the whole, as set forth on Exhibit A; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes."
+    },
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-member.md",
+      "before": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless a Majority in Interest determines otherwise. Each Member's interest in the Company is personal property for all purposes.",
+      "after": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages or fractions of the whole, as set forth on Exhibit A; no certificates shall be issued unless a Majority in Interest determines otherwise. Each Member's interest in the Company is personal property for all purposes."
+    },
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-member-s.md",
+      "before": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless a Majority in Interest determines otherwise. Each Member's interest in the Company is personal property for all purposes.",
+      "after": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages or fractions of the whole, as set forth on Exhibit A; no certificates shall be issued unless a Majority in Interest determines otherwise. Each Member's interest in the Company is personal property for all purposes."
+    }
+  ],
+  "9": [
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-single.md",
+      "before": "**5.8 Statement of Authority.** With the consent of the Member required by Section 5.4(b), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.",
+      "after": "**5.8 Statement of Authority.** With the consent of the Member required by Section 5.4(b), the Manager may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded."
+    },
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-multi.md",
+      "before": "**5.8 Statement of Authority.** With the consent of all Members required by Section 5.4(i), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.",
+      "after": "**5.8 Statement of Authority.** With the consent of all Members required by Section 5.4(i), the Manager may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded."
+    },
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-s.md",
+      "before": "**5.8 Statement of Authority.** With the consent of all Members required by Section 5.4(i), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.",
+      "after": "**5.8 Statement of Authority.** With the consent of all Members required by Section 5.4(i), the Manager may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded."
+    },
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-member.md",
+      "before": "**5.9 Statement of Authority.** With the consent of all Members required by Section 5.5(i), the Members may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of Members to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and the Members shall cause it to be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4(b) apply among the Members whether or not a statement of authority is filed or recorded.",
+      "after": "**5.9 Statement of Authority.** With the consent of all Members required by Section 5.5(i), the Members may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of Members to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and the Members shall cause it to be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4(b) apply among the Members whether or not a statement of authority is filed or recorded."
+    },
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-member-s.md",
+      "before": "**5.9 Statement of Authority.** With the consent of all Members required by Section 5.5(i), the Members may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of Members to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and the Members shall cause it to be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4(b) apply among the Members whether or not a statement of authority is filed or recorded.",
+      "after": "**5.9 Statement of Authority.** With the consent of all Members required by Section 5.5(i), the Members may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of Members to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and the Members shall cause it to be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4(b) apply among the Members whether or not a statement of authority is filed or recorded."
+    },
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-single-s.md",
+      "before": "**5.8 Statement of Authority.** With the consent of the Member required by Section 5.4(b), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.",
+      "after": "**5.8 Statement of Authority.** With the consent of the Member required by Section 5.4(b), the Manager may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded."
+    },
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-member-single.md",
+      "before": "**5.7 Statement of Authority.** The Member may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Member or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate.",
+      "after": "**5.7 Statement of Authority.** The Member may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Member or of any person holding a specified position, to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate."
+    },
+    {
+      "kind": "replace",
+      "file": "webapp/server/templates-oa-member-single-s.md",
+      "before": "**5.7 Statement of Authority.** The Member may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Member or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate.",
+      "after": "**5.7 Statement of Authority.** The Member may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Member or of any person holding a specified position, to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate."
+    }
+  ],
+  "10": [
+    {
+      "kind": "replace",
+      "file": "docs/owners-manual.md",
+      "before": "**Administrative dissolution** — the state's termination of an LLC for ignoring filing duties; kills every series with the company.",
+      "after": "**Administrative dissolution** — dissolution by the state for failing to meet statutory requirements. The company continues to exist for winding up, and its protected series must also wind up. Dissolution is not immediate termination; reinstatement can allow the company and its series to resume operations."
+    },
+    {
+      "kind": "replace",
+      "file": "docs/owners-manual.md",
+      "before": "Ignore it long enough and the company is administratively dissolved — which, in a series LLC, drags **every protected series** down with it (a series cannot outlive its mothership).",
+      "after": "Ignore it long enough and the company is administratively dissolved. Administrative dissolution also dissolves the company’s protected series and requires them to wind up; it does not immediately terminate their existence."
+    }
+  ]
+}

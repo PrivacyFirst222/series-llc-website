@@ -8,7 +8,7 @@ export const serviceIsOpen = (s: AdminServiceOrder) => s.status === "awaiting_in
  *  existing client (Adam, 5 Sep 2026). Intake add-ons (EIN, S election,
  *  certificates chosen on the wizard) are created at payment, before
  *  formation, so they are formation work, not new work: a formed company
- *  still owing them stays in column two. */
+ *  still owing them stays in Post-Filing Items. */
 export const boughtAfterFormation = (s: AdminServiceOrder, formedAt: string | null) =>
   !!formedAt && serviceIsOpen(s) && new Date(s.created_at).getTime() > new Date(formedAt).getTime();
 /** The one-line name for a service order. The surrounding card or dialog

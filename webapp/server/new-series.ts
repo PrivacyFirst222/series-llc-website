@@ -38,6 +38,7 @@ export interface NewSeriesInput {
   /** Human format, e.g. "August 11, 2026". */
   effectiveDate: string;
   memberNames: string[];
+  memberSignatories?: { member: string; signatories?: string[]; jointHolding?: string }[];
   /** A member or Manager that is a company signs through a person (Adam,
    *  13 Sep 2026), keyed by the entity's name. */
   entitySigners?: { entity: string; name: string; title: string }[];
@@ -94,11 +95,20 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   // agreement's exhibits are adopted (Adam, 14 Sep 2026: "Every member should
   // sign it"); every Manager otherwise — under the agreements' own labels
   // (15 Sep 2026): ", Member" and ", Protected Series Manager".
+  const memberBlock = (name: string, suffix: string, dated = true) => {
+    const m = input.memberSignatories?.find(m => m.member === name);
+    if (!m?.signatories || m.signatories.length < 2 || signerOf(name)) return block(name, suffix, dated);
+    return `[[signature-group]]
+
+${name}${m.jointHolding ? ` — ${m.jointHolding}` : ""}${suffix}\n\n${m.signatories.map(n => block(n, "", dated)).join("\n\n")}
+
+[[/signature-group]]`;
+  };
   const psSignature = input.memberManaged
-    ? input.memberNames.map((n) => block(n, ", Member", false)).join("\n\n")
+    ? input.memberNames.map((n) => memberBlock(n, ", Member", false)).join("\n\n")
     : managers.map((n) => block(n, ", Protected Series Manager", false)).join("\n\n");
 
-  const blocks = input.memberNames.map((n) => block(n, "")).join("\n\n");
+  const blocks = input.memberNames.map((n) => memberBlock(n, "")).join("\n\n");
 
   must(s, "[COMPANY NAME], LLC", "company name");
   s = s.split("[COMPANY NAME], LLC").join(input.companyName);
@@ -125,7 +135,8 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
   s = s.split("[MEMBER SIGNATURE BLOCKS]").join(blocks);
   s = s.replace(/\n{3,}/g, "\n\n");
 
-  assertTemplateComplete(s);
+  // The generated group delimiters are renderer controls, not unfilled slots.
+  assertTemplateComplete(s.replace(/\[\[\/?signature-group\]\]/g, ""));
 
   return { markdown: s, encodedClientText: true, title: `Consent & Series Exhibit — ${decodeDocumentText(input.seriesName)}` };
 }

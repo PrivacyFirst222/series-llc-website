@@ -1,5 +1,5 @@
 /** Fault injection against audit coverage and the real ledger guard. No product writes. */
-import { mkdtempSync, rmSync, writeFileSync, readFileSync, mkdirSync, copyFileSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync, readFileSync, mkdirSync, copyFileSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -7,7 +7,7 @@ import { ROOT, git, ledgerRegressions, type Ledger } from "./ledger-lib";
 import { CHECKS, hash, validateAudit, type AuditData, type Finding } from "./audit-session-lib";
 import { intakeItems, type Intake } from "./audit-import-lib";
 import { manifestFor } from "./audit-session";
-import { renderList } from "./ledger-print";
+import { renderList, listRenderVersion } from "./ledger-print";
 const rows:{name:string;ok:boolean}[]=[];
 function check(name:string,ok:boolean){rows.push({name,ok});console.log(`${ok?"PASS":"FAIL"} ${name}`);}
 const ledger:Ledger={version:2,builtFrom:[],rulings:[],batches:[],items:[{id:"1",tag:"fixture",area:"Office",housekeeping:false,source:"fixture",text:"fixture source",verdict:"open",waitsOn:[],parts:[{key:"all",scope:"fixture",status:"open",waitsOn:[],history:[{at:"2026-01-01T00:00:00Z",event:"recorded"}]}]}]};
@@ -85,15 +85,17 @@ try{
  m.files.pop();writeFileSync(join(dir,"manifest.json"),JSON.stringify(m));const tampered=run("check",dir);check("real gate rejects altered manifest denominator",tampered.status!==0&&tampered.stderr.includes("manifest differs"));
  check("existing run never overwritten",run("init",dir,"real-command-fixture","HEAD","2").status!==0);
  const factory=manifestFor("factory",git(["rev-parse","HEAD"]).trim(),2);check("source inventory includes server and browser expectation checks",factory.files.some(f=>f.path==="webapp/server/e2e.ts")&&factory.files.some(f=>f.path==="webapp/scripts/behavioral.ts"));
-  for (const rev of ["e630541", "fffd6567"]) check(`historical generated report remains identical at ${rev}`, renderList(JSON.parse(git(["show", `${rev}:docs/audit/ledger.json`]))) === git(["show", `${rev}:docs/audit/findings-open.md`]));
+  for (const rev of ["e630541", "fffd6567"]) check(`historical generated report remains identical at ${rev}`, renderList(JSON.parse(git(["show", `${rev}:docs/audit/ledger.json`])), listRenderVersion(git(["show", `${rev}:docs/audit/ledger-print.ts`]))) === git(["show", `${rev}:docs/audit/findings-open.md`]));
   // Real intake and guard commands in a tiny synthetic Git repository. The
   // fixture evidence below is deliberately simulated, never a product audit.
   const fixture=join(temp,"intake-repo");mkdirSync(join(fixture,"docs/audit"),{recursive:true});mkdirSync(join(fixture,"webapp/server"),{recursive:true});mkdirSync(join(fixture,"webapp/src"),{recursive:true});
-  for(const name of ["audit-session-lib.ts","audit-session.ts","audit-import-lib.ts","audit-import.ts","ledger-lib.ts","ledger-print.ts","inventory.ts","inventory-policy.json","guard.ts","audit-reader.md"])copyFileSync(join(ROOT,"docs/audit",name),join(fixture,"docs/audit",name));
+  // The copied historical renderer uses the same installed TypeScript parser.
+  symlinkSync(join(ROOT,"webapp/node_modules"),join(fixture,"webapp/node_modules"));
+  for(const name of ["audit-session-lib.ts","audit-session.ts","audit-import-lib.ts","audit-import.ts","ledger-lib.ts","evidence.ts","ledger-print.ts","inventory.ts","inventory-policy.json","guard.ts","audit-reader.md"])copyFileSync(join(ROOT,"docs/audit",name),join(fixture,"docs/audit",name));
   const env={...process.env,FPSLLC_BATCH:"",FPSLLC_HOME:join(temp,"owner"),GIT_AUTHOR_NAME:"audit fixture",GIT_AUTHOR_EMAIL:"fixture@example.invalid",GIT_COMMITTER_NAME:"audit fixture",GIT_COMMITTER_EMAIL:"fixture@example.invalid"};
   const cmd=(...args:string[])=>spawnSync(args[0],args.slice(1),{cwd:fixture,env,encoding:"utf8",maxBuffer:64*1024*1024});
   const must=(...args:string[])=>{const r=cmd(...args);if(r.status!==0)throw Error(r.stdout+r.stderr);return r.stdout.trim();};
-  must("git","init","--quiet");writeFileSync(join(fixture,"webapp/server/fixture.ts"),text);writeFileSync(join(fixture,"webapp/vercel.json"),"{}\n");writeFileSync(join(fixture,"docs/audit/ledger.json"),JSON.stringify(ledger));writeFileSync(join(fixture,"docs/audit/rulings.md"),"# Synthetic fixture decisions\n");
+  must("git","init","--quiet");writeFileSync(join(fixture,".git/info/exclude"),"/webapp/node_modules\n");writeFileSync(join(fixture,"webapp/server/fixture.ts"),text);writeFileSync(join(fixture,"webapp/vercel.json"),"{}\n");writeFileSync(join(fixture,"docs/audit/ledger.json"),JSON.stringify(ledger));writeFileSync(join(fixture,"docs/audit/rulings.md"),"# Synthetic fixture decisions\n");
   must("git","add","webapp/server/fixture.ts","webapp/vercel.json","docs/audit/ledger.json","docs/audit/rulings.md","docs/audit/inventory-policy.json");must("git","commit","--quiet","-m","synthetic audit fixture");
   const runDir=join(temp,"complete-fixture");must("bun","docs/audit/audit-session.ts","init",runDir,"intake-fixture","HEAD","1");
   const fm=JSON.parse(readFileSync(join(runDir,"manifest.json"),"utf8"));

@@ -6,8 +6,9 @@
  *   bun run docs/audit/ledger-print.ts rulings       → what waits on Adam, most-blocking first
  */
 import { writeFileSync } from "node:fs";
+import ts from "../../webapp/node_modules/typescript";
 import { join } from "node:path";
-import { ROOT, loadLedger, loadBatch, unmetWaits, type Ledger, type Item, type Assertion } from "./ledger-lib";
+import { combinedPartPublished, ROOT, loadLedger, loadBatch, unmetWaits, type Ledger, type Item, type Assertion } from "./ledger-lib";
 
 const AREAS = ["Public pages, Terms and Privacy", "Order form and payment", "Client portal", "Office", "Emails and jobs", "Agreements and guidance"];
 
@@ -18,18 +19,42 @@ const statusOf = (it: Item): string => {
   return it.verdict === "optional" ? `optional — ${one}` : one;
 };
 
-export function renderList(l: Ledger): string {
+export const LIST_RENDER_VERSION = 2;
+/** Archived commits retain the renderer version recorded in their source. */
+export function listRenderVersion(source: string | null): 1 | 2 {
+  const file=ts.createSourceFile('ledger-print.ts',source??'',ts.ScriptTarget.Latest,true,ts.ScriptKind.TS);
+  const declarations: ts.VariableDeclaration[]=[];
+  let mentions=0;
+  const visit=(node:ts.Node)=>{
+    if(ts.isIdentifier(node)&&node.text==='LIST_RENDER_VERSION')mentions++;
+    if(ts.isVariableDeclaration(node)&&ts.isIdentifier(node.name)&&node.name.text==='LIST_RENDER_VERSION')declarations.push(node);
+    ts.forEachChild(node,visit);
+  };
+  visit(file);
+  if(!mentions)return 1;
+  const declaration=declarations[0], list=declaration?.parent, statement=list?.parent;
+  if(declarations.length!==1 || !list || !ts.isVariableDeclarationList(list) || !(list.flags&ts.NodeFlags.Const)
+    || !statement || !ts.isVariableStatement(statement) || statement.parent!==file
+    || !statement.modifiers?.some(m=>m.kind===ts.SyntaxKind.ExportKeyword)
+    || !declaration.initializer || !ts.isNumericLiteral(declaration.initializer)
+    || !['1','2'].includes(declaration.initializer.text))throw Error('Malformed or unsupported LIST_RENDER_VERSION declaration');
+  return Number(declaration.initializer.text) as 1|2;
+}
+
+export function renderList(l: Ledger, version: 1 | 2 = LIST_RENDER_VERSION): string {
   const out: string[] = [];
+  const tracked = l.dispositions !== undefined || l.implementations !== undefined || l.combinedReleases !== undefined || l.auditAdjudications !== undefined;
   const live = l.items.filter((i) => i.verdict !== "dropped");
-  const done = (i: Item) => i.parts.every((p) => p.status === "released");
+  const done = (i: Item) => i.parts.every((p) => p.status === "released" || combinedPartPublished(l,i.id,p));
   out.push("# Every audit item and what has been done about it");
   out.push("");
   out.push("GENERATED from docs/audit/ledger.json by `bun run docs/audit/ledger-print.ts list`. Do not edit: the commit step refuses a copy that differs from the ledger. The auditors' original files are unchanged under docs/audit/sources/ and docs/audit/runs/.");
   out.push("");
   const sightings = live.flatMap((i) => i.parts.filter((p) => p.canonical));
   const imported = l.items.filter(i => i.id.startsWith("AUD-")).length;
-  out.push(`${l.items.length} records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11)${imported ? `, plus ${imported} from later checked audit intakes` : ""}. ${l.items.filter((i) => i.verdict === "dropped").length} dropped after Codex's review, ${l.items.filter((i) => i.verdict === "optional").length} optional wording, ${sightings.length} second sightings of another item's part. Released: ${live.filter(done).length} of ${live.length}.`);
+  out.push(`${l.items.length} records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11)${imported ? `, plus ${imported} from later checked audit intakes` : ""}. ${l.items.filter((i) => i.verdict === "dropped").length} dropped after Codex's review, ${l.items.filter((i) => i.verdict === "optional").length} optional wording, ${sightings.length} second sightings of another item's part. ${tracked ? "Published (individual or combined receipt)" : "Released"}: ${live.filter(done).length} of ${live.length}.`);
   out.push("");
+  if (tracked) out.push("Combined publication is shown separately from individual lifecycle states. A combined receipt does not invent separate historical acceptances.");
   out.push("A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.");
   if (l.batches.some(b => b.id === "audit-mechanism") || imported) out.push("For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-session.ts. The historical coverage-check.ts alone does not establish complete prior-item reconciliation. Audit completion does not approve repairs or publication.");
   for (const area of AREAS) {
@@ -42,23 +67,34 @@ export function renderList(l: Ledger): string {
         it.housekeeping ? "housekeeping" : "",
         it.parts.length === 1 ? link(it.parts[0]) : "",
         it.related?.length ? `related: ${it.related.join(", ")}` : "",
-        ...it.waitsOn.map((w) => (w.startsWith("ruling:") ? (w.slice(7) === it.id ? "waits on Adam's ruling" : `waits on Adam's ruling on item ${w.slice(7)}`) : `waits on ${w}`)),
+        ...it.waitsOn.filter(w => version === 1 || !tracked || it.parts.some(p => unmetWaits(l, it, p).includes(w))).map((w) => (w.startsWith("ruling:") ? (w.slice(7) === it.id ? "waits on Adam's ruling" : `waits on Adam's ruling on item ${w.slice(7)}`) : `waits on ${w}`)),
       ].filter(Boolean).join("; ");
       out.push(`- **${it.id}. [${it.tag}]** — **${statusOf(it)}**${flags ? ` — ${flags}` : ""}`);
-      for (const line of it.text.split("\n")) out.push(`  - ${line}`);
+      for (const line of it.text.split("\n")) out.push(version === 2 && !line ? "" : `  - ${line}`);
       if (it.codex && it.codex.status !== "confirmed") out.push(`  - Codex (${it.codex.status}): ${it.codex.evidence}`);
       if (it.codex?.replacementOk === false) out.push(`  - **Codex rejected the proposed replacement:** ${it.codex.replacementNote || "(no note given)"}`);
       if (it.verdictReason) out.push(`  - Outcome: ${it.verdictReason}`);
       if (it.correctedReplacement) out.push(`  - Corrected after Codex's review: ${it.correctedReplacement}`);
       for (const r of l.rulings.filter((x) => (x.kind ?? "ruling") === "ruling" && x.item === it.id)) out.push(`  - Ruling, ${r.date}${r.part ? ` (${r.part})` : ""}: ${r.text}`);
       for (const p of it.parts) {
-        if (it.parts.length > 1) out.push(`  - Part "${p.key}" — ${p.status}: ${p.scope}${p.waitsOn.length ? ` (waits on ${p.waitsOn.join(", ")})` : ""}${link(p) ? ` — ${link(p)}` : ""}`);
-        for (const s of p.supersessions ?? []) out.push(`  - Previous fix${it.parts.length > 1 ? ` (${p.key})` : ""}: ${s.prior.batch} r${s.prior.revision}, commit ${s.prior.commit}; ${s.prior.assertions.length} assertion(s) retained. Replacement attempt: ${s.batch} r${s.revision}, work order ${s.hash}.`);
-        if (p.fix) out.push(`  - Fixed${it.parts.length > 1 ? ` (${p.key})` : ""}: batch ${p.fix.batch} revision ${p.fix.revision}, commit ${p.fix.commit.slice(0, 7)}, by ${p.fix.doneBy}; protected by ${p.fix.assertions.length} assertion(s).`);
+        const displayedWaits = p.waitsOn.filter(w => version === 1 || !tracked || unmetWaits(l, it, p).includes(w));
+        if (it.parts.length > 1) out.push(`  - Part "${p.key}" — ${p.status}: ${p.scope}${displayedWaits.length ? ` (waits on ${displayedWaits.join(", ")})` : ""}${link(p) ? ` — ${link(p)}` : ""}`);
+        for (const s of p.supersessions ?? []) out.push(`  - Previous fix${it.parts.length > 1 ? ` (${p.key})` : ""}: ${s.prior.batch} r${s.prior.revision}, ${tracked ? `release commit ${s.prior.commit || "not recorded"}` : `commit ${s.prior.commit}`}; ${s.prior.assertions.length} assertion(s) retained. Replacement attempt: ${s.batch} r${s.revision}, work order ${s.hash}.`);
+        if (p.fix && !tracked) out.push(`  - Fixed${it.parts.length > 1 ? ` (${p.key})` : ""}: batch ${p.fix.batch} revision ${p.fix.revision}, commit ${p.fix.commit.slice(0, 7)}, by ${p.fix.doneBy}; protected by ${p.fix.assertions.length} assertion(s).`);
+        if (p.fix && tracked) out.push(`  - Implemented protections${it.parts.length > 1 ? ` (${p.key})` : ""}: batch ${p.fix.batch} revision ${p.fix.revision}, release commit ${p.fix.commit ? p.fix.commit.slice(0, 7) : "not recorded"}, by ${p.fix.doneBy}; protected by ${p.fix.assertions.length} assertion(s).`);
+        const retained = l.dispositions?.find(d => d.item === it.id && d.part === p.key);
+        if (retained) out.push(`  - **Owner retained the wording${it.parts.length > 1 ? ` (${p.key})` : ""}.** Technical lifecycle: ${p.status}; protections do not mean the proposed wording change was made. Ruling: ${retained.ruling.text}`);
+        for (const receipt of (l.implementations ?? []).filter(r => r.batch === p.fix?.batch && r.revision === p.fix?.revision)) out.push(`  - Implementation evidence: commit ${receipt.commit}, batch ${receipt.batch} revision ${receipt.revision}, package ${receipt.packageId}. This records implementation, not acceptance or publication.`);
+        if (tracked && p.fix && !(l.implementations ?? []).some(r => r.batch === p.fix?.batch && r.revision === p.fix?.revision)) out.push("  - Implementation receipt: not yet recorded; no commit identity is implied.");
+        for (const receipt of l.combinedReleases ?? []) for (const batch of receipt.manifest.batches) for (const ref of batch.parts.filter(x => x.item === it.id && x.part === p.key)) out.push(`  - Included in combined publication ${receipt.commit.slice(0, 7)}, package ${receipt.packageId}: batch ${batch.batch} revision ${batch.revision}, ${ref.state}. This is the combined release, not a separate earlier acceptance.`);
         for (const h of p.history.filter((x) => /^(rejected|reopened|superseded)/.test(x.event))) out.push(`  - ${h.at.slice(0, 10)} ${h.event}${h.note ? `: ${h.note}` : ""}`);
       }
       for (const p of it.retiredParts ?? []) out.push(`  - Former part "${p.key}" (retired by ${p.retiredBy}, now ${p.migratedTo.join(", ")}): ${p.scope}`);
     }
+  }
+  if (l.auditAdjudications?.length) {
+    out.push("", "## Cross-review adjudications — informational, not repair tasks", "");
+    for (const a of l.auditAdjudications) out.push(`- **${a.sourceId} — ${a.verdict}.** ${a.reason} Proposed replacement: ${a.replacementVerdict}. Source: ${a.source}. No code removal is approved; this is the cross-review's conclusion, not a new owner ruling.`);
   }
   return out.join("\n") + "\n";
 }

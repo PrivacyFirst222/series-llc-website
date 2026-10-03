@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "run": "owner-office-board-2026-09-22",
+  "commit": "1aa316bf63254673db2ac5370a76573e518aeaec",
+  "completedAt": "2026-09-23T02:22:05.995914+00:00",
+  "manifestSha": "be800479398c94e1819854a23cf030d89b652b74cfcb52be23bf267265109936",
+  "auditSha": "be800479398c94e1819854a23cf030d89b652b74cfcb52be23bf267265109936",
+  "findings": [
+    {
+      "key": "completed-orders",
+      "relation": "new",
+      "where": "Office: Formations & Service Orders board and new Completed Orders tab",
+      "file": "webapp/src/pages/admin/OrderBoard.tsx",
+      "line": 376,
+      "reads": "title=\"Complete\"",
+      "claims": "Completed history is displayed in the active-work board; formed orders with unfinished services are mixed into With The State.",
+      "truth": "Owner requested a separate Completed Orders tab and Post-Filing Items third column, then approved the proposed placement, automatic movement, searchable pagination and returning purchases with Go. Implement this.",
+      "replacement": "Show New Orders, With The State and Post-Filing Items on the active board; put fully delivered orders in searchable, paginated Completed Orders; new purchases return as green New Orders.",
+      "severity": "wording",
+      "review": {
+        "reviewer": "Codex source comparison with owner-approved feature request",
+        "evidence": "This is a new owner-requested workflow, not an independently discovered audit defect. Compared OrderBoard.tsx and routes-admin.ts at 1aa316b.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    }
+  ]
+}

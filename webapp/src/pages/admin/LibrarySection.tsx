@@ -1,3 +1,4 @@
+import {BackupAttentionBanner,HistoryRecoveryPanel} from './OfficeRecoveryPanel';
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BookOpen } from "lucide-react";
@@ -36,6 +37,8 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
   const [file, setFile] = useState<File | null>(null);
   const [edition, setEdition] = useState("");
   const [message, setMessage] = useState("");
+  const [restartAcknowledged,setRestartAcknowledged]=useState(false);
+  const [restartMessage,setRestartMessage]=useState('');
 
   const libraryQuery = useQuery({
     queryKey: ["admin-library"],
@@ -94,9 +97,13 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
   });
   const progressQuery = useQuery({
     queryKey:["admin-backup-progress"],
-    queryFn:()=>api.get<{complete:boolean;pending:number;error:string|null;completedAt:string|null}>("/api/admin/backups/progress"),
+    queryFn:()=>api.get<{complete:boolean;pending:number;error:string|null;completedAt:string|null;status?:string;jobKey:string|null;historyCurrentConflicts:{historyId:string;title:string}[]}>("/api/admin/backups/progress"),
     enabled,refetchInterval:5000,
   });
+  const restartBackup=useMutation({mutationFn:async(historyId:string)=>{
+    if(!restartAcknowledged)throw Error('Confirm that the new snapshot will disclose the historical gap.');
+    return api.post<{key:string}>('/api/admin/backups/restart-after-history-change',{expectedJobKey:progressQuery.data?.jobKey,historyId,acknowledge:true});
+  },onSuccess:()=>{setRestartMessage('A new snapshot is queued with the acknowledged historical gap. The unfinished older snapshot has been preserved.');queryClient.invalidateQueries({queryKey:['admin-backup-progress']});},onError:e=>setRestartMessage(e.message)});
   const runBackup = useMutation({
     mutationFn: () => api.post<{ key: string; sizeBytes: number; complete: boolean; pending: number }>("/api/admin/backups/run", {}),
     onSuccess: () => {queryClient.invalidateQueries({ queryKey: ["admin-backups"] });queryClient.invalidateQueries({queryKey:["admin-backup-progress"]});},
@@ -119,6 +126,9 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
 
   return (
     <>
+      <BackupAttentionBanner/>
+      <HistoryRecoveryPanel/>
+      {progressQuery.data?.status==='complete_with_history_gaps'?<p role="status">Restorable backup with historical gaps</p>:null}
       <div className="mt-4 rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center gap-2">
           <BookOpen className="h-4 w-4 text-trust" />
@@ -193,8 +203,14 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
           retained tax documents remain encrypted. Backups are kept. Restore instructions: docs/db-restore.md.
         </p>
         <p className="mt-2 text-xs" role="status" data-testid="backup-progress">
-          {progressQuery.isError ? "Backup status unavailable — completeness has not been verified." : progressQuery.data?.complete ? `Complete — records and retained document copies verified at ${new Date(progressQuery.data.completedAt!).toLocaleString()}.` : `Incomplete — ${progressQuery.data?.pending ?? "unknown"} files pending. ${progressQuery.data?.error || "Automatic continuation runs every five minutes while work remains."}`}
+          {progressQuery.isError ? "Backup status unavailable — completeness has not been verified." : progressQuery.data?.status==='capacity_blocked'?'Backup capacity is blocked — the current snapshot has been unfinished for at least 24 hours in four-worker mode. Release qualification is refused. Completed backups remain available.':progressQuery.data?.status==='complete_with_history_gaps'?'Restorable backup with historical gaps — current documents are verified; the recorded historical originals are unavailable.':progressQuery.data?.complete ? `Complete — records and retained document copies verified at ${new Date(progressQuery.data.completedAt!).toLocaleString()}.` : `Incomplete — ${progressQuery.data?.pending ?? "unknown"} files pending. ${progressQuery.data?.error || "Automatic continuation runs every five minutes while work remains."}`}
         </p>
+        {progressQuery.data?.historyCurrentConflicts?.length?<section className="my-3 space-y-2 rounded border p-3" aria-label="Restart backup after history change">
+          <p>This snapshot needs a missing file that was current when it started. After recording that file as an unavailable historical original, start a new snapshot of the corrected documents.</p>
+          <label className="flex gap-2"><input type="checkbox" checked={restartAcknowledged} onChange={e=>setRestartAcknowledged(e.target.checked)}/>I understand the new snapshot will disclose the acknowledged historical gap.</label>
+          {progressQuery.data.historyCurrentConflicts.map(r=><Button key={r.historyId} variant="outline" disabled={!restartAcknowledged||restartBackup.isPending} onClick={()=>restartBackup.mutate(r.historyId)}>Start new snapshot: {r.title}</Button>)}
+        </section>:null}
+        {restartMessage?<p role={restartBackup.isError?'alert':'status'}>{restartMessage}</p>:null}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Button
             variant="outline"

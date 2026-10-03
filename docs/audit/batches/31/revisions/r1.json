@@ -1,0 +1,659 @@
+{
+  "id": "31",
+  "revision": 1,
+  "title": "Approved guidance and agreement consistency; retain three rejected wordings",
+  "model": "Codex",
+  "base": "9efcb29c4571efc3ddce69c8612f439569c455cf",
+  "items": [
+    {
+      "id": "AUD-claude-reconciled-batch31-reader-1-benefits-deed-unconditional",
+      "part": "all",
+      "scope": "Batch31 review item 1: owner rejected proposed change; retain current wording.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/src/components/home/BenefitsGrid.tsx",
+          "text": "body: \"Real estate can be deeded to and held by a protected series in its own name. Under §605.2301, the recorded deed stands as the record that the property belongs to that series.\","
+        },
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/FAQ.tsx",
+          "text": "a: \"Yes. The deed goes in the series' own full name — something like \\\"Sunshine Holdings, LLC - PS A.\\\" Not the LLC's name, and not another series' name. Recording that deed does two jobs at once: it puts the property in the series, and it becomes your record that the property belongs to that series and not to the LLC or to a different one. One honest caveat — we can't promise how any particular clerk's office or title company will handle a given closing. (§605.2301)\","
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch31-reader-2-series-established-on-effect-not-filing",
+      "part": "all",
+      "scope": "Batch31 review item 2: owner rejected proposed change; retain current wording.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/src/components/forms/florida-llc/sections/StepCertification.tsx",
+          "text": "Florida establishes a protected series when the company files a\n          Protected Series Designation with the Division of Corporations, with\n          the consent of all of its members (&sect;605.2201)."
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch31-reader-3-consent-department-wording",
+      "part": "all",
+      "scope": "Batch31 review item 3: implement the exact wording Adam approved.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/src/pages/portal/OrdersInProgress.tsx",
+          "before": "Exactly as filed with the Department.",
+          "after": "Exactly as filed with the Florida Division of Corporations."
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch31-reader-1-faq-0905-generalized",
+      "part": "all",
+      "scope": "Batch31 review item 4: owner rejected proposed change; retain current wording.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/src/pages/FAQ.tsx",
+          "text": "a: \"A Florida Protected Series LLC works well for Floridians and for Florida businesses and assets. There is no way to guarantee how the courts of another state — particularly one with no series LLC legislation of its own — will interpret it. There is also a registration question that runs in both directions: under §605.0905(3), owning income-producing real property or tangible personal property in a state is itself transacting business there, which means a company formed elsewhere that owns Florida rental property has to qualify here — and a Florida company that buys rental property in another state should expect that state to take the same position. The consequences of skipping it are real: §605.0904 bars a company transacting business in Florida without a certificate of authority from maintaining an action here, and §605.0904(7) adds liability for all back fees plus a civil penalty of at least $500 and not more than $1,000 for each year or part of a year. If you are not a Floridian, or you plan to hold out-of-state property in a Florida Protected Series LLC, you should seek advice from an attorney licensed to practice in the relevant state.\","
+        }
+      ]
+    },
+    {
+      "id": "N2.07",
+      "part": "all",
+      "scope": "Batch31 review item 5: implement the exact wording Adam approved.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "docs/oa-instructions.md",
+          "before": "Under §8.5(b) of your agreement, any asset you fail to associate with a series defaults to the company, where it is exposed to the company's creditors.",
+          "after": "Under §8.5(b) of your agreement, any asset you fail to associate with a series defaults to the company, where it is exposed to the company's creditors. Missing records can leave an asset non-associated; the default rule does not replace the identifying, acquisition, and transfer information the statute requires."
+        },
+        {
+          "kind": "document",
+          "master": "docs/oa-instructions.md",
+          "word": "FPSLLC Operating Agreement Instructions - DRAFT.docx",
+          "masterPresent": [
+            "Missing records can leave an asset non-associated; the default rule does not replace the identifying, acquisition, and transfer information the statute requires."
+          ],
+          "wordPresent": [
+            "Missing records can leave an asset non-associated; the default rule does not replace the identifying, acquisition, and transfer information the statute requires."
+          ]
+        },
+        {
+          "kind": "present",
+          "file": "docs/owners-manual.md",
+          "text": "Your operating agreement fights this battle for you in two ways. Article 8 puts the records in a named person's hands and sets the standard they must meet. The standing association rules in Section 8.5 make the agreement *itself* part of your records and help determine where assets belong. They work alongside real ledgers and real bank accounts, not instead of them. Missing records can leave an asset non-associated; the default rule does not replace the identifying, acquisition, and transfer information the statute requires."
+        },
+        {
+          "kind": "absent",
+          "text": "Your operating agreement fights this battle for you in two ways. Article 8 puts the records in a named person's hands and sets the standard they must meet. And the standing association rules at the end of Article 8 — a provision you will not find in other companies' forms — makes the agreement *itself* part of your records: assets titled in a series' name, bought with a series' funds, or held in a series' accounts are associated with that series by standing rule, income and proceeds follow the asset that produced them, and anything left over is associated with the mothership so that **no asset of yours is ever \"non-associated.\"** They are a safety net, not a substitute: it works alongside real ledgers and real bank accounts, not instead of them."
+        },
+        {
+          "kind": "present",
+          "file": "docs/owners-manual.md",
+          "text": "**Second, your agreement's standing association rules make the mothership the default bucket.** The standing association rules help determine where assets belong, but they do not replace the required records. Missing records can leave an asset non-associated. Keep the mothership asset-light and document every asset."
+        },
+        {
+          "kind": "absent",
+          "text": "**Second, your agreement's standing association rules make the mothership the default bucket.** Any asset you fail to associate with a series lands, by standing rule, in the company's silo. That is deliberately protective — it means a sloppy record never creates a *non-associated* free-for-all asset — but it also means **sloppiness collects in the mothership**. If the mothership is asset-light, a record you missed exposes little."
+        },
+        {
+          "kind": "document",
+          "master": "docs/owners-manual.md",
+          "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+          "masterPresent": [
+            "Missing records can leave an asset non-associated."
+          ],
+          "wordPresent": [
+            "Missing records can leave an asset non-associated."
+          ]
+        }
+      ],
+      "replaces": {
+        "batch": "17",
+        "revision": 2,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "replace",
+            "file": "docs/owners-manual.md",
+            "before": "Your operating agreement fights this battle for you in two ways. Article 8 puts the records in a named person's hands and sets the standard they must meet. And the standing association rules at the end of Article 8 — a provision you will not find in other companies' forms — makes the agreement *itself* part of your records: assets titled in a series' name, bought with a series' funds, or held in a series' accounts are associated with that series by standing rule, income and proceeds follow the asset that produced them, and anything left over is associated with the mothership so that **no asset of yours is ever \"non-associated.\"** They are a safety net, not a substitute: it works alongside real ledgers and real bank accounts, not instead of them.",
+            "after": "Your operating agreement fights this battle for you in two ways. Article 8 puts the records in a named person's hands and sets the standard they must meet. The standing association rules in Section 8.5 make the agreement *itself* part of your records and help determine where assets belong. They work alongside real ledgers and real bank accounts, not instead of them. Missing records can leave an asset non-associated; the default rule does not replace the identifying, acquisition, and transfer information the statute requires."
+          },
+          {
+            "kind": "replace",
+            "file": "docs/owners-manual.md",
+            "before": "**Second, your agreement's standing association rules make the mothership the default bucket.** Any asset you fail to associate with a series lands, by standing rule, in the company's silo. That is deliberately protective — it means a sloppy record never creates a *non-associated* free-for-all asset — but it also means **sloppiness collects in the mothership**. If the mothership is asset-light, a record you missed exposes little.",
+            "after": "**Second, your agreement's standing association rules make the mothership the default bucket.** The standing association rules help determine where assets belong, but they do not replace the required records. Missing records can leave an asset non-associated. Keep the mothership asset-light and document every asset."
+          },
+          {
+            "kind": "document",
+            "master": "docs/owners-manual.md",
+            "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+            "masterPresent": [
+              "Missing records can leave an asset non-associated."
+            ],
+            "wordPresent": [
+              "Missing records can leave an asset non-associated."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "AUD-claude-reconciled-batch31-compare-A-instructions-handle-taxes-differently",
+      "part": "all",
+      "scope": "Batch31 review item 6: implement the exact wording Adam approved.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "docs/oa-instructions.md",
+          "before": "If you start with the single-member form and later add an owner, adopt the multi-member form at that time — the two forms handle taxes, voting, and creditor protection differently, and the single-member form is not built for two owners.",
+          "after": "If you start with the single-member form and later add an owner, adopt the multi-member form at that time. The forms handle voting and creditor protection differently, and the single-member form is not built for two owners. A disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner joins."
+        },
+        {
+          "kind": "document",
+          "master": "docs/oa-instructions.md",
+          "word": "FPSLLC Operating Agreement Instructions - DRAFT.docx",
+          "masterPresent": [
+            "If you start with the single-member form and later add an owner, adopt the multi-member form at that time. The forms handle voting and creditor protection differently, and the single-member form is not built for two owners. A disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner joins."
+          ],
+          "wordPresent": [
+            "If you start with the single-member form and later add an owner, adopt the multi-member form at that time. The forms handle voting and creditor protection differently, and the single-member form is not built for two owners. A disregarded company ordinarily becomes a partnership for federal income-tax purposes when a second owner is admitted. An existing S election does not end merely because a second eligible owner joins."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch31-compare-A-manual-nothing-left-to-add",
+      "part": "all",
+      "scope": "Batch31 review item 7: implement the exact wording Adam approved.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "**In the single-owner forms:** admission of an additional member. Those forms have no transfer article, because Chapter 605 already makes a transfer permissible, gives a transferee distributions and nothing else, and binds a transferee who never signs — there was nothing left for the agreement to add",
+          "after": "**In the single-owner forms:** Article 10 addresses admission of an additional member. Transfer provisions also appear elsewhere in the agreement, including Section 9.3’s shareholder-eligibility restrictions in the S corporation forms and Section 1.4’s ownership requirements for professional companies."
+        },
+        {
+          "kind": "document",
+          "master": "docs/owners-manual.md",
+          "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+          "masterPresent": [
+            "In the single-owner forms: Article 10 addresses admission of an additional member. Transfer provisions also appear elsewhere in the agreement, including Section 9.3’s shareholder-eligibility restrictions in the S corporation forms and Section 1.4’s ownership requirements for professional companies."
+          ],
+          "wordPresent": [
+            "In the single-owner forms: Article 10 addresses admission of an additional member. Transfer provisions also appear elsewhere in the agreement, including Section 9.3’s shareholder-eligibility restrictions in the S corporation forms and Section 1.4’s ownership requirements for professional companies."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch31-render-oa-4-1-percentages-vs-fractions",
+      "part": "all",
+      "scope": "Batch31 review item 8: implement the exact wording Adam approved.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-multi.md",
+          "before": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes.",
+          "after": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages or fractions of the whole, as set forth on Exhibit A; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes."
+        },
+        {
+          "kind": "document",
+          "master": "webapp/server/templates-oa-multi.md",
+          "word": "FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx",
+          "masterPresent": [
+            "percentages or fractions of the whole, as set forth on Exhibit A"
+          ],
+          "wordPresent": [
+            "percentages or fractions of the whole, as set forth on Exhibit A"
+          ]
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-s.md",
+          "before": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes.",
+          "after": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages or fractions of the whole, as set forth on Exhibit A; no certificates shall be issued unless the Manager determines otherwise. Each Member's interest in the Company is personal property for all purposes."
+        },
+        {
+          "kind": "document",
+          "master": "webapp/server/templates-oa-s.md",
+          "word": "FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
+          "masterPresent": [
+            "percentages or fractions of the whole, as set forth on Exhibit A"
+          ],
+          "wordPresent": [
+            "percentages or fractions of the whole, as set forth on Exhibit A"
+          ]
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-member.md",
+          "before": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless a Majority in Interest determines otherwise. Each Member's interest in the Company is personal property for all purposes.",
+          "after": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages or fractions of the whole, as set forth on Exhibit A; no certificates shall be issued unless a Majority in Interest determines otherwise. Each Member's interest in the Company is personal property for all purposes."
+        },
+        {
+          "kind": "document",
+          "master": "webapp/server/templates-oa-member.md",
+          "word": "FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
+          "masterPresent": [
+            "percentages or fractions of the whole, as set forth on Exhibit A"
+          ],
+          "wordPresent": [
+            "percentages or fractions of the whole, as set forth on Exhibit A"
+          ]
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-member-s.md",
+          "before": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages; no certificates shall be issued unless a Majority in Interest determines otherwise. Each Member's interest in the Company is personal property for all purposes.",
+          "after": "**4.1 Members; Percentage Interests.** The Members and their Percentage Interests are set forth on Exhibit A. Membership interests are of a single class and are expressed as percentages or fractions of the whole, as set forth on Exhibit A; no certificates shall be issued unless a Majority in Interest determines otherwise. Each Member's interest in the Company is personal property for all purposes."
+        },
+        {
+          "kind": "document",
+          "master": "webapp/server/templates-oa-member-s.md",
+          "word": "FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
+          "masterPresent": [
+            "percentages or fractions of the whole, as set forth on Exhibit A"
+          ],
+          "wordPresent": [
+            "percentages or fractions of the whole, as set forth on Exhibit A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch31-statutes-0302-series-property",
+      "part": "all",
+      "scope": "Batch31 review item 9: implement the exact wording Adam approved.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-single.md",
+          "before": "**5.8 Statement of Authority.** With the consent of the Member required by Section 5.4(b), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.",
+          "after": "**5.8 Statement of Authority.** With the consent of the Member required by Section 5.4(b), the Manager may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded."
+        },
+        {
+          "kind": "document",
+          "master": "webapp/server/templates-oa-single.md",
+          "word": "SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx",
+          "masterPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ],
+          "wordPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ]
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-multi.md",
+          "before": "**5.8 Statement of Authority.** With the consent of all Members required by Section 5.4(i), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.",
+          "after": "**5.8 Statement of Authority.** With the consent of all Members required by Section 5.4(i), the Manager may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded."
+        },
+        {
+          "kind": "document",
+          "master": "webapp/server/templates-oa-multi.md",
+          "word": "FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx",
+          "masterPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ],
+          "wordPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ]
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-s.md",
+          "before": "**5.8 Statement of Authority.** With the consent of all Members required by Section 5.4(i), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.",
+          "after": "**5.8 Statement of Authority.** With the consent of all Members required by Section 5.4(i), the Manager may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded."
+        },
+        {
+          "kind": "document",
+          "master": "webapp/server/templates-oa-s.md",
+          "word": "FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
+          "masterPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ],
+          "wordPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ]
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-member.md",
+          "before": "**5.9 Statement of Authority.** With the consent of all Members required by Section 5.5(i), the Members may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of Members to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and the Members shall cause it to be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4(b) apply among the Members whether or not a statement of authority is filed or recorded.",
+          "after": "**5.9 Statement of Authority.** With the consent of all Members required by Section 5.5(i), the Members may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of Members to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and the Members shall cause it to be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4(b) apply among the Members whether or not a statement of authority is filed or recorded."
+        },
+        {
+          "kind": "document",
+          "master": "webapp/server/templates-oa-member.md",
+          "word": "FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
+          "masterPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ],
+          "wordPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ]
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-member-s.md",
+          "before": "**5.9 Statement of Authority.** With the consent of all Members required by Section 5.5(i), the Members may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of Members to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and the Members shall cause it to be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4(b) apply among the Members whether or not a statement of authority is filed or recorded.",
+          "after": "**5.9 Statement of Authority.** With the consent of all Members required by Section 5.5(i), the Members may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of Members to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and the Members shall cause it to be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4(b) apply among the Members whether or not a statement of authority is filed or recorded."
+        },
+        {
+          "kind": "document",
+          "master": "webapp/server/templates-oa-member-s.md",
+          "word": "FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
+          "masterPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ],
+          "wordPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ]
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-single-s.md",
+          "before": "**5.8 Statement of Authority.** With the consent of the Member required by Section 5.4(b), the Manager may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded.",
+          "after": "**5.8 Statement of Authority.** With the consent of the Member required by Section 5.4(b), the Manager may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Manager, of any Protected Series Manager, or of any person holding a specified position, to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate. The limitations in Section 5.4 apply to the Manager whether or not a statement of authority is filed or recorded."
+        },
+        {
+          "kind": "document",
+          "master": "webapp/server/templates-oa-single-s.md",
+          "word": "SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx",
+          "masterPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ],
+          "wordPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ]
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-member-single.md",
+          "before": "**5.7 Statement of Authority.** The Member may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Member or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate.",
+          "after": "**5.7 Statement of Authority.** The Member may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Member or of any person holding a specified position, to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate."
+        },
+        {
+          "kind": "document",
+          "master": "webapp/server/templates-oa-member-single.md",
+          "word": "SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx",
+          "masterPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ],
+          "wordPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ]
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/templates-oa-member-single-s.md",
+          "before": "**5.7 Statement of Authority.** The Member may cause the Company to file with the Department a statement of authority under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Member or of any person holding a specified position, to transfer or encumber real property held in the name of the Company or of a Protected Series, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate.",
+          "after": "**5.7 Statement of Authority.** The Member may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series under s. 605.0302, Florida Statutes, stating the authority, or the limitations on the authority, of the Member or of any person holding a specified position, to transfer or encumber real property held in the name of the entity identified in the statement, and may cause a certified copy of that statement to be recorded in the official records of any county in which the real property is located. A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated. A statement so filed shall be consistent with this Agreement, and shall be amended or cancelled as necessary to keep it accurate."
+        },
+        {
+          "kind": "document",
+          "master": "webapp/server/templates-oa-member-single-s.md",
+          "word": "SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx",
+          "masterPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ],
+          "wordPresent": [
+            "A statement concerning real property held in the name of the Company shall identify the Company as the entity whose authority is stated. A statement concerning real property held in the name of a Protected Series shall be filed for and identify that Protected Series as the entity whose authority is stated."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "N2.09",
+      "part": "all",
+      "scope": "Batch31 review item 10: implement the exact wording Adam approved.",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "**Administrative dissolution** — the state's termination of an LLC for ignoring filing duties; kills every series with the company.",
+          "after": "**Administrative dissolution** — dissolution by the state for failing to meet statutory requirements. The company continues to exist for winding up, and its protected series must also wind up. Dissolution is not immediate termination; reinstatement can allow the company and its series to resume operations."
+        },
+        {
+          "kind": "document",
+          "master": "docs/owners-manual.md",
+          "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+          "masterPresent": [
+            "Administrative dissolution — dissolution by the state for failing to meet statutory requirements. The company continues to exist for winding up, and its protected series must also wind up. Dissolution is not immediate termination; reinstatement can allow the company and its series to resume operations."
+          ],
+          "wordPresent": [
+            "Administrative dissolution — dissolution by the state for failing to meet statutory requirements. The company continues to exist for winding up, and its protected series must also wind up. Dissolution is not immediate termination; reinstatement can allow the company and its series to resume operations."
+          ]
+        },
+        {
+          "kind": "replace",
+          "file": "docs/owners-manual.md",
+          "before": "Ignore it long enough and the company is administratively dissolved — which, in a series LLC, drags **every protected series** down with it (a series cannot outlive its mothership).",
+          "after": "Ignore it long enough and the company is administratively dissolved. Administrative dissolution also dissolves the company’s protected series and requires them to wind up; it does not immediately terminate their existence."
+        },
+        {
+          "kind": "document",
+          "master": "docs/owners-manual.md",
+          "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+          "masterPresent": [
+            "Ignore it long enough and the company is administratively dissolved. Administrative dissolution also dissolves the company’s protected series and requires them to wind up; it does not immediately terminate their existence."
+          ],
+          "wordPresent": [
+            "Ignore it long enough and the company is administratively dissolved. Administrative dissolution also dissolves the company’s protected series and requires them to wind up; it does not immediately terminate their existence."
+          ]
+        },
+        {
+          "kind": "present",
+          "file": "docs/owners-manual.md",
+          "text": "- **Reinstatement, if you let it lapse:** $100 plus every missed year's annual report fee. Administrative dissolution restricts the company to winding up; it does not automatically remove its liability protections. Keep the required records and resolve the lapse promptly."
+        },
+        {
+          "kind": "absent",
+          "text": "- **Reinstatement, if you let it lapse:** $100 plus every missed year's annual report fee — on top of losing the shields in the interim."
+        },
+        {
+          "kind": "document",
+          "master": "docs/owners-manual.md",
+          "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+          "masterPresent": [
+            "it does not automatically remove its liability protections."
+          ],
+          "wordPresent": [
+            "it does not automatically remove its liability protections."
+          ]
+        }
+      ],
+      "replaces": {
+        "batch": "17",
+        "revision": 2,
+        "commit": "",
+        "doneBy": "Codex",
+        "assertions": [
+          {
+            "kind": "replace",
+            "file": "docs/owners-manual.md",
+            "before": "- **Reinstatement, if you let it lapse:** $100 plus every missed year's annual report fee — on top of losing the shields in the interim.",
+            "after": "- **Reinstatement, if you let it lapse:** $100 plus every missed year's annual report fee. Administrative dissolution restricts the company to winding up; it does not automatically remove its liability protections. Keep the required records and resolve the lapse promptly."
+          },
+          {
+            "kind": "document",
+            "master": "docs/owners-manual.md",
+            "word": "Series LLC Owners Manual - REVISED DRAFT.docx",
+            "masterPresent": [
+              "it does not automatically remove its liability protections."
+            ],
+            "wordPresent": [
+              "it does not automatically remove its liability protections."
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/oa-instructions.md",
+      "mode": "replace",
+      "why": "Exact owner-approved Batch31 replacements only."
+    },
+    {
+      "path": "docs/owners-manual.md",
+      "mode": "replace",
+      "why": "Exact owner-approved Batch31 replacements only."
+    },
+    {
+      "path": "webapp/server/templates-oa-member-s.md",
+      "mode": "replace",
+      "why": "Exact owner-approved Batch31 replacements only."
+    },
+    {
+      "path": "webapp/server/templates-oa-member-single-s.md",
+      "mode": "replace",
+      "why": "Exact owner-approved Batch31 replacements only."
+    },
+    {
+      "path": "webapp/server/templates-oa-member-single.md",
+      "mode": "replace",
+      "why": "Exact owner-approved Batch31 replacements only."
+    },
+    {
+      "path": "webapp/server/templates-oa-member.md",
+      "mode": "replace",
+      "why": "Exact owner-approved Batch31 replacements only."
+    },
+    {
+      "path": "webapp/server/templates-oa-multi.md",
+      "mode": "replace",
+      "why": "Exact owner-approved Batch31 replacements only."
+    },
+    {
+      "path": "webapp/server/templates-oa-s.md",
+      "mode": "replace",
+      "why": "Exact owner-approved Batch31 replacements only."
+    },
+    {
+      "path": "webapp/server/templates-oa-single-s.md",
+      "mode": "replace",
+      "why": "Exact owner-approved Batch31 replacements only."
+    },
+    {
+      "path": "webapp/server/templates-oa-single.md",
+      "mode": "replace",
+      "why": "Exact owner-approved Batch31 replacements only."
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "mode": "replace",
+      "why": "Exact owner-approved Batch31 replacements only."
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Record actual decisions and update provision evidence for the approved text."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Record actual decisions and update provision evidence for the approved text."
+    },
+    {
+      "path": "docs/audit/rulings.md",
+      "mode": "code",
+      "control": true,
+      "why": "Record actual decisions and update provision evidence for the approved text."
+    },
+    {
+      "path": "docs/audit/intakes/claude-reconciled-batch31.json",
+      "mode": "code",
+      "control": true,
+      "why": "Record actual decisions and update provision evidence for the approved text."
+    },
+    {
+      "path": "docs/oa-map.md",
+      "mode": "code",
+      "control": true,
+      "why": "Record actual decisions and update provision evidence for the approved text."
+    },
+    {
+      "path": "docs/event-map.md",
+      "mode": "code",
+      "control": true,
+      "why": "Record actual decisions and update provision evidence for the approved text."
+    },
+    {
+      "path": "docs/word/SMMMDE - FPSLLC Operating Agreement - Manager-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated by the normal master-to-Word hook."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated by the normal master-to-Word hook."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Manager-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated by the normal master-to-Word hook."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed Multi-Member (Partnership) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated by the normal master-to-Word hook."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement - Member-Managed (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated by the normal master-to-Word hook."
+    },
+    {
+      "path": "docs/word/SMMMS - FPSLLC Operating Agreement - Manager-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated by the normal master-to-Word hook."
+    },
+    {
+      "path": "docs/word/SMMEMDE - FPSLLC Operating Agreement - Member-Managed Single Member (Disregarded) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated by the normal master-to-Word hook."
+    },
+    {
+      "path": "docs/word/SMMEMS - FPSLLC Operating Agreement - Member-Managed Single Member (S Corporation) - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated by the normal master-to-Word hook."
+    },
+    {
+      "path": "docs/word/FPSLLC Amendment to Operating Agreement - FORM.docx",
+      "mode": "generated",
+      "why": "Regenerated by the normal master-to-Word hook."
+    },
+    {
+      "path": "docs/word/Series LLC Owners Manual - REVISED DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated by the normal master-to-Word hook."
+    },
+    {
+      "path": "docs/word/FPSLLC Statement of Authorized Representative - FORM.docx",
+      "mode": "generated",
+      "why": "Regenerated by the normal master-to-Word hook."
+    },
+    {
+      "path": "docs/word/FPSLLC Operating Agreement Instructions - DRAFT.docx",
+      "mode": "generated",
+      "why": "Regenerated by the normal master-to-Word hook."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Production bundle generated by the normal hook."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": []
+}

@@ -22,6 +22,7 @@
  */
 import { assembleOa, OA_TEMPLATE_VERSION, type OaInputs } from "./oa";
 import { readFileSync } from "node:fs";
+import { computeCapital, type CapitalResult } from "./oa-capital";
 import { assembleAmendment } from "./oa-amendment";
 
 const MASTERS: Record<OaInputs["version"], string> = {
@@ -73,7 +74,7 @@ const S = {
 /** Distinctive, so no other figure in the document can be mistaken for it. */
 const AM_NUMBER = 7419;
 
-function inputsFor(v: OaInputs["version"]): OaInputs {
+export function inputsFor(v: OaInputs["version"], contribution: "equal" | "shares" | "joint" = "joint"): OaInputs {
   const single = v.includes("single");
   const memberManaged = v.startsWith("member");
   return {
@@ -102,10 +103,10 @@ function inputsFor(v: OaInputs["version"]): OaInputs {
       { name: S.ser1, purpose: S.purpose1, contribution: `${S.asset1} ($1,000)`, specialTerms: S.special },
       { name: S.ser2, purpose: S.purpose2, contribution: `${S.asset2} ($500)`, specialTerms: S.special },
     ],
-    assets: [
-      { description: S.asset1, value: "$1,000", by: single ? S.m1 : `${S.m1} and ${S.m2}, equally`, to: S.ser1 },
-      { description: S.asset2, value: "$500", by: single ? S.m1 : `${S.m1} (60%) and ${S.m2} (40%)`, to: S.ser2 },
-    ],
+    assets: computeCapital([
+      { description: S.asset1, value: 1000, allocatedTo: 0, contributedBy: { mode: contribution === "shares" ? "shares" : "equal", shares: [60,40] } },
+      { description: S.asset2, value: 500, allocatedTo: 1, contributedBy: { mode: "shares", shares: [60,40] } },
+    ], single ? [S.m1] : [S.m1,S.m2], [S.ser1,S.ser2], [false,contribution === "joint"]).assetRows,
     seriesAllocations: [
       { name: S.ser1, items: `${S.asset1} ($1,000)`, total: "$1,000" },
       { name: S.ser2, items: `${S.asset2} ($500)`, total: "$500" },
@@ -230,11 +231,6 @@ function masterKey(s: string): string {
       .replace(/\[MEMBER ADDRESS\]|\[ADDRESS\]/g, "[ADDRESS]")
       .replace(/\[MEMBER CONTRIBUTION\]|\$\[AMOUNT\] \[and\/or described property\]|\$\[AMOUNT\]|\[ASSET VALUE\]|\[SERIES TOTAL\]|\[RETAINED\]/g, "[MONEY]")
       .replace(/\[CONTRIBUTION\]|\[RETAINED ASSETS\]/g, "[SERCONTRIB]")
-      // The contributed-by cell holds a name list — "A and B, equally" or
-      // "A (60%) and B (40%)"; the allocated-to cell a series or the Company.
-      // Both sides reduce to the master's slots. Runs after the name slots
-      // above have become [NAME], so it applies to master and output alike.
-      .replace(/\[NAME\](?: \(\d+(?:\.\d+)?%\))?(?:(?:, \[NAME\](?: \(\d+(?:\.\d+)?%\))?)*,? and \[NAME\](?: \(\d+(?:\.\d+)?%\))?)?(?:, equally)?(?= \| (?:\[SERIES\]|the Company|\[ASSET TO\]) \|)/g, "[ASSET BY]")
       .replace(/(\| (?:\[ASSET BY\]|\[MONEY\]) \| )(?:\[SERIES\]|the Company)( \|)/g, "$1[ASSET TO]$2")
       .replace(/\[MEMBER DATE\]|\[AMENDMENT DATE\]|\[AGREEMENT DATE\]|\[DATE\]/g, "[DATE]")
       .replace(/\[AMENDMENT NUMBER\]/g, "[NUM]")
@@ -252,7 +248,17 @@ function masterKey(s: string): string {
 }
 
 const keyMaster = (s: string) => normalize(masterKey(s));
-const keyOutput = (s: string) => normalize(masterKey(unwind(s)));
+/** Only the contributed-by cell of the exact known asset row is reduced.
+ * No generic name/fraction regex can conceal a changed contributor elsewhere. */
+export function contributedCells(s: string, assets: CapitalResult["assetRows"]): string {
+  return s.split("\n").map(line => {
+    const cells=line.split("|");
+    if(cells.length!==6)return line;
+    const expected=assets.find(a=>a.description===cells[1].trim());
+    if(expected && cells[3].trim()===expected.by)cells[3]=" [ASSET BY] ";
+    return cells.join("|");
+  }).join("\n");
+}
 
 /** Original paragraph blocks — split only, no collapsing, so table rows and
  *  other line structure survive for the per-line fallback. */
@@ -303,7 +309,8 @@ function knownOf(raw: string): Set<string> {
   return known;
 }
 
-function report(label: string, file: string, markdown: string): void {
+function report(label: string, file: string, markdown: string, assets: CapitalResult["assetRows"] = []): void {
+  const keyOutput = (s: string) => normalize(masterKey(unwind(contributedCells(s,assets))));
   const known = knownOf(readFileSync(`${import.meta.dir}/${file}`, "utf8"));
   const traces = (block: string): boolean => {
     const k = keyOutput(block);
@@ -328,13 +335,17 @@ function report(label: string, file: string, markdown: string): void {
   violations += orphans.length;
 }
 
+if (import.meta.main) {
 for (const [version, file] of Object.entries(MASTERS) as [OaInputs["version"], string][]) {
   for (const professional of [false, true]) {
     for (const restatement of ["initial", "dated", "undated"] as const) {
-      report(`${version}, ${professional ? "professional" : "ordinary"}, ${restatement}`, file,
-        assembleOa({ ...inputsFor(version), professional,
+      for (const contribution of ["equal", "shares", "joint"] as const) {
+      const input=inputsFor(version, contribution);
+      report(`${version}, ${contribution}, ${professional ? "professional" : "ordinary"}, ${restatement}`, file,
+        assembleOa({ ...input, professional,
           amendedRestated: restatement !== "initial",
-          priorAgreementDate: restatement === "dated" ? S.prior : null }).markdown);
+          priorAgreementDate: restatement === "dated" ? S.prior : null }).markdown, input.assets);
+      }
     }
   }
 }
@@ -350,3 +361,5 @@ const AMENDMENT_MASTER = "templates-oa-amendment.md";
 }
 console.log(`\n${violations} untraceable paragraph(s) across the eight forms and the amendment.`);
 process.exit(violations > 0 ? 1 : 0);
+
+}

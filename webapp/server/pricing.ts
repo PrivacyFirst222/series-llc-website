@@ -22,7 +22,7 @@ export const OPTIONAL_DOC_PREP_CENTS = 10_00;
 export const SERIES_ADDON_STATE_CENTS = 25_00;
 /** S election package is purchasable only this many days after the formation
  *  order is paid — leaves ~10 days of buffer inside the IRS's 2-months-and-15-days
- *  election deadline for preparation, signing, and mailing. */
+ *  election deadline for preparation, signing, and faxing or mailing. */
 export const S_ELECTION_WINDOW_DAYS = 65;
 
 export interface PricedOrder {

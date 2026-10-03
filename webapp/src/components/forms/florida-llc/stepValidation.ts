@@ -2,11 +2,11 @@ import { englishTextProblems } from "@/lib/englishText";
 import { selectedFormData } from "./buildPayload";
 import { stepForField } from "./steps";
 import { postalCodeError } from "./addressValidation";
-import { registeredAgentName } from "./registeredAgent";
+import { registeredAgentName, personalAgentMatches } from "./registeredAgent";
 import { FIRST_AND_LAST, hasFirstAndLast } from "@/lib/personName";
 import { isPoBox } from "./schema";
 import { nameCheckKey, normalizeEntityName } from "./nameSimilarity";
-import { seriesDedupeKey } from "./validation";
+import { seriesConflictKey } from "./validation";
 import {
   buildFinalLlcName,
   designatorAllowedForFormationType,
@@ -125,7 +125,7 @@ export function validateStep(
             e[field] =
               r.verdict === "taken"
                 ? "Unavailable — an existing Florida company already has this name. Please choose a different name."
-                : "Unavailable — this name belongs to a recently dissolved company, and Florida protects it for up to a year. Please choose a different name.";
+                : "Unavailable — this name matches a recently inactive company. Our service conservatively treats it as unavailable. Please choose a different name.";
           });
         }
       }
@@ -197,12 +197,12 @@ export function validateStep(
           'Include "PS" (or "P.S." / "protected series") — s. 605.2202, Fla. Stat., requires it in every series name.';
       }
     });
-    const keys = data.series.map((s) => seriesDedupeKey(s.name));
+    const keys = data.series.map((s) => seriesConflictKey(s.name));
     keys.forEach((k, i) => {
       const first = keys.indexOf(k);
       if (data.series[i].name.trim() && first !== i)
         e[`series.${i}.name`] =
-          `Same name as series ${first + 1} — "PS", "P.S.", and "Protected Series" count as the same prefix, and capitalization is ignored. Make it distinct.`;
+          `Same name as series ${first + 1} under our preliminary Florida naming checks. Changes only to series prefixes, capitalization, punctuation, articles or “and”/“&” do not resolve this conflict. Choose a distinguishable name.`;
     });
   }
 
@@ -214,6 +214,7 @@ export function validateStep(
     if (data.registeredAgentChoice === "SERVICE" && data.raRenewalCardConsent !== true)
       e.raRenewalCardConsent = "Please agree to keep a card on file for the yearly renewal.";
     if (data.registeredAgentChoice === "SELF") {
+      if (data.filingPath !== "CONVERT" && !personalAgentMatches(data)) e.registeredAgentFirstName = "To serve personally, use your name from the client information step, or choose our registered agent service.";
       const retainedEntity = data.filingPath === "CONVERT" && data.registeredAgentType === "ENTITY";
       if (!retainedEntity && data.registeredAgentType !== "INDIVIDUAL") e.registeredAgentType = "Choose an individual agent.";
       if (retainedEntity && !(data.registeredAgentBusinessEntityName ?? "").trim()) e.registeredAgentBusinessEntityName = "The agent’s legal entity name is required.";
@@ -253,11 +254,11 @@ export function validateStep(
       e.registeredAgentAcceptanceName = "Your name is required.";
     else if (!hasFirstAndLast(data.registeredAgentAcceptanceName))
       e.registeredAgentAcceptanceName = FIRST_AND_LAST;
-    if (!data.registeredAgentElectronicSignature)
+    if (!data.registeredAgentElectronicSignature.trim())
       e.registeredAgentElectronicSignature = "Electronic signature required.";
     const expected = registeredAgentName(data);
-    if (data.registeredAgentAcceptanceName.trim() !== expected) e.registeredAgentAcceptanceName = `The acceptance name must match the registered agent name exactly: ${expected}`;
-    if (data.registeredAgentElectronicSignature.trim() !== expected) e.registeredAgentElectronicSignature = `Your electronic signature must match the registered agent name exactly: ${expected}`;
+    if (!e.registeredAgentAcceptanceName && data.registeredAgentAcceptanceName.trim() !== expected) e.registeredAgentAcceptanceName = `The acceptance name must match the registered agent name exactly: ${expected}`;
+    if (!e.registeredAgentElectronicSignature && data.registeredAgentElectronicSignature.trim() !== expected) e.registeredAgentElectronicSignature = `Your electronic signature must match the registered agent name exactly: ${expected}`;
     if (!data.registeredAgentAcceptanceCheckbox)
       e.registeredAgentAcceptanceCheckbox = "Acceptance is required.";
     if (!data.registeredAgentSignatureAuthorizationCheckbox)
@@ -382,7 +383,7 @@ export function validateStep(
 
   // "review" step has no required validation
   if (step === "certify") {
-    if (data.filingPath === "CONVERT" && data.registeredAgentChoice === "SELF" && data.registeredAgentSeriesAgreementAcknowledgment !== true) e.registeredAgentSeriesAgreementAcknowledgment = "Confirm the registered agent has agreed to serve the company and each protected series.";
+    if (data.registeredAgentChoice === "SELF" && data.registeredAgentSeriesAgreementAcknowledgment !== true) e.registeredAgentSeriesAgreementAcknowledgment = "Confirm the registered agent has agreed to serve the company and each protected series.";
     if (data.filingPath === "CONVERT") {
       // No Articles to sign: the client certifies authority for the company
       // already on file and authorizes the Designation filings.

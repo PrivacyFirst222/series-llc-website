@@ -3,6 +3,8 @@ import { waitForOwnedApi } from "../scripts/isolated-stack";
 import { batch16Checks } from "./batch16-check";
 import {batch05Checks} from "./batch05-check";
 import {batch04Checks} from "./batch04-check";
+import {p105Checks} from "./p105-check";
+import {remainingAccountChecks} from "./chunk1-remaining-check";
 import {batch03Checks} from "./batch03-check";
 import { batch02Checks } from "./batch02-check";
 import { equalShares, sharesAreComplete } from "../src/lib/ownership";
@@ -170,6 +172,27 @@ async function adminSession() {
     adminLogin = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ password: "dev-admin" }) });
   }
   return adminLogin;
+}
+
+// Office-only assertions need a paid order under Adam's unpaid-checkout rule.
+async function payForOfficeInspection(id: string, label: string) {
+  const admin = await adminSession();
+  const before = await api(`/api/admin/orders/${id}`, { cookies: admin.cookie });
+  check(`${label}: unpaid checkout is absent from office`, before.status === 404, before.body);
+  const paid = await api("/api/dev/simulate-payment", { method: "POST", body: JSON.stringify({ orderId: id, card: "credit" }) });
+  check(`${label}: fixture payment succeeds before office inspection`, paid.status === 200, paid.body);
+}
+
+// The offline checkout adapter explicitly uses dev-<orderId> (square.ts).
+// Verify its dev URL rather than requesting payment metadata from an office
+// route that correctly refuses unpaid checkouts. The creation response supplies
+// the server-computed price; status is read from the confirmation endpoint.
+function offlineCheckoutReference(result: { body: { data?: { orderId?: string; checkoutUrl?: string } } }): string {
+  const data = result.body.data;
+  if (!data?.orderId || !data.checkoutUrl || new URL(data.checkoutUrl).searchParams.get("dev") !== "1") {
+    throw new Error("Webhook fixture requires an actual offline checkout creation response");
+  }
+  return `dev-${data.orderId}`;
 }
 
 // The suite is hermetic by default: it creates orders, documents, backups and
@@ -377,6 +400,7 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
 {
   // The sheet's agent signature row is a person's name when we are the
   // agent (Adam, 14 Sep 2026), not the series' name.
+  await payForOfficeInspection(svc.body.data.orderId, "service-agent sheet");
   const admS = await adminSession();
   const sheet = (await api(`/api/admin/orders/${svc.body?.data?.orderId}`, { cookies: admS.cookie })).body?.data as { groups?: { fields: { key: string; value: string }[] }[] } | undefined;
   const sig = sheet?.groups?.flatMap((g) => g.fields).find((f) => f.key === "raSignature");
@@ -546,7 +570,11 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
     }
     const again = new FormData(); again.set("articles", pdfFile()); again.set("documentNumber", "L26000123456");
     const againRes = await fetch(`${BASE}/api/admin/orders/${apId}/articles`, { method: "POST", headers: { Cookie: adm.cookie }, body: again });
-    check("statement: a second Articles upload at this step is still refused as before", againRes.status === 409);
+    // R3: an identical retry returns the saved result; a different upload is
+    // still refused (covered by the separate duplicate-upload case below).
+    const afterRetry = await api("/api/portal/documents", { cookies: apPw.cookie });
+    const afterIds = ((afterRetry.body?.data ?? []) as {id:string}[]).map(d=>d.id).sort();
+    check("statement: an identical Articles retry reuses the same documents", againRes.status === 200 && JSON.stringify(afterIds) === JSON.stringify(clientList.map(d=>d.id).sort()), {status:againRes.status,afterIds});
   }
 }
 
@@ -731,6 +759,7 @@ check("client account auto-created on payment", !!client && !client.has_password
       clientEmail: uc("stray"), confirmClientEmail: uc("stray"), correspondentEmail: uc("stray"), confirmCorrespondentEmail: uc("stray"),
     }) });
     check("a conversion with a stray S election tick and no agent acceptance is accepted", stray.status === 200, stray.body);
+    await payForOfficeInspection(stray.body.data.orderId, "conversion record");
     const strayDet = (await api(`/api/admin/orders/${stray.body?.data?.orderId}`, { cookies: admin.cookie })).body?.data as { payload?: unknown; groups?: { title: string; fields: { key: string; value: string }[] }[] } | undefined;
     const sp = (typeof strayDet?.payload === "string" ? JSON.parse(strayDet.payload) : strayDet?.payload) as { optionalDocuments?: { sElection?: boolean }; acknowledgments?: { sElectionFilingAcknowledgment?: boolean }; certifications?: { authorizedRepresentativeSignature?: string } } | undefined;
     check("the conversion's record carries no S election, no S election acknowledgment, and no client signature", sp?.optionalDocuments?.sElection === false && sp?.acknowledgments?.sElectionFilingAcknowledgment === false && (sp?.certifications?.authorizedRepresentativeSignature ?? "") === "", { od: sp?.optionalDocuments, ack: sp?.acknowledgments?.sElectionFilingAcknowledgment, sig: sp?.certifications?.authorizedRepresentativeSignature });
@@ -743,6 +772,7 @@ check("client account auto-created on payment", !!client && !client.has_password
     const noState = await api("/api/orders", { method: "POST", headers: strayIp(), body: JSON.stringify({ ...formData, clientAddress: { ...formData.clientAddress, state: "" }, clientEmail: uc("nost"), confirmClientEmail: uc("nost"), correspondentEmail: uc("nost"), confirmCorrespondentEmail: uc("nost") }) });
     check("the client's state is required by the server", noState.status === 400 && /clientAddress/.test(JSON.stringify(noState.body)) && /state/i.test(JSON.stringify(noState.body)), noState.body);
   }
+  await payForOfficeInspection(conv.body.data.orderId, "conversion company name");
   const fullC = await api(`/api/admin/orders/${conv.body?.data?.orderId}`, { cookies: admin.cookie });
   check("a conversion order is named by the company being converted",
     (fullC.body?.data as { llcName?: string })?.llcName === "E2E Converted Holdings, LLC",
@@ -929,6 +959,7 @@ check("no duplicate client on repeat webhook", dupes.length === 1);
 
 // 7. Admin uploads a document for the client (multipart)
 const fd = new FormData();
+fd.set("submissionId", crypto.randomUUID());
 fd.set("clientId", client!.id);
 fd.set("kind", "package");
 fd.set("title", "Operating Agreement");
@@ -948,7 +979,8 @@ check("admin uploads document", uploadRes.status === 200, await uploadRes.clone(
   const afterPackage = (await outbox()).filter((m) => m.to === testEmail).at(-1);
   check("a formation package sends the plain new-document notice", afterPackage?.subject === "A new document is available in your portal", afterPackage?.subject);
   const lm = new FormData();
-  lm.set("clientId", client!.id);
+  lm.set("submissionId", crypto.randomUUID());
+lm.set("clientId", client!.id);
   lm.set("kind", "legal_mail");
   lm.set("title", "Summons — Coastal v. E2E Coastal Holdings");
   lm.set("notify", "true");
@@ -976,7 +1008,8 @@ check("admin uploads document", uploadRes.status === 200, await uploadRes.clone(
 // be one used to sail through and reach the client dressed as a PDF.
 {
   const txtFd = new FormData();
-  txtFd.set("clientId", client!.id);
+  txtFd.set("submissionId", crypto.randomUUID());
+txtFd.set("clientId", client!.id);
   txtFd.set("kind", "package");
   txtFd.set("title", "Not A PDF Probe");
   txtFd.set("notify", "false");
@@ -1032,7 +1065,7 @@ if (mint.status === 200) {
 
   // Cross-purpose rejection: a token minted to verify an email address must
   // not be able to set a password (AUD-002). The wrong-purpose token is left
-  // unconsumed so it still works for its own purpose.
+  // unconsumed so prior use cannot explain its refusal.
   const wrongPurpose = await api("/api/dev/mint-reset-token", {
     method: "POST",
     body: JSON.stringify({ email: testEmail, purpose: "verify_email" }),
@@ -1041,9 +1074,13 @@ if (mint.status === 200) {
     method: "POST",
     body: JSON.stringify({ token: wrongPurpose.body.data.token, password: "e2e-crosspurpose-1" }),
   });
+  const purposeFixtureCurrent = wrongPurpose.status === 200 &&
+    mint.body.data.accountVersion !== undefined && wrongPurpose.body.data.accountVersion !== undefined &&
+    BigInt(wrongPurpose.body.data.accountVersion) === BigInt(mint.body.data.accountVersion) + 1n;
+  check("wrong-purpose fixture uses the current account revision", purposeFixtureCurrent);
   check(
     "verify_email token cannot set a password",
-    crossPw.status === 400 && crossPw.body?.error?.code === "BAD_TOKEN",
+    purposeFixtureCurrent && crossPw.status === 400 && crossPw.body?.error?.code === "BAD_TOKEN",
     crossPw.body,
   );
   const me = await api("/api/auth/me", { cookies: setPw.cookie });
@@ -1597,15 +1634,15 @@ if (mint.status === 200) {
     const storedRes = await api(`/api/dev/oa-generation-inputs/${gen2.body?.data?.generationId}`);
     const stored = storedRes.body?.data?.inputs as OaInputs;
     const owner = stored?.members?.[0]?.name ?? "";
-    const blank = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "typed", text: "   " }) });
+    const blank = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "typed", text: "   " }) });
     check("amendment: typed changes left blank are refused", blank.status === 400 && blank.body?.error?.code === "INVALID_INPUT", blank.body);
-    const noAgreementDate = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ effectiveDate: "2026-09-12", mode: "attached" }) });
+    const noAgreementDate = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, effectiveDate: "2026-09-12", mode: "attached" }) });
     check("amendment: refused without the agreement's effective date", noAgreementDate.status === 400, noAgreementDate.body);
     const history = await api("/api/portal/oa", { cookies: setPw.cookie });
     check("the agreement list carries each agreement's effective date, printed and as a date box needs it", history.body?.data?.generations?.[0]?.effective_date === "August 5, 2026" && history.body?.data?.generations?.[0]?.effective_date_iso === "2026-08-05", history.body?.data?.generations?.[0]);
-    const badDate = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ agreementDate: "2026-08-05", effectiveDate: "next week", mode: "attached" }) });
+    const badDate = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, agreementDate: "2026-08-05", effectiveDate: "next week", mode: "attached" }) });
     check("amendment: a date that is not a date is refused", badDate.status === 400, badDate.body);
-    const typed = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "typed", text: "Section 3.2 is amended to read: \"The Company may designate up to four Protected Series.\"\nSection 9.4 is deleted." }) });
+    const typed = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "typed", text: "Section 3.2 is amended to read: \"The Company may designate up to four Protected Series.\"\nSection 9.4 is deleted." }) });
     check("amendment with typed changes generates", typed.status === 200, typed.body);
     check("the first amendment is No. 1, titled for the company", typed.body?.data?.number === 1 && typed.body?.data?.title === "Amendment No. 1 to Operating Agreement — E2E Coastal Holdings, LLC", typed.body?.data);
     const amPdf = await fetch(`${BASE}/api/portal/documents/${typed.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } });
@@ -1627,7 +1664,7 @@ if (mint.status === 200) {
       check("read off the PDF: the Member signs, and nobody else", owner !== "" && new RegExp(`MEMBER: ${owner.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} Date:`).test(flat) && !/ACKNOWLEDGED/.test(flat) && !/MEMBERS:/.test(flat), { owner, tail: flat.slice(-400) });
       check("read off the PDF: the effective date typed is the one printed", /effective as of September 12, 2026, by the undersigned sole member/.test(flat), flat.match(/effective as of [^,]*, by[^.]*/)?.[0]);
     }
-    const attached = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ agreementDate: "2025-03-03", effectiveDate: "2026-10-01", mode: "attached" }) });
+    const attached = await api("/api/portal/oa/amend", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, agreementDate: "2025-03-03", effectiveDate: "2026-10-01", mode: "attached" }) });
     check("a second amendment, with the changes attached as Exhibit A, is No. 2", attached.status === 200 && attached.body?.data?.number === 2 && /^Amendment No\. 2 /.test(attached.body?.data?.title ?? ""), attached.body?.data);
     const atBytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${attached.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } })).arrayBuffer());
     const atText = pdfText(atBytes);
@@ -1639,25 +1676,25 @@ if (mint.status === 200) {
     const docsNow = await api("/api/portal/documents", { cookies: setPw.cookie });
     const amDocs = ((docsNow.body?.data ?? []) as { kind: string; title: string }[]).filter((d) => d.kind === "amendment").map((d) => d.title);
     check("both amendments are in the client's documents as amendments", amDocs.length === 2 && amDocs.some((x) => x.startsWith("Amendment No. 1 ")) && amDocs.some((x) => x.startsWith("Amendment No. 2 ")), amDocs);
-    const noSession = await api("/api/portal/oa/amend", { method: "POST", body: JSON.stringify({ agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "attached" }) });
+    const noSession = await api("/api/portal/oa/amend", { method: "POST", body: JSON.stringify({ generationId: gen2.body?.data?.generationId, agreementDate: "2026-08-05", effectiveDate: "2026-09-12", mode: "attached" }) });
     check("amendment requires a signed-in client", noSession.status === 401);
   }
 
   // --- consent + Series Exhibit for a series added after formation ---
   const badName = await api("/api/portal/series/consent", {
     method: "POST", cookies: setPw.cookie,
-    body: JSON.stringify({ seriesName: "Totally Different Co, PS 4", seriesNumber: "4", purpose: "", effectiveDate: "2026-09-01" }),
+    body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "Totally Different Co, PS 4", seriesNumber: "4", purpose: "", effectiveDate: "2026-09-01" }),
   });
   check("series name not beginning with the company name is refused (s. 605.2202)",
     badName.status === 400, badName.body);
   const noPS = await api("/api/portal/series/consent", {
     method: "POST", cookies: setPw.cookie,
-    body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC - Unit 4", seriesNumber: "4", purpose: "", effectiveDate: "2026-09-01" }),
+    body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "E2E Coastal Holdings, LLC - Unit 4", seriesNumber: "4", purpose: "", effectiveDate: "2026-09-01" }),
   });
   check('series name without "PS" is refused (s. 605.2202)', noPS.status === 400, noPS.body);
   const consent = await api("/api/portal/series/consent", {
     method: "POST", cookies: setPw.cookie,
-    body: JSON.stringify({
+    body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true,
       seriesName: "E2E Coastal Holdings, LLC, PS D",
       seriesNumber: "D",
       purpose: "to acquire, own, and lease the real property at 400 Bay Court",
@@ -1692,7 +1729,7 @@ if (mint.status === 200) {
   }
   {
     // Special terms and a contribution, as the agreement's exhibit takes them (15 Sep 2026).
-    const withTerms = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", purpose: "", effectiveDate: "2026-09-02", specialTerms: "The Member may not sell 500 Bay Street without a written appraisal.", contribution: "the real property at 500 Bay Street" }) });
+    const withTerms = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", purpose: "", effectiveDate: "2026-09-02", specialTerms: "The Member may not sell 500 Bay Street without a written appraisal.", contribution: "the real property at 500 Bay Street" }) });
     check("a consent with special terms and a contribution generates", withTerms.status === 200, withTerms.body);
     if (withTerms.status === 200 && hasPdftotext) {
       const bytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${withTerms.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } })).arrayBuffer());
@@ -1702,7 +1739,7 @@ if (mint.status === 200) {
   }
   const consentBlank = await api("/api/portal/series/consent", {
     method: "POST", cookies: setPw.cookie,
-    body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", purpose: "", effectiveDate: "2026-09-02" }),
+    body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", purpose: "", effectiveDate: "2026-09-02" }),
   });
   check("consent with no stated purpose generates", consentBlank.status === 200, consentBlank.body);
   {
@@ -1714,13 +1751,13 @@ if (mint.status === 200) {
   }
   {
     // Each refusal names the box (15 Sep 2026).
-    const longTerms = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "2026-09-02", specialTerms: "x".repeat(2001) }) });
+    const longTerms = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "2026-09-02", specialTerms: "x".repeat(2001) }) });
     check("consent: special terms over 2,000 characters are refused by name", longTerms.status === 400 && longTerms.body?.error?.message === "Special terms can be at most 2,000 characters.", longTerms.body);
-    const noName = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "", seriesNumber: "E", effectiveDate: "2026-09-02" }) });
+    const noName = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "", seriesNumber: "E", effectiveDate: "2026-09-02" }) });
     check("consent: a missing series name is refused by name", noName.status === 400 && noName.body?.error?.message === "Enter the protected series name.", noName.body);
-    const noDate = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "soon" }) });
+    const noDate = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "soon" }) });
     check("consent: a missing date is refused by name", noDate.status === 400 && noDate.body?.error?.message === "Enter the effective date.", noDate.body);
-    const longContribution = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "2026-09-02", contribution: "y".repeat(301) }) });
+    const longContribution = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId: gen2.body?.data?.generationId, partiesConfirmed: true, seriesName: "E2E Coastal Holdings, LLC, PS E", seriesNumber: "E", effectiveDate: "2026-09-02", contribution: "y".repeat(301) }) });
     check("consent: a contribution over 300 characters is refused by name", longContribution.status === 400 && longContribution.body?.error?.message === "The contribution can be at most 300 characters.", longContribution.body);
   }
   {
@@ -1907,7 +1944,8 @@ if (mint.status === 200) {
       const named = await api(`/api/portal/oa/answers?company=${secondId}`, { method: "PUT", cookies: setPw.cookie, body: JSON.stringify({ firstOrAmended: "first", effectiveDate: "2026-10-01", members: [{ name: "Sydney Secondowner", address: "9 Second Street, Tampa, FL 33602" }], series: [] }) });
       check("the second company's owner is saved", named.status === 200, named.body);
       const secondName = ((await api(`/api/admin/orders/${secondId}`, { cookies: (await adminSession()).cookie })).body?.data as { llcName?: string })?.llcName ?? "";
-      const consent2 = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ company: secondId, seriesName: `${secondName}, PS B`, seriesNumber: "B", purpose: "", effectiveDate: "2026-10-02" }) });
+      const selectedSecond = await api(`/api/portal/oa/generate?company=${secondId}`, {method:"POST",cookies:setPw.cookie,body:JSON.stringify({firstOrAmended:"first",effectiveDate:"2026-10-01",authorized:true,multiOwner:false,members:[{name:"Sydney Secondowner",address:"9 Second Street, Tampa, FL 33602"}],series:[],assets:[]})});
+      const consent2 = await api("/api/portal/series/consent", { method: "POST", cookies: setPw.cookie, body: JSON.stringify({ generationId:selectedSecond.body?.data?.generationId, partiesConfirmed:true, company: secondId, seriesName: `${secondName}, PS B`, seriesNumber: "B", purpose: "", effectiveDate: "2026-10-02" }) });
       check("a consent for the second company generates", consent2.status === 200, consent2.body);
       if (consent2.status === 200 && hasPdftotext) {
         const bytes = new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${consent2.body?.data?.documentId}/download`, { headers: { Cookie: setPw.cookie } })).arrayBuffer());
@@ -1960,7 +1998,8 @@ if (mint.status === 200) {
       check("the series consent carries its company", consentDoc?.order_id === orderId, consentDoc);
       const admU = await adminSession();
       const noCompany = new FormData();
-      noCompany.set("clientId", client!.id);
+      noCompany.set("submissionId", crypto.randomUUID());
+noCompany.set("clientId", client!.id);
       noCompany.set("kind", "package");
       noCompany.set("title", "Hand-uploaded package");
       noCompany.set("notify", "false");
@@ -1968,7 +2007,8 @@ if (mint.status === 200) {
       const noCompanyRes = await fetch(`${BASE}/api/admin/documents`, { method: "POST", body: noCompany, headers: { Cookie: admU.cookie, "X-Forwarded-For": RUN_IP } });
       check("a hand-uploaded package for a two-company client must name the company", noCompanyRes.status === 400 && ((await noCompanyRes.json().catch(() => null)) as { error?: { code?: string } } | null)?.error?.code === "COMPANY_REQUIRED");
       const withCompany = new FormData();
-      withCompany.set("clientId", client!.id);
+      withCompany.set("submissionId", crypto.randomUUID());
+withCompany.set("clientId", client!.id);
       withCompany.set("kind", "package");
       withCompany.set("title", "Hand-uploaded package");
       withCompany.set("notify", "false");
@@ -1981,7 +2021,8 @@ if (mint.status === 200) {
       const handDoc = docsAfterHand.find((d) => d.title === "Hand-uploaded package");
       check("the hand-uploaded package carries the chosen company", handDoc?.order_id === secondId, handDoc);
       const mail = new FormData();
-      mail.set("clientId", client!.id);
+      mail.set("submissionId", crypto.randomUUID());
+mail.set("clientId", client!.id);
       mail.set("kind", "legal_mail");
       mail.set("title", "Hand-uploaded legal mail");
       mail.set("notify", "false");
@@ -2417,9 +2458,9 @@ if (mint.status === 200) {
     clientEmail: mmEmail, confirmClientEmail: mmEmail,
     clientFirstName: "Dana", clientLastName: "Reed",
     confirmCorrespondentEmail: mmEmail,
-    registeredAgentFirstName: "Dana", registeredAgentLastName: "Reed", registeredAgentSuffix: "",
-    registeredAgentAcceptanceName: "Dana Reed",
-    registeredAgentElectronicSignature: "Dana Reed",
+    registeredAgentFirstName: "Dana", registeredAgentLastName: "Reed", registeredAgentSuffix: "Jr.",
+    registeredAgentAcceptanceName: "Dana Reed, Jr.",
+    registeredAgentElectronicSignature: "Dana Reed, Jr.",
     authorizedRepresentativeName: "Dana Reed",
     authorizedRepresentativeSignature: "Dana Reed",
     desiredLlcName: "E2E Member Managed Holdings",
@@ -2516,7 +2557,7 @@ if (mint.status === 200) {
       check("Exhibit A shows each owner's computed contribution",
         inputsRes.status === 200 && /\| Dana Reed \| [^|]*\| 50% \| \$125,000 \|/.test(md) && /\| Jamie Reed \| [^|]*\| 50% \| \$125,000 \|/.test(md), md.match(/\| (?:Dana|Jamie) Reed[^\n]*/g));
       check("Exhibit A lists the assets with who contributed them and where they went",
-        /\| 123 Main Street, Tampa \| \$200,000 \| Dana Reed and Jamie Reed, equally \| E2E Member Managed Holdings, LLC, PS A \|/.test(md) && /\| Cash \| \$50,000 \| Dana Reed and Jamie Reed, equally \| E2E Member Managed Holdings, LLC, PS A: \$10,000; the Company: \$40,000 \|/.test(md), md.match(/\| (?:123 Main|Cash) [^\n]*/g));
+        /\| 123 Main Street, Tampa \| \$200,000 \| Dana Reed \(1\/2\); Jamie Reed \(1\/2\)\. \| E2E Member Managed Holdings, LLC, PS A \|/.test(md) && /\| Cash \| \$50,000 \| Dana Reed \(1\/2\); Jamie Reed \(1\/2\)\. \| E2E Member Managed Holdings, LLC, PS A: \$10,000; the Company: \$40,000 \|/.test(md), md.match(/\| (?:123 Main|Cash) [^\n]*/g));
       check("Exhibit A totals the series and what the company retained",
         /\| E2E Member Managed Holdings, LLC, PS A \| 123 Main Street, Tampa \(\$200,000\); Cash \(\$10,000\) \| \$210,000 \|/.test(md) && /\| \*\*Retained by the Company\*\* \| Cash \(\$40,000\) \| \$40,000 \|/.test(md), md.match(/(PS A \| 123|Retained by the Company)[^\n]*/g));
       check("the Series Exhibit shows what the Company contributed to the series", /By the Company: 123 Main Street, Tampa \(\$200,000\); Cash \(\$10,000\)/.test(md), md.match(/By the Company:[^\n]*/)?.[0]);
@@ -2574,9 +2615,9 @@ if (mint.status === 200) {
     clientEmail: smEmail, confirmClientEmail: smEmail,
     clientFirstName: "Alex", clientLastName: "Vale",
     confirmCorrespondentEmail: smEmail,
-    registeredAgentFirstName: "Alex", registeredAgentLastName: "Vale", registeredAgentSuffix: "",
-    registeredAgentAcceptanceName: "Alex Vale",
-    registeredAgentElectronicSignature: "Alex Vale",
+    registeredAgentFirstName: "Alex", registeredAgentLastName: "Vale", registeredAgentSuffix: "Jr.",
+    registeredAgentAcceptanceName: "Alex Vale, Jr.",
+    registeredAgentElectronicSignature: "Alex Vale, Jr.",
     authorizedRepresentativeName: "Alex Vale",
     authorizedRepresentativeSignature: "Alex Vale",
     desiredLlcName: "E2E Harbor Single Manager",
@@ -2643,7 +2684,7 @@ if (mint.status === 200) {
     const md = res.status === 200 ? assembleOa(res.body?.data?.inputs as OaInputs).markdown : "";
     check("the sole owner's s. 5.4 has no borrowing clause and no dollar limit", md.includes("**5.4 Actions Requiring Member Approval.**") && !/indebtedness in excess of/.test(md) && !/\[THRESHOLD\]/.test(md), md.match(/\*\*5\.4[\s\S]{0,900}/)?.[0]);
     check("the sole owner's s. 5.4 reletters: (a) then (b) the statement of authority", /\(a\) sell, exchange, or otherwise dispose[^\n]*; or\n\n\(b\) file, amend, or cancel a statement of authority/.test(md), md.match(/\(a\) sell[\s\S]{0,400}/)?.[0]);
-    check("the sole owner's s. 5.8 points at the relettered consent, Section 5.4(b)", md.includes("With the consent of the Member required by Section 5.4(b), the Manager may cause the Company to file"), md.match(/With the consent of the Member required by Section 5\.4\([a-d]\)/)?.[0]);
+    check("the sole owner's s. 5.8 points at the relettered consent, Section 5.4(b)", md.includes("With the consent of the Member required by Section 5.4(b), the Manager may cause a statement of authority to be filed with the Department for the Company or the relevant Protected Series"), md.match(/With the consent of the Member required by Section 5\.4\([a-d]\)/)?.[0]);
   }
   const smAfter = await api("/api/portal/oa", { cookies: smPw.cookie });
   check(
@@ -2685,8 +2726,8 @@ if (mint.status === 200) {
     const smSeed = (await api("/api/portal/oa", { cookies: smPw.cookie })).body?.data?.seed as { llcName: string } | undefined;
     const savedBefore = (await api("/api/portal/oa", { cookies: smPw.cookie })).body?.data?.answers as Record<string, unknown> | undefined;
     await api("/api/portal/oa/answers", { method: "PUT", cookies: smPw.cookie, body: JSON.stringify({ ...smAnswers, members: [{ ...trustOwner, signerName: "" }] }) });
-    const consentGap = await api("/api/portal/series/consent", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ seriesName: `${smSeed?.llcName}, PS Z`, seriesNumber: "Z", effectiveDate: "2026-10-01" }) });
-    check("consent: a company or trust owner with no signer is refused, naming the owner", consentGap.status === 400 && /Name the person who signs for Vale Family Trust/.test(consentGap.body?.error?.message ?? ""), consentGap.body);
+    const consentGap = await api("/api/portal/series/consent", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ generationId:entityGen.body?.data?.generationId, partiesConfirmed:true, seriesName: `${smSeed?.llcName}, PS Z`, seriesNumber: "Z", effectiveDate: "2026-10-01" }) });
+    check("consent: incomplete questionnaire edits do not replace selected agreement parties", consentGap.status === 200, consentGap.body);
     // A backup beneficiary with no first beneficiary is refused, naming the owner.
     const soloOwner = { name: "Sam Solo", address: "9 Harbor Road, Naples, FL 34102", isEntity: false, todBeneficiary: "", todBackup: "my children in equal shares" };
     const backupOnly = await api("/api/portal/oa/generate", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ ...smAnswers, members: [soloOwner] }) });
@@ -2710,7 +2751,7 @@ if (mint.status === 200) {
   // On a manager-managed form the amendment carries the Manager's
   // acknowledgment — s. 12.1(b) bars new obligations on the Manager without
   // the Manager's written consent — beneath the Member's signature.
-  const smAmend = await api("/api/portal/oa/amend", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ agreementDate: "2026-08-08", effectiveDate: "2026-09-12", mode: "attached" }) });
+  const smAmend = await api("/api/portal/oa/amend", { method: "POST", cookies: smPw.cookie, body: JSON.stringify({ generationId:entityGen.body?.data?.generationId, agreementDate: "2026-08-08", effectiveDate: "2026-09-12", mode: "attached" }) });
   check("manager-managed sole owner: amendment generates", smAmend.status === 200 && smAmend.body?.data?.number === 1, smAmend.body);
   const smAmText = pdfText(new Uint8Array(await (await fetch(`${BASE}/api/portal/documents/${smAmend.body?.data?.documentId}/download`, { headers: { Cookie: smPw.cookie } })).arrayBuffer()));
   if (smAmText !== null) {
@@ -2892,6 +2933,7 @@ if (mint.status === 200) {
   const aOrder = await api("/api/orders", { method: "POST", body: JSON.stringify(acctData) });
   check("account-test order accepted", aOrder.status === 200, aOrder.body);
   const aId = aOrder.body?.data?.orderId as string;
+  await payForOfficeInspection(aId, "account correspondence record");
   {
     const adm = await adminSession();
     const stored = await api(`/api/admin/orders/${aId}`, { cookies: adm.cookie });
@@ -3068,7 +3110,7 @@ if (mint.status === 200) {
     sun,
   );
   check(
-    "recently dissolved entity is HELD (s. 605.0715 window)",
+    "recently inactive entity is held under the service’s conservative name-availability rule",
     gator?.verdict === "held" && gator?.conflicts?.[0]?.status === "Inactive",
     gator,
   );
@@ -3114,6 +3156,7 @@ if (mint.status === 200) {
       clientEmail: convEmail, confirmClientEmail: convEmail, correspondentEmail: convEmail, confirmCorrespondentEmail: convEmail,
     }) });
     check("a conversion is not refused over a taken name it never uses", convTaken.status === 200, convTaken.body);
+    await payForOfficeInspection(convTaken.body.data.orderId, "conversion discarded fields");
     const admN = await adminSession();
     const raw = (await api(`/api/admin/orders/${convTaken.body?.data?.orderId}`, { cookies: admN.cookie })).body?.data?.payload;
     const pl = typeof raw === "string" ? JSON.parse(raw) : raw;
@@ -3288,10 +3331,10 @@ if (mint.status === 200) {
     // paid for later.
     const { readdirSync, existsSync } = await import("node:fs");
     const { fileURLToPath } = await import("node:url");
-    const root = fileURLToPath(new URL("../.dev-data/dropbox-mirror/", import.meta.url));
+    const root = process.env.DEV_MIRROR_DIR || fileURLToPath(new URL("../.dev-data/dropbox-mirror/", import.meta.url));
     const firstDet = (await api(`/api/admin/orders/${orderId}`, { cookies: adm.cookie })).body?.data as { documents: { id: string; kind: string }[] };
     const artsId = firstDet.documents.find((d) => d.kind === "articles")?.id ?? "";
-    const folder = `${root}E2E Coastal Holdings, LLC`;
+    const folder = joinPath(root, "E2E Coastal Holdings, LLC");
     const inOwn = existsSync(folder) && readdirSync(folder).some((f) => f.startsWith(artsId.slice(0, 8)));
     check("a document is mirrored into its own company's folder, not the client's newest company's", inOwn, { folder, artsId, listing: existsSync(folder) ? readdirSync(folder).slice(-5) : "missing" });
   }
@@ -3388,11 +3431,12 @@ if (mint.status === 200) {
     }),
   });
   const id = ord.body?.data?.orderId as string;
-  const detail = await api(`/api/admin/orders/${id}`, { cookies: adm.cookie });
-  const squareOrderId = detail.body?.data?.squareOrderId as string;
-  const total = detail.body?.data?.totalCents as number;
+  const unpaidOffice = await api(`/api/admin/orders/${id}`, { cookies: adm.cookie });
+  check("payment reconciliation: unpaid checkout is absent from office", unpaidOffice.status === 404, unpaidOffice.body);
+  const squareOrderId = offlineCheckoutReference(ord);
+  const total = ord.body?.data?.totalCents as number;
   const statusOf = async () =>
-    (await api(`/api/admin/orders/${id}`, { cookies: adm.cookie })).body?.data?.status;
+    (await api(`/api/orders/${id}/status`)).body?.data?.status;
   const hook = (eventId: string, amount: number | null, currency: string) =>
     api("/api/square/webhook", {
       method: "POST",
@@ -3552,10 +3596,11 @@ if (mint.status === 200) {
     });
     const id = res.body?.data?.orderId as string;
     const full = await api(`/api/admin/orders/${id}`, { cookies: adm.cookie });
-    return { id, squareOrderId: full.body?.data?.squareOrderId as string };
+    check(`${name}: unpaid checkout is absent from office`, full.status === 404, full.body);
+    return { id, squareOrderId: offlineCheckoutReference(res) };
   };
   const statusOf = async (id: string) =>
-    (await api(`/api/admin/orders/${id}`, { cookies: adm.cookie })).body?.data?.status;
+    (await api(`/api/orders/${id}/status`)).body?.data?.status;
   const hook = (eventId: string, squareOrderId: string, payId: string) =>
     api("/api/square/webhook", {
       method: "POST",
@@ -3754,8 +3799,8 @@ if (mint.status === 200) {
   }
 }
 
-// The registered-agent renewal date is set at formation for a client who
-// took our service, shown to the client, and named in the cancellation
+// The registered-agent renewal date is based on the recorded appointment for
+// a client using our service, shown to the client, and named in the cancellation
 // email (Adam, 14 Sep 2026: "The date should be stored and shown in the
 // portal"). A company serving as Manager is offered to the questionnaire
 // as a company, so the signer question appears for it.
@@ -3804,7 +3849,7 @@ if (mint.status === 200) {
   const afterMe = ((await api("/api/portal/companies", { cookies: raPw.cookie })).body?.data ?? []).find((x: { orderId: string }) => x.orderId === raId) as { raRenewalDate?: string | null; raService?: boolean } | undefined;
   check("the client is shown the same renewal date", afterMe?.raRenewalDate === det?.raRenewalDate, afterMe);
   // ---- Automatic renewal (16 Sep 2026): the card kept from the formation
-  //      payment, the notice 45 days out, the charge 15 days out, a decline
+  //      payment, the notice 70 days out, the charge 15 days out, a decline
   //      with its link, the link paid, and the office's view of it all.
   {
     const renewalDate = det?.raRenewalDate as string;
@@ -3813,13 +3858,13 @@ if (mint.status === 200) {
     const co0 = await companiesOf();
     check("renewal: the card the formation was paid with is kept, with its last four", co0?.cardStatus === "on_file" && co0?.cardLast4 === "1111", co0);
     // Too early: nothing happens.
-    const early = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -61)}`)).body?.data as { notices: number } | undefined;
+    const early = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -71)}`)).body?.data as { notices: number } | undefined;
     const co1 = await companiesOf();
-    check("renewal: 61 days out, no notice yet", (co1?.renewals ?? []).length === 0, { early, renewals: co1?.renewals });
-    // 45 days out: the notice.
-    const noticeRun = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -60)}`)).body?.data as { notices: number } | undefined;
+    check("renewal: 71 days out, no notice yet", (co1?.renewals ?? []).length === 0, { early, renewals: co1?.renewals });
+    // 70 days out: the scheduled notice.
+    const noticeRun = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -70)}`)).body?.data as { notices: number } | undefined;
     const co2 = await companiesOf();
-    check("renewal: 60 days out, the notice goes and the renewal is recorded", (noticeRun?.notices ?? 0) >= 1 && co2?.renewals?.[0]?.status === "notice_sent", { noticeRun, renewals: co2?.renewals });
+    check("renewal: 70 days out, the notice goes and the renewal is recorded", (noticeRun?.notices ?? 0) >= 1 && co2?.renewals?.[0]?.status === "notice_sent", { noticeRun, renewals: co2?.renewals });
     {
       const mails = ((await api("/api/dev/outbox")).body?.data ?? []) as { to: string; subject: string; html: string }[];
       const notice = mails.filter((m) => m.to === raEmail && /renews on/.test(m.subject)).at(-1);
@@ -3829,7 +3874,7 @@ if (mint.status === 200) {
       check("renewal: the notice names the date, $99, the card's last four, the charge day and the cancellation deadline", !!notice && /\$99/.test(flat) && /card ending 1111/.test(flat) && flat.includes(`on ${chargeWords}`) && flat.includes(`by ${cancelWords}`), { subject: notice?.subject, flat: flat.slice(0, 400) });
     }
     // The same day again: nothing doubles.
-    const again = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -60)}`)).body?.data as { notices: number } | undefined;
+    const again = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -70)}`)).body?.data as { notices: number } | undefined;
     check("renewal: running the job twice sends nothing twice", again?.notices === 0 && (await companiesOf())?.renewals?.length === 1, again);
     // 15 days out: declined first (a plain decline, no retry), with a link.
     await api("/api/dev/renewal-decline", { method: "POST", body: JSON.stringify({ code: "GENERIC_DECLINE" }) });
@@ -3840,7 +3885,8 @@ if (mint.status === 200) {
       const mails = ((await api("/api/dev/outbox")).body?.data ?? []) as { to: string; subject: string; html: string }[];
       const declined = mails.filter((m) => m.to === raEmail && /declined/i.test(m.subject)).at(-1);
       const flat = (declined?.html ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-      check("renewal: the decline email names the card, the deadline and carries a payment link, with no retry promised for a plain decline", !!declined && /card ending 1111/.test(flat) && /Pay the renewal/.test(flat) && !/try the card once more/.test(flat), flat.slice(0, 300));
+      const deadlineWords = new Date(`${renewalDate}T12:00:00Z`).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
+      check("renewal: the decline email names the card, the deadline and carries a payment link, with no retry promised for a plain decline", !!declined && /card ending 1111/.test(flat) && /Pay renewal now/.test(flat) && flat.includes(`Please pay by ${deadlineWords} to avoid delinquency.`) && !/try the card once more/.test(flat), flat.slice(0, 600));
     }
     // The next day: a plain decline is not retried.
     const noRetry = (await api(`/api/cron/ra-renewals?today=${shift(renewalDate, -12)}`)).body?.data as { retried: number; declined: number } | undefined;
@@ -3872,7 +3918,9 @@ if (mint.status === 200) {
       }) });
       const giftId = giftRes.body?.data?.orderId as string;
       const refused = await api("/api/dev/simulate-payment", {method:"POST",body:JSON.stringify({orderId:giftId,card:"prepaid"})});
-      const pending = (await api(`/api/admin/orders/${giftId}`,{cookies:adm.cookie})).body?.data;
+      const pending = (await api(`/api/orders/${giftId}/status`)).body?.data;
+      const giftOffice = await api(`/api/admin/orders/${giftId}`,{cookies:adm.cookie});
+      check("refused prepaid checkout stays absent from office", giftOffice.status===404, giftOffice.body);
       check("prepaid attempted agent purchase is refused before completion",refused.status===400&&refused.body?.error?.code==="PREPAID_CARD"&&pending?.status==="pending_payment",{refused:refused.body,pending:pending?.status});
       const retry=await api("/api/dev/simulate-payment",{method:"POST",body:JSON.stringify({orderId:giftId,card:"credit"})});
       check("eligible card can retry a refused prepaid purchase immediately",retry.status===200,retry.body);
@@ -3902,11 +3950,11 @@ if (mint.status === 200) {
     const after = ((await api("/api/portal/companies", { cookies: raPw.cookie })).body?.data as { orderId: string; raRenewalDate: string | null; renewals: { date: string; status: string }[] }[]).find((x) => x.orderId === raId);
     check("renewal: after a timely cancellation no notice goes and nothing is charged", run45?.notices === 0 && run15?.charged === 0 && run15?.declined === 0 && after?.raRenewalDate === next && !(after?.renewals ?? []).some((r) => r.date === next), { run45, run15, renewals: after?.renewals });
   }
-  // The renewal above moved the date a year on (16 Sep 2026): the email
-  // names the date the company now carries.
-  const renewalNow = ((await api("/api/portal/companies", { cookies: raPw.cookie })).body?.data as { orderId: string; raRenewalDate: string | null }[]).find((x) => x.orderId === raId)?.raRenewalDate ?? "";
-  const year = renewalNow.slice(0, 4);
-  check("the cancellation email names the renewal date", !!cancelMail && year.length === 4 && cancelMail.html.includes(year) && /renew/i.test(cancelMail.html), cancelMail && { subject: cancelMail.subject, snippet: cancelMail.html.replace(/<[^>]+>/g, " ").match(/[^.]*renew[^.]*\./i)?.[0] });
+  // The job simulated a future advance payment. Cancellation still refers
+  // to that upcoming paid cycle, not the following anniversary now on the order.
+  const cancellationCycle = String(det?.raRenewalDate ?? '');
+  const cycleWords = new Date(cancellationCycle+'T12:00:00Z').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric',timeZone:'UTC'});
+  check("the cancellation email names the renewal date", !!cancelMail && cancellationCycle.length === 10 && cancelMail.html.includes(cycleWords) && /renew/i.test(cancelMail.html), cancelMail && { expected:cycleWords, subject: cancelMail.subject, snippet: cancelMail.html.replace(/<[^>]+>/g, " ").match(/[^.]*renew[^.]*\./i)?.[0] });
 }
 
 // An abandoned S election checkout does not lock the client out, and refused
@@ -3936,6 +3984,7 @@ if (mint.status === 200) {
 
 const batch02Results = new Map<string, {ok:boolean; detail?:unknown}>();
 await batch02Checks((label,ok,detail)=>batch02Results.set(label,{ok,detail}));
+const batch30OfficeTax = batch02Results.get("batch02 N1.07: EIN tax instructions do not borrow another entity election");
 const batch02Result = (label:string) => { const result=batch02Results.get(label);batch02Results.delete(label);return result ?? {ok:false,detail:"The Batch 02 probe did not run"}; };
 { const result=batch02Result("batch02 N1.04: S-election copies use their own company address");check("batch02 N1.04: S-election copies use their own company address",result.ok,result.detail); }
 { const result=batch02Result("batch02 N1.05: agreement series belong to the selected company");check("batch02 N1.05: agreement series belong to the selected company",result.ok,result.detail); }
@@ -3966,6 +4015,8 @@ await batch03Checks((label,ok,detail)=>batch03Results.set(label,{ok,detail}));
 for(const [label,r]of batch03Results)check(label,r.ok,r.detail);
 
 const batch04Results = new Map<string,{ok:boolean;detail?:unknown}>();
+await p105Checks(check);
+await remainingAccountChecks(check);
 await batch04Checks((label,ok,detail)=>batch04Results.set(label,{ok,detail}));
 {const r=batch04Results.get("batch04 64: welcome resend follows paid account state");check("batch04 64: welcome resend follows paid account state",r?.ok===true,r?.detail);batch04Results.delete("batch04 64: welcome resend follows paid account state");}
 {const r=batch04Results.get("batch04 N4.06: failed welcome email remains retryable");check("batch04 N4.06: failed welcome email remains retryable",r?.ok===true,r?.detail);batch04Results.delete("batch04 N4.06: failed welcome email remains retryable");}
@@ -4110,6 +4161,72 @@ batch16Checks((label, ok, detail) => batch16Results.set(label, {ok, detail}));
 { const r = batch16Results.get("batch16: restatement recitals remain sequential"); check("batch16: restatement recitals remain sequential", r?.ok === true, r?.detail); }
 { const r = batch16Results.get("batch16: professional eligibility is conditional and cumulative"); check("batch16: professional eligibility is conditional and cumulative", r?.ok === true, r?.detail); }
 { const r = batch16Results.get("batch16: bankruptcy paragraph is exactly owner approved"); check("batch16: bankruptcy paragraph is exactly owner approved", r?.ok === true, r?.detail); }
+
+const batch41Results = new Map<string, {ok:boolean;detail?:unknown}>();
+const {batch41BillingChecks}=await import("./batch41-billing-check");
+await batch41BillingChecks((label,ok,detail)=>batch41Results.set(label,{ok,detail}));
+const {batch41RecoveryChecks}=await import("./batch41-recovery-check");
+await batch41RecoveryChecks((label,ok,detail)=>batch41Results.set(label,{ok,detail}));
+const {batch41ControlsChecks}=await import("./batch41-controls-check");
+await batch41ControlsChecks((label,ok,detail)=>batch41Results.set(label,{ok,detail}));
+{const r=batch41Results.get("batch41 agent obligations and payment recovery");check("batch41 agent obligations and payment recovery",r?.ok===true,r?.detail);}
+{const r=batch41Results.get("batch41 financial correspondence recovery");check("batch41 financial correspondence recovery",r?.ok===true,r?.detail);}
+{const r=batch41Results.get("batch41 B1 filing revision recovery");check("batch41 B1 filing revision recovery",r?.ok===true,r?.detail);}
+{const r=batch41Results.get("batch41 B2 retained package recovery");check("batch41 B2 retained package recovery",r?.ok===true,r?.detail);}
+{const r=batch41Results.get("batch41 ruling completeness and settled display");check("batch41 ruling completeness and settled display",r?.ok===true,r?.detail);}
+{const r=batch41Results.get("batch41 Manual company filing and signature grouping");check("batch41 Manual company filing and signature grouping",r?.ok===true,r?.detail);}
+
+const {batch40Checks}=await import("./batch40-check");
+await batch40Checks((_label,ok,detail)=>check("batch40 renewal reminders do not gate billing",ok,detail));
+const {batch38Checks}=await import("./batch38-check");
+const batch38Results=new Map<string,{ok:boolean;detail?:unknown}>();
+await batch38Checks((label,ok,detail)=>batch38Results.set(label,{ok,detail}));
+{const r=batch38Results.get("batch38 verification controls");check("batch38 verification controls",r?.ok===true,r?.detail);}
+const {batch37Checks}=await import("./batch37-check");
+const batch37Results=new Map<string,{ok:boolean;detail?:unknown}>();
+await batch37Checks((label,ok,detail)=>batch37Results.set(label,{ok,detail}));
+{const r=batch37Results.get("batch37 approved corrections");check("batch37 approved corrections",r?.ok===true,r?.detail);}
+const {batch36Checks}=await import("./batch36-check");
+const batch36Results=new Map<string,{ok:boolean;detail?:unknown}>();
+await batch36Checks((label,ok,detail)=>batch36Results.set(label,{ok,detail}));
+{const r=batch36Results.get("batch36 office workflow");check("batch36 office workflow",r?.ok===true,r?.detail);}
+const {batch35Checks}=await import("./batch35-check");
+const batch35Results=new Map<string,{ok:boolean;detail?:unknown}>();
+await batch35Checks((label,ok,detail)=>batch35Results.set(label,{ok,detail}));
+{const r=batch35Results.get("batch35 RR-01");check("batch35 RR-01",r?.ok===true,r?.detail);}
+{const r=batch35Results.get("batch35 RR-02");check("batch35 RR-02",r?.ok===true,r?.detail);}
+const {batch30Checks}=await import("./batch30-check");
+const batch30Results=new Map<string,{ok:boolean;detail?:unknown}>();
+await batch30Checks((label,ok,detail)=>batch30Results.set(label,{ok,detail}));
+{const r=batch30Results.get("batch30 C01");check("batch30 C01",r?.ok===true,r?.detail);}
+{const r=batch30Results.get("batch30 C02");check("batch30 C02",r?.ok===true,r?.detail);}
+{const r=batch30Results.get("batch30 C03");check("batch30 C03",r?.ok===true&&batch30OfficeTax?.ok===true,{portal:r?.detail,office:batch30OfficeTax});}
+const {batch29Checks}=await import("./batch29-check");
+const batch29Results=new Map<string,{ok:boolean;detail?:unknown}>();
+await batch29Checks((label,ok,detail)=>batch29Results.set(label,{ok,detail}));
+{const r=batch29Results.get("batch29 B01");check("batch29 B01",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B02");check("batch29 B02",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B03");check("batch29 B03",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B04");check("batch29 B04",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B05");check("batch29 B05",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B06");check("batch29 B06",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B07");check("batch29 B07",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B08");check("batch29 B08",r?.ok===true,r?.detail);}
+{const r=batch29Results.get("batch29 B09");check("batch29 B09",r?.ok===true,r?.detail);}
+const {batch28Checks}=await import("./batch28-check");
+const batch28Results=new Map<string,{ok:boolean;detail?:unknown}>();
+await batch28Checks((label,ok,detail)=>batch28Results.set(label,{ok,detail}));
+{const r=batch28Results.get("batch28 A01");check("batch28 A01",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A02");check("batch28 A02",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A03");check("batch28 A03",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A04");check("batch28 A04",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A05");check("batch28 A05",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A06");check("batch28 A06",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A07");check("batch28 A07",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A08");check("batch28 A08",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A09");check("batch28 A09",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A10");check("batch28 A10",r?.ok===true,r?.detail);}
+{const r=batch28Results.get("batch28 A11");check("batch28 A11",r?.ok===true,r?.detail);}
 
 console.log(failures === 0 ? "\nALL PASS" : `\n${failures} FAILURES`);
 process.exit(failures === 0 ? 0 : 1);

@@ -114,8 +114,8 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | mbs sgms | 3.5 | Series Exhibits Control Series Terms | 3e179bb7 | mechanic | company | member | — | drafting convention; the Article 9 carve-out stops a Series Exhibit from varying the S corporation terms |
 | mbr mbs mul scp sgl sgm sgms sgs | 3.6 | Company as Owner | a566e682 | statutory-route | — | members company | — | s. 605.2303(1)-(3) |
 | sgl | 4.1 | Sole Member | 86821bf1 | mechanic | — | member | — | drafting convention |
-| mul scp | 4.1 | Members; Percentage Interests | 65ad85a1 | mechanic | — | members | — | s. 605.04073(1)(b) |
-| mbr mbs | 4.1 | Members; Percentage Interests | eaf1d35a | mechanic | — | members | — | s. 605.04073(1)(b) |
+| mul scp | 4.1 | Members; Percentage Interests | 0b791e14 | mechanic | — | members | — | Exhibit A identifies percentage or fractional ownership; existing certificate authority and single-class language preserved. |
+| mbr mbs | 4.1 | Members; Percentage Interests | f4b6a177 | mechanic | — | members | — | Exhibit A identifies percentage or fractional ownership; existing certificate authority and single-class language preserved. |
 | sgs | 4.1 | Sole Member | 149ef929 | mechanic | — | member | — | drafting convention |
 | sgm | 4.1 | Sole Member | baf17f0f | mechanic | — | member | — | drafting convention |
 | sgms | 4.1 | Sole Member | c304d44d | mechanic | — | member | — | drafting convention; the single class of ownership is IRC 1361(b)(1)(D) |
@@ -175,12 +175,12 @@ Forms: `sgl` single-member · `mul` multi-member · `scp` S corporation ·
 | sgl sgs | 5.7 | Compensation; Reimbursement; Shared Expenses | a0c4af21 | benefit | company | manager member | — | s. 605.04091(1) |
 | mul scp | 5.7 | Compensation; Reimbursement; Shared Expenses | 95dfa725 | benefit | company | manager members | — | s. 605.04091(1) |
 | mbr mbs | 5.7 | Indemnification | b6c395f8 | benefit | company series | manager members | — | s. 605.0408 |
-| sgm sgms | 5.7 | Statement of Authority | c16a3718 | authority | company | members manager third-party | — | s. 605.0302 |
-| sgl sgs | 5.8 | Statement of Authority | 99712aba | authority | company | members manager third-party | — | s. 605.0302 |
-| mul scp | 5.8 | Statement of Authority | df63a96d | authority | company | members manager third-party | — | s. 605.0302 |
+| sgm sgms | 5.7 | Statement of Authority | 9b3f829a | authority | company series | members manager third-party | — | ss. 605.0302 and 605.2108(3); identify the actual property-owning entity while preserving the form-specific consent and authority limitations. |
+| sgl sgs | 5.8 | Statement of Authority | 32505f57 | authority | company series | members manager third-party | — | ss. 605.0302 and 605.2108(3); identify the actual property-owning entity while preserving the form-specific consent and authority limitations. |
+| mul scp | 5.8 | Statement of Authority | 551b94c1 | authority | company series | members manager third-party | — | ss. 605.0302 and 605.2108(3); identify the actual property-owning entity while preserving the form-specific consent and authority limitations. |
 | mbr mbs | 5.8 | Administrative Member | 8a779b5a | authority | members | members | — | drafting convention |
 | mul scp | 5.9 | Competition; Other Activities of the Manager. [SELECT THE SAME ALTERNATIVE AS SECTION 4.7] | b206cf04 | covenant | members | members | The member competed in breach of the agreement — a claim among the members, not against the company. | s. 605.04091(2)(c) as varied under s. 605.0105(3) |
-| mbr mbs | 5.9 | Statement of Authority | 0cce8cea | authority | company | members manager third-party | — | s. 605.0302 |
+| mbr mbs | 5.9 | Statement of Authority | 7c10af6a | authority | company series | members manager third-party | — | ss. 605.0302 and 605.2108(3); identify the actual property-owning entity while preserving the form-specific consent and authority limitations. |
 | mbr mbs | 5.10 | Compensation; Reimbursement; Shared Expenses | 5d683322 | benefit | company | manager members | — | s. 605.04091(1) |
 | sgl sgm sgms sgs | 6.1 | Contributions | 2d7ae1b4 | mechanic | — | members | — | s. 605.0402 |
 | mbr mbs mul scp | 6.1 | Initial Contributions | 1b58f807 | mechanic | — | members | — | s. 605.0402 |

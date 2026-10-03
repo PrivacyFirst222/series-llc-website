@@ -1,0 +1,266 @@
+{
+  "schema": 1,
+  "run": "claude-reconciled-batch28",
+  "commit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+  "completedAt": "2026-09-21T23:43:01.725194+00:00",
+  "manifestSha": "1e5f8d3028a2b37e072c0998e01ac8c3c3ef8d48c549b4b18eb43b0eedb3f6b9",
+  "auditSha": "d5cea47a12ffef821f0acdf101940e00372019629bf6d324143c87bd59b3a5a1",
+  "findings": [
+    {
+      "key": "runtime-B-restore-aborts-when-journal-lost",
+      "where": "Office \u2192 Reference Library \u2192 Database backups, and docs/db-restore.md 'Restore into an empty database': recovering after the Blob store is lost",
+      "file": "webapp/server/restore.ts",
+      "line": 28,
+      "reads": "  if(!data||!f.sha||hashBytes(isEncrypted(data)?unseal(data):data)!==f.sha)throw new Error(`Backup file missing or changed: ${f.path}`);",
+      "claims": "LibrarySection.tsx:190-191 'Complete backups include business records, email and renewal history, and a verified manifest of retained documents'; docs/db-restore.md:59 'It fails closed if the journal, a required file, or a key is unavailable'; privacy.md:17 'We keep a deletion record so restoring an older backup does not make your deleted document available again.'",
+      "truth": "Current cross-review: Current deletionJournal reads only deletions/ object keys (document-retention.ts:7-9); deletions write object storage17 then DB23 and remove mirror file36. Restore reads current journal15, skips its keys30, and requires every other mirror file32. Contrary to the absolute historical description, backup.ts:21-35 DOES snapshot document_deletions. But an older snapshot cannot contain later deletions; no independent post-snapshot tombstone mirror is present. With lost Blob journal and a post-snapshot completed mirror deletion, required file verification aborts before row insertion. If its mirror removal was still pending, absent tombstone information can allow restoration. Source mechanism remains; historical runtime not rerun.",
+      "replacement": "Durably mirror every deletion decision independently of file deletion, and consult that journal even when the old file is still available. Require a trustworthy complete journal before recovery; reconcile snapshot plus later records and verify deleted documents stay unavailable. Merely checking .deleted when a file is missing fails the pending-deletion case.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "runtime-B-backup-complete-and-restore"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current deletionJournal reads only deletions/ object keys (document-retention.ts:7-9); deletions write object storage17 then DB23 and remove mirror file36. Restore reads current journal15, skips its keys30, and requires every other mirror file32. Contrary to the absolute historical description, backup.ts:21-35 DOES snapshot document_deletions. But an older snapshot cannot contain later deletions; no independent post-snapshot tombstone mirror is present. With lost Blob journal and a post-snapshot completed mirror deletion, required file verification aborts before row insertion. If its mirror removal was still pending, absent tombstone information can allow restoration. Source mechanism remains; historical runtime not rerun.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 5,
+      "reader": "reader-5",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "runtime-B-legal-mail-notice-lost-with-no-resend",
+      "where": "Office \u2192 Clients \u2192 Upload \u2192 Legal mail (and other documents) when the email provider fails; Terms 10(b)",
+      "file": "webapp/server/routes-admin.ts",
+      "line": 1565,
+      "reads": "    notified = await sendMail({ to: clients[0].email, ...mail }).then(",
+      "claims": "terms.md:59: 'Our sole obligations as registered agent are to accept service of process\u2026 to post scanned copies to your client portal, and to send a notification email to the address on file.'; AdminDashboard.tsx:362: 'The client is emailed the moment legal mail is posted.'",
+      "truth": "Current cross-review: Current upload stores the document at1565-1570 then records notified false when sending rejects at1580-1585. Search of all routes in routes-admin.ts found no existing-document notify route; current UI toast is transient. Uploading again is not a retry of the same document. Existing email logs record failures, but matching only a subject cannot reliably associate a generic new-document subject with one specific document.",
+      "replacement": "Add an authenticated office resend action keyed to document ID, preserve legal-mail context and current recipient, and retain delivery status keyed to that document. Reuse the existing stored document; report send acceptance truthfully.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "runtime-B-email-failure-and-retry"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current upload stores the document at1565-1570 then records notified false when sending rejects at1580-1585. Search of all routes in routes-admin.ts found no existing-document notify route; current UI toast is transient. Uploading again is not a retry of the same document. Existing email logs record failures, but matching only a subject cannot reliably associate a generic new-document subject with one specific document.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 5,
+      "reader": "reader-5",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "runtime-B-contact-form-fails-after-storing",
+      "where": "Contact page \u2192 Send, when the office email cannot be sent",
+      "file": "webapp/server/routes-payments.ts",
+      "line": 663,
+      "reads": "    await sendMail({",
+      "claims": "routes-payments.ts:637-640 (comment): 'Now: stored (and so backed up nightly), emailed to the notify address, and acknowledged only after both.'",
+      "truth": "Current cross-review: Current handler inserts contact_messages657-660, then awaits sendMail663-668 without catch. A transport exception escapes before the success response670. The office contact-message listing still exists in routes-admin.ts:883 onward. Retrying can insert a second copy. No current provider failure injection was run.",
+      "replacement": "Acknowledge durable message receipt even when the separate office notification fails, and retain a visible retryable delivery failure for the office. Update the comment that currently promises acknowledgment only after both. Idempotency is useful if added, but no claim of exactly-once delivery is warranted.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "runtime-B-email-failure-and-retry"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current handler inserts contact_messages657-660, then awaits sendMail663-668 without catch. A transport exception escapes before the success response670. The office contact-message listing still exists in routes-admin.ts:883 onward. Retrying can insert a second copy. No current provider failure injection was run.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 6,
+      "reader": "reader-6",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-5-office-nonpayment-resignation",
+      "where": "Office, order detail, 'Registered-agent appointment and cancellation' panel \u2014 recording 'Resignation submitted' for a client whose renewal was never paid (Terms 9(e) and 10(f) resignation for nonpayment)",
+      "file": "webapp/server/ra-office.ts",
+      "line": 45,
+      "reads": "if(!o.ra_resignation_due||b.date<isoOf(o.ra_resignation_due)!)return c.json(err('The cancellation resignation is not due yet.','NOT_DUE'),400);",
+      "claims": "A resignation can be recorded only when a cancellation resignation is due.",
+      "truth": "Current cross-review: Current submitted branch requires ra_resignation_due. renewals.ts:124 sets it only in the timely-cancellation path; declined nonpayment does not set it. filed/mailed/copy require prior submission at ra-office.ts:47-59, so the office cannot record these actual events for an otherwise permitted nonpayment resignation. Terms9(e)/10(f) still describe such resignations. Current source corroborates historical reproduction; no current route rerun.",
+      "replacement": "Allow the office to record an actual resignation with a documented Terms ground, required event dates and existing chronology safeguards. Do not gate every actual resignation on a timely-cancellation schedule. Separately resolve any automatic scheduling or fee rule.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "reader-5-ra-office",
+        "reader-5-renewals"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current submitted branch requires ra_resignation_due. renewals.ts:124 sets it only in the timely-cancellation path; declined nonpayment does not set it. filed/mailed/copy require prior submission at ra-office.ts:47-59, so the office cannot record these actual events for an otherwise permitted nonpayment resignation. Terms9(e)/10(f) still describe such resignations. Current source corroborates historical reproduction; no current route rerun.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 5,
+      "reader": "reader-5",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "runtime-B-late-cancellation-charged-without-saying-so",
+      "where": "Client portal \u2192 Registered agent service card \u2192 Cancel registered agent service (fewer than 30 days before the renewal date); the confirmation email 'Your registered agent cancellation request'",
+      "file": "webapp/server/email.ts",
+      "line": 264,
+      "reads": "      <p>We received your request to cancel registered agent service${llcName ? ` for <strong>${escapeHtml(llcName)}</strong>` : \"\"}.</p>",
+      "claims": "That the cancellation request has been received and (with the quoted rule) will be acted on; the card (PortalDashboard.tsx:360) says 'Cancellation requested on \u2026'.",
+      "truth": "Current cross-review: Current cancellation email only acknowledges receipt, reports renewal date and repeats general RA_CANCELLATION; routes-portal.ts:2637 passes no timeliness result. renewals.ts:118-128 evaluates saved cancellation relative to each anniversary. A late request can permit this renewal then become timely for the following year. PortalDashboard.tsx:355-389 hides renewal receipt lines in the cancellation branch. This confirms the source mechanism and missing disclosure; no new charge executed.",
+      "replacement": "Show a charged renewal even when cancellation exists. Give an explicit current renewal/cancellation result using approved policy. Do not state cancellation guarantees another full service year irrespective of replacement or other termination events.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "runtime-B-renewal-cancel-and-replacement",
+        "runtime-B-screens"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current cancellation email only acknowledges receipt, reports renewal date and repeats general RA_CANCELLATION; routes-portal.ts:2637 passes no timeliness result. renewals.ts:118-128 evaluates saved cancellation relative to each anniversary. A late request can permit this renewal then become timely for the following year. PortalDashboard.tsx:355-389 hides renewal receipt lines in the cancellation branch. This confirms the source mechanism and missing disclosure; no new charge executed.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 5,
+      "reader": "reader-5",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-5-late-notice-omits-amount",
+      "where": "Registered agent renewal notice email, the version sent when the notice is late (billing hold) \u2014 the paragraph that replaces the fee sentence",
+      "file": "webapp/server/email.ts",
+      "line": 110,
+      "reads": "const how = opts.billingHold ? `<p>Your renewal notice was delayed. Automatic charging is on hold; please contact us to resolve the renewal. You may also pay now using <a href=\"${opts.linkUrl}\">this payment link</a>.</p>`",
+      "claims": "This is the renewal notice the Terms promise, sent when it is late.",
+      "truth": "Current cross-review: email.ts:110 selects billingHold text without amount; :111\u2013115 have amount only in other branches. Entire returned HTML :117\u2013130 adds dates/cancellation/support but no fee. renewals:138 passes amount and billingHold:late. Terms:48 promises the amount even when the reminder is delayed.",
+      "replacement": "Include the formatted renewal amount in the delayed-notice branch while keeping automatic billing on hold and retaining the payment/contact options.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "reader-5-email",
+        "reader-5-renewals"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. email.ts:110 selects billingHold text without amount; :111\u2013115 have amount only in other branches. Entire returned HTML :117\u2013130 adds dates/cancellation/support but no fee. renewals:138 passes amount and billingHold:late. Terms:48 promises the amount even when the reminder is delayed.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 5,
+      "reader": "reader-5",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "reader-5-clients-tab-cancel-chip",
+      "where": "Office, Clients tab \u2014 the amber 'RA cancel requested \u2026' chip beside a client's name",
+      "file": "webapp/server/routes-admin.ts",
+      "line": 895,
+      "reads": "`SELECT cl.id, cl.email, cl.name, cl.created_at, cl.ra_cancellation_requested_at,",
+      "claims": "The client-level column says whether a cancellation of registered agent service has been requested.",
+      "truth": "Current cross-review: routes-admin:904 reads clients.ra_cancellation_requested_at; AdminDashboard:562\u2013564 renders it. Portal route :2635 writes the legacy client column; ra-office:38\u201340 records email cancellations on orders only. Proposed subquery fixes the missing office event but still collapses multiple companies and drops an appointment whose ra_ended_date is set to a future effective date (ra-office filed action sets date +31). An IS NULL test is not equivalent to not ended yet.",
+      "replacement": "Derive cancellation summaries from company order records and identify the affected company; if keeping an account summary, use a clearly defined active/pending-company rule that handles a future appointment-end date.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "reader-5-routes-admin",
+        "reader-5-ra-office",
+        "reader-5-db"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. routes-admin:904 reads clients.ra_cancellation_requested_at; AdminDashboard:562\u2013564 renders it. Portal route :2635 writes the legacy client column; ra-office:38\u201340 records email cancellations on orders only. Proposed subquery fixes the missing office event but still collapses multiple companies and drops an appointment whose ra_ended_date is set to a future effective date (ra-office filed action sets date +31). An IS NULL test is not equivalent to not ended yet.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 5,
+      "reader": "reader-5",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "runtime-B-backup-rowcounts-count-deleted-documents",
+      "where": "The nightly backup job's report (/api/cron/db-backup log line and /api/admin/backups/run response)",
+      "file": "webapp/server/backup.ts",
+      "line": 150,
+      "reads": "  const rowCounts=Object.fromEntries(BACKUP_TABLES.map(t=>[t,job!.dump.tables[t].length]));",
+      "claims": "That rowCounts describes the snapshot written (routes-ops.ts:317 logs it as '[backup] <key>: <bytes> bytes' with the counts; e2e.ts:3234-3238 reads rowCounts.clients).",
+      "truth": "Current cross-review: rowCounts is computed before document deletion filtering at157 and returned unchanged at164 after publishing the filtered snapshot. A deleted document therefore inflates the completed backup count. This is reporting mismatch, not proof of backup data loss. Historical runtime reports are corroborative; no current rerun claimed.",
+      "replacement": "Calculate completed counts after the final filters. Keep pending-job counts separately labeled as provisional if they are returned before completion.",
+      "severity": "housekeeping",
+      "relation": "new",
+      "evidence": [
+        "runtime-B-backup-complete-and-restore"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. rowCounts is computed before document deletion filtering at157 and returned unchanged at164 after publishing the filtered snapshot. A deleted document therefore inflates the completed backup count. This is reporting mismatch, not proof of backup data loss. Historical runtime reports are corroborative; no current rerun claimed.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 4,
+      "reader": "reader-4",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "runtime-B-no-way-to-replace-the-renewal-card",
+      "where": "Client portal \u2192 Registered agent service card ('Renewal card: Visa ending 1111'); the renewal notice email; Terms 9(c) and 9(e)",
+      "file": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "line": 380,
+      "reads": "                <p className=\"mt-1\" data-testid=\"renewal-card\">Renewal card: {brandWord(company.cardBrand)} ending {company.cardLast4}.</p>",
+      "claims": "terms.md:46: 'You must agree to automatic renewal and keep an eligible payment card on file with Square; we will not undertake the appointment without both.'; the notice email (email.ts:111-113): 'will be charged to your card ending 1111 on <date>. There is nothing you need to do.'",
+      "truth": "Current cross-review: No dedicated card-update control is present. However PortalDashboard:422 offers Pay renewal now / use another card whenever an open link exists. renewals.ts:127-141 creates that link with the60-day notice, before decline, and ra-checkout.ts:55-62 saves a new eligible card during payment. Historical claim that replacement is possible only after decline is false. email.ts:111-112 still says nothing needs doing and there is no independent replacement path outside an open payable renewal. No provider or payment route run.",
+      "replacement": "A standalone card-update action requires a supported token-to-card design, saved-card consent and eligible-card checks. Explain the existing pre-decline payment option accurately. Do not promise an office payment link outside a payable renewal unless implemented.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "runtime-B-renewal-cancel-and-replacement",
+        "runtime-B-payment-failure-and-retry"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. No dedicated card-update control is present. However PortalDashboard:422 offers Pay renewal now / use another card whenever an open link exists. renewals.ts:127-141 creates that link with the60-day notice, before decline, and ra-checkout.ts:55-62 saves a new eligible card during payment. Historical claim that replacement is possible only after decline is false. email.ts:111-112 still says nothing needs doing and there is no independent replacement path outside an open payable renewal. No provider or payment route run.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 3,
+      "reader": "reader-3",
+      "link": null,
+      "presentedAs": "new"
+    },
+    {
+      "key": "runtime-B-undelivered-s-election-numbers-never-expire",
+      "where": "Client portal \u2192 Orders in progress \u2192 S corporation election details saved while we are obtaining the company EIN; Privacy Policy \u00a72",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 568,
+      "reads": "    WHERE type='s-election' AND status='fulfilled' AND fulfilled_at < now()-interval '14 days'",
+      "claims": "privacy.md:15: 'You may correct your answers and regenerate the package for fourteen (14) days after delivery. After that editing window, our scheduled cleanup removes the full numbers from the questionnaire records.'; the S election dialog (OrdersInProgress.tsx:279): 'the questionnaire numbers are removed after the fourteen-day editing window.'",
+      "truth": "Current cross-review: Current purge filters status fulfilled and fulfilled_at older than14days at574. Pending-EIN saves2419-2422 retain encrypted numbers in_progress with no independent expiry. Privacy15 describes the post-delivery editing window; it does not state an abandonment/cancellation horizon. This is an unbounded pre-delivery state, not evidence that the stated post-delivery14day rule itself is violated. RulingsN1.01/140/150 intentionally permit pending completion but do not specify abandoned pre-delivery retention.",
+      "replacement": "Choose a finite pre-delivery/abandonment retention rule or clearly disclose retention through delivery, then make cleanup and re-entry behavior match. Any purge path must return the order to a usable re-entry state and remove full numbers rather than completed retained PDFs.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "runtime-B-s-election-and-document-deletion"
+      ],
+      "review": {
+        "reviewer": "Codex reconciliation of Claude second-read evidence",
+        "evidence": "Original independent reviewer and evidence retained in docs/audit/batches/28/evidence/reconciled-source.json. Current purge filters status fulfilled and fulfilled_at older than14days at574. Pending-EIN saves2419-2422 retain encrypted numbers in_progress with no independent expiry. Privacy15 describes the post-delivery editing window; it does not state an abandonment/cancellation horizon. This is an unbounded pre-delivery state, not evidence that the stated post-delivery14day rule itself is violated. RulingsN1.01/140/150 intentionally permit pending completion but do not specify abandoned pre-delivery retention.",
+        "priorCompared": true,
+        "replacement": "correct"
+      },
+      "bucket": 6,
+      "reader": "reader-6",
+      "link": null,
+      "presentedAs": "new"
+    }
+  ]
+}

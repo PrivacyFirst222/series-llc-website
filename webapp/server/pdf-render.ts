@@ -145,25 +145,45 @@ export function wrapSegs(f: Fonts, segs: Seg[], width: number, size: number): Se
   const lines: Seg[][] = [];
   let cur: Seg[] = [];
   let curW = 0;
+  // A word can cross font boundaries: **Company**, has no break opportunity
+  // before its comma. Measure the complete non-whitespace cluster first.
+  const groups: Seg[][] = [];
   for (const seg of segs) {
-    const words = seg.text.split(/(\s+)/).filter((w) => w.length > 0);
-    for (const word of words) {
-      const font = fontFor(f, seg);
-      const w = drawnWidth(font, word, size);
-      if (curW + w > width && cur.length > 0 && word.trim() !== "") {
-        lines.push(cur);
-        cur = [];
-        curW = 0;
-        if (word.trim() === "") continue;
-      }
-      const last = cur[cur.length - 1];
-      if (last && last.bold === seg.bold && last.italic === seg.italic) {
-        last.text += word;
-      } else {
-        cur.push({ text: word, bold: seg.bold, italic: seg.italic });
-      }
-      curW += w;
+    for (const text of seg.text.split(/(\s+)/).filter(Boolean)) {
+      const part = { ...seg, text };
+      const previous = groups.at(-1);
+      if (previous && !/\s/.test(text) && !/\s/.test(previous[0].text)) previous.push(part);
+      else groups.push([part]);
     }
+  }
+  for (const group of groups) {
+    const whitespace = /^\s+$/.test(group[0].text);
+    const w = group.reduce((sum, seg) => sum + drawnWidth(fontFor(f, seg), seg.text, size), 0);
+    if (!whitespace && curW + w > width && cur.length > 0) {
+      // Trailing whitespace belongs between words, not outside the margin.
+      while (cur.length && !cur.at(-1)!.text.trim()) cur.pop();
+      if (cur.length) cur[cur.length - 1].text = cur[cur.length - 1].text.trimEnd();
+      if (cur.length) lines.push(cur);
+      cur = []; curW = 0;
+    }
+    if (whitespace && cur.length === 0) continue;
+    if (!whitespace && w > width) {
+      for (const seg of group) for (const character of Array.from(seg.text)) {
+        const cw = drawnWidth(fontFor(f, seg), character, size);
+        if (cur.length && curW + cw > width) { lines.push(cur); cur = []; curW = 0; }
+        const last = cur.at(-1);
+        if (last && last.bold === seg.bold && last.italic === seg.italic) last.text += character;
+        else cur.push({ ...seg, text: character });
+        curW += cw;
+      }
+      continue;
+    }
+    for (const seg of group) {
+      const last = cur.at(-1);
+      if (last && last.bold === seg.bold && last.italic === seg.italic) last.text += seg.text;
+      else cur.push({ ...seg });
+    }
+    curW += w;
   }
   if (cur.length > 0) lines.push(cur);
   return lines.map((ln) => {
@@ -338,7 +358,7 @@ export async function renderMarkdownPdf(opts: {
     if (isDate(paraTextAt(at))) at++;
     return at;
   };
-  const drawSignature = (from: number, end: number) => {
+  const signatureRows = (from: number, end: number) => {
     const lineH = BODY_SIZE + LINE_GAP;
     const rows = blocks.slice(from, end).map((b, i) => {
       if (b.kind !== "para") throw new Error("Signature block contains a non-paragraph");
@@ -351,6 +371,11 @@ export async function renderMarkdownPdf(opts: {
       const after = i === end - from - 1 || (!rule && !indent && !by && i === 0 && isBy(paraTextAt(from + 1))) ? 6 : 0;
       return {rule, by, date, offset, lines, before, after, height: before + (rule ? 1 : lines.length) * lineH + after};
     });
+    return rows;
+  };
+  const drawSignature = (from: number, end: number) => {
+    const lineH = BODY_SIZE + LINE_GAP;
+    const rows = signatureRows(from, end);
     const height = rows.reduce((total, r) => total + r.height, 0);
     if (height > TEXT_H) throw new Error("Signature block is too tall to fit on one page");
     need(height);
@@ -374,8 +399,54 @@ export async function renderMarkdownPdf(opts: {
     }
   };
 
+  // Measure with exactly the same row metrics used below. Closing Exhibit A
+  // sections can move as a whole; oversized tables retain normal pagination.
+  const tableRows = (rows: string[][]) => {
+    const cols = Math.max(...rows.map(r => r.length)), colW = width / cols;
+    const asset = /^Asset description/i.test(rows[0]?.[0] ?? "");
+    return rows.map((row, ri) => {
+      const fillable = asset && ri > 0 && row.every(c => c.trim() === "");
+      const cellLines = row.map(cell => (opts.encodedClientText ? cell.split(/&#13;&#10;|&#10;|&#13;/) : [cell]).flatMap(line => wrapSegs(fonts, parseInline(line, opts.encodedClientText).map(s => ri === 0 ? { ...s, bold: true } : s), colW - 8, 9.5)));
+      return { cellLines, fillable, rowH: (fillable ? 4 : Math.max(1, ...cellLines.map(c => c.length))) * 12 + 8 };
+    });
+  };
+  let inExhibitA = false;
   for (let bi = 0; bi < blocks.length; bi++) {
     const block = blocks[bi];
+    if (block.kind === "heading" && /^(EXHIBIT|SERIES EXHIBIT|ASSET SCHEDULE)/.test(block.text.trim())) inExhibitA = /^EXHIBIT A\b/.test(block.text.trim());
+    if (inExhibitA && block.kind === "para" && blocks[bi + 1]?.kind === "table") {
+      const table = blocks[bi + 1];
+      const tail = tailHeightBeforeBreak(bi + 2);
+      if (table.kind === "table" && tail !== null && tail > 0) {
+        const lead = wrapSegs(fonts, block.segs, width, BODY_SIZE).length * (BODY_SIZE + LINE_GAP) + 6;
+        const together = lead + tableRows(table.rows).reduce((n, r) => n + r.rowH, 0) + 8 + tail;
+        if (together <= TEXT_H) need(together);
+      }
+    }
+    // Keep MEMBERS/MEMBER with the first complete signature, not merely two
+    // lines of a long entity block. Very large groups keep existing limits.
+    if (block.kind === "para" && /^MEMBERS?:$/.test(block.segs.map(s => s.text).join("").trim())) {
+      let from = bi + 1, end = signatureEnd(from);
+      if (paraTextAt(from) === "[[signature-group]]") {
+        from++;
+        end = from;
+        while (end < blocks.length && paraTextAt(end) !== "[[/signature-group]]") end++;
+      }
+      if (end !== null && end < blocks.length) {
+        const together = wrapSegs(fonts, block.segs, width, BODY_SIZE).length * (BODY_SIZE + LINE_GAP) + 6 + signatureRows(from, end).reduce((n, r) => n + r.height, 0);
+        if (together <= TEXT_H) need(together);
+      }
+    }
+    // A joint ownership unit has a heading and separate human signatures.
+    // Reserve the complete group so the heading cannot be stranded.
+    if (block.kind === "para" && block.sourceText.trim() === "[[signature-group]]") {
+      let end = bi + 1;
+      while (end < blocks.length && paraTextAt(end) !== "[[/signature-group]]") end++;
+      if (end === blocks.length) throw new Error("Unclosed signature group");
+      drawSignature(bi + 1, end);
+      bi = end;
+      continue;
+    }
     const signatureTo = block.kind === "para" ? signatureEnd(bi) : null;
     if (signatureTo !== null) { drawSignature(bi, signatureTo); bi = signatureTo - 1; continue; }
     if (block.kind === "para" && !tailPulled) {
@@ -537,16 +608,9 @@ export async function renderMarkdownPdf(opts: {
       // wraps and auto-sizes its text — the PDF's own "0 Tf" rule, which
       // readers apply as "as large as fits, shrinking as the text grows".
       const isAssetSchedule = /^Asset description/i.test(block.rows[0]?.[0] ?? "");
-      const FILL_LINES = 4;
       if (isAssetSchedule) assetScheduleNo++;
-      for (let ri = 0; ri < block.rows.length; ri++) {
-        const row = block.rows[ri];
-        const fillable = isAssetSchedule && ri > 0 && row.every((c) => c.trim() === "");
-        const cellLines = row.map((cell) =>
-          (opts.encodedClientText ? cell.split(/&#13;&#10;|&#10;|&#13;/) : [cell]).flatMap((line) => wrapSegs(fonts, parseInline(line, opts.encodedClientText).map((s) => (ri === 0 ? { ...s, bold: true } : s)), colW - 2 * pad, size)),
-        );
-        const rowH = (fillable ? FILL_LINES : Math.max(1, ...cellLines.map((c) => c.length))) * lineH + 2 * pad;
-        need(rowH);
+      const measuredRows = tableRows(block.rows);
+      const drawRow=(ri:number,cellLines:Seg[][][],rowH:number,fillable=false)=>{
         if (fillable) {
           const form = doc.getForm();
           for (let ci = 0; ci < cols; ci++) {
@@ -580,7 +644,7 @@ export async function renderMarkdownPdf(opts: {
             thickness: 0.5,
           });
         }
-        for (let ci = 0; ci < row.length; ci++) {
+        for (let ci = 0; ci < cellLines.length; ci++) {
           let cy = y - pad;
           for (const ln of cellLines[ci]) {
             drawSegLine(page, ln, MARGIN + ci * colW + pad, cy - size, size);
@@ -588,6 +652,33 @@ export async function renderMarkdownPdf(opts: {
           }
         }
         y -= rowH;
+      };
+      const header=measuredRows[0];
+      const pageForRow=(ri:number,continuation:boolean)=>{
+        newPage();
+        if(ri>0&&header.rowH<TEXT_H/3)drawRow(0,header.cellLines,header.rowH);
+        if(continuation){
+          page.drawText('Continued from previous page',{x:MARGIN,y:y-size,size,font:fonts.italic});
+          y-=lineH+pad;
+        }
+      };
+      for(let ri=0;ri<measuredRows.length;ri++){
+        const {fillable,cellLines,rowH}=measuredRows[ri];
+        if(fillable){need(rowH);drawRow(ri,cellLines,rowH,true);continue;}
+        // Ordinary rows stay together. A cell taller than a page is split by
+        // measured lines, with the column headings repeated on each new page.
+        const repeatedHeader=ri>0&&header.rowH<TEXT_H/3?header.rowH:0;
+        if(rowH<=TEXT_H-repeatedHeader&&y-rowH<MARGIN)pageForRow(ri,false);
+        const count=Math.max(1,...cellLines.map(lines=>lines.length));
+        let offset=0;
+        while(offset<count){
+          let capacity=Math.floor((y-MARGIN-2*pad)/lineH);
+          if(capacity<1){pageForRow(ri,offset>0);capacity=Math.floor((y-MARGIN-2*pad)/lineH);}
+          const take=Math.min(count-offset,capacity);
+          drawRow(ri,cellLines.map(lines=>lines.slice(offset,offset+take)),take*lineH+2*pad);
+          offset+=take;
+          if(offset<count)pageForRow(ri,true);
+        }
       }
       y -= 8;
       continue;
@@ -616,7 +707,7 @@ function stampPageNumbers(doc: PDFDocument, font: PDFFont): void {
   });
 }
 
-function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo): void {
+function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo, preservePageNumbers = false): void {
   const pages = doc.getPages();
   const total = pages.length;
   const text = sanitize(`Copyright FLORIDA PROTECTED SERIES, LLC - PS 1${wm.note ? ", " + wm.note.replace(/\s+\u2014\s+/g, ", ") : ""}`);
@@ -627,6 +718,7 @@ function stampFooters(doc: PDFDocument, font: PDFFont, wm: WatermarkInfo): void 
   pages.forEach((p, i) => {
     const { width } = p.getSize();
     p.drawText(text, { x: MARGIN, y: FOOTER_Y, size: 7.5, font, color: grey });
+    if (preservePageNumbers) return;
     const pn = `Page ${i + 1} of ${total}`;
     const w = drawnWidth(font, pn, 7.5);
     p.drawText(pn, { x: width - MARGIN - w, y: FOOTER_Y, size: 7.5, font, color: grey });
@@ -757,9 +849,11 @@ export async function stampExistingPdf(opts: {
   bytes: Uint8Array | ArrayBuffer;
   watermark: WatermarkInfo;
   title: string;
+  /** Preserve authored pagination, including unnumbered cover/contents pages. */
+  preservePageNumbers?: boolean;
 }): Promise<Uint8Array> {
   const doc = await PDFDocument.load(opts.bytes, { ignoreEncryption: true });
   const font = await doc.embedFont(StandardFonts.Helvetica);
-  stampFooters(doc, font, opts.watermark);
+  stampFooters(doc, font, opts.watermark, opts.preservePageNumbers);
   return finishWithPermissions(doc, opts.title, opts.watermark, font);
 }

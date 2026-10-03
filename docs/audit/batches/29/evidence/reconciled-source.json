@@ -1,0 +1,542 @@
+[
+  {
+    "number": 5,
+    "key": "reader-2-series-agreement-not-required-new-self",
+    "disposition": "current-repair-proposal",
+    "reviewTopic": "reader-2-series-agreement-not-required-new-self",
+    "original": {
+      "key": "reader-2-series-agreement-not-required-new-self",
+      "where": "Order form, Certify & sign step on a NEW formation where the client serves as their own registered agent: the tick 'I confirm that the company's registered agent has agreed to serve as registered agent for the company and each of its protected series\u2026'",
+      "file": "webapp/src/components/forms/florida-llc/sections/StepCertification.tsx",
+      "line": 372,
+      "reads": "{data.registeredAgentChoice === \"SELF\" ? <AcknowledgeBox id=\"cert-agent-series\" checked={data.registeredAgentSeriesAgreementAcknowledgment === true} onChange={(v) => patch({ registeredAgentSeriesAgreementAcknowledgment: v })} label={AGENT_SERIES_AGREEMENT} error={errors.registeredAgentSeriesAgreementAcknowledgment} /> : null}",
+      "claims": "The box is one of the certifications the order needs and the client's tick is recorded with the order.",
+      "truth": "On a new formation the tick is decorative: stepValidation.ts:383 requires it only when filingPath === \"CONVERT\"; server/validation.ts:241-243 requires it only for a retained agent; buildPayload.ts:162 records `registeredAgentSeriesAgreementAcknowledgment: isConversion && \u2026`, so a ticked box on a new formation is stored as false. Yet a new formation also files Designations (StepFilingPath.tsx:21 'We file the Articles of Organization and your Protected Series Designations together'), and the 2026 s. 605.2203(2) (Online Sunshine, opened 20 Sep 2026) requires, before delivering ANY protected series designation, that the company 'agree with a registered agent specifying that the agent will serve as the registered agent in this state for that company and for each protected series of that company'; (3) makes the signer affirm that as a fact. The self-agent's acceptance (registeredAgent.ts:6) covers 'this Florida LLC' only. So a new self-agent order can be submitted with no agreement for the series on record, and when the client does tick the box the record says they did not.",
+      "replacement": "Require and record the confirmation for every self-agent order: stepValidation.ts:383 \u2192 `if (data.registeredAgentChoice === \"SELF\" && data.registeredAgentSeriesAgreementAcknowledgment !== true) e.registeredAgentSeriesAgreementAcknowledgment = \"Confirm the registered agent has agreed to serve the company and each protected series.\";` server/validation.ts: move the line-243 check out of `if (retained)` so it runs for every SELF agent; buildPayload.ts:162 \u2192 `registeredAgentSeriesAgreementAcknowledgment: data.registeredAgentChoice === \"SELF\" && data.registeredAgentSeriesAgreementAcknowledgment === true,`. On the new-formation path the label should speak in the first person, since the client is the agent: `I agree to serve as registered agent for the company and each of its protected series, including every protected series in this order.` (Alternatively, if the owner decides the acceptance suffices, hide the box on the NEW path \u2014 but the acceptance would then need to name the series.)",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "reader-2-finding-series-agreement-new-self",
+        "reader-2-statute-605-2203"
+      ],
+      "review": {
+        "reviewer": "reviewer-B",
+        "evidence": "reviewer-B-reader-2-series-agreement-not-required-new-self, reviewer-B-statute-605-2203: reopened StepCertification.tsx:127-128,372 (NEW-path component), registeredAgent.ts:6-7, stepValidation.ts:383, server/validation.ts:230-243, buildPayload.ts:162, StepFilingPath.tsx:21; s. 605.2203(2)-(3) opened on Online Sunshine (2026 edition) and quoted \u2014 matches reader-2's artifact. Confirmed: shown, not required, stored false on a new self-agent order. Prior N4.07 (implemented) is the CONVERT-path sibling; no item covers NEW \u2014 new is right. Code changes are sound; the first-person certification wording and the alternative (hide on NEW, widen the acceptance) are the owner's legal call.",
+        "replacement": "needs owner ruling",
+        "priorCompared": true
+      },
+      "bucket": 2,
+      "reader": "reader-2",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "reader-2-series-agreement-not-required-new-self",
+      "verdict": "confirmed-current",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "currentLocation": "webapp/src/components/forms/florida-llc/sections/StepCertification.tsx:372",
+      "currentEvidence": [
+        "NEW SELF checkbox is rendered, but stepValidation.ts:385 requires it only for CONVERT; server/validation.ts:241-248 likewise checks it only under retained; buildPayload.ts:217 forces it false outside conversion.",
+        "Current s.605.2203(2)-(3), independently opened, requires the company/series agent agreement before a designation and the signer affirms compliance. The code proves a displayed affirmative tick is discarded; no inference that the office actually filed an unlawful designation is made."
+      ],
+      "verificationLevel": "source",
+      "runtimeRerun": false,
+      "historicalAssessment": "The stated core mechanism or wording gap survives in current source; detailed historical runtime results were not rerun.",
+      "replacementVerdict": "mechanical fix correct; first-person alternative is not necessary",
+      "plainEnglishRepair": "Require and preserve this displayed confirmation on every SELF path, keeping the current third-person certification unless the actual self-agent flow establishes the applicant is personally the agent. Verify unchecked refuses and checked survives payload/storage.",
+      "canonicalDuplicate": "reader-2-series-agreement-not-required-new-self",
+      "priorItem": {
+        "id": "N4.07",
+        "part": "related retained-agent requirement; NEW uncovered"
+      },
+      "ownerDecisionNeeded": false,
+      "ownerDecisionReason": "No new owner decision identified for the stated repair; ordinary review of a concrete change still applies.",
+      "primarySources": [
+        "https://www.flsenate.gov/Laws/Statutes/2026/605.2203",
+        "https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/Sections/0605.2203.html"
+      ],
+      "sourceMethod": "Full relevant Online Sunshine 2026 sections retrieved with urllib and read on2026-09-21; saved under primary-1. They corroborate the previously opened Senate provisions. Initial web-tool failure is resolved; no browser or shared tab used."
+    },
+    "evidence": [
+      "NEW SELF checkbox is rendered, but stepValidation.ts:385 requires it only for CONVERT; server/validation.ts:241-248 likewise checks it only under retained; buildPayload.ts:217 forces it false outside conversion.",
+      "Current s.605.2203(2)-(3), independently opened, requires the company/series agent agreement before a designation and the signer affirms compliance. The code proves a displayed affirmative tick is discarded; no inference that the office actually filed an unlawful designation is made."
+    ],
+    "proposal": "Require and preserve this displayed confirmation on every SELF path, keeping the current third-person certification unless the actual self-agent flow establishes the applicant is personally the agent. Verify unchecked refuses and checked survives payload/storage.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 6,
+    "key": "reader-2-series-names-distinguishable-not-identical",
+    "disposition": "current-repair-proposal",
+    "reviewTopic": "reader-2-series-names-distinguishable-not-identical",
+    "original": {
+      "key": "reader-2-series-names-distinguishable-not-identical",
+      "where": "Order form, Series step, the 'How series must be named' box, last bullet; and the duplicate-name refusal on that step",
+      "file": "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx",
+      "line": 87,
+      "reads": "No two series of the same LLC may share an identical name.",
+      "claims": "Two series names are acceptable as long as they are not identical.",
+      "truth": "The 2026 s. 605.2202(1) (Online Sunshine, opened 20 Sep 2026) makes every protected series name 'comply with s. 605.0112', and s. 605.0112(1)(b) requires a name 'distinguishable in the records of the department from the names of all other entities or filings that are on file' and says a name is NOT distinguishable when it differs only by a suffix, an article, 'and'/'&', 'the singular, plural, or possessive form of a word', or punctuation. The form's own name check applies exactly those rules to the LLC name (nameSimilarity.ts:1-40), but the series check (stepValidation.ts:198-204 and server/validation.ts:189-195) compares seriesDedupeKey, which strips only the PS prefix and case (validation.ts:177-181). 'PS Rental' and 'PS Rentals', or 'PS Smith & Sons' and 'PS Smith and Sons', pass both checks and would be refused by the Division as indistinguishable filings.",
+      "replacement": "StepSeries.tsx:87 \u2014 `Each series name must be distinguishable on the Division's records from every other name on file, including your other series: names that differ only by punctuation, an article, \"and\" versus \"&\", or a singular/plural/possessive form count as the same name (s. 605.0112, applied by s. 605.2202(1)).` And in validation.ts seriesDedupeKey: `return normalizeEntityName(canonicalizeSeriesName(name).replace(/(^|[^A-Za-z0-9])(?:Protected\\s+Series|P\\.?S\\.?)(?=[^A-Za-z0-9]|$)[\\s-]*/gi, \"$1\"));` so the client-side and server refusals apply the s. 605.0112 rules.",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "reader-2-finding-series-name-distinguishable",
+        "reader-2-statute-605-2202",
+        "reader-2-statute-605-0112"
+      ],
+      "review": {
+        "reviewer": "reviewer-B",
+        "evidence": "reviewer-B-reader-2-series-names-distinguishable-not-identical, reviewer-B-statute-605-2202, reviewer-B-statute-605-0112: reopened StepSeries.tsx:86-88, stepValidation.ts:198-203, server/validation.ts:189-195, validation.ts:177-181 (seriesDedupeKey strips prefix and case only), nameSimilarity.ts:1-40; ss. 605.2202(1) and 605.0112(1)(b) opened on Online Sunshine (2026) and quoted in full, including the consent exception reader-2 elided. Code claim confirmed; the statutory reading (sibling designations as filings on file) is the reader's own unknown. New. The client-facing sentence states a legal rule and the stricter refusal is policy \u2014 owner's ruling; the proposed seriesDedupeKey is mechanically sound.",
+        "replacement": "needs owner ruling",
+        "priorCompared": true
+      },
+      "bucket": 2,
+      "reader": "reader-2",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "reader-2-series-names-distinguishable-not-identical",
+      "verdict": "partly-confirmed-current",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "currentLocation": "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx:87",
+      "currentEvidence": [
+        "Current seriesDedupeKey at validation.ts:177-180 only strips PS variants/case. New in-memory execution of the extracted current functions returned RENTAL versus RENTALS and SMITH & SONS versus SMITH AND SONS; both pairs remain distinct keys used by client/server duplicate checks.",
+        "Opened ss.605.2202(1) and605.0112(1)(b): distinguishability applies, but statute includes filed-consent and excluded-filing qualifications. A statement that these particular filings will necessarily be refused was not independently tested.",
+        "Proposed normalizeEntityName implementation at nameSimilarity.ts:23-39 is heuristic: drops AND completely and strips only final S; it is not a complete legal distinguishability oracle and the local list cannot check all existing filings."
+      ],
+      "verificationLevel": "source / newly reproduced pure local expression",
+      "runtimeRerun": false,
+      "historicalAssessment": "Core surviving issue is supported, but the historical finding includes repaired subparts or overbroad factual/replacement claims identified below.",
+      "replacementVerdict": "incomplete and overconfident as a complete statutory implementation",
+      "plainEnglishRepair": "Describe distinguishability accurately, preserve the consent exception where relevant, and apply tested local collision checks. Keep a separately identified office/live-record review for existing filings; do not promise complete statutory validation from this normalizer.",
+      "canonicalDuplicate": "reader-2-series-names-distinguishable-not-identical",
+      "priorItem": null,
+      "ownerDecisionNeeded": true,
+      "ownerDecisionReason": "The handling of statutory written-consent exceptions and when uncertain name matches block an order is not settled by the existing exact-duplicate rule.",
+      "primarySources": [
+        "https://www.flsenate.gov/Laws/Statutes/2026/605.2202",
+        "https://www.flsenate.gov/Laws/Statutes/2026/605.0112",
+        "https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/Sections/0605.2202.html",
+        "https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/Sections/0605.0112.html"
+      ],
+      "sourceMethod": "Full relevant Online Sunshine 2026 sections retrieved with urllib and read on2026-09-21; saved under primary-1. They corroborate the previously opened Senate provisions. Initial web-tool failure is resolved; no browser or shared tab used."
+    },
+    "evidence": [
+      "Current seriesDedupeKey at validation.ts:177-180 only strips PS variants/case. New in-memory execution of the extracted current functions returned RENTAL versus RENTALS and SMITH & SONS versus SMITH AND SONS; both pairs remain distinct keys used by client/server duplicate checks.",
+      "Opened ss.605.2202(1) and605.0112(1)(b): distinguishability applies, but statute includes filed-consent and excluded-filing qualifications. A statement that these particular filings will necessarily be refused was not independently tested.",
+      "Proposed normalizeEntityName implementation at nameSimilarity.ts:23-39 is heuristic: drops AND completely and strips only final S; it is not a complete legal distinguishability oracle and the local list cannot check all existing filings."
+    ],
+    "proposal": "Describe distinguishability accurately, preserve the consent exception where relevant, and apply tested local collision checks. Keep a separately identified office/live-record review for existing filings; do not promise complete statutory validation from this normalizer.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 10,
+    "key": "reader-4-s-election-officer-title-default",
+    "disposition": "current-repair-proposal",
+    "reviewTopic": "reader-4-s-election-officer-title-default",
+    "original": {
+      "key": "reader-4-s-election-officer-title-default",
+      "where": "Client portal \u2192 S-election details form \u2192 the pre-filled Officer title box beside Signing officer, and the Form 2553 the package prints from it (contact line H, the Sign Here title line, the cover letter and the instruction sheet)",
+      "file": "webapp/src/pages/portal/SElectionDetailsForm.tsx",
+      "line": 117,
+      "reads": "const [officerTitle, setOfficerTitle] = useState(draft?.officerTitle ?? prior.officerTitle ?? \"Manager\");",
+      "claims": "The person signing Form 2553 for this company is its Manager.",
+      "truth": "The order form offers Member-managed as well as Manager-managed (StepManagement.tsx:18-25), and a member-managed company has no manager \u2014 its signer is a member. The server knows which form the company took (routes-portal.ts oaSeed carries managementStructure at :69, :133, :176), but the /portal/services response the form is built from (:1861-1885; ServicesData at ServicesCard.tsx:58-78) does not send it, so the form pre-fills 'Manager' for every company. s-election.ts:128 prints `${officerName}, ${officerTitle}` on line H, :130 puts the title on the Sign Here line, and :222, :272 and :277 repeat it in the instructions and cover letter. A member-managed client who accepts the default signs the IRS form as Manager of a company that has none, and nothing on the screen says the title depends on how the company is managed.",
+      "replacement": "Send the management form with the services data and default from it. routes-portal.ts /portal/services: add `memberManaged: seed?.managementStructure === \"MEMBER_MANAGED\",` to the data object; ServicesCard.tsx ServicesData: add `memberManaged: boolean;`; OrdersInProgress passes `memberManaged={data.memberManaged}` to the form; SElectionDetailsForm.tsx: accept `memberManaged = false` and initialise `useState(draft?.officerTitle ?? prior.officerTitle ?? (memberManaged ? \"Member\" : \"Manager\"))`, with help under the Officer title box: \"Pre-filled from how your company is managed \u2014 change it if the signer holds a different title.\"",
+      "severity": "substantive",
+      "relation": "new",
+      "evidence": [
+        "reader-4-f-officer-title"
+      ],
+      "review": {
+        "reviewer": "reviewer-A",
+        "evidence": "Confirmed and reproduced (reviewer-A-reader-4-s-election-officer-title-default, reviewer-A-probe-officer-title, reviewer-A-probe-address-label): SElectionDetailsForm.tsx:117 defaults \"Manager\"; the /portal/services data object at routes-portal.ts:1862-1889 carries no management form although oaSeed (:69, :133, :176) returns managementStructure and `seed` is in scope at :1857; ServicesData (ServicesCard.tsx:58-78) has no such field; StepManagement.tsx:18-25 offers MEMBER_MANAGED. Rendered form shows value=\"Manager\" with no draft or prior; a package built with officerTitle \"Manager\" prints it on line H, the Sign Here title line, the instructions and the cover letter (officer-title-probe.txt lines 18, 73, 78, 120, 135). No ledger item or ruling on the title default (N2.03 quotes the member-managed agreements: \"There is no manager\") \u2014 new. The proposed code path is sound, but the title a member-managed signer is prompted to use on an IRS form (\"Member\") and the help sentence are the owner's decisions.",
+        "replacement": "needs owner ruling",
+        "priorCompared": true
+      },
+      "bucket": 4,
+      "reader": "reader-4",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "reader-4-s-election-officer-title-default",
+      "verdict": "confirmed-current",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "currentLocation": "webapp/src/pages/portal/SElectionDetailsForm.tsx:117",
+      "currentEvidence": [
+        "The form still defaults officerTitle to Manager for every company. services response routes-portal.ts:1876-1904 supplies no management structure; the editable title is then printed by s-election.ts.",
+        "A member-managed company therefore gets an unsupported Manager default. Current IRS Form2553 instructions require an authorized officer; management form alone does not prove which signer/title is legally appropriate."
+      ],
+      "verificationLevel": "source",
+      "runtimeRerun": false,
+      "historicalAssessment": "The stated core mechanism or wording gap survives in current source; detailed historical runtime results were not rerun.",
+      "replacementVerdict": "mechanical wiring plausible; Member default alone not validated as IRS-authority rule",
+      "plainEnglishRepair": "Use management information to avoid the false Manager assumption, and ask the client to confirm the authorized signer and actual title. A blank required title with clear help is safer than inventing office status from management type.",
+      "canonicalDuplicate": "reader-4-s-election-officer-title-default",
+      "priorItem": null,
+      "ownerDecisionNeeded": true,
+      "ownerDecisionReason": "The exact authorized-signer/title prompt on the tax form requires a concrete wording decision; IRS instructions do not establish that every member is an authorized officer.",
+      "primarySources": [
+        "https://www.irs.gov/instructions/i2553"
+      ]
+    },
+    "evidence": [
+      "The form still defaults officerTitle to Manager for every company. services response routes-portal.ts:1876-1904 supplies no management structure; the editable title is then printed by s-election.ts.",
+      "A member-managed company therefore gets an unsupported Manager default. Current IRS Form2553 instructions require an authorized officer; management form alone does not prove which signer/title is legally appropriate."
+    ],
+    "proposal": "Use management information to avoid the false Manager assumption, and ask the client to confirm the authorized signer and actual title. A blank required title with clear help is safer than inventing office status from management type.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 37,
+    "key": "reader-3-ein-responsible-party-manager",
+    "disposition": "current-repair-proposal",
+    "reviewTopic": "reader-3-ein-responsible-party-manager",
+    "original": {
+      "key": "reader-3-ein-responsible-party-manager",
+      "where": "Client portal, Orders in progress, the EIN application questionnaire ('EIN application details' dialog), the heading of the first block",
+      "file": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "line": 495,
+      "reads": "Responsible party \u2014 typically the LLC's manager",
+      "claims": "The responsible party on the IRS EIN application is usually the LLC's manager.",
+      "truth": "The same dialog serves every company, including a member-managed LLC, which has no manager (OAQuestionnaire.tsx:433-437 tells such a client 'there is no manager'; services members come from the owner list, routes-portal.ts:1855-1860). For that client the heading names a person who does not exist. The IRS defines the term by ownership or control, not by office: Instructions for Form SS-4 (12/2025), 'Responsible party defined.': 'The \"responsible party\" is the person who ultimately owns or controls the entity or who exercises ultimate effective control over the entity.' The explanatory sentence under the heading (:497-498) already says this; only the heading misdirects. Evidence reader-3-f-responsible.",
+      "replacement": "Responsible party \u2014 typically an owner, or the manager of a manager-managed LLC",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "reader-3-f-responsible"
+      ],
+      "review": {
+        "reviewer": "reviewer-C",
+        "evidence": "reviewer-C-reader-3-ein-responsible-party-manager, reviewer-C-irs-ss4: reopened OrdersInProgress.tsx:492-499 (incl. the 7 Sep comment), OAQuestionnaire.tsx:433-437, routes-portal.ts:1853-1859 (owner dropdown from owners, not managers); opened the IRS SS-4 (12/2025) instructions in the browser and quoted the body 'Responsible party defined.' passage. No ledger text contains 'typically the LLC' or 'Responsible party': new. Replacement is accurate for both management structures \u2014 correct; note the heading may have been Adam's own words (comment :492-494).",
+        "replacement": "correct",
+        "priorCompared": true
+      },
+      "bucket": 3,
+      "reader": "reader-3",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "reader-3-ein-responsible-party-manager",
+      "currentFile": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "currentLine": 503,
+      "currentLocation": "webapp/src/pages/portal/OrdersInProgress.tsx:503",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "historicalStatus": "Quoted historical source persists in the current candidate; verdict below accounts for owner rulings and unintegrated approved changes.",
+      "verificationLevel": "source",
+      "evidence": [
+        "OrdersInProgress:500\u2013506 still names typically the manager while the same questionnaire supports member-managed clients. IRS SS-4 instructions, opened live, define the role through ultimate ownership/control and practical control over funds; they do not establish the frequency claim in either the old or proposed heading. The explanatory paragraph already gives the appropriate functional test. Source comment is evidence of a past request, not a full recorded leave-unchanged ruling."
+      ],
+      "verdict": "partly-confirmed-current",
+      "replacementVerdict": "direction-correct-but-frequency-unproved",
+      "proposedFix": "Use the neutral heading \u201cResponsible party\u201d and retain the existing explanation of ultimate ownership or control.",
+      "canonicalDuplicateOrPrior": null,
+      "ownerDecisionNeeded": true,
+      "ownerDecisionReason": "The source comment attributes the heading choice to Adam on September 7; confirm the replacement heading in the proposed wording.",
+      "limitations": "No whole suite or live service was run. Historical runtime evidence is not a current runtime certification.",
+      "officialSources": [
+        "https://www.irs.gov/instructions/iss4"
+      ],
+      "lawVerification": "Official primary text retrieved and read this run: IRS via web tool; Florida 2026 pages via direct urllib read after web tool URL failure and unavailable browser. No shared browser tab used."
+    },
+    "evidence": [
+      "OrdersInProgress:500\u2013506 still names typically the manager while the same questionnaire supports member-managed clients. IRS SS-4 instructions, opened live, define the role through ultimate ownership/control and practical control over funds; they do not establish the frequency claim in either the old or proposed heading. The explanatory paragraph already gives the appropriate functional test. Source comment is evidence of a past request, not a full recorded leave-unchanged ruling."
+    ],
+    "proposal": "Use the neutral heading \u201cResponsible party\u201d and retain the existing explanation of ultimate ownership or control.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 38,
+    "key": "reader-3-portal-footer-download-only",
+    "disposition": "current-repair-proposal",
+    "reviewTopic": "reader-3-portal-footer-download-only",
+    "original": {
+      "key": "reader-3-portal-footer-download-only",
+      "where": "Client portal, the footer sentence under the Account card on the portal page",
+      "file": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "line": 814,
+      "reads": "Completed S-election forms and EIN letters stay encrypted here until you delete them. Download and keep your copies.",
+      "claims": "The footer explains retention of the tax documents; nothing tells the client that portal documents are download-only.",
+      "truth": "The owner's ruling of 15 Sep 2026 (docs/audit/rulings.md:12) retains the footer sentence: '\"Documents are download-only.\" \u2014 portal footer \u2014 15 Sep 2026: \"Download only means uneditable.\" (self-generated agreements may still be deleted; the sentence stays).' At the commit the sentence is gone from the portal: git grep over webapp/src finds 'download-only' only in the Terms (terms.md:83) and a server comment, and git log -S shows it was replaced in commit 4b30e9b ('Implement batch 03 encrypted retained documents\u2026') by the retention sentence. The Batch 03 work order (docs/audit/batches/03/batch.md) approves explaining encrypted retention but never names or withdraws the retained footer sentence, so the implementation departs from a standing ruling without a recorded decision to do so. Whether Adam's Batch 03 approval was meant to replace the sentence is an owner question; recorded here as the mismatch the README asks for. Evidence reader-3-f-footer, reader-3-decisions.",
+      "replacement": "Documents are download-only. Completed S-election forms and EIN letters stay encrypted here until you delete them. Download and keep your copies. If something looks wrong or missing, email support@myfloridaseriesllc.com.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "reader-3-f-footer",
+        "reader-3-decisions"
+      ],
+      "review": {
+        "reviewer": "reviewer-C",
+        "evidence": "reviewer-C-reader-3-portal-footer-download-only: reopened PortalDashboard.tsx:813-819, rulings.md:12 (verbatim: the sentence stays), terms.md:83; ran git grep/git log -S myself \u2014 the sentence left in 4b30e9b (Batch 03); read batch 03 batch.md whole and rulings N1.01/N1.02: they approve the retention sentence and never name or withdraw the footer ruling. No ledger item text contains 'download-only': new. Mismatch between a standing ruling and the implementation confirmed; whether Batch 03's 'Go - approve all' replaced the sentence is Adam's call \u2014 needs owner ruling.",
+        "replacement": "needs owner ruling",
+        "priorCompared": true
+      },
+      "bucket": 3,
+      "reader": "reader-3",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "reader-3-portal-footer-download-only",
+      "currentFile": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "currentLine": 814,
+      "currentLocation": "webapp/src/pages/portal/PortalDashboard.tsx:814",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "historicalStatus": "Quoted historical source persists in the current candidate; verdict below accounts for owner rulings and unintegrated approved changes.",
+      "verificationLevel": "source",
+      "evidence": [
+        "PortalDashboard:814 omits the sentence. Current rulings.md:12 expressly retains it and defines download-only as uneditable. Batch 03 approves encrypted retention but does not expressly revoke this instruction. This is an instruction/implementation mismatch; interpreting download-only to prohibit deletion would be wrong."
+      ],
+      "verdict": "confirmed-current",
+      "replacementVerdict": "correct-as-restoration",
+      "proposedFix": "Restore \u201cDocuments are download-only.\u201d before the current retention explanation, preserving the current support link and encrypted-retention wording.",
+      "canonicalDuplicateOrPrior": "standing download-only ruling; Batch 03",
+      "ownerDecisionNeeded": false,
+      "ownerDecisionReason": "The express standing instruction says the sentence stays; no additional owner choice is required to restore it.",
+      "limitations": "No whole suite or live service was run. Historical runtime evidence is not a current runtime certification."
+    },
+    "evidence": [
+      "PortalDashboard:814 omits the sentence. Current rulings.md:12 expressly retains it and defines download-only as uneditable. Batch 03 approves encrypted retention but does not expressly revoke this instruction. This is an instruction/implementation mismatch; interpreting download-only to prohibit deletion would be wrong."
+    ],
+    "proposal": "Restore \u201cDocuments are download-only.\u201d before the current retention explanation, preserving the current support link and encrypted-retention wording.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 39,
+    "key": "runtime-B-agent-card-raw-iso-dates",
+    "disposition": "current-repair-proposal",
+    "reviewTopic": "runtime-B-agent-card-raw-iso-dates",
+    "original": {
+      "key": "runtime-B-agent-card-raw-iso-dates",
+      "where": "Client portal \u2192 Registered agent service card, after the office records a resignation (and the 'appointment ends' sentence)",
+      "file": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "line": 421,
+      "reads": "        {company.raResignationDue ? <p className=\"mt-3\">{company.raResignationSubmitted ? `Resignation submitted ${company.raResignationSubmitted}.` : `Resignation due ${company.raResignationDue}; submission has not yet been recorded.`} {company.raEndedDate ? `Appointment ends ${company.raEndedDate}.` : \"\"}</p> : null}",
+      "claims": "Dates the client can read, in the form the rest of the card uses ('Cancellation requested on August 6, 2026', 'renews on September 20, 2027').",
+      "truth": "These values are the API's YYYY-MM-DD strings printed raw. Runtime screen (screen-portal-resignation.png, screens.md step 2): 'Resignation submitted 2026-09-20. Appointment ends 2026-10-21.' directly under 'Cancellation requested on August 6, 2026.'; the late-cancellation client sees 'Resignation due 2027-10-05; submission has not yet been recorded.'; line 376 prints raEndedDate raw the same way.",
+      "replacement": "Format with the card's own helper: `Resignation submitted ${formatDate(company.raResignationSubmitted)}.` / `Resignation due ${formatDate(company.raResignationDue)}; \u2026` / `Appointment ends ${formatDate(company.raEndedDate)}.` and, at line 376, `Our registered-agent appointment ends on ${formatDate(company.raEndedDate)}.` (formatDate is already imported for requestedAt).",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "runtime-B-screens",
+        "runtime-B-renewal-cancel-and-replacement"
+      ],
+      "review": {
+        "reviewer": "reviewer-G",
+        "evidence": "reviewer-G-runtime-B-agent-card-raw-iso-dates (note) and reviewer-G-probe (section E): PortalDashboard.tsx:26/:360/:376/:421, routes-portal.ts:986-988/:353-356, datetime.ts:28-38, calendar.ts:16-19 reopened; ledger 128 compared (same helper, other fields). On my own stack /portal/companies returned raResignationDue 2026-09-20, raResignationSubmitted 2026-09-20, raEndedDate 2026-10-21 as plain ISO strings; runtime-B's screenshot shows 'Resignation submitted 2026-09-20. Appointment ends 2026-10-21.' under 'Cancellation requested on August 6, 2026.' formatDate handles YYYY-MM-DD without a zone shift; the four substitutions are complete.",
+        "replacement": "correct",
+        "priorCompared": true
+      },
+      "bucket": 3,
+      "reader": "reader-3",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "runtime-B-agent-card-raw-iso-dates",
+      "currentFile": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "currentLine": 421,
+      "currentLocation": "webapp/src/pages/portal/PortalDashboard.tsx:421",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "historicalStatus": "Quoted historical source persists in the current candidate; verdict below accounts for owner rulings and unintegrated approved changes.",
+      "verificationLevel": "source",
+      "evidence": [
+        "PortalDashboard:376 and :421 print raw end/due/submitted dates. routes-portal:992\u2013994 returns ISO calendar strings. datetime.ts:28\u201338 handles YYYY-MM-DD without a viewer-zone shift. The neighboring cancellation date already uses formatDate. Prior 128 concerns other date displays, not these four locations."
+      ],
+      "verdict": "confirmed-current",
+      "replacementVerdict": "correct",
+      "proposedFix": "Apply formatDate to all four resignation/end-date interpolations in the registered-agent card.",
+      "canonicalDuplicateOrPrior": null,
+      "ownerDecisionNeeded": false,
+      "ownerDecisionReason": "Formatting only; no policy or legal wording change.",
+      "limitations": "No whole suite or live service was run. Historical runtime evidence is not a current runtime certification."
+    },
+    "evidence": [
+      "PortalDashboard:376 and :421 print raw end/due/submitted dates. routes-portal:992\u2013994 returns ISO calendar strings. datetime.ts:28\u201338 handles YYYY-MM-DD without a viewer-zone shift. The neighboring cancellation date already uses formatDate. Prior 128 concerns other date displays, not these four locations."
+    ],
+    "proposal": "Apply formatDate to all four resignation/end-date interpolations in the registered-agent card.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 40,
+    "key": "reader-4-s-election-typed-address-on-file",
+    "disposition": "current-repair-proposal",
+    "reviewTopic": "reader-4-s-election-typed-address-on-file",
+    "original": {
+      "key": "reader-4-s-election-typed-address-on-file",
+      "where": "Client portal \u2192 S-election details form (the dialog opened by Provide details securely on an S Corporation Election Package order) \u2192 an owner card \u2192 the line under the Home address box, after the client types an address by hand without choosing a lookup suggestion",
+      "file": "webapp/src/pages/portal/SElectionDetailsForm.tsx",
+      "line": 538,
+      "reads": "<p className=\"text-xs text-muted-foreground\">Address on file</p>",
+      "claims": "The address shown is one we already had on file (imported from the order or previously saved).",
+      "truth": ":526 onChangeText sets verified: false on every keystroke, and :532-539 prints 'Address on file' for any nonempty value that is not verified \u2014 so an address the client has just typed, never saved and never imported, is labelled as on file. Batch 01 (N3.06, batch.md:115) approved 'Address on file' for imported or previously saved addresses and 'Verified address' only for a lookup result; the freshly typed case was given no label and inherits the wrong one. The genuinely on-file cases are the rows loaded at :120-138 and an owner chosen at :488.",
+      "replacement": "Track where the text came from. In ShareholderRow (ServicesCard.tsx:80-107) add `fromFile?: boolean; fromFile2?: boolean;`; set `fromFile: true, fromFile2: Boolean(s.address2)` on rows built at :122-138 (prior.shareholders), keep the draft's own flags at :120, and at :488 set `fromFile: Boolean(m?.address)`; at :526 use `onChangeText={(text) => patchRow(i, who === \"first\" ? { address: text, verified: false, fromFile: false } : { address2: text, verified2: false, fromFile2: false })}`; in addressBox read `const fromFile = who === \"first\" ? r.fromFile : r.fromFile2;` and render `{value ? (verified ? (<p \u2026><CheckCircle2 \u2026 /> Verified address</p>) : fromFile ? (<p className=\"text-xs text-muted-foreground\">Address on file</p>) : null) : null}`.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "reader-4-f-address-on-file",
+        "reader-4-pN3-06"
+      ],
+      "review": {
+        "reviewer": "reviewer-A",
+        "evidence": "Confirmed and reproduced (reviewer-A-reader-4-s-election-typed-address-on-file, reviewer-A-probe-address-label): SElectionDetailsForm.tsx:526 sets verified:false on every keystroke and :532-539 print \"Address on file\" for any nonempty unverified value; ShareholderRow (ServicesCard.tsx:80-107) has no provenance flag. Pure render in my worktree: a draft row with a typed address renders \"Address on file\" x1 (state B), a stored shareholder the same (A), empty address no label (D). Batch 01 batch.md:115 approved \"Address on file\" for imported or previously saved addresses only \u2014 the implementation labels typed text too, a decision/implementation mismatch; related prior N3.06, relation new confirmed. Replacement is correct and complete: per-row fromFile flags set for prior rows and a chosen owner, cleared on typing, no label for typed text, ruled labels unchanged; no legal statement.",
+        "replacement": "correct",
+        "priorCompared": true
+      },
+      "bucket": 4,
+      "reader": "reader-4",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "reader-4-s-election-typed-address-on-file",
+      "currentFile": "webapp/src/pages/portal/SElectionDetailsForm.tsx",
+      "currentLine": 538,
+      "currentLocation": "webapp/src/pages/portal/SElectionDetailsForm.tsx:538",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "historicalStatus": "Quoted historical source persists in the current candidate; verdict below accounts for owner rulings and unintegrated approved changes.",
+      "verificationLevel": "source",
+      "evidence": [
+        "SElectionDetailsForm:520\u2013540 labels every nonempty unverified value Address on file; :526 sets verified false on typing. :120\u2013138 initializes drafts/stored rows and :488 handles imported owners. ServicesCard ShareholderRow lacks provenance fields. The proposed flags address the core defect, but reopened saved-draft semantics and second-address reset paths must be considered rather than treating all draft flags as authoritative."
+      ],
+      "verdict": "confirmed-current",
+      "replacementVerdict": "correct-direction-needs-complete-provenance-handling",
+      "proposedFix": "Track whether each address came from saved/imported data; clear that status on typing for both owners; show no on-file label on unsaved typed text. Preserve lookup verification and correctly initialize reopened saved drafts.",
+      "canonicalDuplicateOrPrior": "related N3.06:all, new typed-address case",
+      "ownerDecisionNeeded": false,
+      "ownerDecisionReason": "Implements the already approved distinction in N3.06.",
+      "limitations": "No whole suite or live service was run. Historical runtime evidence is not a current runtime certification."
+    },
+    "evidence": [
+      "SElectionDetailsForm:520\u2013540 labels every nonempty unverified value Address on file; :526 sets verified false on typing. :120\u2013138 initializes drafts/stored rows and :488 handles imported owners. ServicesCard ShareholderRow lacks provenance fields. The proposed flags address the core defect, but reopened saved-draft semantics and second-address reset paths must be considered rather than treating all draft flags as authoritative."
+    ],
+    "proposal": "Track whether each address came from saved/imported data; clear that status on typing for both owners; show no on-file label on unsaved typed text. Preserve lookup verification and correctly initialize reopened saved drafts.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 44,
+    "key": "reader-6-name-hold-dissolved",
+    "disposition": "existing-prior-repair",
+    "reviewTopic": "reader-6-name-hold-dissolved",
+    "original": {
+      "key": "reader-6-name-hold-dissolved",
+      "where": "Order form, LLC name step and Submit \u2014 the refusal when the mirror holds an inactive record within the hold window",
+      "file": "webapp/server/routes-payments.ts",
+      "line": 326,
+      "reads": ": \"it belongs to a recently dissolved company, and Florida protects it for up to a year\"",
+      "claims": "Every inactive Florida record within the hold window is a dissolved company, and Florida protects its name for up to a year.",
+      "truth": "The mirror knows only status 'A' or 'I' (sunbiz.ts:62-63) and applies a 366-day window from last_txn_date/file_date to every inactive record (sunbiz.ts:167, :237-239) \u2014 its own comment says the mirror 'does not establish the dissolution cause/date' (:164-165). s. 605.0715(5), read whole on Online Sunshine, gives the one-year hold for an administratively dissolved company; s. 605.0717(2) gives 120 days for other dissolutions. A merged, converted or withdrawn company is 'I' too. Ledger canonical is item 90 (open); Batch 10 retained the wording pending 90/96. The same sentence is at NameCheck.tsx:45 and stepValidation.ts:126.",
+      "replacement": ": \"it belongs to a company that recently went inactive in the Division's records, and Florida can protect such a name for up to a year\"",
+      "severity": "wording",
+      "relation": "prior",
+      "evidence": [
+        "reader-6-f-name-hold",
+        "reader-6-stat-605-0715",
+        "reader-6-stat-605-0717"
+      ],
+      "review": {
+        "reviewer": "reviewer-C",
+        "evidence": "reviewer-C-reader-6-name-hold-dissolved, reviewer-C-st-605-0715, reviewer-C-st-605-0717: reopened routes-payments.ts:315-332, sunbiz.ts:58-66/:160-167/:222-252, NameCheck.tsx:45, stepValidation.ts:126; read ss. 605.0715 and 605.0717 whole on Online Sunshine (2026) and quoted (5) and (2) \u2014 they match reader-6's artifacts; read ledger 90 (open, waitsOn ruling:90, Codex corrected replacement) and 96 (canonical 90); batch 10 batch.md:3/:13 retain the visible wording pending 90/96. Prior 90/all correct. Replacement matches Codex's correction and the statutes, but the wording is retained pending Adam \u2014 needs owner ruling.",
+        "replacement": "needs owner ruling",
+        "priorCompared": true
+      },
+      "prior": {
+        "id": "90",
+        "part": "all"
+      },
+      "bucket": 6,
+      "reader": "reader-6",
+      "link": null,
+      "presentedAs": "prior 90:all"
+    },
+    "assessment": {
+      "key": "reader-6-name-hold-dissolved",
+      "currentFile": "webapp/server/routes-payments.ts",
+      "currentLine": 326,
+      "currentLocation": "webapp/server/routes-payments.ts:326",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "historicalStatus": "Quoted historical source persists in the current candidate; verdict below accounts for owner rulings and unintegrated approved changes.",
+      "verificationLevel": "source",
+      "evidence": [
+        "routes-payments:326, NameCheck:45 and stepValidation retain dissolved wording. sunbiz:160\u2013167/222\u2013247 uses status I and last transaction/file dates, not proven dissolution. Official 605.0715(5) and 605.0717(2) independently read: administrative and other dissolved-name rules differ. \u201cFlorida can protect\u201d is improved but does not clearly distinguish this service\u2019s conservative proxy."
+      ],
+      "verdict": "existing-prior-open",
+      "replacementVerdict": "direction-correct-needs-service-rule-clarity",
+      "proposedFix": "Describe the record as recently inactive and explain that this service conservatively treats the name as unavailable. Do not claim the mirror proves dissolution; preserve the owner-approved blocking rule.",
+      "canonicalDuplicateOrPrior": "90:all; 96:all duplicate",
+      "ownerDecisionNeeded": true,
+      "ownerDecisionReason": "Canonical 90 wording remains pending; the conservative blocking policy stays.",
+      "limitations": "No whole suite or live service was run. Historical runtime evidence is not a current runtime certification.",
+      "officialSources": [
+        "https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/Sections/0605.0715.html",
+        "https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699/0605/Sections/0605.0717.html"
+      ],
+      "lawVerification": "Official primary text retrieved and read this run: IRS via web tool; Florida 2026 pages via direct urllib read after web tool URL failure and unavailable browser. No shared browser tab used."
+    },
+    "evidence": [
+      "routes-payments:326, NameCheck:45 and stepValidation retain dissolved wording. sunbiz:160\u2013167/222\u2013247 uses status I and last transaction/file dates, not proven dissolution. Official 605.0715(5) and 605.0717(2) independently read: administrative and other dissolved-name rules differ. \u201cFlorida can protect\u201d is improved but does not clearly distinguish this service\u2019s conservative proxy."
+    ],
+    "proposal": "Describe the record as recently inactive and explain that this service conservatively treats the name as unavailable. Do not claim the mirror proves dissolution; preserve the owner-approved blocking rule.",
+    "allRepairsRequireAdamReview": true
+  },
+  {
+    "number": 46,
+    "key": "runtime-A-generation-number-burned",
+    "disposition": "current-repair-proposal",
+    "reviewTopic": "runtime-A-generation-number-burned",
+    "original": {
+      "key": "runtime-A-generation-number-burned",
+      "where": "Client portal \u2192 Operating agreement questionnaire \u2192 Generate Operating Agreement (PDF): the number printed in the agreement's title (\"Partnership Operating Agreement (No. N)\"), in Your documents, in Your agreements and in the amendment form's \"Most recently generated agreement on file\" line",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 1256,
+      "reads": "  const bumped = await db.query<{ oa_generation_seq: number }>(\n    \"UPDATE clients SET oa_generation_seq = oa_generation_seq + 1 WHERE id = $1 RETURNING oa_generation_seq\",\n    [session.clientId],\n  );\n  const nextGenerationNumber = Number(bumped[0]?.oa_generation_seq ?? 1);",
+      "claims": "The comment above it (lines 1253-1255) says the counter exists so a number is never reused because it is printed on the PDF; the client expects their first generated agreement to be No. 1 and successive agreements to be numbered consecutively.",
+      "truth": "The counter is incremented BEFORE the checks that can still refuse the request: the percentage total (line 1387), the competition/option answers (1398-1406), the borrowing limit (1414-1417), the contributor review and capital errors (1424-1431), the stale-draft 409 (1432-1438) and the rate limit (1477). Each refused attempt burns a number. Runtime (oa-save-reopen-generate.md, checks \"a one-word owner name\", \"the client's FIRST agreement is numbered No. 1\", \"the stale-tab refusal (409) also consumed a printed number\"): after three refusals the client's first agreement was titled \"Partnership Operating Agreement (No. 4) \u2014 RA Draft Holdings, LLC\", and the agreement generated after a 409 was numbered two higher than the one before. The questionnaire's Generate button is not disabled for these gaps (OAQuestionnaire.tsx line 820 checks neither the percentage total nor the option answers nor the threshold), so a real client reaches them by pressing Generate.",
+      "replacement": "Move lines 1253-1260 (the comment and the `bumped`/`nextGenerationNumber` statements) to immediately after the rate-limit refusal at lines 1477-1479, i.e. just before `const clients = await db.query<{ email: string; name: string }>(...)` at line 1480, so the sequence is spent only by a request that has passed every refusal (the same rule the route already applies to the rate limit: \"Only a request that passed every check spends the allowance\"). `inputs.generationNumber` (line 1472) must then be assigned after the move, e.g. set `inputs.generationNumber = nextGenerationNumber` before `assembleOa(inputs)`.",
+      "severity": "wording",
+      "relation": "new",
+      "evidence": [
+        "runtime-A-oa-save-reopen-generate",
+        "runtime-A-findings-sources"
+      ],
+      "review": {
+        "reviewer": "reviewer-G",
+        "evidence": "reviewer-G-runtime-A-generation-number-burned (note) and reviewer-G-probe (section A): routes-portal.ts generate route :1168-1530 read whole (:1219, :1253-1260, :1387-1406, :1415, :1426, :1430, :1437, :1472, :1475-1479, :1527), oa.ts:101/:752, OAQuestionnaire.tsx:820 reopened; rulings.md refusals-do-not-count (14 Sep) and ledger 127/137/195 compared; new confirmed. On my own stack: one refusal before :1256 and two after, then the first agreement was titled (No. 3); a 409 then No. 5. Moving :1253-1260 after :1479 is right; the inputs literal (:1447-1473) must then set generationNumber after the bump (the field is optional), which the reader already notes.",
+        "replacement": "correct",
+        "priorCompared": true
+      },
+      "bucket": 6,
+      "reader": "reader-6",
+      "link": null,
+      "presentedAs": "new"
+    },
+    "assessment": {
+      "key": "runtime-A-generation-number-burned",
+      "currentFile": "webapp/server/routes-portal.ts",
+      "currentLine": 1265,
+      "currentLocation": "webapp/server/routes-portal.ts:1265",
+      "currentCommit": "4b6d0d54297f169def1729bf789dd8bdbfc2d5d0",
+      "historicalStatus": "Quoted historical source persists in the current candidate; verdict below accounts for owner rulings and unintegrated approved changes.",
+      "verificationLevel": "existing runtime evidence",
+      "evidence": [
+        "Current routes-portal:1265\u20131269 increments before shares/options/capital/stale-base checks and rate limit at ~1488. Historical runtime-A report records first success No.4 after refusals. Current source confirms the same ordering. However the recorded owner rule concerns rate-limit allowance, not a stated requirement that generated identifiers be consecutive; gaps alone do not invalidate an agreement. Later render/storage failure can still consume a number under Claude\u2019s move."
+      ],
+      "verdict": "partly-confirmed-current",
+      "replacementVerdict": "correct-for-validation-refusals-not-gap-free-guarantee",
+      "proposedFix": "Allocate the number after validation, stale-draft and rate-limit refusals, and assign inputs.generationNumber after allocation. Preserve never-reuse behavior; do not promise gap-free numbering after rendering/storage failures.",
+      "canonicalDuplicateOrPrior": null,
+      "ownerDecisionNeeded": false,
+      "ownerDecisionReason": "Moving allocation past known refusals does not change the existing never-reuse rule.",
+      "limitations": "No whole suite or live service was run. Historical runtime evidence is not a current runtime certification."
+    },
+    "evidence": [
+      "Current routes-portal:1265\u20131269 increments before shares/options/capital/stale-base checks and rate limit at ~1488. Historical runtime-A report records first success No.4 after refusals. Current source confirms the same ordering. However the recorded owner rule concerns rate-limit allowance, not a stated requirement that generated identifiers be consecutive; gaps alone do not invalidate an agreement. Later render/storage failure can still consume a number under Claude\u2019s move."
+    ],
+    "proposal": "Allocate the number after validation, stale-draft and rate-limit refusals, and assign inputs.generationNumber after allocation. Preserve never-reuse behavior; do not promise gap-free numbering after rendering/storage failures.",
+    "allRepairsRequireAdamReview": true
+  }
+]

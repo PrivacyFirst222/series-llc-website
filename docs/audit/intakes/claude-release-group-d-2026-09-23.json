@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "run": "claude-release-group-d-2026-09-23",
+  "commit": "09d1cd374b45a3a154b6abfecc11935b153defb7",
+  "completedAt": "2026-09-23T14:13:13.665251+00:00",
+  "manifestSha": "285856f188dc8b5a47c500fa1eae6078b17033d7dba2e8298c47fc54fb99a70c",
+  "auditSha": "285856f188dc8b5a47c500fa1eae6078b17033d7dba2e8298c47fc54fb99a70c",
+  "findings": [
+    {
+      "key": "item-30",
+      "relation": "new",
+      "where": "Group D item-30",
+      "file": "docs/owners-manual.md",
+      "line": 198,
+      "reads": "| **1. Prepare it** | Division of Corporations form **CR2E138, \"Statement of Authority.\"** It asks for the company's name exactly as the state has it, the principal office addresses, and the authority \u2014 or the limits on it \u2014 of members or managers, stated by name or by position. **Use the position, not the name.** People change; \"the Manager\" survives a change of personnel, and a name forces a refiling. |",
+      "claims": "Company-only filing instructions do not distinguish the series that owns property.",
+      "truth": "Release reconciliation items 30\u201331; Adam approved item 1 and revised item 2, then Go on 23 September 2026.",
+      "replacement": "If you choose to file a statement of authority, identify the entity that holds the property. A statement concerning property held by the company identifies the company; a statement concerning property held by a protected series identifies that protected series. The company-form instructions below should not be used for a series filing without confirming the Division\u2019s filing requirements for that series.",
+      "severity": "wording",
+      "review": {
+        "reviewer": "Codex source reconciliation",
+        "evidence": "Current source read; statutory filing sources opened; owner billing instruction controls this policy change.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "item-31",
+      "relation": "new",
+      "where": "Group D item-31",
+      "file": "webapp/src/content/terms.md",
+      "line": 48,
+      "reads": "**(d) Renewal reminder.** We schedule your renewal reminder 70 days before your renewal date. The reminder states the renewal date, the amount, the cancellation deadline, and how to cancel. Your obligation to give cancellation notice at least 30 days before renewal and provide replacement proof by the renewal date does not depend on receiving this reminder, and our failure to send it or your failure to receive it does not extend those deadlines. If we fail to send a reminder required by applicable law, we will not automatically renew or charge your card except as permitted by law.",
+      "claims": "Prior reminder hold conflicts with Adam's revised billing policy.",
+      "truth": "Release reconciliation items 30\u201331; Adam approved item 1 and revised item 2, then Go on 23 September 2026.",
+      "replacement": "A missing or late renewal reminder does not postpone renewal, prevent us from charging your authorized payment method for the renewal fee, or extend your cancellation or replacement deadlines.",
+      "severity": "wording",
+      "review": {
+        "reviewer": "Codex source reconciliation",
+        "evidence": "Current source read; statutory filing sources opened; owner billing instruction controls this policy change.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    }
+  ]
+}

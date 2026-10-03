@@ -3,7 +3,10 @@
 import { createCipheriv, createDecipheriv, randomBytes, createHash } from 'node:crypto';
 import { env } from './env';
 const MAGIC = 'FPSLLC-ENC-1\n';
+/** Preserve configuration provenance without changing other callers' handling. */
+export class EncryptionKeyError extends Error {}
 export function encryptionKeys(): { active: string; keys: Record<string, Buffer> } {
+ try {
   const active = process.env.DOCUMENT_ENCRYPTION_ACTIVE_KEY || 'dev';
   const raw = process.env.DOCUMENT_ENCRYPTION_KEYS;
   if (!raw) {
@@ -20,6 +23,9 @@ export function encryptionKeys(): { active: string; keys: Record<string, Buffer>
   }
   if (!keys[active]) throw new Error('The active encryption key is missing');
   return { active, keys };
+ } catch (error) {
+   throw new EncryptionKeyError(error instanceof Error ? error.message : 'Invalid encryption key configuration');
+ }
 }
 export function isEncrypted(data: Buffer): boolean { return data.subarray(0, MAGIC.length).toString() === MAGIC; }
 export function encryptedKeyId(data: Buffer): string | null { return isEncrypted(data) ? JSON.parse(data.subarray(MAGIC.length).toString()).key : null; }
@@ -33,7 +39,7 @@ export function seal(data: Buffer): Buffer {
 export function unseal(data: Buffer): Buffer {
   if (!isEncrypted(data)) throw new Error('Expected an encrypted document');
   const p = JSON.parse(data.subarray(MAGIC.length).toString()), { keys } = encryptionKeys();
-  if (!keys[p.key]) throw new Error(`Required encryption key ${p.key} is unavailable`);
+  if (!keys[p.key]) throw new EncryptionKeyError(`Required encryption key ${p.key} is unavailable`);
   const decipher = createDecipheriv('aes-256-gcm', keys[p.key], Buffer.from(p.iv, 'base64'));
   decipher.setAAD(Buffer.from(`${MAGIC}${p.key}`));
   decipher.setAuthTag(Buffer.from(p.tag, 'base64'));

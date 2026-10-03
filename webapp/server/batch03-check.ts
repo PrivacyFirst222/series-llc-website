@@ -5,6 +5,7 @@ import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {gunzipSync} from 'node:zlib';
 import {PDFDocument,StandardFonts} from '@cantoo/pdf-lib';
+import {spyOn} from 'bun:test';
 export async function batch03Checks(check:(label:string,ok:boolean,detail?:unknown)=>void){
  const dir=mkdtempSync(join(tmpdir(),'batch03-'));
  try{
@@ -113,7 +114,18 @@ async function child(){
   extra('an early failure does not strand later files',first.failed===1&&first.complete===false&&Number(count.n)===207,first);
   await storage.putObject('missing-fixture',Buffer.from(pdf));const retried=await mirror.runFileMirror();extra('failed mirror converges after repair',retried.failed===0&&retried.complete===true,retried);
 
-  const interrupted=await backup.runDbBackup({budgetMs:0});extra('interruption remains incomplete',interrupted.complete===false&&interrupted.pending>0,interrupted);
+  // Expire the file-work budget after the first file checkpoint is saved.
+  // A literal zero budget now forbids even snapshot IO; it cannot model a
+  // persisted interruption. The controlled clock leaves the specified 5ms
+  // checkpoint reserve and does not shorten or skip the resume assertions.
+  const realNow=Date.now,realPut=storage.putObject;let clock=realNow(),expired=false;
+  Date.now=()=>clock;
+  const checkpoint=spyOn(storage,'putObject').mockImplementation(async(...args:Parameters<typeof storage.putObject>)=>{
+   const result=await realPut(...args);if(args[0]==='backup-jobs/current.json'&&!expired&&JSON.parse(args[1].toString()).cursor>0){expired=true;clock+=20;}return result;
+  });
+  let interrupted:Awaited<ReturnType<typeof backup.runDbBackup>>;
+  try{interrupted=await backup.runDbBackup({budgetMs:20});}finally{checkpoint.mockRestore();Date.now=realNow;}
+  extra('interruption remains incomplete',expired&&interrupted.complete===false&&interrupted.pending>0,interrupted);
   const resumed=await backup.runDbBackup({resumeOnly:true});extra('interrupted backup automatically resumes to completion',resumed.complete===true&&resumed.pending===0,resumed);
  }
 }
@@ -121,8 +133,9 @@ async function restore(){
  const dir=process.env.BATCH03_DIR!,dump=JSON.parse(readFileSync(join(dir,'dump.json'),'utf8')),want=JSON.parse(readFileSync(join(dir,'expected.json'),'utf8'));
  const {restoreBackup}=await import('./restore'),{getDb}=await import('./db'),{readFileStream}=await import('./storage');const db=await getDb();
  const retainedDump=dump.tables.documents.find((d:{id:string})=>d.id===want.retained);const entry=dump.files.find((f:{storageKey:string})=>f.storageKey===retainedDump.storage_key);const mirrorPath=process.env.DEV_MIRROR_DIR!+entry.path,encrypted=readFileSync(mirrorPath);let plaintextRefused=false;
- writeFileSync(mirrorPath,Buffer.from(want.pdf,'base64'));try{await restoreBackup(db,dump);}catch(e){plaintextRefused=String(e).includes('not encrypted');}finally{writeFileSync(mirrorPath,encrypted);}
- if(!plaintextRefused)throw new Error('Restore accepted an unencrypted sensitive document');
+ writeFileSync(mirrorPath,Buffer.from(want.pdf,'base64'));try{await restoreBackup(db,dump);}catch(e){plaintextRefused=String(e).includes('not encrypted')||String(e).includes('Saved original size, hash or envelope does not match');}finally{writeFileSync(mirrorPath,encrypted);}
+ const [untouched]=await db.query<{n:number}>("SELECT count(*)::int n FROM clients");
+ if(!plaintextRefused||untouched.n!==0)throw new Error('Restore did not refuse the unencrypted sensitive document before business writes');
  const result=await restoreBackup(db,dump);
  const [email]=await db.query<{html:string;provider_id:string}>('SELECT html,provider_id FROM email_log WHERE id=$1',[want.emailId]);const [renewal]=await db.query<{square_payment_id:string;amount_cents:number}>('SELECT square_payment_id,amount_cents FROM ra_renewals WHERE id=$1',[want.renewalId]);const [retained]=await db.query<{storage_key:string}>('SELECT storage_key FROM documents WHERE id=$1',[want.retained]);const deleted=await db.query('SELECT id FROM documents WHERE id=$1',[want.deleted]);
  const bytes=retained?await readFileStream(retained.storage_key):Buffer.alloc(0);

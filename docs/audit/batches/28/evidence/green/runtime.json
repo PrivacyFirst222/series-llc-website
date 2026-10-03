@@ -1,0 +1,466 @@
+{
+  "code": 0,
+  "rows": [
+    {
+      "label": "A06",
+      "ok": true,
+      "detail": {
+        "before": [],
+        "failed": [
+          {
+            "id": "2cbe343f-3f04-404e-a3f4-80c630b467cb",
+            "order_id": "986b3781-d68b-4ba8-82a0-778de58e1b1f",
+            "renewal_date": "2030-06-01T00:00:00.000Z",
+            "amount_cents": 9900,
+            "status": "notice_pending",
+            "charge_due": "2030-05-17T00:00:00.000Z",
+            "notice_sent_at": null,
+            "charged_at": null,
+            "square_payment_id": null,
+            "square_order_id": null,
+            "link_url": null,
+            "decline_code": null,
+            "retry_after": null,
+            "retries": 0,
+            "created_at": "2026-09-22T02:03:09.993Z",
+            "updated_at": "2026-09-22T02:03:09.993Z",
+            "purpose": "renewal",
+            "billing_hold": false,
+            "notice_error": "Error: Resend 503: Injected mail outage",
+            "lock_until": null,
+            "checkout_token": "RN5L3NFNWKmh_onJaLOEIAM0VYBN1QkL-yVBd4-RMcU"
+          }
+        ],
+        "recovered": [
+          {
+            "id": "2cbe343f-3f04-404e-a3f4-80c630b467cb",
+            "order_id": "986b3781-d68b-4ba8-82a0-778de58e1b1f",
+            "renewal_date": "2030-06-01T00:00:00.000Z",
+            "amount_cents": 9900,
+            "status": "notice_sent",
+            "charge_due": "2030-05-17T00:00:00.000Z",
+            "notice_sent_at": "2030-03-24T12:00:00.000Z",
+            "charged_at": null,
+            "square_payment_id": null,
+            "square_order_id": null,
+            "link_url": "http://localhost:8000/agent-checkout?kind=renewal&id=2cbe343f-3f04-404e-a3f4-80c630b467cb&token=RN5L3NFNWKmh_onJaLOEIAM0VYBN1QkL-yVBd4-RMcU",
+            "decline_code": null,
+            "retry_after": null,
+            "retries": 0,
+            "created_at": "2026-09-22T02:03:09.993Z",
+            "updated_at": "2026-09-22T02:03:09.993Z",
+            "purpose": "renewal",
+            "billing_hold": false,
+            "notice_error": null,
+            "lock_until": null,
+            "checkout_token": "RN5L3NFNWKmh_onJaLOEIAM0VYBN1QkL-yVBd4-RMcU"
+          }
+        ],
+        "held": [
+          {
+            "id": "4b0faa42-5442-456b-917f-3f6551f71458",
+            "order_id": "e8fbaf3c-99e3-4b9e-8c2a-2e48f52be049",
+            "renewal_date": "2030-06-01T00:00:00.000Z",
+            "amount_cents": 9900,
+            "status": "notice_sent",
+            "charge_due": "2030-05-17T00:00:00.000Z",
+            "notice_sent_at": "2030-04-03T12:00:00.000Z",
+            "charged_at": null,
+            "square_payment_id": null,
+            "square_order_id": null,
+            "link_url": "http://localhost:8000/agent-checkout?kind=renewal&id=4b0faa42-5442-456b-917f-3f6551f71458&token=zv9Ab-TFErYlFw7G9eQSPYymfrtD7ffPYimpRkt-DgU",
+            "decline_code": null,
+            "retry_after": null,
+            "retries": 0,
+            "created_at": "2026-09-22T02:03:10.002Z",
+            "updated_at": "2026-09-22T02:03:10.002Z",
+            "purpose": "renewal",
+            "billing_hold": true,
+            "notice_error": null,
+            "lock_until": null,
+            "checkout_token": "zv9Ab-TFErYlFw7G9eQSPYymfrtD7ffPYimpRkt-DgU"
+          }
+        ]
+      }
+    },
+    {
+      "label": "A03",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "stored": {
+          "id": "69f78f9d-efa4-4731-94b7-c0ad491289d6",
+          "name": "Message Sender",
+          "email": "sender@example.test",
+          "message": "Please record this one message.",
+          "created_at": "2026-09-22T02:03:10.007Z",
+          "notice_status": "failed",
+          "notice_error": "Error: Resend 503: Injected mail outage",
+          "notice_sent_at": null,
+          "notice_lock_until": null
+        },
+        "contacts": [
+          {
+            "id": "69f78f9d-efa4-4731-94b7-c0ad491289d6",
+            "name": "Message Sender",
+            "email": "sender@example.test",
+            "message": "Please record this one message.",
+            "created_at": "2026-09-22T02:03:10.007Z",
+            "notice_status": "sent",
+            "notice_error": null,
+            "notice_sent_at": "2026-09-22T02:03:10.009Z",
+            "notice_lock_until": null
+          }
+        ]
+      }
+    },
+    {
+      "label": "A02",
+      "ok": true,
+      "detail": {
+        "mailDoc": {
+          "id": "edc233b5-6904-4037-be5c-9ce126c03111",
+          "client_id": "3f28cfb6-22e5-458e-8184-2d44fb4d43a3",
+          "kind": "legal_mail",
+          "title": "Service of process",
+          "storage_key": "dev:0f39224db6764114cb6b723a-mail.pdf",
+          "content_type": "application/pdf",
+          "size_bytes": 682,
+          "created_at": "2026-09-22T02:03:10.025Z",
+          "meta": {
+            "receivedOn": "2026-09-20"
+          },
+          "order_id": "986b3781-d68b-4ba8-82a0-778de58e1b1f",
+          "mirrored_at": null,
+          "deleted_at": null,
+          "mirror_path": null,
+          "mirror_hash": null,
+          "mirror_error": null,
+          "mirror_attempted_at": null,
+          "notice_status": "failed",
+          "notice_error": "Error: Resend 503: Injected mail outage",
+          "notice_sent_at": null,
+          "notice_recipient": "current@example.test",
+          "notice_lock_until": null
+        },
+        "afterMail": {
+          "id": "edc233b5-6904-4037-be5c-9ce126c03111",
+          "client_id": "3f28cfb6-22e5-458e-8184-2d44fb4d43a3",
+          "kind": "legal_mail",
+          "title": "Service of process",
+          "storage_key": "dev:0f39224db6764114cb6b723a-mail.pdf",
+          "content_type": "application/pdf",
+          "size_bytes": 682,
+          "created_at": "2026-09-22T02:03:10.025Z",
+          "meta": {
+            "receivedOn": "2026-09-20"
+          },
+          "order_id": "986b3781-d68b-4ba8-82a0-778de58e1b1f",
+          "mirrored_at": null,
+          "deleted_at": null,
+          "mirror_path": null,
+          "mirror_hash": null,
+          "mirror_error": null,
+          "mirror_attempted_at": null,
+          "notice_status": "sent",
+          "notice_error": null,
+          "notice_sent_at": "2026-09-22T02:03:10.029Z",
+          "notice_recipient": "updated@example.test",
+          "notice_lock_until": null
+        },
+        "forbidden": 401
+      }
+    },
+    {
+      "label": "A04",
+      "ok": true,
+      "detail": {
+        "noNote": 400,
+        "submitted": 200,
+        "fees": [
+          {
+            "id": "cd676f16-102a-4533-9cd5-c1a8a3d58437",
+            "order_id": "f855c5b5-ace5-4b1a-98a3-fd1253e0a981",
+            "renewal_date": "2026-09-21T00:00:00.000Z",
+            "amount_cents": 9900,
+            "status": "link_sent",
+            "charge_due": "2026-09-21T00:00:00.000Z",
+            "notice_sent_at": "2026-09-22T02:03:10.034Z",
+            "charged_at": null,
+            "square_payment_id": null,
+            "square_order_id": null,
+            "link_url": "http://localhost:8000/agent-checkout?kind=renewal&id=cd676f16-102a-4533-9cd5-c1a8a3d58437&token=VHKaE4HD6Uf5nTGQOqpUa53u4EM4aVIwk1cm5ZwQCAw",
+            "decline_code": null,
+            "retry_after": null,
+            "retries": 0,
+            "created_at": "2026-09-22T02:03:10.033Z",
+            "updated_at": "2026-09-22T02:03:10.033Z",
+            "purpose": "resignation",
+            "billing_hold": false,
+            "notice_error": null,
+            "lock_until": null,
+            "checkout_token": "VHKaE4HD6Uf5nTGQOqpUa53u4EM4aVIwk1cm5ZwQCAw"
+          },
+          {
+            "id": "495a54bf-38ae-40cc-8df1-b697f290f68a",
+            "order_id": "f855c5b5-ace5-4b1a-98a3-fd1253e0a981",
+            "renewal_date": "2030-06-01T00:00:00.000Z",
+            "amount_cents": 9900,
+            "status": "declined",
+            "charge_due": null,
+            "notice_sent_at": null,
+            "charged_at": null,
+            "square_payment_id": null,
+            "square_order_id": null,
+            "link_url": null,
+            "decline_code": null,
+            "retry_after": null,
+            "retries": 0,
+            "created_at": "2026-09-22T02:03:10.030Z",
+            "updated_at": "2026-09-22T02:03:10.030Z",
+            "purpose": "renewal",
+            "billing_hold": false,
+            "notice_error": null,
+            "lock_until": null,
+            "checkout_token": null
+          }
+        ]
+      }
+    },
+    {
+      "label": "A05",
+      "ok": true,
+      "detail": {
+        "cancelView": {
+          "orderId": "5cedc89c-e1cf-4db9-8dc3-d29b660f2317",
+          "llcName": "Late Cancel LLC",
+          "formed": true,
+          "raService": true,
+          "raAppointmentDate": "2026-01-01",
+          "raResignationDue": null,
+          "raResignationSubmitted": null,
+          "raEndedDate": null,
+          "cardNote": null,
+          "raRenewalDate": "2027-09-26",
+          "raCancellationRequestedAt": "2026-09-22T02:03:10.037Z",
+          "raCancellationLate": true,
+          "cardStatus": "on_file",
+          "cardLast4": "1111",
+          "cardBrand": null,
+          "renewals": [
+            {
+              "id": "aa11f7d6-dbdb-4384-bbce-4b469580c7bf",
+              "date": "2026-09-26",
+              "status": "charged",
+              "linkUrl": null,
+              "purpose": "renewal",
+              "chargedAt": "2026-09-21T21:03:10.036-05:00",
+              "amountCents": 9900
+            }
+          ]
+        },
+        "officeView": {
+          "orderId": "b6955f88-bc48-43dd-9910-de5bd65b54a0",
+          "llcName": "Office Cancel LLC",
+          "formed": true,
+          "raService": true,
+          "raAppointmentDate": "2026-01-01",
+          "raResignationDue": null,
+          "raResignationSubmitted": null,
+          "raEndedDate": null,
+          "cardNote": null,
+          "raRenewalDate": "2027-09-26",
+          "raCancellationRequestedAt": "2026-09-21T12:00:00.000Z",
+          "raCancellationLate": true,
+          "cardStatus": "on_file",
+          "cardLast4": "1111",
+          "cardBrand": null,
+          "renewals": [
+            {
+              "id": "0c24eb2e-1efd-4c8e-a4a0-67d9c8f51ce0",
+              "date": "2026-09-26",
+              "status": "charged",
+              "linkUrl": null,
+              "purpose": "renewal",
+              "chargedAt": "2026-09-21T21:03:10.042-05:00",
+              "amountCents": 9900
+            }
+          ]
+        }
+      }
+    },
+    {
+      "label": "A07",
+      "ok": true,
+      "detail": [
+        "Late Cancel LLC (renews Sep 26, 2027 — cancellation requested Sep 21, 2026)",
+        "Late Notice LLC (renews Jun 1, 2030)",
+        "Nonpayment LLC (renews Jun 1, 2030)",
+        "Notice Test LLC (renews Jun 1, 2030 — cancellation requested Sep 21, 2026)",
+        "Office Cancel LLC (renews Sep 26, 2027 — cancellation requested Sep 21, 2026)"
+      ]
+    },
+    {
+      "label": "A10",
+      "ok": true,
+      "detail": {
+        "statuses": [
+          503,
+          400,
+          401,
+          400,
+          200,
+          200,
+          503,
+          200,
+          409,
+          200,
+          404
+        ],
+        "cardBefore": {
+          "square_card_id": "old-card",
+          "ra_renewal_date": "2030-06-01T00:00:00.000Z"
+        },
+        "afterBad": {
+          "square_card_id": "old-card",
+          "ra_renewal_date": "2030-06-01T00:00:00.000Z"
+        },
+        "afterGood": {
+          "square_card_id": "dev-card-7f18b55d-3636-4503-801c-347f0e8c8188",
+          "ra_renewal_date": "2030-06-01T00:00:00.000Z"
+        },
+        "stableCard": {
+          "square_card_id": "fixture-card-be9a40a9147ef4484b3c853c440ea3ba776d33fc",
+          "ra_renewal_date": "2030-06-01T00:00:00.000Z"
+        },
+        "consistent": true,
+        "requests": [
+          {
+            "path": "/v2/cards",
+            "body": {
+              "idempotency_key": "87a4830184afcfcd4cb10432d3f0c4d5e941432a",
+              "source_id": "fixture-token",
+              "card": {
+                "customer_id": "old-customer",
+                "cardholder_name": "Test Client",
+                "reference_id": "2736e23c-00e8-4c62-bed7-1fa4a7a4aba2"
+              }
+            }
+          },
+          {
+            "path": "/v2/cards",
+            "body": {
+              "idempotency_key": "87a4830184afcfcd4cb10432d3f0c4d5e941432a",
+              "source_id": "fixture-token",
+              "card": {
+                "customer_id": "old-customer",
+                "cardholder_name": "Test Client",
+                "reference_id": "2736e23c-00e8-4c62-bed7-1fa4a7a4aba2"
+              }
+            }
+          },
+          {
+            "path": "/v2/cards",
+            "body": {
+              "idempotency_key": "be9a40a9147ef4484b3c853c440ea3ba776d33fc",
+              "source_id": "fixture-next-token",
+              "card": {
+                "customer_id": "old-customer",
+                "cardholder_name": "Changed account name",
+                "reference_id": "2736e23c-00e8-4c62-bed7-1fa4a7a4aba2"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "label": "A11",
+      "ok": true,
+      "detail": {
+        "expired": {
+          "id": "f201b8e2-fd18-435e-8a41-9f94bda51f25",
+          "ein_secret": null,
+          "details": {
+            "phone": "4075550100",
+            "shareholders": [
+              {
+                "name": "Test Client",
+                "ssnLast4": "",
+                "ssnLast4Second": ""
+              }
+            ],
+            "taxpayerNumbersRequired": true,
+            "taxpayerNumbersExpiredAt": "2026-09-21 21:03:10.063-05"
+          }
+        },
+        "freshHasSecret": true,
+        "deliveredHasSecret": false
+      }
+    },
+    {
+      "label": "A09",
+      "ok": true,
+      "detail": [
+        {
+          "fault": "upload",
+          "refused": true,
+          "count": 2,
+          "clean": true
+        },
+        {
+          "fault": "insert",
+          "refused": true,
+          "count": 2,
+          "clean": true
+        },
+        {
+          "fault": "order-update",
+          "refused": true,
+          "count": 2,
+          "clean": true
+        },
+        {
+          "newId": "d9c45fc9-cbd9-4a01-95a7-cd70deccfe7b",
+          "encrypted": true,
+          "clockPreserved": true,
+          "staleRefused": true
+        }
+      ]
+    },
+    {
+      "label": "A08",
+      "ok": true,
+      "detail": {
+        "counts": {
+          "clients": 2,
+          "orders": 8,
+          "service_orders": 3,
+          "documents": 3,
+          "oa_profiles": 0,
+          "oa_generations": 0,
+          "library_documents": 0,
+          "webhook_events": 0,
+          "fl_sync_state": 0,
+          "contact_messages": 1,
+          "email_log": 10,
+          "ra_renewals": 6,
+          "ra_payment_attempts": 0,
+          "document_deletions": 2
+        },
+        "documents": 3
+      }
+    },
+    {
+      "label": "A01",
+      "ok": true,
+      "detail": {
+        "code": 0,
+        "out": "[email:dev] to=changed@example.test subject=\"Action needed for your S election — Card Test LLC\"\n<div style=\"font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px\"><p><strong>MyFloridaSeriesLLC</strong></p><p>We need the owners’ Social Security numbers again to complete the S corporation election package for <strong>Card Test LLC</strong>. Your other saved answers remain available.</p><p>Sign in to your client portal, select this company, and open <strong>Re-enter taxpayer numbers</strong> under <strong>Orders in progress</strong>. Enter each owner’s number and submit the form securely.</p><p>Do not send Social Security numbers by email.</p><p><a href=\"http://localhost:8000/portal\">Open your client portal</a></p></div>\nRESTORE_OK\n",
+        "err": ""
+      }
+    }
+  ],
+  "out": "B28:{\"label\":\"A06\",\"ok\":true,\"detail\":{\"before\":[],\"failed\":[{\"id\":\"2cbe343f-3f04-404e-a3f4-80c630b467cb\",\"order_id\":\"986b3781-d68b-4ba8-82a0-778de58e1b1f\",\"renewal_date\":\"2030-06-01T00:00:00.000Z\",\"amount_cents\":9900,\"status\":\"notice_pending\",\"charge_due\":\"2030-05-17T00:00:00.000Z\",\"notice_sent_at\":null,\"charged_at\":null,\"square_payment_id\":null,\"square_order_id\":null,\"link_url\":null,\"decline_code\":null,\"retry_after\":null,\"retries\":0,\"created_at\":\"2026-09-22T02:03:09.993Z\",\"updated_at\":\"2026-09-22T02:03:09.993Z\",\"purpose\":\"renewal\",\"billing_hold\":false,\"notice_error\":\"Error: Resend 503: Injected mail outage\",\"lock_until\":null,\"checkout_token\":\"RN5L3NFNWKmh_onJaLOEIAM0VYBN1QkL-yVBd4-RMcU\"}],\"recovered\":[{\"id\":\"2cbe343f-3f04-404e-a3f4-80c630b467cb\",\"order_id\":\"986b3781-d68b-4ba8-82a0-778de58e1b1f\",\"renewal_date\":\"2030-06-01T00:00:00.000Z\",\"amount_cents\":9900,\"status\":\"notice_sent\",\"charge_due\":\"2030-05-17T00:00:00.000Z\",\"notice_sent_at\":\"2030-03-24T12:00:00.000Z\",\"charged_at\":null,\"square_payment_id\":null,\"square_order_id\":null,\"link_url\":\"http://localhost:8000/agent-checkout?kind=renewal&id=2cbe343f-3f04-404e-a3f4-80c630b467cb&token=RN5L3NFNWKmh_onJaLOEIAM0VYBN1QkL-yVBd4-RMcU\",\"decline_code\":null,\"retry_after\":null,\"retries\":0,\"created_at\":\"2026-09-22T02:03:09.993Z\",\"updated_at\":\"2026-09-22T02:03:09.993Z\",\"purpose\":\"renewal\",\"billing_hold\":false,\"notice_error\":null,\"lock_until\":null,\"checkout_token\":\"RN5L3NFNWKmh_onJaLOEIAM0VYBN1QkL-yVBd4-RMcU\"}],\"held\":[{\"id\":\"4b0faa42-5442-456b-917f-3f6551f71458\",\"order_id\":\"e8fbaf3c-99e3-4b9e-8c2a-2e48f52be049\",\"renewal_date\":\"2030-06-01T00:00:00.000Z\",\"amount_cents\":9900,\"status\":\"notice_sent\",\"charge_due\":\"2030-05-17T00:00:00.000Z\",\"notice_sent_at\":\"2030-04-03T12:00:00.000Z\",\"charged_at\":null,\"square_payment_id\":null,\"square_order_id\":null,\"link_url\":\"http://localhost:8000/agent-checkout?kind=renewal&id=4b0faa42-5442-456b-917f-3f6551f71458&token=zv9Ab-TFErYlFw7G9eQSPYymfrtD7ffPYimpRkt-DgU\",\"decline_code\":null,\"retry_after\":null,\"retries\":0,\"created_at\":\"2026-09-22T02:03:10.002Z\",\"updated_at\":\"2026-09-22T02:03:10.002Z\",\"purpose\":\"renewal\",\"billing_hold\":true,\"notice_error\":null,\"lock_until\":null,\"checkout_token\":\"zv9Ab-TFErYlFw7G9eQSPYymfrtD7ffPYimpRkt-DgU\"}]}}\nB28:{\"label\":\"A03\",\"ok\":true,\"detail\":{\"status\":200,\"stored\":{\"id\":\"69f78f9d-efa4-4731-94b7-c0ad491289d6\",\"name\":\"Message Sender\",\"email\":\"sender@example.test\",\"message\":\"Please record this one message.\",\"created_at\":\"2026-09-22T02:03:10.007Z\",\"notice_status\":\"failed\",\"notice_error\":\"Error: Resend 503: Injected mail outage\",\"notice_sent_at\":null,\"notice_lock_until\":null},\"contacts\":[{\"id\":\"69f78f9d-efa4-4731-94b7-c0ad491289d6\",\"name\":\"Message Sender\",\"email\":\"sender@example.test\",\"message\":\"Please record this one message.\",\"created_at\":\"2026-09-22T02:03:10.007Z\",\"notice_status\":\"sent\",\"notice_error\":null,\"notice_sent_at\":\"2026-09-22T02:03:10.009Z\",\"notice_lock_until\":null}]}}\nB28:{\"label\":\"A02\",\"ok\":true,\"detail\":{\"mailDoc\":{\"id\":\"edc233b5-6904-4037-be5c-9ce126c03111\",\"client_id\":\"3f28cfb6-22e5-458e-8184-2d44fb4d43a3\",\"kind\":\"legal_mail\",\"title\":\"Service of process\",\"storage_key\":\"dev:0f39224db6764114cb6b723a-mail.pdf\",\"content_type\":\"application/pdf\",\"size_bytes\":682,\"created_at\":\"2026-09-22T02:03:10.025Z\",\"meta\":{\"receivedOn\":\"2026-09-20\"},\"order_id\":\"986b3781-d68b-4ba8-82a0-778de58e1b1f\",\"mirrored_at\":null,\"deleted_at\":null,\"mirror_path\":null,\"mirror_hash\":null,\"mirror_error\":null,\"mirror_attempted_at\":null,\"notice_status\":\"failed\",\"notice_error\":\"Error: Resend 503: Injected mail outage\",\"notice_sent_at\":null,\"notice_recipient\":\"current@example.test\",\"notice_lock_until\":null},\"afterMail\":{\"id\":\"edc233b5-6904-4037-be5c-9ce126c03111\",\"client_id\":\"3f28cfb6-22e5-458e-8184-2d44fb4d43a3\",\"kind\":\"legal_mail\",\"title\":\"Service of process\",\"storage_key\":\"dev:0f39224db6764114cb6b723a-mail.pdf\",\"content_type\":\"application/pdf\",\"size_bytes\":682,\"created_at\":\"2026-09-22T02:03:10.025Z\",\"meta\":{\"receivedOn\":\"2026-09-20\"},\"order_id\":\"986b3781-d68b-4ba8-82a0-778de58e1b1f\",\"mirrored_at\":null,\"deleted_at\":null,\"mirror_path\":null,\"mirror_hash\":null,\"mirror_error\":null,\"mirror_attempted_at\":null,\"notice_status\":\"sent\",\"notice_error\":null,\"notice_sent_at\":\"2026-09-22T02:03:10.029Z\",\"notice_recipient\":\"updated@example.test\",\"notice_lock_until\":null},\"forbidden\":401}}\nB28:{\"label\":\"A04\",\"ok\":true,\"detail\":{\"noNote\":400,\"submitted\":200,\"fees\":[{\"id\":\"cd676f16-102a-4533-9cd5-c1a8a3d58437\",\"order_id\":\"f855c5b5-ace5-4b1a-98a3-fd1253e0a981\",\"renewal_date\":\"2026-09-21T00:00:00.000Z\",\"amount_cents\":9900,\"status\":\"link_sent\",\"charge_due\":\"2026-09-21T00:00:00.000Z\",\"notice_sent_at\":\"2026-09-22T02:03:10.034Z\",\"charged_at\":null,\"square_payment_id\":null,\"square_order_id\":null,\"link_url\":\"http://localhost:8000/agent-checkout?kind=renewal&id=cd676f16-102a-4533-9cd5-c1a8a3d58437&token=VHKaE4HD6Uf5nTGQOqpUa53u4EM4aVIwk1cm5ZwQCAw\",\"decline_code\":null,\"retry_after\":null,\"retries\":0,\"created_at\":\"2026-09-22T02:03:10.033Z\",\"updated_at\":\"2026-09-22T02:03:10.033Z\",\"purpose\":\"resignation\",\"billing_hold\":false,\"notice_error\":null,\"lock_until\":null,\"checkout_token\":\"VHKaE4HD6Uf5nTGQOqpUa53u4EM4aVIwk1cm5ZwQCAw\"},{\"id\":\"495a54bf-38ae-40cc-8df1-b697f290f68a\",\"order_id\":\"f855c5b5-ace5-4b1a-98a3-fd1253e0a981\",\"renewal_date\":\"2030-06-01T00:00:00.000Z\",\"amount_cents\":9900,\"status\":\"declined\",\"charge_due\":null,\"notice_sent_at\":null,\"charged_at\":null,\"square_payment_id\":null,\"square_order_id\":null,\"link_url\":null,\"decline_code\":null,\"retry_after\":null,\"retries\":0,\"created_at\":\"2026-09-22T02:03:10.030Z\",\"updated_at\":\"2026-09-22T02:03:10.030Z\",\"purpose\":\"renewal\",\"billing_hold\":false,\"notice_error\":null,\"lock_until\":null,\"checkout_token\":null}]}}\nB28:{\"label\":\"A05\",\"ok\":true,\"detail\":{\"cancelView\":{\"orderId\":\"5cedc89c-e1cf-4db9-8dc3-d29b660f2317\",\"llcName\":\"Late Cancel LLC\",\"formed\":true,\"raService\":true,\"raAppointmentDate\":\"2026-01-01\",\"raResignationDue\":null,\"raResignationSubmitted\":null,\"raEndedDate\":null,\"cardNote\":null,\"raRenewalDate\":\"2027-09-26\",\"raCancellationRequestedAt\":\"2026-09-22T02:03:10.037Z\",\"raCancellationLate\":true,\"cardStatus\":\"on_file\",\"cardLast4\":\"1111\",\"cardBrand\":null,\"renewals\":[{\"id\":\"aa11f7d6-dbdb-4384-bbce-4b469580c7bf\",\"date\":\"2026-09-26\",\"status\":\"charged\",\"linkUrl\":null,\"purpose\":\"renewal\",\"chargedAt\":\"2026-09-21T21:03:10.036-05:00\",\"amountCents\":9900}]},\"officeView\":{\"orderId\":\"b6955f88-bc48-43dd-9910-de5bd65b54a0\",\"llcName\":\"Office Cancel LLC\",\"formed\":true,\"raService\":true,\"raAppointmentDate\":\"2026-01-01\",\"raResignationDue\":null,\"raResignationSubmitted\":null,\"raEndedDate\":null,\"cardNote\":null,\"raRenewalDate\":\"2027-09-26\",\"raCancellationRequestedAt\":\"2026-09-21T12:00:00.000Z\",\"raCancellationLate\":true,\"cardStatus\":\"on_file\",\"cardLast4\":\"1111\",\"cardBrand\":null,\"renewals\":[{\"id\":\"0c24eb2e-1efd-4c8e-a4a0-67d9c8f51ce0\",\"date\":\"2026-09-26\",\"status\":\"charged\",\"linkUrl\":null,\"purpose\":\"renewal\",\"chargedAt\":\"2026-09-21T21:03:10.042-05:00\",\"amountCents\":9900}]}}}\nB28:{\"label\":\"A07\",\"ok\":true,\"detail\":[\"Late Cancel LLC (renews Sep 26, 2027 — cancellation requested Sep 21, 2026)\",\"Late Notice LLC (renews Jun 1, 2030)\",\"Nonpayment LLC (renews Jun 1, 2030)\",\"Notice Test LLC (renews Jun 1, 2030 — cancellation requested Sep 21, 2026)\",\"Office Cancel LLC (renews Sep 26, 2027 — cancellation requested Sep 21, 2026)\"]}\nB28:{\"label\":\"A10\",\"ok\":true,\"detail\":{\"statuses\":[503,400,401,400,200,200,503,200,409,200,404],\"cardBefore\":{\"square_card_id\":\"old-card\",\"ra_renewal_date\":\"2030-06-01T00:00:00.000Z\"},\"afterBad\":{\"square_card_id\":\"old-card\",\"ra_renewal_date\":\"2030-06-01T00:00:00.000Z\"},\"afterGood\":{\"square_card_id\":\"dev-card-7f18b55d-3636-4503-801c-347f0e8c8188\",\"ra_renewal_date\":\"2030-06-01T00:00:00.000Z\"},\"stableCard\":{\"square_card_id\":\"fixture-card-be9a40a9147ef4484b3c853c440ea3ba776d33fc\",\"ra_renewal_date\":\"2030-06-01T00:00:00.000Z\"},\"consistent\":true,\"requests\":[{\"path\":\"/v2/cards\",\"body\":{\"idempotency_key\":\"87a4830184afcfcd4cb10432d3f0c4d5e941432a\",\"source_id\":\"fixture-token\",\"card\":{\"customer_id\":\"old-customer\",\"cardholder_name\":\"Test Client\",\"reference_id\":\"2736e23c-00e8-4c62-bed7-1fa4a7a4aba2\"}}},{\"path\":\"/v2/cards\",\"body\":{\"idempotency_key\":\"87a4830184afcfcd4cb10432d3f0c4d5e941432a\",\"source_id\":\"fixture-token\",\"card\":{\"customer_id\":\"old-customer\",\"cardholder_name\":\"Test Client\",\"reference_id\":\"2736e23c-00e8-4c62-bed7-1fa4a7a4aba2\"}}},{\"path\":\"/v2/cards\",\"body\":{\"idempotency_key\":\"be9a40a9147ef4484b3c853c440ea3ba776d33fc\",\"source_id\":\"fixture-next-token\",\"card\":{\"customer_id\":\"old-customer\",\"cardholder_name\":\"Changed account name\",\"reference_id\":\"2736e23c-00e8-4c62-bed7-1fa4a7a4aba2\"}}}]}}\nB28:{\"label\":\"A11\",\"ok\":true,\"detail\":{\"expired\":{\"id\":\"f201b8e2-fd18-435e-8a41-9f94bda51f25\",\"ein_secret\":null,\"details\":{\"phone\":\"4075550100\",\"shareholders\":[{\"name\":\"Test Client\",\"ssnLast4\":\"\",\"ssnLast4Second\":\"\"}],\"taxpayerNumbersRequired\":true,\"taxpayerNumbersExpiredAt\":\"2026-09-21 21:03:10.063-05\"}},\"freshHasSecret\":true,\"deliveredHasSecret\":false}}\nB28:{\"label\":\"A09\",\"ok\":true,\"detail\":[{\"fault\":\"upload\",\"refused\":true,\"count\":2,\"clean\":true},{\"fault\":\"insert\",\"refused\":true,\"count\":2,\"clean\":true},{\"fault\":\"order-update\",\"refused\":true,\"count\":2,\"clean\":true},{\"newId\":\"d9c45fc9-cbd9-4a01-95a7-cd70deccfe7b\",\"encrypted\":true,\"clockPreserved\":true,\"staleRefused\":true}]}\nB28:{\"label\":\"A08\",\"ok\":true,\"detail\":{\"counts\":{\"clients\":2,\"orders\":8,\"service_orders\":3,\"documents\":3,\"oa_profiles\":0,\"oa_generations\":0,\"library_documents\":0,\"webhook_events\":0,\"fl_sync_state\":0,\"contact_messages\":1,\"email_log\":10,\"ra_renewals\":6,\"ra_payment_attempts\":0,\"document_deletions\":2},\"documents\":3}}\nB28:{\"label\":\"A01\",\"ok\":true,\"detail\":{\"code\":0,\"out\":\"[email:dev] to=changed@example.test subject=\\\"Action needed for your S election — Card Test LLC\\\"\\n<div style=\\\"font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px\\\"><p><strong>MyFloridaSeriesLLC</strong></p><p>We need the owners’ Social Security numbers again to complete the S corporation election package for <strong>Card Test LLC</strong>. Your other saved answers remain available.</p><p>Sign in to your client portal, select this company, and open <strong>Re-enter taxpayer numbers</strong> under <strong>Orders in progress</strong>. Enter each owner’s number and submit the form securely.</p><p>Do not send Social Security numbers by email.</p><p><a href=\\\"http://localhost:8000/portal\\\">Open your client portal</a></p></div>\\nRESTORE_OK\\n\",\"err\":\"\"}}\n",
+  "err": ""
+}

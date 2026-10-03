@@ -1,5 +1,5 @@
 /** B5-ARTICLES-METADATA and B4-RESTORE-S-ELECTION-SECRET-STATE: actual routes and empty database restore. */
-import {mkdtempSync,rmSync,readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {mkdtempSync,rmSync,readFileSync,writeFileSync,mkdirSync,cpSync} from 'node:fs';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {gunzipSync} from 'node:zlib';
@@ -35,7 +35,10 @@ async function child(){
  const ein=ids.ein=crypto.randomUUID();await db.query("INSERT INTO service_orders(id,client_id,formation_order_id,type,status,llc_name,details,amount_cents,paid_at)VALUES($1,$2,$3,'ein','in_progress','Recovery LLC','{}',0,now())",[ein,client,co.id]);
  const{runDbBackup,listBackups}=await import('./backup');const snap=await runDbBackup(),hit=(await listBackups()).find(b=>b.key===snap.key)!,dump=JSON.parse(gunzipSync(Buffer.from(await readFileStream(hit.storageKey))).toString());report('B4-RESTORE-S-ELECTION-SECRET-STATE backup excludes all temporary numbers',dump.tables.service_orders.every((s:{ein_secret:unknown})=>s.ein_secret===null)&&!JSON.stringify(dump).includes('123456789|321654321'));
  const dir=process.env.BATCH23_DIR!;writeFileSync(join(dir,'dump.json'),JSON.stringify(dump));writeFileSync(join(dir,'want.json'),JSON.stringify({client,co,other,ids,date,token:token.token,admin:admin.token,details}));
- for(const fail of [false,true]){const cp=Bun.spawn(['bun',import.meta.filename,'--restore'],{cwd:process.cwd(),env:{...process.env,DEV_PG_DIR:join(dir,fail?'restored-fail':'restored'),BATCH23_FAIL_MAIL:fail?'1':'0'},stdout:'pipe',stderr:'pipe'});const[out,err,code]=await Promise.all([new Response(cp.stdout).text(),new Response(cp.stderr).text(),cp.exited]);retain(`restore-${fail}-stdout.log`,out);retain(`restore-${fail}-stderr.log`,err);out.split('\n').filter(l=>l.startsWith(prefix)).forEach(l=>console.log(l));if(code)throw new Error(`Restore fixture ${code}\n${out}\n${err}`);}
+ // Each scenario begins at the same recovery point. The successful scenario
+ // creates a package in its independent journal and must not change the failed-
+ // email scenario's starting state. Restore reconstructs each empty primary.
+ for(const fail of [false,true]){const phase=join(dir,fail?'restored-fail':'restored');mkdirSync(phase,{recursive:true});cpSync(process.env.DEV_MIRROR_DIR!,join(phase,'mirror'),{recursive:true});const cp=Bun.spawn(['bun',import.meta.filename,'--restore'],{cwd:process.cwd(),env:{...process.env,DEV_PG_DIR:join(phase,'db'),DEV_STORAGE_DIR:join(phase,'files'),DEV_MIRROR_DIR:join(phase,'mirror'),BATCH23_FAIL_MAIL:fail?'1':'0'},stdout:'pipe',stderr:'pipe'});const[out,err,code]=await Promise.all([new Response(cp.stdout).text(),new Response(cp.stderr).text(),cp.exited]);retain(`restore-${fail}-stdout.log`,out);retain(`restore-${fail}-stderr.log`,err);out.split('\n').filter(l=>l.startsWith(prefix)).forEach(l=>console.log(l));if(code)throw new Error(`Restore fixture ${code}\n${out}\n${err}`);}
 }
 async function restored(){
  const{db,req,mails,admin:restoredAdmin,newToken}=await runtime(),{restoreBackup}=await import('./restore'),dir=process.env.BATCH23_DIR!,want=JSON.parse(readFileSync(join(dir,'want.json'),'utf8')),dump=JSON.parse(readFileSync(join(dir,'dump.json'),'utf8'));

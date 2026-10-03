@@ -1,0 +1,294 @@
+{
+  "id": "29",
+  "revision": 4,
+  "title": "Formation and client portal details",
+  "model": "Codex",
+  "base": "3f178aaad17e9440f1cf6001c66bb32635061fcb",
+  "items": [
+    {
+      "id": "AUD-claude-reconciled-batch29-reader-2-series-agreement-not-required-new-self",
+      "part": "all",
+      "scope": "Require and preserve the personal series-agent acceptance for a new-company SELF order; enforce applicant identity in client and server. Existing-company keep-agent path remains as previously approved.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch29 B01"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-reader-2-series-names-distinguishable-not-identical",
+      "part": "all",
+      "scope": "Describe distinguishability accurately, preserve the consent exception where relevant, and apply tested local collision checks. Keep a separately identified office/live-record review for existing filings; do not promise complete statutory validation from this normalizer.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch29 B02"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-reader-4-s-election-officer-title-default",
+      "part": "all",
+      "scope": "Use management information to avoid the false Manager assumption, and ask the client to confirm the authorized signer and actual title. A blank required title with clear help is safer than inventing office status from management type.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch29 B03"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-reader-3-ein-responsible-party-manager",
+      "part": "all",
+      "scope": "Use the neutral heading \u201cResponsible party\u201d and retain the existing explanation of ultimate ownership or control.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch29 B04"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-reader-4-s-election-typed-address-on-file",
+      "part": "all",
+      "scope": "Track whether each address came from saved/imported data; clear that status on typing for both owners; show no on-file label on unsaved typed text. Preserve lookup verification and correctly initialize reopened saved drafts.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch29 B05"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-runtime-B-agent-card-raw-iso-dates",
+      "part": "all",
+      "scope": "Apply formatDate to all four resignation/end-date interpolations in the registered-agent card.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch29 B06"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-reader-3-portal-footer-download-only",
+      "part": "all",
+      "scope": "Restore \u201cDocuments are download-only.\u201d before the current retention explanation, preserving the current support link and encrypted-retention wording.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch29 B07"
+        }
+      ]
+    },
+    {
+      "id": "AUD-claude-reconciled-batch29-runtime-A-generation-number-burned",
+      "part": "all",
+      "scope": "Allocate the number after validation, stale-draft and rate-limit refusals, and assign inputs.generationNumber after allocation. Preserve never-reuse behavior; do not promise gap-free numbering after rendering/storage failures.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch29 B08"
+        }
+      ]
+    },
+    {
+      "id": "90",
+      "part": "all",
+      "scope": "Describe the record as recently inactive and explain that this service conservatively treats the name as unavailable. Do not claim the mirror proves dissolution; preserve the owner-approved blocking rule.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch29 B09"
+        }
+      ]
+    },
+    {
+      "id": "96",
+      "part": "all",
+      "scope": "Describe the record as recently inactive and explain that this service conservatively treats the name as unavailable. Do not claim the mirror proves dissolution; preserve the owner-approved blocking rule.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "batch29 B09"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "docs/audit/intakes/claude-reconciled-batch29.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/registeredAgent.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepRegisteredAgent.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepCertification.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/buildPayload.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/validation.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/src/pages/portal/SElectionDetailsForm.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/src/pages/portal/ServicesCard.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/src/pages/portal/OrdersInProgress.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/src/pages/portal/PortalDashboard.tsx",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/server/validation.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/server/routes-payments.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/server/sunbiz.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/server/batch29-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/scripts/batch29-portal-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/package.json",
+      "mode": "code",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "control": true,
+      "why": "Approved Batch29 form validation, wording, date and numbering repairs with regression checks."
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Update the real walkthrough to use read-only applicant identity on new formations and the approved neutral EIN heading."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/NameCheck.tsx",
+      "mode": "code",
+      "why": "Keep the displayed inactive-name result consistent with approved item9 and all server/client copies."
+    },
+    {
+      "path": "webapp/server/batch06-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Update only the shared test applicant identity to match its personal agent, preserving every existing assertion under the approved Batch29 restriction."
+    }
+  ],
+  "requiredChecks": [],
+  "removedChecks": [
+    "EIN form: the responsible party heading says it is typically the manager"
+  ],
+  "testSupport": [
+    "webapp/server/batch29-check.ts",
+    "webapp/scripts/batch29-portal-check.ts"
+  ]
+}

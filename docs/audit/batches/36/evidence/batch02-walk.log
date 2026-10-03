@@ -1,0 +1,13 @@
+review server: process 25308, started by this command from /Users/adam/Documents/FLPSLLC Website Review/batch-36-implementation-2026-09-22/repo/webapp, owns port 50266; it reports offline = true and no live connections (database, square, blob, resend, dropbox, smarty, sunbiz all off); database: a throwaway folder
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+{"ok":true,"label":"batch02 N3.05: office EIN answers name the series applicant"}
+{"ok":true,"label":"batch02 office series tax treatment requires confirmation"}
+{"ok":true,"label":"batch02 123: EIN description names the applicant directly"}
+{"ok":true,"label":"batch02 legal mail stays on co1 tab"}
+{"ok":true,"label":"batch02 legal mail stays on co2 tab"}
+{"ok":true,"label":"batch02 office legal-mail upload selects and sends recipient company"}
+{"ok":true,"label":"batch02 N4.01: changing party type clears the previous name"}

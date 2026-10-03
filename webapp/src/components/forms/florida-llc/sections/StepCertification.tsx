@@ -1,4 +1,4 @@
-import { conversionAuthority, AGENT_SERIES_AGREEMENT } from "../registeredAgent";
+import { conversionAuthority, AGENT_SERIES_AGREEMENT, AGENT_PERSONAL_SERIES_AGREEMENT } from "../registeredAgent";
 import { Link } from "react-router-dom";
 import { fullPersonName } from "../validation";
 import { Input } from "@/components/ui/input";
@@ -369,7 +369,7 @@ export function StepCertification({ data, patch, errors }: StepProps) {
           label="I affirm that the LLC has or will have at least one member when the Articles of Organization become effective."
           error={errors.atLeastOneMemberAcknowledgment}
         />
-        {data.registeredAgentChoice === "SELF" ? <AcknowledgeBox id="cert-agent-series" checked={data.registeredAgentSeriesAgreementAcknowledgment === true} onChange={(v) => patch({ registeredAgentSeriesAgreementAcknowledgment: v })} label={AGENT_SERIES_AGREEMENT} error={errors.registeredAgentSeriesAgreementAcknowledgment} /> : null}
+        {data.registeredAgentChoice === "SELF" ? <AcknowledgeBox id="cert-agent-series" checked={data.registeredAgentSeriesAgreementAcknowledgment === true} onChange={(v) => patch({ registeredAgentSeriesAgreementAcknowledgment: v })} label={AGENT_PERSONAL_SERIES_AGREEMENT} error={errors.registeredAgentSeriesAgreementAcknowledgment} /> : null}
         <SharedAcknowledgments data={data} patch={patch} errors={errors} />
       </div>
     </div>

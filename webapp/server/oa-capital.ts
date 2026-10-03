@@ -42,7 +42,7 @@ const joinNames = (names: string[]): string =>
 
 const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
 
-export function computeCapital(assets: AssetAnswer[] | undefined, unitNames: string[], seriesNames: string[]): CapitalResult {
+export function computeCapital(assets: AssetAnswer[] | undefined, unitNames: string[], seriesNames: string[], jointUnits: boolean[] = []): CapitalResult {
   const list = assets ?? [];
   const errors: string[] = [];
   const units = Math.max(1, unitNames.length);
@@ -79,7 +79,7 @@ export function computeCapital(assets: AssetAnswer[] | undefined, unitNames: str
         ? unitNames[0] ?? ""
         : asset.contributedBy?.mode === "shares"
           ? joinNames(unitNames.map((n, i) => ({ n, s: shares[i] })).filter((x) => x.s > 0).map((x) => `${x.n} (${Number(x.s.toFixed(2))}%)`))
-          : `${joinNames(unitNames)}, equally`;
+          : unitNames.map((name, i) => `${name} (${jointUnits[i] ? "jointly: " : ""}1/${units})`).join("; ") + ".";
     // Where the Company allocated it.
     let to = "";
     if (asset.kind === "cash") {

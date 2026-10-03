@@ -1,3 +1,4 @@
+import {ioSignal,activeDeadline,providerFailure} from './operation-deadline';
 import { RA_CANCELLATION } from "../src/lib/agentBilling";
 import { env } from "./env";
 import { getDb } from "./db";
@@ -7,6 +8,7 @@ interface Mail {
   subject: string;
   html: string;
   replyTo?: string;
+  idempotencyKey?: string;
   attachments?: {filename:string;content:string}[];
 }
 
@@ -31,39 +33,39 @@ async function recordMail(mail: Mail, ok: boolean, providerId: string | null, er
 
 /** Sends via Resend; development without a key records a simulated send,
  *  while production without a key refuses the send. */
-export async function sendMail(mail: Mail): Promise<void> {
+export async function sendMail(mail: Mail, options:{deadline?:number}={}): Promise<string> {
   if (!env.RESEND_API_KEY) {
     if (env.isProd) {await recordMail(mail,false,null,"Email provider is not configured");throw new Error("Email provider is not configured");}
     console.log(`[email:dev] to=${mail.to} subject="${mail.subject}"\n${mail.html}`);
     devOutbox.push(mail);
     if (devOutbox.length > 50) devOutbox.splice(0, devOutbox.length - 50);
     await recordMail(mail, true, "dev", null);
-    return;
+    return 'dev';
   }
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    signal: AbortSignal.timeout(30000),
-    headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: env.MAIL_FROM,
-      to: [mail.to],
-      subject: mail.subject,
-      html: mail.html,
-      reply_to: mail.replyTo,
-      attachments: mail.attachments,
-    }),
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    await recordMail(mail, false, null, `Resend ${res.status}: ${body}`.slice(0, 2000));
-    throw new Error(`Resend ${res.status}: ${body}`);
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      signal: ioSignal(30000,Math.min(options.deadline??Infinity,activeDeadline())),
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+        ...(mail.idempotencyKey ? {"Idempotency-Key":mail.idempotencyKey} : {}),
+      },
+      body: JSON.stringify({
+        from: env.MAIL_FROM, to: [mail.to], subject: mail.subject, html: mail.html,
+        reply_to: mail.replyTo, attachments: mail.attachments,
+      }),
+    });
+    if (!res.ok) throw Object.assign(new Error(`Resend ${res.status}: ${await res.text()}`),{retryAfterMs:providerFailure(res,'Resend').retryAfterMs});
+    const accepted = (await res.json().catch(() => null)) as { id?: string } | null;
+    if (!accepted?.id) throw new Error("Email provider did not confirm acceptance");
+    await recordMail(mail, true, accepted.id, null);
+    return accepted.id;
+  } catch (error) {
+    // Includes a connection/timeout failure while reading the response body.
+    await recordMail(mail, false, null, (error instanceof Error ? error.message : String(error)).slice(0, 2000));
+    throw error;
   }
-  const accepted = (await res.json().catch(() => null)) as { id?: string } | null;
-  if (!accepted?.id) {await recordMail(mail,false,null,"Email provider did not confirm acceptance");throw new Error("Email provider did not confirm acceptance");}
-  await recordMail(mail, true, accepted.id, null);
 }
 
 const wrap = (inner: string) => `
@@ -102,27 +104,26 @@ export function welcomeEmail(name: string, setPasswordUrl: string, isConversion 
 /* ------------------- registered agent renewal (16 Sep 2026) ------------------- */
 
 /** The notice the Terms promise (9(d)): the date, the amount, the
- *  cancellation deadline, and how to cancel — sent 60 days before the date. */
+ *  cancellation deadline, and how to cancel — scheduled 70 days before the date; delivery does not gate renewal billing. */
 export function raRenewalNoticeEmail(opts: {
   name: string; llcName: string; renewalDate: string; amount: string; last4: string | null;
-  chargeDate: string; cancelBy: string; linkUrl: string | null; giftCard: boolean; billingHold?: boolean;
+  chargeDate: string; cancelBy: string; linkUrl: string | null; chargeDue?: boolean; deadlinePassed?: boolean; overdue?: boolean;
 }): { subject: string; html: string } {
-  const how = opts.billingHold ? `<p>Your renewal notice was delayed. Automatic charging is on hold; please contact us to resolve the renewal. You may also pay now using <a href="${opts.linkUrl}">this payment link</a>.</p>` : opts.last4
+  const how = opts.last4
     ? `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong> and will be charged to your card ending
-      <strong>${escapeHtml(opts.last4)}</strong> on <strong>${escapeHtml(opts.chargeDate)}</strong>. There is nothing you need to do.</p>`
-    : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. ${opts.giftCard ? "An eligible card is required" : "No eligible card is on file"},
-      so please pay it by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below. Paying with a credit or debit
+      <strong>${escapeHtml(opts.last4)}</strong> ${opts.chargeDue ? 'now that the scheduled billing date has arrived' : `on <strong>${escapeHtml(opts.chargeDate)}</strong>`}. There is nothing you need to do.</p>`
+    : `<p>The renewal fee is <strong>${escapeHtml(opts.amount)}</strong>. No eligible card is on file,
+      ${opts.overdue ? 'and the renewal fee remains unpaid and is now overdue. Please pay using the button below.' : `so please pay it by <strong>${escapeHtml(opts.renewalDate)}</strong> using the button below.`} Paying with a credit or debit
       card keeps that card for the following years, so the renewal is automatic from then on.</p>
       <p><a href="${opts.linkUrl ?? "#"}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the renewal</a></p>`;
   return {
-    subject: `Your registered agent service renews on ${opts.renewalDate}`,
+    subject: opts.overdue ? `Registered-agent renewal fee overdue — ${opts.llcName}` : `Your registered agent service renews on ${opts.renewalDate}`,
     html: wrap(`
       <p>Hi ${escapeHtml(opts.name || "there")},</p>
-      <p>Your registered agent service for <strong>${escapeHtml(opts.llcName)}</strong> renews on
+      <p>Your registered agent service for <strong>${escapeHtml(opts.llcName)}</strong> ${opts.overdue ? 'had its renewal date on' : 'renews on'}
       <strong>${escapeHtml(opts.renewalDate)}</strong>.</p>
       ${how}
-      <p><strong>To cancel</strong>, give notice by <strong>${escapeHtml(opts.cancelBy)}</strong> — in your client portal
-      (the Registered agent service card) or by email to support@myfloridaseriesllc.com. Florida law requires your LLC
+      <p>${opts.deadlinePassed ? `The cancellation deadline for this renewal was ${escapeHtml(opts.cancelBy)} and has passed. You may still give cancellation notice in your client portal or by emailing support@myfloridaseriesllc.com. A late reminder does not extend the cancellation or replacement deadlines.` : `<strong>To cancel</strong>, give notice by <strong>${escapeHtml(opts.cancelBy)}</strong> — in your client portal (the Registered agent service card) or by email to support@myfloridaseriesllc.com.`} Florida law requires your LLC
       to have a registered agent at all times, so you must also designate a successor agent with the Division of
       Corporations and send us proof; the Terms of Service explain both steps.</p>
       <p>Questions? Just reply to this email.</p>
@@ -131,30 +132,30 @@ export function raRenewalNoticeEmail(opts: {
 }
 
 /** The receipt after the renewal is charged or paid through its link. */
-export function raRenewalReceiptEmail(opts: { name: string; llcName: string; amount: string; last4: string; throughDate: string }): { subject: string; html: string } {
+export function raRenewalReceiptEmail(opts: { name: string; llcName: string; amount: string; last4: string; throughDate: string; recovered?: boolean; deadlinesHtml?: string }): { subject: string; html: string } {
   return {
     subject: `Registered agent service renewed — ${opts.llcName}`,
     html: wrap(`
       <p>Hi ${escapeHtml(opts.name || "there")},</p>
-      <p>We received <strong>${escapeHtml(opts.amount)}</strong>
-      for registered agent service for <strong>${escapeHtml(opts.llcName)}</strong> through
-      <strong>${escapeHtml(opts.throughDate)}</strong>.</p>
+      ${opts.recovered ? `<p>We received your ${escapeHtml(opts.amount)} renewal payment. Your registered-agent service is paid through ${escapeHtml(opts.throughDate)}. No further payment is due for this renewal.</p>` : `<p>We received <strong>${escapeHtml(opts.amount)}</strong> for registered agent service for <strong>${escapeHtml(opts.llcName)}</strong> through <strong>${escapeHtml(opts.throughDate)}</strong>.</p>`}
       <p>Your renewal date is shown on the Registered agent service card in your client portal.</p>
+      ${opts.deadlinesHtml ?? ""}
     `),
   };
 }
 
 /** The charge was declined (Terms 9(e)): pay by the renewal date or the
  *  service is delinquent. */
-export function raRenewalDeclinedEmail(opts: { name: string; llcName: string; last4: string; renewalDate: string; linkUrl: string; willRetry: boolean; retryDate: string | null; resignation?: boolean }): { subject: string; html: string } {
+export function raRenewalDeclinedEmail(opts: { name: string; llcName: string; last4: string; renewalDate: string; linkUrl: string; willRetry: boolean; retryDate: string | null; resignation?: boolean; amount?: string; overdue?: boolean; deadlinesHtml?: string }): { subject: string; html: string } {
   return {
     subject: `Action needed: your registered agent ${opts.resignation ? "resignation" : "renewal"} charge was declined`,
     html: wrap(`
       <p>Hi ${escapeHtml(opts.name || "there")},</p>
-      <p>The ${opts.resignation ? "resignation" : "renewal"} charge to your card ending <strong>${escapeHtml(opts.last4)}</strong> for registered agent
-      service for <strong>${escapeHtml(opts.llcName)}</strong> was declined.${opts.willRetry && opts.retryDate ? ` We will try the card once more on ${escapeHtml(opts.retryDate)}.` : ""}</p>
-      <p>You may pay now using the same or a different eligible card; there is no two-day waiting period. ${opts.resignation ? "This payment is for state filing fees and processing, not another service year." : `Pay by ${escapeHtml(opts.renewalDate)} to avoid delinquency. The card you use is saved for future annual renewals.`}</p>
-      <p><a href="${opts.linkUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Pay the ${opts.resignation ? "resignation charge" : "renewal"}</a></p>
+      <p>${opts.resignation ? `The resignation charge${opts.last4 ? ` to your card ending ${escapeHtml(opts.last4)}` : ''} for ${escapeHtml(opts.llcName)} was declined.` : `Your ${escapeHtml(opts.amount??'$99')} registered-agent renewal charge was declined. You may pay now using the same or a different eligible card.`}${opts.willRetry && opts.retryDate ? ` We will try the card once more on ${escapeHtml(opts.retryDate)}.` : ""}</p>
+      ${!opts.resignation && opts.last4 ? `<p>The charge was to your card ending <strong>${escapeHtml(opts.last4)}</strong> for registered agent service for <strong>${escapeHtml(opts.llcName)}</strong>.</p>` : ""}
+      <p>You may pay now using the same or a different eligible card; there is no two-day waiting period. ${opts.resignation ? "This payment is for state filing fees and processing, not another service year." : `${opts.overdue ? "The renewal fee remains unpaid and is now overdue." : `Please pay by ${escapeHtml(opts.renewalDate)} to avoid delinquency.`} The card you use is saved for future annual renewals.`}</p>
+      <p><a href="${opts.linkUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">${opts.resignation ? "Pay the resignation charge" : "Pay renewal now"}</a></p>
+      ${opts.deadlinesHtml ?? ""}
       <p>If the reason for the decline is not clear to you, your card issuer can tell you.</p>
     `),
   };
@@ -256,13 +257,14 @@ export function newDocumentEmail(portalUrl: string): { subject: string; html: st
   };
 }
 
-export function raCancellationEmail(name: string, renewalDate: string | null = null, llcName = ""): { subject: string; html: string } {
+export function raCancellationEmail(name: string, renewalDate: string | null = null, llcName = "", late = false): { subject: string; html: string } {
   return {
     subject: "Your registered agent cancellation request",
     html: wrap(`
       <p>Hi ${escapeHtml(name || "there")},</p>
       <p>We received your request to cancel registered agent service${llcName ? ` for <strong>${escapeHtml(llcName)}</strong>` : ""}.</p>
       ${renewalDate ? `<p>Your renewal date is ${escapeHtml(renewalDate)}.</p>` : ""}
+      ${late ? "<p>Your cancellation notice arrived less than 30 days before this renewal. The full annual renewal fee remains due; any payment already received remains shown in your portal.</p>" : ""}
       <p>${escapeHtml(RA_CANCELLATION)}</p>
       <p>Email replacement proof to support@myfloridaseriesllc.com.</p>
       <p>Questions? Just reply to this email.</p>
@@ -486,15 +488,21 @@ export function escapeHtml(s: string): string {
 
 /** The EIN arrived and the client's Form 2553 package was rebuilt with it
  *  (Adam, 7 Sep 2026). */
-export function sElectionEinAddedEmail(opts: { llcName: string; einDisplay: string; portalUrl: string }): { subject: string; html: string } {
+export function sElectionEinAddedEmail(opts: { llcName: string; einDisplay: string; portalUrl: string } & ({ firstPackage: true; editableUntil: string } | { firstPackage: false })): { subject: string; html: string } {
+  if (opts.firstPackage && !opts.editableUntil) throw new Error('The S-election editing deadline is unavailable.');
   return {
     subject: `Your EIN has been added to your Form 2553 package — ${opts.llcName}`,
     html: wrap(`
       <p>The IRS has issued the EIN for <strong>${escapeHtml(opts.llcName)}</strong>:
       <strong>${escapeHtml(opts.einDisplay)}</strong>. The confirmation letter is in your portal.</p>
-      <p>Your S corporation election package is ready with the issued EIN in item A. <strong>Download the new copy before signing and
+      ${opts.firstPackage ? `<p>Your S corporation election package is ready with the issued EIN in item A.
+      <strong>Download the package before signing and faxing or mailing.</strong></p>
+      <p>You can correct your answers and regenerate the package until
+      <strong>${escapeHtml(opts.editableUntil)}</strong>. After that, editing closes and the full numbers are removed from the questionnaire records.
+      Your completed document stays encrypted in your portal until you choose to delete it.
+      Download and keep your own copy.</p>` : `<p>Your S corporation election package is ready with the issued EIN in item A. <strong>Download the new copy before signing and
       faxing or mailing</strong> — use this updated copy now that the
-      number exists.</p>
+      number exists.</p>`}
       <p><a href="${opts.portalUrl}" style="display:inline-block;background:#0d2e55;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open your portal</a></p>
     `),
   };
