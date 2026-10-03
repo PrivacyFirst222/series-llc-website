@@ -29,6 +29,10 @@ export async function reconcileHeldPackage(db:Db,id:string,evidence:HoldEvidence
  let cleanupPending=0;
  if(evidence.decision==='client-deletion'){
   if(evidence.authority!=='verified-client-request')throw Error('A verified client deletion instruction is required');
+  // Retain the verified instruction before any durable deletion. Registration
+  // makes the hold terminal, and a lost reply must not lose its authorization.
+  const recorded=await db.query("UPDATE recovery_holds SET evidence=COALESCE(evidence,'{}'::jsonb)||$2::jsonb WHERE id=$1 AND status='held' RETURNING id",[id,JSON.stringify(evidence)]);
+  if(!recorded.length)throw Error('Held package changed before its deletion instruction was recorded');
   await appendDeletionMirror({storageKey:r.storageKey,documentId:r.id,mirrorPath:r.mirrorPath,requestedAt:new Date().toISOString(),reason:'client'});
   const journal=await readRecoveryJournal(),covered=new Set(journal.packages.filter(p=>p.serviceId===r.serviceId).map(p=>p.id));
   covered.add(r.id);
