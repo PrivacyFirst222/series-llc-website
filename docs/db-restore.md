@@ -20,6 +20,8 @@ key rotation without invalidating earlier snapshot manifests. The keys are
 stored separately in the deployment's environment; keep a secure recovery copy
 of the key ring. Losing all copies of the required key makes recovery impossible.
 
+Current BACKUP_TABLES (22): `clients`, `orders`, `service_orders`, `documents`, `oa_profiles`, `oa_generations`, `library_documents`, `webhook_events`, `fl_sync_state`, `contact_messages`, `email_log`, `ra_renewals`, `ra_payment_attempts`, `document_deletions`, `staged_documents`, `renewal_card_attempts`, `launch_policy`, `payment_reconciliation_log`, `recovery_holds`, `checkout_payment_receipts`, `payment_alerts`, `office_operations`.
+
 Excluded: the reloadable Sunbiz entity dataset, sign-in sessions, one-time auth
 tokens, rate-limit windows and the schema-migration ledger (created by startup).
 The full taxpayer numbers in service-order questionnaire records are always
@@ -31,7 +33,7 @@ included; they may contain full taxpayer numbers and are encrypted.
 
 The Office Reference Library shows complete/incomplete status, remaining files
 and errors. A file failure does not prevent later files from being attempted.
-Progress is saved outside the database in private storage. The continuation cron
+The backup_progress control table is not included in the database dump. Its resumable file-work checkpoint is saved separately in private primary storage; restore does not revive that checkpoint. The continuation cron
 runs every five minutes, resuming incomplete work and retrying deletions; the
 nightly document-mirror job also verifies all retained client files. There is no
 200-file total limit. Per-invocation time limits preserve progress for continuation.
@@ -134,8 +136,7 @@ version history is available. No historical sample backup is rewritten or delete
 ## Completed S-election replacement recovery
 
 The independent journal at the existing `/recovery/deletion-journal-v1.json` path
-accepts legacy deletion-only and version 2 envelopes, and a version 3 envelope containing
-package recovery records and the original launch notice cutoff. Its revision-matched writes serialize replacement and
+reads versions 1–4; the current version 4 envelope includes package recovery records, the original launch notice cutoff and controlled office-document copies. Its revision-matched writes serialize replacement and
 client-deletion decisions together. Older restore tools must not be used with the
 new envelope. The original deletion records remain authoritative.
 
@@ -179,7 +180,13 @@ does not submit a payment or decide that an ambiguous provider request failed.
 
 Use `--hold-unresolved-packages` only when intentionally restoring verified unrelated data while preserving unresolved package identities, encrypted copies, ownership and deletion evidence. This option does not waive corruption or missing encryption keys. A new service created after the snapshot and an interrupted package operation are reported as those conditions, not as an unverified PDF. API activation is blocked until the exact current held manifest is acknowledged. Client access to held packages stays blocked afterwards.
 
-The supported list, acknowledgment, original-owner import and reconciliation commands, their evidence requirements, payment reconciliation, original-cutoff recovery and old-writer shutdown requirements are in [Operational procedures](release-repair-operations.md). Do not substitute database edits or invent missing ownership. Completed-package EIN and last-four metadata survive matching recovery; missing legacy metadata is identified as unavailable and does not trigger a false late-EIN notice.
+Supported dump versions are 1 (full) and 2 (acknowledged history gaps), with matching fileManifestVersion. Dry-run parses/counts only. A default restore reports the complete sorted unresolved-package list with PACKAGE_RECONCILIATION_REQUIRED before any new file or business-row writes. Missing keys, corrupt records and identity conflicts remain hard refusals; held mode does not waive them.
+
+For an intentional held recovery, use `bun run scripts/db-restore.ts <snapshot.json.gz> --hold-unresolved-packages` on a fresh empty target. It remains inactive. Inspect `bun run scripts/recovery-holds.ts list`. Reconcile each package using its exact independent identity and original transaction evidence; for a missing original owner, first use `bun run scripts/recovery-holds.ts restore-owner DOCUMENT_ID ORIGINAL_EXPORT.json`, then `bun run scripts/recovery-holds.ts reconcile DOCUMENT_ID VERIFIED_EVIDENCE.json`. Do not infer a completed transaction from PDF presence. A verified client-deletion decision is terminal even when cleanupPending reports physical copies still pending; inspect the targeted cleanup state and let the existing worker retry. Read the current list again, and explicitly acknowledge its exact SHA and operator with `bun run scripts/recovery-holds.ts acknowledge MANIFEST_SHA OPERATOR`. A changed list requires a new inspection. Held documents remain unavailable after acknowledgment. A rehearsal never activates or sends notices. For real recovery, use the separate activation step only after these checks; preserve the original notice cutoff.
+
+Retained workflow tables include ra_payment_attempts, renewal_card_attempts, payment_reconciliation_log, checkout_payment_receipts, payment_alerts, document_deletions, staged_documents, recovery_holds, office_operations and launch_policy, in addition to the other BACKUP_TABLES. Retained encrypted payment tokens preserve provider request IDs. Stop payment/card/document writes for key rotation, and keep keys needed by immutable old backups even after live rotation succeeds.
+
+The complete evidence requirements, payment reconciliation, original-cutoff recovery and old-writer shutdown requirements remain in [Operational procedures](release-repair-operations.md). Do not substitute database edits or invent missing ownership. Completed-package EIN and last-four metadata survive matching recovery; missing legacy metadata is identified as unavailable and does not trigger a false late-EIN notice.
 
 An obsolete incomplete backup restarts when an ordinary document is deleted/replaced, a library document changes or an order summary changes. Cleanup uses durable bounded batches and retains deletion obligations without an age cutoff. Continue checking pending/errors and completion; a successful invocation is not a statement that every historical cleanup obligation has disappeared.
 
