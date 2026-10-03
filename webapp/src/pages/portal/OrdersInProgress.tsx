@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { api, ApiError } from "@/lib/api";
 import { SElectionDetailsForm, EIN_CERTIFICATION, type SElectionDraft } from "./SElectionDetailsForm";
-import { STATUS_LABEL, clientMustAct, money, summaryOf } from "./services.helpers";
+import { STATUS_LABEL, clientMustAct, isRecoveryHeld, money, summaryOf } from "./services.helpers";
 import { clearDraft, loadDrafts, saveDraft } from "./drafts";
 import type { ServiceOrder, ServicesData } from "./ServicesCard";
 
@@ -169,6 +169,20 @@ export function OrdersInProgress({
   });
 
   const data = servicesQuery.data;
+  const currentDetails = detailsFor && (data?.orders.find((o) => o.id === detailsFor.id) ?? detailsFor);
+  const detailsHeld = currentDetails !== null && isRecoveryHeld(currentDetails);
+
+  useEffect(() => {
+    const held = data?.orders.filter(isRecoveryHeld) ?? [];
+    if (!held.length) return;
+    const ids = new Set(held.map((o) => o.id));
+    for (const id of ids) clearDraft("sel", id);
+    setSelDrafts((prev) => {
+      if (!Object.keys(prev).some((id) => ids.has(id))) return prev;
+      return Object.fromEntries(Object.entries(prev).filter(([id]) => !ids.has(id)));
+    });
+    setDetailsFor((prev) => prev && ids.has(prev.id) ? null : prev);
+  }, [data]);
 
   // A fulfilled S election's "Edit answers" and a filed series' "Consent &
   // Series Exhibit" sit on the document rows above; they open the dialogs here.
@@ -178,7 +192,7 @@ export function OrdersInProgress({
     if (o) {
       setError("");
       if (external.kind === "consent") setConsentFor(o);
-      else setDetailsFor(o);
+      else if (!isRecoveryHeld(o)) setDetailsFor(o);
     }
     onExternalHandled();
     // onExternalHandled is a stable setter from the dashboard.
@@ -218,8 +232,8 @@ export function OrdersInProgress({
                 <div className="text-sm font-medium">{summaryOf(o)}</div>
                 <div className="text-xs text-muted-foreground">
                   {money(o.amount_cents)} ·{" "}
-                  <span className={o.status === "awaiting_info" ? "font-medium text-amber-700" : ""}>
-                    {o.type === "s-election" && o.details.taxpayerNumbersRequired ? "Action needed — re-enter taxpayer numbers" : o.type === "s-election" && o.status === "in_progress" && o.details.einPending ? "Details saved — waiting for your issued EIN" : STATUS_LABEL[o.status]}
+                  <span className={!isRecoveryHeld(o) && o.status === "awaiting_info" ? "font-medium text-amber-700" : ""}>
+                    {isRecoveryHeld(o) ? "Your S-election package is awaiting recovery reconciliation. Contact support@myfloridaseriesllc.com for help." : o.type === "s-election" && o.details.taxpayerNumbersRequired ? "Action needed — re-enter taxpayer numbers" : o.type === "s-election" && o.status === "in_progress" && o.details.einPending ? "Details saved — waiting for your issued EIN" : STATUS_LABEL[o.status]}
                   </span>
                 </div>
 
@@ -236,7 +250,7 @@ export function OrdersInProgress({
                     Consent &amp; Series Exhibit
                   </Button>
                 ) : null}
-                {o.status === "awaiting_info" || (o.type === "s-election" && o.status === "in_progress" && o.details.einPending) ? (
+                {!isRecoveryHeld(o) && (o.status === "awaiting_info" || (o.type === "s-election" && o.status === "in_progress" && o.details.einPending)) ? (
                   <Button
                     size="sm"
                     className="rounded-full"
@@ -275,7 +289,7 @@ export function OrdersInProgress({
 
       {/* Secure S election details dialog */}
       <Dialog
-        open={detailsFor !== null && detailsFor.type === "s-election"}
+        open={detailsFor !== null && detailsFor.type === "s-election" && !detailsHeld}
         onOpenChange={(v) => { if (!v) setDetailsFor(null); }}
       >
         {/* An outside tap does nothing — only the X or Escape closes it, and
@@ -294,7 +308,7 @@ export function OrdersInProgress({
               package. Your completed document stays encrypted in Your documents until you choose to delete it.
             </DialogDescription>
           </DialogHeader>
-          {detailsFor ? (
+          {detailsFor && !detailsHeld ? (
             <SElectionDetailsForm
               order={detailsFor}
               members={data.members ?? []}
@@ -307,6 +321,7 @@ export function OrdersInProgress({
                 ? {...selDrafts[detailsFor.id], rows: selDrafts[detailsFor.id].rows.map(r => ({...r, ssnLast4: undefined, ssnLast4Second: undefined}))}
                 : selDrafts[detailsFor.id]}
               onDraftChange={(d) => {
+                if (detailsHeld) return;
                 setSelDrafts((prev) => ({ ...prev, [detailsFor.id]: d }));
                 saveDraft("sel", detailsFor.id, { ...d, rows: d.rows.map((r) => ({ ...r, ssn: "", ssn2: "" })) });
               }}
