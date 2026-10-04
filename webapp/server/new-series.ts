@@ -127,8 +127,10 @@ ${name}${m.jointHolding ? ` — ${titleCaseHolding(m.jointHolding)}` : ""}${suff
   s = s.split("[SERIES NAME]").join(input.seriesName);
   must(s, "PS-[N]", "series number");
   s = s.split("PS-[N]").join(`PS-${input.seriesNumber}`);
-  must(s, "[SERIES PURPOSE]", "series purpose");
-  s = s.split("[SERIES PURPOSE]").join(purpose);
+  if (purpose !== "") {
+    must(s, "[SERIES PURPOSE]", "series purpose");
+    s = s.split("[SERIES PURPOSE]").join(purpose);
+  }
   must(s, "[CONTRIBUTION]", "contribution");
   // An empty contribution prints None, matching the agreement's Series Exhibit.
   s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "None");

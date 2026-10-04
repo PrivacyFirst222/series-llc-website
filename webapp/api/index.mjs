@@ -110342,8 +110342,10 @@ ${m2.signatories.map((n) => block(n, "", dated)).join("\n\n")}
   s = s.split("[SERIES NAME]").join(input.seriesName);
   must2(s, "PS-[N]", "series number");
   s = s.split("PS-[N]").join(`PS-${input.seriesNumber}`);
-  must2(s, "[SERIES PURPOSE]", "series purpose");
-  s = s.split("[SERIES PURPOSE]").join(purpose);
+  if (purpose !== "") {
+    must2(s, "[SERIES PURPOSE]", "series purpose");
+    s = s.split("[SERIES PURPOSE]").join(purpose);
+  }
   must2(s, "[CONTRIBUTION]", "contribution");
   s = s.split("[CONTRIBUTION]").join((input.contribution ?? "").trim() || "None");
   must2(s, "[SPECIAL TERMS]", "special terms");
