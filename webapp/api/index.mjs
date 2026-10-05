@@ -54043,8 +54043,10 @@ async function runBackupWithinDeadline(options, entered, workDeadline, checkpoin
       job.cursor = 0;
       job.phase = "copy";
       job.format = 2;
+      job.deadlineDeferred = {};
     }
     job.nextEligibleAt ??= {};
+    job.deadlineDeferred ??= {};
     const processFile = async (f, phase) => {
       const i = identities.get(f.storageKey);
       if ((job.nextEligibleAt[f.storageKey] ?? 0) > Date.now()) {
@@ -54085,7 +54087,7 @@ async function runBackupWithinDeadline(options, entered, workDeadline, checkpoin
           return { f, value: f.sha };
         });
       } catch (error2) {
-        return { f, error: error2 };
+        return { f, error: error2, deferred: error2 instanceof DOMException && error2.name === "TimeoutError" && ["Operation deadline reached", "The operation was aborted due to timeout"].includes(error2.message) && Date.now() >= deadline };
       }
     };
     while (Date.now() < deadline && job.phase !== "publish") {
@@ -54102,7 +54104,8 @@ async function runBackupWithinDeadline(options, entered, workDeadline, checkpoin
         } else job.phase = "publish";
         continue;
       }
-      const outcomes = await Promise.all(batch.map((f) => phase === "verify" && job.errors[f.storageKey] || phase === "copy" && job.done[f.storageKey] && !job.errors[f.storageKey] ? Promise.resolve({ f, skipped: true }) : processFile(f, phase)));
+      let retryCursor;
+      const outcomes = await Promise.all(batch.map((f) => phase === "verify" && job.errors[f.storageKey] && job.deadlineDeferred?.[f.storageKey] !== phase || phase === "copy" && job.done[f.storageKey] && !job.errors[f.storageKey] ? Promise.resolve({ f, skipped: true }) : processFile(f, phase)));
       for (const outcome of outcomes) {
         const f = outcome.f, i = identities.get(f.storageKey);
         if ("skipped" in outcome) {
@@ -54110,6 +54113,10 @@ async function runBackupWithinDeadline(options, entered, workDeadline, checkpoin
           continue;
         }
         if ("error" in outcome) {
+          if (outcome.deferred) {
+            job.deadlineDeferred[f.storageKey] = phase;
+            retryCursor ??= job.cursor;
+          } else delete job.deadlineDeferred[f.storageKey];
           const e = outcome.error;
           job.errors[f.storageKey] = e instanceof OfficeRecoveryError ? e.code + ": " + e.message : String(e);
           delete job.done[f.storageKey];
@@ -54125,6 +54132,7 @@ async function runBackupWithinDeadline(options, entered, workDeadline, checkpoin
             }
           }
         } else {
+          delete job.deadlineDeferred[f.storageKey];
           job.done[f.storageKey] = outcome.value;
           if (phase === "verify" || ["deleted", "history-gap"].includes(outcome.value)) job.verified[f.storageKey] = outcome.value;
           job.dump.files[job.cursor] = f;
@@ -54137,6 +54145,7 @@ async function runBackupWithinDeadline(options, entered, workDeadline, checkpoin
         }
         job.cursor++;
       }
+      if (retryCursor !== void 0) job.cursor = retryCursor;
       await withDeadline(checkpointDeadline, () => putObject(JOB, Buffer.from(JSON.stringify(job)), true));
     }
     const pending = job.dump.files.filter((f) => !job.verified[f.storageKey]).length;

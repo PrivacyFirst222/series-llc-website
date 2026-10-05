@@ -112,7 +112,7 @@ export async function listBackups(): Promise<BackupInfo[]> {
  *  visible. */
 
 export interface BackupDump {version:1|2; status?:'complete_with_history_gaps'; restorable?:boolean; historyComplete?:boolean; historyGaps?:HistoryGap[]; dumpedAt:string; tables:Record<string,Record<string,unknown>[]>; files:BackupFile[]; fileManifestVersion:1|2; deletionCheckpoint?:string[]; packageCheckpoint?:string[]}
-interface BackupJob {key:string; dump:BackupDump; done:Record<string,string>; errors:Record<string,string>; format?:2; phase?:'copy'|'verify'|'publish'; cursor?:number; verified?:Record<string,string>; nextEligibleAt?:Record<string,number>;publicationSha?:string}
+interface BackupJob {key:string; dump:BackupDump; done:Record<string,string>; errors:Record<string,string>; format?:2; phase?:'copy'|'verify'|'publish'; cursor?:number; verified?:Record<string,string>; nextEligibleAt?:Record<string,number>;publicationSha?:string;deadlineDeferred?:Record<string,'copy'|'verify'>}
 const JOB='backup-jobs/current.json';
 const backupKey=(iso:string)=>`db-${iso.slice(0,10)}-${iso.slice(11, 19).replace(/:/g, "")}.json.gz`;
 const publishOptions = { allowOverwrite: false };
@@ -197,8 +197,8 @@ async function runBackupWithinDeadline(options:{resumeOnly?:boolean;budgetMs?:nu
   const deadline=workDeadline;
   job.phase??='copy';job.cursor??=0;job.verified??={};
   // A checkpoint names an expected original, never the bytes observed after damage.
-  if(job.format!==2){job.done={};job.verified={};job.cursor=0;job.phase='copy';job.format=2;}
-  job.nextEligibleAt??={};
+  if(job.format!==2){job.done={};job.verified={};job.cursor=0;job.phase='copy';job.format=2;job.deadlineDeferred={};}
+  job.nextEligibleAt??={};job.deadlineDeferred??={};
   const processFile=async(f:BackupFile,phase:'copy'|'verify')=>{
    const i=identities.get(f.storageKey);
    if((job!.nextEligibleAt![f.storageKey]??0)>Date.now()){const error=new OfficeRecoveryError('Provider retry is not eligible yet.','RECOVERY_UNAVAILABLE',503);error.retryAfterMs=job!.nextEligibleAt![f.storageKey]-Date.now();return {f,error};}
@@ -226,7 +226,7 @@ async function runBackupWithinDeadline(options:{resumeOnly?:boolean;budgetMs?:nu
     const raw=await readMirror(f.path);
     if(!raw||hashBytes(isEncrypted(raw)?unseal(raw):raw)!==f.sha)throw Error('Backup copy failed verification');
     return {f,value:f.sha!};
-   });}catch(error){return {f,error};}
+   });}catch(error){return {f,error,deferred:error instanceof DOMException&&error.name==='TimeoutError'&&['Operation deadline reached','The operation was aborted due to timeout'].includes(error.message)&&Date.now()>=deadline};}
   };
   while(Date.now()<deadline&&job.phase!=='publish'){
    const phase=job.phase;
@@ -242,21 +242,21 @@ async function runBackupWithinDeadline(options:{resumeOnly?:boolean;budgetMs?:nu
    // A failed verification returns only that file to copy. Recopying every
    // successful predecessor can repeatedly exhaust the deadline before the
    // failed tail is reached. These skips never bypass the verify phase.
-   const outcomes=await Promise.all(batch.map(f=>(phase==='verify'&&job!.errors[f.storageKey])
+   let retryCursor:number|undefined;const outcomes=await Promise.all(batch.map(f=>(phase==='verify'&&job!.errors[f.storageKey]&&job!.deadlineDeferred?.[f.storageKey]!==phase)
     ||(phase==='copy'&&job!.done[f.storageKey]&&!job!.errors[f.storageKey])
     ?Promise.resolve({f,skipped:true as const}):processFile(f,phase)));
    for(const outcome of outcomes){
     const f=outcome.f,i=identities.get(f.storageKey);
     if('skipped' in outcome){job.cursor++;continue;}
     if('error' in outcome){
-     const e=outcome.error;job.errors[f.storageKey]=e instanceof OfficeRecoveryError?e.code+': '+e.message:String(e);delete job.done[f.storageKey];delete job.verified[f.storageKey];
+     if(outcome.deferred){job.deadlineDeferred[f.storageKey]=phase;retryCursor??=job.cursor;}else delete job.deadlineDeferred[f.storageKey];const e=outcome.error;job.errors[f.storageKey]=e instanceof OfficeRecoveryError?e.code+': '+e.message:String(e);delete job.done[f.storageKey];delete job.verified[f.storageKey];
      const retryAfter=(e as {retryAfterMs?:number})?.retryAfterMs;if(retryAfter)job.nextEligibleAt[f.storageKey]=Date.now()+retryAfter;
      if(Date.now()<deadline&&!(e instanceof OfficeRecoveryError&&e.status===503)&&!(e instanceof DOMException&&e.name==='TimeoutError')){
       try{await withDeadline(deadline,()=>observeBackupProblem(i?historyId(i):hashBytes(Buffer.from(f.storageKey)),i?.historical?'needs_staff_decision':'required_file_unavailable'));delete job.errors['notification:'+f.storageKey];}
       catch(alertError){job.errors['notification:'+f.storageKey]='Backup alert persistence failed: '+String(alertError);}
      }
     }else{
-     job.done[f.storageKey]=outcome.value;
+     delete job.deadlineDeferred[f.storageKey];job.done[f.storageKey]=outcome.value;
      if(phase==='verify'||['deleted','history-gap'].includes(outcome.value))job.verified[f.storageKey]=outcome.value;
      job.dump.files[job.cursor]=f;
      job.dump.historyGaps=(job.dump.historyGaps??[]).filter(g=>g.storageKey!==f.storageKey);
@@ -266,6 +266,7 @@ async function runBackupWithinDeadline(options:{resumeOnly?:boolean;budgetMs?:nu
     }
     job.cursor++;
    }
+   if(retryCursor!==undefined)job.cursor=retryCursor;
    await withDeadline(checkpointDeadline,()=>putObject(JOB,Buffer.from(JSON.stringify(job)),true));
   }
   const pending=job.dump.files.filter(f=>!job!.verified![f.storageKey]).length;
