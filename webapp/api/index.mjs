@@ -118179,6 +118179,7 @@ function registerOpsRoutes(app2) {
     if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
     if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
     await cleanupStagedDocuments();
+    await cleanupOfficeUploads();
     const purged = await purgeExpiredSElections();
     const db = await getDb();
     await db.query("DELETE FROM rate_limits WHERE window_start < now() - interval '2 days'");
@@ -118212,7 +118213,7 @@ function registerOpsRoutes(app2) {
     const db = await getDb();
     const { retryRecoveryNotices: retryRecoveryNotices2 } = await Promise.resolve().then(() => (init_s_election_recovery(), s_election_recovery_exports));
     const [saved] = await db.query("SELECT cursor FROM backup_progress WHERE id='backup-ancillary'");
-    const jobs = [() => retryDocumentDeletions2({ deadline: cleanupDeadline }), () => cleanupStagedDocuments({ deadline: cleanupDeadline }), () => retryRecoveryNotices2(db, { deadline: cleanupDeadline })];
+    const jobs = [() => retryDocumentDeletions2({ deadline: cleanupDeadline }), () => cleanupStagedDocuments({ deadline: cleanupDeadline }), () => retryRecoveryNotices2(db, { deadline: cleanupDeadline }), () => cleanupOfficeUploads({ deadline: cleanupDeadline })];
     let cursor = Number(saved?.cursor ?? 0) % jobs.length;
     for (let n = 0; n < jobs.length && Date.now() < cleanupDeadline; n++) {
       const next = (cursor + 1) % jobs.length;

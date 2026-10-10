@@ -1,3 +1,4 @@
+import {cleanupOfficeUploads} from './office-uploads';
 import {withDeadline} from './operation-deadline';
 import {deliverBackupAttention} from './backup-attention';
 import { runCheckoutRecovery } from './checkout-recovery';
@@ -310,6 +311,7 @@ app.get("/cron/purge", async (c) => {
   if (secret && auth !== `Bearer ${secret}`) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
   if (!secret && env.isProd) return c.json(err("Not authorized", "UNAUTHENTICATED"), 401);
   await cleanupStagedDocuments();
+  await cleanupOfficeUploads();
   const purged = await purgeExpiredSElections();
   // Rate-limit windows are minutes-to-hours; anything older than two days is
   // inert bookkeeping. Swept here so the table cannot grow without bound.
@@ -355,7 +357,7 @@ app.get("/cron/backup-continue", async (c) => {
   const db=await getDb();
   const {retryRecoveryNotices}=await import('./s-election-recovery');
   const [saved]=await db.query<{cursor:string|null}>("SELECT cursor FROM backup_progress WHERE id='backup-ancillary'");
-  const jobs:(()=>Promise<unknown>)[]=[()=>retryDocumentDeletions({deadline:cleanupDeadline}),()=>cleanupStagedDocuments({deadline:cleanupDeadline}),()=>retryRecoveryNotices(db,{deadline:cleanupDeadline})];
+  const jobs:(()=>Promise<unknown>)[]=[()=>retryDocumentDeletions({deadline:cleanupDeadline}),()=>cleanupStagedDocuments({deadline:cleanupDeadline}),()=>retryRecoveryNotices(db,{deadline:cleanupDeadline}),()=>cleanupOfficeUploads({deadline:cleanupDeadline})];
   let cursor=Number(saved?.cursor??0)%jobs.length;
   for(let n=0;n<jobs.length&&Date.now()<cleanupDeadline;n++){
    const next=(cursor+1)%jobs.length;
