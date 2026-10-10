@@ -178,11 +178,11 @@ var require_exchange_vercel_oidc_token = __commonJS({
     var tokenCache = new TokenCache(MAX_CACHE_ENTRIES);
     async function getCacheKey(options) {
       const input = JSON.stringify([options.token, options.audience, options.jti]);
-      const digest3 = await crypto.subtle.digest(
+      const digest4 = await crypto.subtle.digest(
         "SHA-256",
         new TextEncoder().encode(input)
       );
-      return Array.from(new Uint8Array(digest3)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+      return Array.from(new Uint8Array(digest4)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
     }
     async function exchangeVercelOidcToken2(options) {
       const cacheKey = await getCacheKey(options);
@@ -19321,8 +19321,8 @@ var require_digest = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var node_crypto_1 = __require("node:crypto");
-    var digest3 = (algorithm, data) => (0, node_crypto_1.createHash)(algorithm).update(data).digest();
-    exports.default = digest3;
+    var digest4 = (algorithm, data) => (0, node_crypto_1.createHash)(algorithm).update(data).digest();
+    exports.default = digest4;
   }
 });
 
@@ -41000,8 +41000,8 @@ var require_connection = __commonJS({
             return;
           }
           const secWSAccept = response.headersList.get("Sec-WebSocket-Accept");
-          const digest3 = crypto3.createHash("sha1").update(keyValue + uid).digest("base64");
-          if (secWSAccept !== digest3) {
+          const digest4 = crypto3.createHash("sha1").update(keyValue + uid).digest("base64");
+          if (secWSAccept !== digest4) {
             failWebsocketConnection(ws, "Incorrect hash received in Sec-WebSocket-Accept header.");
             return;
           }
@@ -80954,7 +80954,7 @@ var init_PDFSecurity = __esm({
         if (v2 !== 1 && v2 !== 2 && v2 !== 4) {
           throw new Error(`Unsupported algorithm '${v2}'.`);
         }
-        const digest3 = mergeUint8Arrays([
+        const digest4 = mergeUint8Arrays([
           this.encryptionKey,
           new Uint8Array([
             obj & 255,
@@ -80965,9 +80965,9 @@ var init_PDFSecurity = __esm({
           ])
         ]);
         if (v2 === 4) {
-          return aesEncryptFn(md5(mergeUint8Arrays([digest3, AESV2_SALT])));
+          return aesEncryptFn(md5(mergeUint8Arrays([digest4, AESV2_SALT])));
         }
-        const key = md5(digest3).subarray(0, Math.min(16, this.keyBits / 8 + 5));
+        const key = md5(digest4).subarray(0, Math.min(16, this.keyBits / 8 + 5));
         return (buffer) => rc4(key, buffer);
       }
       encrypt() {
@@ -81041,17 +81041,17 @@ var init_PDFSecurity = __esm({
       return mergeUint8Arrays([cipher, new Uint8Array(16)]);
     };
     getOwnerPasswordR2R3R4 = (r, keyBits, paddedUserPassword, paddedOwnerPassword) => {
-      let digest3 = paddedOwnerPassword;
+      let digest4 = paddedOwnerPassword;
       let round = r >= 3 ? 51 : 1;
       for (let i = 0; i < round; i++) {
-        digest3 = md5(digest3);
+        digest4 = md5(digest4);
       }
       const key = new Uint8Array(keyBits / 8);
       let cipher = paddedUserPassword;
       round = r >= 3 ? 20 : 1;
       for (let i = 0; i < round; i++) {
         for (let j = 0; j < key.length; j++)
-          key[j] = digest3[j] ^ i;
+          key[j] = digest4[j] ^ i;
         cipher = rc4(key, cipher);
       }
       return cipher;
@@ -102364,6 +102364,7 @@ var uuid2 = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-f
 var spec = external_exports.object({ field: external_exports.string().min(1), name: external_exports.string().min(1), size: external_exports.number().int().min(8).max(MAX_UPLOAD_BYTES), sha: external_exports.string().regex(/^[a-f0-9]{64}$/) }).strict();
 var initial = external_exports.object({ route: external_exports.string(), fields: external_exports.array(external_exports.tuple([external_exports.string(), external_exports.string()])), files: external_exports.array(spec).min(1) }).strict();
 var requests = /* @__PURE__ */ new WeakMap();
+var digest3 = (b2) => createHash9("sha256").update(b2).digest("hex");
 function reject(message, code, status = 400) {
   throw new HTTPException(status, { res: Response.json(err(message, code), { status }) });
 }
@@ -102400,6 +102401,93 @@ async function authorizeTarget(route, fields2) {
     const found = route.includes("/history-recovery/") ? identities.some((i) => historyId(i) === route.split("/").at(-2)) : identities.some((i) => i.orderId === order2?.[1] && i.operationId === route.split("/").at(-2) && i.slot === route.split("/").at(-1));
     if (!found) reject("Recovery document not found.", "NOT_FOUND", 404);
   }
+}
+async function boundedCipher(file) {
+  const maximum = file.size + 16;
+  if (!env.BLOB_READ_WRITE_TOKEN) {
+    const b2 = await readObject("dev:" + file.path);
+    if (!b2) reject("Upload has not completed. Retry the same upload.", "UPLOAD_PENDING", 503);
+    if (b2.length !== maximum) reject("Uploaded file length does not match.", "UPLOAD_INVALID");
+    return b2;
+  }
+  const { get: get2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
+  const r = await get2(file.path, { access: "private", token: env.BLOB_READ_WRITE_TOKEN, useCache: false, abortSignal: ioSignal() });
+  if (!r || r.statusCode !== 200) reject("Upload has not completed. Retry the same upload.", "UPLOAD_PENDING", 503);
+  const reader = r.stream.getReader(), parts = [];
+  let total = 0;
+  try {
+    for (; ; ) {
+      const chunk = await reader.read();
+      if (chunk.done) break;
+      total += chunk.value.byteLength;
+      if (total > maximum) reject("Uploaded file exceeds its authorized length.", "UPLOAD_INVALID");
+      parts.push(Buffer.from(chunk.value));
+    }
+  } finally {
+    await reader.cancel().catch(() => {
+    });
+    reader.releaseLock();
+  }
+  if (total !== maximum) reject("Uploaded file is incomplete.", "UPLOAD_INVALID");
+  return Buffer.concat(parts, total);
+}
+async function plainFile(file) {
+  const ciphertext = await boundedCipher(file);
+  let plain;
+  try {
+    const decipher = createDecipheriv3("aes-256-gcm", unseal(Buffer.from(file.key, "base64")), Buffer.from(file.iv, "base64"));
+    decipher.setAAD(Buffer.from(file.id));
+    decipher.setAuthTag(ciphertext.subarray(-16));
+    plain = Buffer.concat([decipher.update(ciphertext.subarray(0, -16)), decipher.final()]);
+  } catch {
+    reject("Uploaded file authentication failed.", "UPLOAD_INVALID");
+  }
+  if (plain.length !== file.size || plain.length > MAX_UPLOAD_BYTES || digest3(plain) !== file.sha) reject("Uploaded file does not match the selected original.", "UPLOAD_INVALID");
+  if (!plain.subarray(0, 8).toString().startsWith("%PDF-") || !plain.subarray(-1024).toString().includes("%%EOF")) reject("Choose a readable PDF.", "NOT_A_PDF");
+  return plain;
+}
+var StagedPdf = class extends File {
+  constructor(entry) {
+    super([], entry.name, { type: "application/pdf" });
+    this.entry = entry;
+  }
+  entry;
+  get size() {
+    return this.entry.size;
+  }
+  async arrayBuffer() {
+    return Uint8Array.from(await plainFile(this.entry)).buffer;
+  }
+};
+async function parseOfficeUpload(c, options = {}) {
+  const request = requests.get(c);
+  if (!request) return c.req.parseBody(options);
+  const { stage } = request, db = await getDb(), lease = crypto.randomUUID();
+  const [held] = await db.query(`UPDATE office_upload_stages SET state='validating',lease=$2,lease_until=now()+interval '15 minutes' WHERE id=$1 AND expires_at>now() AND (state='issued' OR (state='validating' AND lease_until<now())) RETURNING *`, [stage.id, lease]);
+  if (!held) reject("This upload is already in use. Its result must be checked before retrying.", "UPLOAD_BUSY", 409);
+  stage.lease = lease;
+  try {
+    for (const file of stage.files) await plainFile(file);
+  } catch (error2) {
+    const invalid = error2 instanceof HTTPException && error2.status === 400;
+    await db.query("UPDATE office_upload_stages SET state=$3,cleanup_pending=$4,lease=NULL,lease_until=NULL WHERE id=$1 AND lease=$2", [stage.id, lease, invalid ? "rejected" : "issued", invalid]);
+    if (invalid) await cleanupOfficeUploads({ id: stage.id }).catch(() => {
+    });
+    throw error2;
+  }
+  const [claimed] = await db.query("UPDATE office_upload_stages SET state='processing' WHERE id=$1 AND lease=$2 AND lease_until>now() RETURNING id", [stage.id, lease]);
+  if (!claimed) reject("Upload reservation expired. No business operation was started.", "UPLOAD_BUSY", 409);
+  request.claimed = true;
+  const body = {};
+  const append = (key, value) => {
+    if (options.all && key in body) {
+      const old = body[key];
+      body[key] = Array.isArray(old) ? [...old, value] : [old, value];
+    } else body[key] = value;
+  };
+  for (const [key, value] of stage.fields) append(key, value);
+  for (const file of stage.files) append(file.field, new StagedPdf(file));
+  return body;
 }
 async function cleanupOfficeUploads(options = {}) {
   const db = await getDb();
@@ -116466,7 +116554,7 @@ function registerAdminRoutes(app2) {
   app2.post("/admin/library/:key", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const form = await c.req.parseBody();
+    const form = await parseOfficeUpload(c);
     const file = form.file;
     const title = typeof form.title === "string" ? form.title.trim() : "";
     const edition = typeof form.edition === "string" ? form.edition.trim() : "";
@@ -116474,7 +116562,7 @@ function registerAdminRoutes(app2) {
     if (!(file instanceof File) || !title) {
       return c.json(err("title and file are required.", "INVALID_INPUT"), 400);
     }
-    if (file.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+    if (file.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (40 MB per file).", "TOO_LARGE"), 400);
     if (!await looksLikePdf(file)) {
       return c.json(err(`${file.name} is not a readable PDF. Everything delivered through the portal is a PDF.`, "NOT_A_PDF"), 400);
     }
@@ -116786,14 +116874,15 @@ function registerAdminRoutes(app2) {
     const existing = await db.query("SELECT * FROM documents WHERE order_id=$1 AND kind='articles' AND deleted_at IS NULL", [o.id]);
     const statements = await db.query("SELECT id FROM documents WHERE order_id=$1 AND kind='statement' AND deleted_at IS NULL", [o.id]);
     const prior = await findOfficeOperation(db, "articles", o.id);
-    const form = await c.req.parseBody();
+    const form = await parseOfficeUpload(c);
     const file = form.articles instanceof File ? form.articles : null;
     const weSigned = appointedUs(o.payload);
     if (existing.length && (!weSigned || statements.length) && !prior) return c.json(err("Articles are already uploaded for this order.", "ALREADY_UPLOADED"), 409);
     const documentNumber = String(form.documentNumber || prior?.payload.documentNumber || existing[0]?.meta?.documentNumber || "").trim();
     if (weSigned && !documentNumber) return c.json(err(DOC_NUMBER_NEEDED, "DOCUMENT_NUMBER_REQUIRED"), 400);
     if (documentNumber && !/^L\d{11}$/.test(documentNumber)) return c.json(err("A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.", "DOCUMENT_NUMBER_SHAPE"), 400);
-    if (file && (file.size > MAX_UPLOAD_BYTES || !await looksLikePdf(file))) return c.json(err("This is not a readable PDF under 20 MB. Upload the filed Articles from Sunbiz.", "NOT_A_PDF"), 400);
+    if (file && file.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (40 MB per file).", "TOO_LARGE"), 400);
+    if (file && !await looksLikePdf(file)) return c.json(err("This is not a readable PDF. Upload the filed Articles from Sunbiz.", "NOT_A_PDF"), 400);
     if (!file && !existing.length && !prior?.files.articles) return c.json(err("The Articles of Organization PDF is required.", "INVALID_INPUT"), 400);
     const bytes2 = file ? Buffer.from(await file.arrayBuffer()) : null;
     let op;
@@ -116868,7 +116957,7 @@ function registerAdminRoutes(app2) {
     const o = rows[0];
     if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
     if (o.status === "pending_payment") return c.json(err("This order has not been paid.", "BAD_STATE"), 400);
-    const form = await c.req.parseBody();
+    const form = await parseOfficeUpload(c);
     const notify = form.notify !== "false";
     const payloadOpts = (typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload).optionalDocuments;
     const files = [];
@@ -116881,7 +116970,7 @@ function registerAdminRoutes(app2) {
         if (!payloadOpts?.[key]) {
           return c.json(err(`The client did not purchase a ${title.toLowerCase()} with this order.`, "NOT_PURCHASED"), 400);
         }
-        if (f.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+        if (f.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (40 MB per file).", "TOO_LARGE"), 400);
         if (!await looksLikePdf(f)) return c.json(err(`${f.name} is not a readable PDF.`, "NOT_A_PDF"), 400);
         files.push({ kind, title: certTitle(title, o.llc_name), file: f });
       }
@@ -116919,7 +117008,7 @@ function registerAdminRoutes(app2) {
     if (o.status === "pending_payment") {
       return c.json(err("This order has not been paid.", "BAD_STATE"), 400);
     }
-    const form = await c.req.parseBody({ all: true });
+    const form = await parseOfficeUpload(c, { all: true });
     const maybeArticles = form.articles;
     const articles = maybeArticles instanceof File ? maybeArticles : null;
     const suppliedDocNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
@@ -116994,7 +117083,7 @@ function registerAdminRoutes(app2) {
     const files = [...articles ? [articles] : [], ...psdFiles, ...certFiles.map((cf) => cf.file)];
     for (const f of files) {
       if (f.size > MAX_UPLOAD_BYTES) {
-        return c.json(err(`${f.name} is too large (20 MB max).`, "TOO_LARGE"), 400);
+        return c.json(err(`${f.name} is too large (40 MB per file).`, "TOO_LARGE"), 400);
       }
       if (!await looksLikePdf(f)) {
         return c.json(err(`${f.name} is not a readable PDF. Filed Articles and designations must be the PDFs from Sunbiz.`, "NOT_A_PDF"), 400);
@@ -117491,8 +117580,8 @@ function registerAdminRoutes(app2) {
     let assignedEin = "";
     let correctionOf = "";
     let reviewRestoredOriginal = false;
-    if (contentType.includes("multipart/form-data")) {
-      const form = await c.req.parseBody();
+    if (contentType.includes("multipart/form-data") || !!c.req.header("x-office-upload")) {
+      const form = await parseOfficeUpload(c);
       if (form.file instanceof File && form.file.size > 0) file = form.file;
       notify = form.notify !== "false";
       if (typeof form.title === "string") titleOverride = form.title.trim();
@@ -117504,7 +117593,7 @@ function registerAdminRoutes(app2) {
       notify = body.notify !== false;
     }
     if (file && file.size > MAX_UPLOAD_BYTES) {
-      return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+      return c.json(err("File is too large (40 MB per file).", "TOO_LARGE"), 400);
     }
     const db = await getDb();
     const rows = await db.query(
@@ -117749,10 +117838,10 @@ function registerAdminRoutes(app2) {
     if (rows[0].kind !== "articles" && rows[0].kind !== "psd") {
       return c.json(err("Only the Articles or a designation can be replaced. Upload another certificate copy instead.", "BAD_KIND"), 400);
     }
-    const form = await c.req.parseBody();
+    const form = await parseOfficeUpload(c);
     const file = form.file;
     if (!(file instanceof File) || file.size === 0) return c.json(err("Choose the replacement PDF.", "INVALID_INPUT"), 400);
-    if (file.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
+    if (file.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (40 MB per file).", "TOO_LARGE"), 400);
     if (!await looksLikePdf(file)) return c.json(err(`${file.name} is not a readable PDF.`, "NOT_A_PDF"), 400);
     const replaced = await replaceFilingDocument(db, {
       id: rows[0].id,
@@ -117788,7 +117877,7 @@ function registerAdminRoutes(app2) {
   app2.post("/admin/documents", async (c) => {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const form = await c.req.parseBody();
+    const form = await parseOfficeUpload(c);
     const submissionId = typeof form.submissionId === "string" ? form.submissionId : "";
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(submissionId)) return c.json(err("A valid upload submission ID is required.", "INVALID_INPUT"), 400);
     const file = form.file;
@@ -117804,7 +117893,7 @@ function registerAdminRoutes(app2) {
       return c.json(err("Enter the date the mail was received.", "RECEIVED_ON_REQUIRED"), 400);
     }
     if (file.size > MAX_UPLOAD_BYTES) {
-      return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+      return c.json(err("File is too large (40 MB per file).", "TOO_LARGE"), 400);
     }
     if (!await looksLikePdf(file)) {
       return c.json(err(`${file.name} is not a readable PDF. Everything delivered through the portal is a PDF.`, "NOT_A_PDF"), 400);

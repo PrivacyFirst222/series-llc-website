@@ -1,3 +1,4 @@
+import {parseOfficeUpload} from './office-uploads';
 import {prepareCorrectionHistory} from './office-history-recovery';
 import {saveDocumentSubmission,DocumentUploadError} from './document-upload';
 import {officeFileIdentities} from './office-recovery-sources';
@@ -80,7 +81,7 @@ app.post("/admin/library/owners-manual/regenerate", async (c) => {
 app.post("/admin/library/:key", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  const form = await c.req.parseBody();
+  const form = await parseOfficeUpload(c);
   const file = form.file;
   const title = typeof form.title === "string" ? form.title.trim() : "";
   const edition = typeof form.edition === "string" ? form.edition.trim() : "";
@@ -88,7 +89,7 @@ app.post("/admin/library/:key", async (c) => {
   if (!(file instanceof File) || !title) {
     return c.json(err("title and file are required.", "INVALID_INPUT"), 400);
   }
-  if (file.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+  if (file.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (40 MB per file).", "TOO_LARGE"), 400);
   // Strict, not claims-based: the portal download layer stamps ".pdf" and
   // serves application/pdf on EVERYTHING it delivers, so a text file that
   // never claimed to be a PDF still reaches the client dressed as one
@@ -485,14 +486,15 @@ app.post("/admin/orders/:id/articles", async (c) => {
   const existing=await db.query<{id:string;storage_key:string;title:string;size_bytes:number;meta:Record<string,unknown>}>("SELECT * FROM documents WHERE order_id=$1 AND kind='articles' AND deleted_at IS NULL",[o.id]);
   const statements=await db.query("SELECT id FROM documents WHERE order_id=$1 AND kind='statement' AND deleted_at IS NULL",[o.id]);
   const prior=await findOfficeOperation(db,'articles',o.id);
-  const form=await c.req.parseBody();
+  const form=await parseOfficeUpload(c);
   const file=form.articles instanceof File?form.articles:null;
   const weSigned=appointedUs(o.payload);
   if(existing.length&&(!weSigned||statements.length)&&!prior)return c.json(err("Articles are already uploaded for this order.","ALREADY_UPLOADED"),409);
   const documentNumber=String(form.documentNumber||prior?.payload.documentNumber||existing[0]?.meta?.documentNumber||'').trim();
   if(weSigned&&!documentNumber)return c.json(err(DOC_NUMBER_NEEDED,"DOCUMENT_NUMBER_REQUIRED"),400);
   if(documentNumber&&!/^L\d{11}$/.test(documentNumber))return c.json(err("A Florida LLC document number is the letter L followed by eleven digits, like L26000123456. Use the digit zero, not the letter o.","DOCUMENT_NUMBER_SHAPE"),400);
-  if(file&&(file.size>MAX_UPLOAD_BYTES||!(await looksLikePdf(file))))return c.json(err("This is not a readable PDF under 20 MB. Upload the filed Articles from Sunbiz.","NOT_A_PDF"),400);
+  if(file&&file.size>MAX_UPLOAD_BYTES)return c.json(err("File is too large (40 MB per file).","TOO_LARGE"),400);
+  if(file&&!(await looksLikePdf(file)))return c.json(err("This is not a readable PDF. Upload the filed Articles from Sunbiz.","NOT_A_PDF"),400);
   if(!file&&!existing.length&&!prior?.files.articles)return c.json(err("The Articles of Organization PDF is required.","INVALID_INPUT"),400);
   const bytes=file?Buffer.from(await file.arrayBuffer()):null;
   let op:Awaited<ReturnType<typeof claimOfficeOperation>>|undefined;
@@ -576,7 +578,7 @@ app.post("/admin/orders/:id/certificates", async (c) => {
   const o = rows[0];
   if (!o.client_id) return c.json(err("This order has no client account yet.", "NO_CLIENT"), 400);
   if (o.status === "pending_payment") return c.json(err("This order has not been paid.", "BAD_STATE"), 400);
-  const form = await c.req.parseBody();
+  const form = await parseOfficeUpload(c);
   const notify = form.notify !== "false";
   const payloadOpts = ((typeof o.payload === "string" ? JSON.parse(o.payload) : o.payload) as {
     optionalDocuments?: { certificateOfStatus?: boolean; certifiedCopy?: boolean };
@@ -591,7 +593,7 @@ app.post("/admin/orders/:id/certificates", async (c) => {
       if (!payloadOpts?.[key]) {
         return c.json(err(`The client did not purchase a ${title.toLowerCase()} with this order.`, "NOT_PURCHASED"), 400);
       }
-      if (f.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+      if (f.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (40 MB per file).", "TOO_LARGE"), 400);
       if (!(await looksLikePdf(f))) return c.json(err(`${f.name} is not a readable PDF.`, "NOT_A_PDF"), 400);
       files.push({ kind, title: certTitle(title, o.llc_name), file: f });
     }
@@ -642,7 +644,7 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
     return c.json(err("This order has not been paid.", "BAD_STATE"), 400);
   }
 
-  const form = await c.req.parseBody({ all: true });
+  const form = await parseOfficeUpload(c,{ all: true });
   const maybeArticles = form.articles;
   const articles = maybeArticles instanceof File ? maybeArticles : null;
   const suppliedDocNumber = typeof form.documentNumber === "string" ? form.documentNumber.trim() : "";
@@ -729,7 +731,7 @@ app.post("/admin/orders/:id/formation-documents", async (c) => {
   const files = [...(articles ? [articles] : []), ...psdFiles, ...certFiles.map((cf) => cf.file)];
   for (const f of files) {
     if (f.size > MAX_UPLOAD_BYTES) {
-      return c.json(err(`${f.name} is too large (20 MB max).`, "TOO_LARGE"), 400);
+      return c.json(err(`${f.name} is too large (40 MB per file).`, "TOO_LARGE"), 400);
     }
     if (!(await looksLikePdf(f))) {
       return c.json(err(`${f.name} is not a readable PDF. Filed Articles and designations must be the PDFs from Sunbiz.`, "NOT_A_PDF"), 400);
@@ -1325,8 +1327,8 @@ app.post("/admin/services/:id/fulfill", async (c) => {
   let assignedEin = "";
   let correctionOf = "";
   let reviewRestoredOriginal=false;
-  if (contentType.includes("multipart/form-data")) {
-    const form = await c.req.parseBody();
+  if ((contentType.includes("multipart/form-data") || !!c.req.header("x-office-upload"))) {
+    const form = await parseOfficeUpload(c);
     if (form.file instanceof File && form.file.size > 0) file = form.file;
     notify = form.notify !== "false";
     if (typeof form.title === "string") titleOverride = form.title.trim();
@@ -1338,7 +1340,7 @@ app.post("/admin/services/:id/fulfill", async (c) => {
     notify = body.notify !== false;
   }
   if (file && file.size > MAX_UPLOAD_BYTES) {
-    return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+    return c.json(err("File is too large (40 MB per file).", "TOO_LARGE"), 400);
   }
 
   const db = await getDb();
@@ -1612,10 +1614,10 @@ app.post("/admin/documents/:id/replace", async (c) => {
   if (rows[0].kind !== "articles" && rows[0].kind !== "psd") {
     return c.json(err("Only the Articles or a designation can be replaced. Upload another certificate copy instead.", "BAD_KIND"), 400);
   }
-  const form = await c.req.parseBody();
+  const form = await parseOfficeUpload(c);
   const file = form.file;
   if (!(file instanceof File) || file.size === 0) return c.json(err("Choose the replacement PDF.", "INVALID_INPUT"), 400);
-  if (file.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (20 MB max).", "TOO_LARGE"), 400);
+  if (file.size > MAX_UPLOAD_BYTES) return c.json(err("The file is too large (40 MB per file).", "TOO_LARGE"), 400);
   if (!(await looksLikePdf(file))) return c.json(err(`${file.name} is not a readable PDF.`, "NOT_A_PDF"), 400);
   const replaced = await replaceFilingDocument(db, {
     id: rows[0].id,
@@ -1657,7 +1659,7 @@ app.get("/admin/clients/:id/documents", async (c) => {
 app.post("/admin/documents", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-  const form = await c.req.parseBody();
+  const form = await parseOfficeUpload(c);
   const submissionId=typeof form.submissionId==='string'?form.submissionId:'';
   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(submissionId))return c.json(err('A valid upload submission ID is required.','INVALID_INPUT'),400);
   const file = form.file;
@@ -1677,7 +1679,7 @@ app.post("/admin/documents", async (c) => {
     return c.json(err("Enter the date the mail was received.", "RECEIVED_ON_REQUIRED"), 400);
   }
   if (file.size > MAX_UPLOAD_BYTES) {
-    return c.json(err("File is too large (20 MB max).", "TOO_LARGE"), 400);
+    return c.json(err("File is too large (40 MB per file).", "TOO_LARGE"), 400);
   }
   // Strict, not claims-based: the portal download layer stamps ".pdf" and
   // serves application/pdf on EVERYTHING it delivers, so a text file that
