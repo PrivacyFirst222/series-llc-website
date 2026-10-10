@@ -30,7 +30,7 @@ export async function requireAdmin(c: Parameters<typeof getSession>[0]) {
 }
 
 
-export const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+export { MAX_UPLOAD_BYTES } from "../src/lib/uploadLimits";
 
 
 /** A client-facing PDF must actually be one: %PDF- header and a %%EOF marker

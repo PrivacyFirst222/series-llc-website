@@ -97987,6 +97987,9 @@ function clientIp(c) {
   return c.req.header("x-forwarded-for")?.split(",")[0].trim() || c.req.header("x-real-ip") || "local";
 }
 
+// src/lib/uploadLimits.ts
+var MAX_UPLOAD_BYTES = 40 * 1024 * 1024;
+
 // server/shared.ts
 var testHooks = {
   /** Makes the next fulfillment throw once (dev suite scaffolding). */
@@ -98004,7 +98007,6 @@ function maskEmail(email) {
 async function requireAdmin(c) {
   return getAdminSession(c);
 }
-var MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
 var looksLikePdf = async (f) => {
   const bytes2 = new Uint8Array(await f.arrayBuffer());
   if (bytes2.length < 8) return false;
