@@ -47,131 +47,6 @@ var __toESM = (mod, isNodeMode, target2) => (target2 = mod != null ? __create(__
   mod
 ));
 
-// server/env.ts
-var OFFLINE, ext, env;
-var init_env = __esm({
-  "server/env.ts"() {
-    OFFLINE = process.env.E2E_OFFLINE === "1";
-    ext = (v2) => OFFLINE ? "" : v2 ?? "";
-    env = {
-      OFFLINE,
-      DATABASE_URL: ext(process.env.DATABASE_URL),
-      SESSION_SECRET: process.env.SESSION_SECRET ?? "dev-only-secret-change-me",
-      SQUARE_APPLICATION_ID: ext(process.env.SQUARE_APPLICATION_ID),
-      SQUARE_ACCESS_TOKEN: ext(process.env.SQUARE_ACCESS_TOKEN),
-      SQUARE_LOCATION_ID: ext(process.env.SQUARE_LOCATION_ID),
-      SQUARE_ENV: process.env.SQUARE_ENV === "production" ? "production" : "sandbox",
-      SQUARE_WEBHOOK_SIGNATURE_KEY: ext(process.env.SQUARE_WEBHOOK_SIGNATURE_KEY),
-      RESEND_API_KEY: ext(process.env.RESEND_API_KEY),
-      MAIL_FROM: process.env.MAIL_FROM ?? "MyFloridaSeriesLLC <onboarding@resend.dev>",
-      ADMIN_NOTIFY_EMAIL: process.env.ADMIN_NOTIFY_EMAIL ?? "",
-      ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
-      /** Shared secret for scheduled maintenance jobs. Required in production. */
-      CRON_SECRET: process.env.CRON_SECRET ?? "",
-      // Dropbox app-folder credentials for the nightly client-file mirror.
-      DROPBOX_APP_KEY: ext(process.env.DROPBOX_APP_KEY),
-      DROPBOX_APP_SECRET: ext(process.env.DROPBOX_APP_SECRET),
-      DROPBOX_REFRESH_TOKEN: ext(process.env.DROPBOX_REFRESH_TOKEN),
-      BLOB_READ_WRITE_TOKEN: ext(process.env.BLOB_READ_WRITE_TOKEN),
-      SMARTY_AUTH_ID: ext(process.env.SMARTY_AUTH_ID),
-      SMARTY_AUTH_TOKEN: ext(process.env.SMARTY_AUTH_TOKEN),
-      /** Public origin for links in emails and Square redirects. */
-      PUBLIC_BASE_URL: process.env.PUBLIC_BASE_URL ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:8000"),
-      isProd: !!process.env.VERCEL
-    };
-  }
-});
-
-// server/operation-deadline.ts
-import { AsyncLocalStorage } from "node:async_hooks";
-function checkDeadline(deadline = activeDeadline()) {
-  if (Date.now() >= deadline) throw new DOMException("Operation deadline reached", "TimeoutError");
-}
-function ioSignal(maxMs = 2e4, deadline = activeDeadline()) {
-  checkDeadline(deadline);
-  return AbortSignal.timeout(Math.max(1, Math.min(maxMs, deadline - Date.now())));
-}
-async function withDeadline(deadline, work) {
-  const until = Math.min(deadline, activeDeadline());
-  checkDeadline(until);
-  return deadlines.run(until, async () => {
-    const result = await work();
-    checkDeadline(until);
-    return result;
-  });
-}
-function providerFailure(response, action) {
-  const error2 = new Error(`${action} failed (${response.status})`);
-  if (response.status === 429 || response.status === 503) {
-    const header = response.headers.get("retry-after"), seconds = header !== null ? Number(header) : NaN;
-    error2.retryAfterMs = Number.isFinite(seconds) ? Math.max(0, seconds * 1e3) : header && Number.isFinite(Date.parse(header)) ? Math.max(0, Date.parse(header) - Date.now()) : 1e3;
-  }
-  return error2;
-}
-var deadlines, activeDeadline;
-var init_operation_deadline = __esm({
-  "server/operation-deadline.ts"() {
-    deadlines = new AsyncLocalStorage();
-    activeDeadline = () => deadlines.getStore() ?? Infinity;
-  }
-});
-
-// server/encryption.ts
-import { createCipheriv, createDecipheriv, randomBytes, createHash } from "node:crypto";
-function encryptionKeys() {
-  try {
-    const active = process.env.DOCUMENT_ENCRYPTION_ACTIVE_KEY || "dev";
-    const raw2 = process.env.DOCUMENT_ENCRYPTION_KEYS;
-    if (!raw2) {
-      if (env.isProd && !env.OFFLINE) throw new Error("Document encryption keys are not configured; refusing plaintext storage.");
-      return { active: "dev", keys: { dev: createHash("sha256").update("offline-document-test-key").digest() } };
-    }
-    const parsed = JSON.parse(raw2), keys = /* @__PURE__ */ Object.create(null);
-    if (!parsed || Array.isArray(parsed) || typeof parsed !== "object") throw new Error("Invalid encryption key configuration");
-    for (const [id, value] of Object.entries(parsed)) {
-      if (!/^[a-zA-Z0-9_-]{1,40}$/.test(id) || typeof value !== "string") throw new Error("Invalid encryption key configuration");
-      const bytes2 = Buffer.from(value, "base64");
-      if (bytes2.length !== 32) throw new Error("Encryption keys must contain 32 random bytes");
-      keys[id] = bytes2;
-    }
-    if (!keys[active]) throw new Error("The active encryption key is missing");
-    return { active, keys };
-  } catch (error2) {
-    throw new EncryptionKeyError(error2 instanceof Error ? error2.message : "Invalid encryption key configuration");
-  }
-}
-function isEncrypted(data) {
-  return data.subarray(0, MAGIC.length).toString() === MAGIC;
-}
-function encryptedKeyId(data) {
-  return isEncrypted(data) ? JSON.parse(data.subarray(MAGIC.length).toString()).key : null;
-}
-function seal(data) {
-  const { active, keys } = encryptionKeys(), iv = randomBytes(12);
-  const cipher = createCipheriv("aes-256-gcm", keys[active], iv);
-  cipher.setAAD(Buffer.from(`${MAGIC}${active}`));
-  const bytes2 = Buffer.concat([cipher.update(data), cipher.final()]);
-  return Buffer.from(MAGIC + JSON.stringify({ key: active, iv: iv.toString("base64"), tag: cipher.getAuthTag().toString("base64"), data: bytes2.toString("base64") }));
-}
-function unseal(data) {
-  if (!isEncrypted(data)) throw new Error("Expected an encrypted document");
-  const p2 = JSON.parse(data.subarray(MAGIC.length).toString()), { keys } = encryptionKeys();
-  if (!keys[p2.key]) throw new EncryptionKeyError(`Required encryption key ${p2.key} is unavailable`);
-  const decipher = createDecipheriv("aes-256-gcm", keys[p2.key], Buffer.from(p2.iv, "base64"));
-  decipher.setAAD(Buffer.from(`${MAGIC}${p2.key}`));
-  decipher.setAuthTag(Buffer.from(p2.tag, "base64"));
-  return Buffer.concat([decipher.update(Buffer.from(p2.data, "base64")), decipher.final()]);
-}
-var MAGIC, EncryptionKeyError;
-var init_encryption = __esm({
-  "server/encryption.ts"() {
-    init_env();
-    MAGIC = "FPSLLC-ENC-1\n";
-    EncryptionKeyError = class extends Error {
-    };
-  }
-});
-
 // node_modules/is-node-process/lib/index.mjs
 function isNodeProcess() {
   if (typeof navigator !== "undefined" && navigator.product === "ReactNative") {
@@ -735,10 +610,10 @@ var require_isexe = __commonJS({
         if (typeof Promise !== "function") {
           throw new TypeError("callback not provided");
         }
-        return new Promise(function(resolve3, reject) {
+        return new Promise(function(resolve3, reject2) {
           isexe(path, options || {}, function(er, is2) {
             if (er) {
-              reject(er);
+              reject2(er);
             } else {
               resolve3(is2);
             }
@@ -806,16 +681,16 @@ var require_which = __commonJS({
         opt = {};
       const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt);
       const found = [];
-      const step = (i) => new Promise((resolve3, reject) => {
+      const step = (i) => new Promise((resolve3, reject2) => {
         if (i === pathEnv.length)
-          return opt.all && found.length ? resolve3(found) : reject(getNotFoundError(cmd));
+          return opt.all && found.length ? resolve3(found) : reject2(getNotFoundError(cmd));
         const ppRaw = pathEnv[i];
         const pathPart = /^".*"$/.test(ppRaw) ? ppRaw.slice(1, -1) : ppRaw;
         const pCmd = path.join(pathPart, cmd);
         const p2 = !pathPart && /^\.[\\\/]/.test(cmd) ? cmd.slice(0, 2) + pCmd : pCmd;
         resolve3(subStep(p2, i, 0));
       });
-      const subStep = (p2, i, ii2) => new Promise((resolve3, reject) => {
+      const subStep = (p2, i, ii2) => new Promise((resolve3, reject2) => {
         if (ii2 === pathExt.length)
           return resolve3(step(i + 1));
         const ext2 = pathExt[ii2];
@@ -2008,18 +1883,18 @@ var require_kill = __commonJS({
         context.isCanceled = true;
       }
     };
-    var timeoutKill = (spawned, signal, reject) => {
+    var timeoutKill = (spawned, signal, reject2) => {
       spawned.kill(signal);
-      reject(Object.assign(new Error("Timed out"), { timedOut: true, signal }));
+      reject2(Object.assign(new Error("Timed out"), { timedOut: true, signal }));
     };
     var setupTimeout = (spawned, { timeout, killSignal = "SIGTERM" }, spawnedPromise) => {
       if (timeout === 0 || timeout === void 0) {
         return spawnedPromise;
       }
       let timeoutId;
-      const timeoutPromise = new Promise((resolve3, reject) => {
+      const timeoutPromise = new Promise((resolve3, reject2) => {
         timeoutId = setTimeout(() => {
-          timeoutKill(spawned, killSignal, reject);
+          timeoutKill(spawned, killSignal, reject2);
         }, timeout);
       });
       const safeSpawnedPromise = spawnedPromise.finally(() => {
@@ -2136,12 +2011,12 @@ var require_get_stream = __commonJS({
       };
       const { maxBuffer } = options;
       const stream3 = bufferStream(options);
-      await new Promise((resolve3, reject) => {
+      await new Promise((resolve3, reject2) => {
         const rejectPromise = (error2) => {
           if (error2 && stream3.getBufferedLength() <= BufferConstants.MAX_LENGTH) {
             error2.bufferedData = stream3.getBufferedValue();
           }
-          reject(error2);
+          reject2(error2);
         };
         (async () => {
           try {
@@ -2303,16 +2178,16 @@ var require_promise = __commonJS({
       return spawned;
     };
     var getSpawnedPromise = (spawned) => {
-      return new Promise((resolve3, reject) => {
+      return new Promise((resolve3, reject2) => {
         spawned.on("exit", (exitCode, signal) => {
           resolve3({ exitCode, signal });
         });
         spawned.on("error", (error2) => {
-          reject(error2);
+          reject2(error2);
         });
         if (spawned.stdin) {
           spawned.stdin.on("error", (error2) => {
-            reject(error2);
+            reject2(error2);
           });
         }
       });
@@ -4667,12 +4542,12 @@ var require_regexes = __commonJS({
     exports.duration = /^P(?:(\d+W)|(?!.*W)(?=\d|T\d)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+([.,]\d+)?S)?)?)$/;
     exports.extendedDuration = /^[-+]?P(?!$)(?:(?:[-+]?\d+Y)|(?:[-+]?\d+[.,]\d+Y$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:(?:[-+]?\d+W)|(?:[-+]?\d+[.,]\d+W$))?(?:(?:[-+]?\d+D)|(?:[-+]?\d+[.,]\d+D$))?(?:T(?=[\d+-])(?:(?:[-+]?\d+H)|(?:[-+]?\d+[.,]\d+H$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:[-+]?\d+(?:[.,]\d+)?S)?)??$/;
     exports.guid = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$/;
-    var uuid3 = (version) => {
+    var uuid4 = (version) => {
       if (!version)
         return /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/;
       return new RegExp(`^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-${version}[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$`);
     };
-    exports.uuid = uuid3;
+    exports.uuid = uuid4;
     exports.uuid4 = (0, exports.uuid)(4);
     exports.uuid6 = (0, exports.uuid)(6);
     exports.uuid7 = (0, exports.uuid)(7);
@@ -16896,7 +16771,7 @@ var require_schemas2 = __commonJS({
     exports.string = string;
     exports.email = email;
     exports.guid = guid;
-    exports.uuid = uuid3;
+    exports.uuid = uuid4;
     exports.uuidv4 = uuidv4;
     exports.uuidv6 = uuidv6;
     exports.uuidv7 = uuidv7;
@@ -17137,7 +17012,7 @@ var require_schemas2 = __commonJS({
       core.$ZodUUID.init(inst, def);
       exports.ZodStringFormat.init(inst, def);
     });
-    function uuid3(params) {
+    function uuid4(params) {
       return core._uuid(exports.ZodUUID, params);
     }
     function uuidv4(params) {
@@ -19783,8 +19658,8 @@ var require_timing_safe_equal = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var node_crypto_1 = __require("node:crypto");
-    var timingSafeEqual3 = node_crypto_1.timingSafeEqual;
-    exports.default = timingSafeEqual3;
+    var timingSafeEqual4 = node_crypto_1.timingSafeEqual;
+    exports.default = timingSafeEqual4;
   }
 });
 
@@ -19811,9 +19686,9 @@ var require_webcrypto = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.isCryptoKey = void 0;
-    var crypto2 = __require("node:crypto");
+    var crypto3 = __require("node:crypto");
     var util2 = __require("node:util");
-    var webcrypto = crypto2.webcrypto;
+    var webcrypto = crypto3.webcrypto;
     exports.default = webcrypto;
     var isCryptoKey = (key) => util2.types.isCryptoKey(key);
     exports.isCryptoKey = isCryptoKey;
@@ -22105,17 +21980,17 @@ var require_sign = __commonJS({
   "node_modules/jose/dist/node/cjs/runtime/sign.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var crypto2 = __require("node:crypto");
+    var crypto3 = __require("node:crypto");
     var node_util_1 = __require("node:util");
     var dsa_digest_js_1 = require_dsa_digest();
     var hmac_digest_js_1 = require_hmac_digest();
     var node_key_js_1 = require_node_key();
     var get_sign_verify_key_js_1 = require_get_sign_verify_key();
-    var oneShotSign = (0, node_util_1.promisify)(crypto2.sign);
+    var oneShotSign = (0, node_util_1.promisify)(crypto3.sign);
     var sign = async (alg, key, data) => {
       const k = (0, get_sign_verify_key_js_1.default)(alg, key, "sign");
       if (alg.startsWith("HS")) {
-        const hmac = crypto2.createHmac((0, hmac_digest_js_1.default)(alg), k);
+        const hmac = crypto3.createHmac((0, hmac_digest_js_1.default)(alg), k);
         hmac.update(data);
         return hmac.digest();
       }
@@ -22130,20 +22005,20 @@ var require_verify = __commonJS({
   "node_modules/jose/dist/node/cjs/runtime/verify.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var crypto2 = __require("node:crypto");
+    var crypto3 = __require("node:crypto");
     var node_util_1 = __require("node:util");
     var dsa_digest_js_1 = require_dsa_digest();
     var node_key_js_1 = require_node_key();
     var sign_js_1 = require_sign();
     var get_sign_verify_key_js_1 = require_get_sign_verify_key();
-    var oneShotVerify = (0, node_util_1.promisify)(crypto2.verify);
-    var verify = async (alg, key, signature, data) => {
+    var oneShotVerify = (0, node_util_1.promisify)(crypto3.verify);
+    var verify2 = async (alg, key, signature, data) => {
       const k = (0, get_sign_verify_key_js_1.default)(alg, key, "verify");
       if (alg.startsWith("HS")) {
         const expected = await (0, sign_js_1.default)(alg, k, data);
         const actual = signature;
         try {
-          return crypto2.timingSafeEqual(actual, expected);
+          return crypto3.timingSafeEqual(actual, expected);
         } catch {
           return false;
         }
@@ -22156,7 +22031,7 @@ var require_verify = __commonJS({
         return false;
       }
     };
-    exports.default = verify;
+    exports.default = verify2;
   }
 });
 
@@ -24257,7 +24132,7 @@ var require_lib4 = __commonJS({
   "node_modules/async-retry/lib/index.js"(exports, module) {
     var retrier = require_retry2();
     function retry2(fn, opts) {
-      function run(resolve3, reject) {
+      function run(resolve3, reject2) {
         var options = opts || {};
         var op;
         if (!("randomize" in options)) {
@@ -24265,7 +24140,7 @@ var require_lib4 = __commonJS({
         }
         op = retrier.operation(options);
         function bail(err3) {
-          reject(err3 || new Error("Aborted"));
+          reject2(err3 || new Error("Aborted"));
         }
         function onError(err3, num2) {
           if (err3.bail) {
@@ -24273,7 +24148,7 @@ var require_lib4 = __commonJS({
             return;
           }
           if (!op.retry(err3)) {
-            reject(op.mainError());
+            reject2(op.mainError());
           } else if (options.onRetry) {
             options.onRetry(err3, num2);
           }
@@ -26122,9 +25997,9 @@ var require_dispatcher_base = __commonJS({
       }
       close(callback) {
         if (callback === void 0) {
-          return new Promise((resolve3, reject) => {
+          return new Promise((resolve3, reject2) => {
             this.close((err3, data) => {
-              return err3 ? reject(err3) : resolve3(data);
+              return err3 ? reject2(err3) : resolve3(data);
             });
           });
         }
@@ -26162,11 +26037,11 @@ var require_dispatcher_base = __commonJS({
           err3 = null;
         }
         if (callback === void 0) {
-          return new Promise((resolve3, reject) => {
+          return new Promise((resolve3, reject2) => {
             this.destroy(err3, (err4, data) => {
               return err4 ? (
                 /* istanbul ignore next: should never error */
-                reject(err4)
+                reject2(err4)
               ) : resolve3(data);
             });
           });
@@ -28049,11 +27924,11 @@ var require_util3 = __commonJS({
     var { isUint8Array } = __require("node:util/types");
     var { webidl } = require_webidl();
     var supportedHashes = [];
-    var crypto2;
+    var crypto3;
     try {
-      crypto2 = __require("node:crypto");
+      crypto3 = __require("node:crypto");
       const possibleRelevantHashes = ["sha256", "sha384", "sha512"];
-      supportedHashes = crypto2.getHashes().filter((hash2) => possibleRelevantHashes.includes(hash2));
+      supportedHashes = crypto3.getHashes().filter((hash2) => possibleRelevantHashes.includes(hash2));
     } catch {
     }
     function responseURL(response) {
@@ -28065,17 +27940,17 @@ var require_util3 = __commonJS({
       if (!redirectStatusSet.has(response.status)) {
         return null;
       }
-      let location = response.headersList.get("location", true);
-      if (location !== null && isValidHeaderValue(location)) {
-        if (!isValidEncodedURL(location)) {
-          location = normalizeBinaryStringToUtf8(location);
+      let location2 = response.headersList.get("location", true);
+      if (location2 !== null && isValidHeaderValue(location2)) {
+        if (!isValidEncodedURL(location2)) {
+          location2 = normalizeBinaryStringToUtf8(location2);
         }
-        location = new URL(location, responseURL(response));
+        location2 = new URL(location2, responseURL(response));
       }
-      if (location && !location.hash) {
-        location.hash = requestFragment;
+      if (location2 && !location2.hash) {
+        location2.hash = requestFragment;
       }
-      return location;
+      return location2;
     }
     function isValidEncodedURL(url) {
       for (let i = 0; i < url.length; ++i) {
@@ -28326,7 +28201,7 @@ var require_util3 = __commonJS({
       }
     }
     function bytesMatch(bytes2, metadataList) {
-      if (crypto2 === void 0) {
+      if (crypto3 === void 0) {
         return true;
       }
       const parsedMetadata = parseMetadata(metadataList);
@@ -28341,7 +28216,7 @@ var require_util3 = __commonJS({
       for (const item of metadata) {
         const algorithm = item.algo;
         const expectedValue = item.hash;
-        let actualValue = crypto2.createHash(algorithm).update(bytes2).digest("base64");
+        let actualValue = crypto3.createHash(algorithm).update(bytes2).digest("base64");
         if (actualValue[actualValue.length - 1] === "=") {
           if (actualValue[actualValue.length - 2] === "=") {
             actualValue = actualValue.slice(0, -2);
@@ -28434,9 +28309,9 @@ var require_util3 = __commonJS({
     function createDeferredPromise() {
       let res;
       let rej;
-      const promise = new Promise((resolve3, reject) => {
+      const promise = new Promise((resolve3, reject2) => {
         res = resolve3;
-        rej = reject;
+        rej = reject2;
       });
       return { promise, resolve: res, reject: rej };
     }
@@ -29405,8 +29280,8 @@ var require_body = __commonJS({
     var { multipartFormDataParser } = require_formdata_parser();
     var random;
     try {
-      const crypto2 = __require("node:crypto");
-      random = (max) => crypto2.randomInt(0, max);
+      const crypto3 = __require("node:crypto");
+      random = (max) => crypto3.randomInt(0, max);
     } catch {
       random = (max) => Math.floor(Math.random(max));
     }
@@ -30292,9 +30167,9 @@ var require_client_h1 = __commonJS({
         client2[kHTTPContext] = null;
         if (client2.destroyed) {
           assert(client2[kPending] === 0);
-          const requests = client2[kQueue].splice(client2[kRunningIdx]);
-          for (let i = 0; i < requests.length; i++) {
-            const request = requests[i];
+          const requests2 = client2[kQueue].splice(client2[kRunningIdx]);
+          for (let i = 0; i < requests2.length; i++) {
+            const request = requests2[i];
             util2.errorRequest(client2, request, err3);
           }
         } else if (client2[kRunning] > 0 && err3.code !== "UND_ERR_INFO") {
@@ -30681,10 +30556,10 @@ upgrade: ${upgrade}\r
           cb();
         }
       }
-      const waitForDrain = () => new Promise((resolve3, reject) => {
+      const waitForDrain = () => new Promise((resolve3, reject2) => {
         assert(callback === null);
         if (socket[kError]) {
-          reject(socket[kError]);
+          reject2(socket[kError]);
         } else {
           callback = resolve3;
         }
@@ -30909,9 +30784,9 @@ var require_client_h2 = __commonJS({
         client2[kHTTP2Session] = null;
         if (client2.destroyed) {
           assert(client2[kPending] === 0);
-          const requests = client2[kQueue].splice(client2[kRunningIdx]);
-          for (let i = 0; i < requests.length; i++) {
-            const request = requests[i];
+          const requests2 = client2[kQueue].splice(client2[kRunningIdx]);
+          for (let i = 0; i < requests2.length; i++) {
+            const request = requests2[i];
             util2.errorRequest(client2, request, err3);
           }
         }
@@ -31323,10 +31198,10 @@ var require_client_h2 = __commonJS({
           cb();
         }
       }
-      const waitForDrain = () => new Promise((resolve3, reject) => {
+      const waitForDrain = () => new Promise((resolve3, reject2) => {
         assert(callback === null);
         if (socket[kError]) {
-          reject(socket[kError]);
+          reject2(socket[kError]);
         } else {
           callback = resolve3;
         }
@@ -31816,9 +31691,9 @@ var require_client = __commonJS({
       }
       async [kDestroy](err3) {
         return new Promise((resolve3) => {
-          const requests = this[kQueue].splice(this[kPendingIdx]);
-          for (let i = 0; i < requests.length; i++) {
-            const request = requests[i];
+          const requests2 = this[kQueue].splice(this[kPendingIdx]);
+          for (let i = 0; i < requests2.length; i++) {
+            const request = requests2[i];
             util2.errorRequest(this, request, err3);
           }
           const callback = () => {
@@ -31842,9 +31717,9 @@ var require_client = __commonJS({
     function onError(client, err3) {
       if (client[kRunning] === 0 && err3.code !== "UND_ERR_INFO" && err3.code !== "UND_ERR_SOCKET") {
         assert(client[kPendingIdx] === client[kRunningIdx]);
-        const requests = client[kQueue].splice(client[kRunningIdx]);
-        for (let i = 0; i < requests.length; i++) {
-          const request = requests[i];
+        const requests2 = client[kQueue].splice(client[kRunningIdx]);
+        for (let i = 0; i < requests2.length; i++) {
+          const request = requests2[i];
           util2.errorRequest(client, request, err3);
         }
         assert(client[kSize] === 0);
@@ -31877,7 +31752,7 @@ var require_client = __commonJS({
         });
       }
       try {
-        const socket = await new Promise((resolve3, reject) => {
+        const socket = await new Promise((resolve3, reject2) => {
           client[kConnector]({
             host,
             hostname,
@@ -31887,7 +31762,7 @@ var require_client = __commonJS({
             localAddress: client[kLocalAddress]
           }, (err3, socket2) => {
             if (err3) {
-              reject(err3);
+              reject2(err3);
             } else {
               resolve3(socket2);
             }
@@ -33469,7 +33344,7 @@ var require_readable = __commonJS({
         if (this._readableState.closeEmitted) {
           return null;
         }
-        return await new Promise((resolve3, reject) => {
+        return await new Promise((resolve3, reject2) => {
           if (this[kContentLength] > limit) {
             this.destroy(new AbortError());
           }
@@ -33480,7 +33355,7 @@ var require_readable = __commonJS({
           this.on("close", function() {
             signal?.removeEventListener("abort", onAbort);
             if (signal?.aborted) {
-              reject(signal.reason ?? new AbortError());
+              reject2(signal.reason ?? new AbortError());
             } else {
               resolve3(null);
             }
@@ -33501,17 +33376,17 @@ var require_readable = __commonJS({
     }
     async function consume(stream2, type) {
       assert(!stream2[kConsume]);
-      return new Promise((resolve3, reject) => {
+      return new Promise((resolve3, reject2) => {
         if (isUnusable(stream2)) {
           const rState = stream2._readableState;
           if (rState.destroyed && rState.closeEmitted === false) {
             stream2.on("error", (err3) => {
-              reject(err3);
+              reject2(err3);
             }).on("close", () => {
-              reject(new TypeError("unusable"));
+              reject2(new TypeError("unusable"));
             });
           } else {
-            reject(rState.errored ?? new TypeError("unusable"));
+            reject2(rState.errored ?? new TypeError("unusable"));
           }
         } else {
           queueMicrotask(() => {
@@ -33519,7 +33394,7 @@ var require_readable = __commonJS({
               type,
               stream: stream2,
               resolve: resolve3,
-              reject,
+              reject: reject2,
               length: 0,
               body: []
             };
@@ -33856,9 +33731,9 @@ var require_api_request = __commonJS({
     };
     function request(opts, callback) {
       if (callback === void 0) {
-        return new Promise((resolve3, reject) => {
+        return new Promise((resolve3, reject2) => {
           request.call(this, opts, (err3, data) => {
-            return err3 ? reject(err3) : resolve3(data);
+            return err3 ? reject2(err3) : resolve3(data);
           });
         });
       }
@@ -34081,9 +33956,9 @@ var require_api_stream = __commonJS({
     };
     function stream2(opts, factory, callback) {
       if (callback === void 0) {
-        return new Promise((resolve3, reject) => {
+        return new Promise((resolve3, reject2) => {
           stream2.call(this, opts, factory, (err3, data) => {
-            return err3 ? reject(err3) : resolve3(data);
+            return err3 ? reject2(err3) : resolve3(data);
           });
         });
       }
@@ -34368,9 +34243,9 @@ var require_api_upgrade = __commonJS({
     };
     function upgrade(opts, callback) {
       if (callback === void 0) {
-        return new Promise((resolve3, reject) => {
+        return new Promise((resolve3, reject2) => {
           upgrade.call(this, opts, (err3, data) => {
-            return err3 ? reject(err3) : resolve3(data);
+            return err3 ? reject2(err3) : resolve3(data);
           });
         });
       }
@@ -34462,9 +34337,9 @@ var require_api_connect = __commonJS({
     };
     function connect(opts, callback) {
       if (callback === void 0) {
-        return new Promise((resolve3, reject) => {
+        return new Promise((resolve3, reject2) => {
           connect.call(this, opts, (err3, data) => {
-            return err3 ? reject(err3) : resolve3(data);
+            return err3 ? reject2(err3) : resolve3(data);
           });
         });
       }
@@ -37504,7 +37379,7 @@ var require_fetch = __commonJS({
     function handleFetchDone(response) {
       finalizeAndReportTiming(response, "fetch");
     }
-    function fetch4(input, init = void 0) {
+    function fetch5(input, init = void 0) {
       webidl.argumentLengthCheck(arguments, 1, "globalThis.fetch");
       let p2 = createDeferredPromise();
       let requestObject;
@@ -38326,7 +38201,7 @@ var require_fetch = __commonJS({
       function dispatch({ body }) {
         const url = requestCurrentURL(request);
         const agent = fetchParams.controller.dispatcher;
-        return new Promise((resolve3, reject) => agent.dispatch(
+        return new Promise((resolve3, reject2) => agent.dispatch(
           {
             path: url.pathname + url.search,
             origin: url.origin,
@@ -38357,21 +38232,21 @@ var require_fetch = __commonJS({
               if (status < 200) {
                 return;
               }
-              let location = "";
+              let location2 = "";
               const headersList = new HeadersList();
               for (let i = 0; i < rawHeaders.length; i += 2) {
                 headersList.append(bufferToLowerCasedHeaderName(rawHeaders[i]), rawHeaders[i + 1].toString("latin1"), true);
               }
-              location = headersList.get("location", true);
+              location2 = headersList.get("location", true);
               this.body = new Readable3({ read: resume });
               const decoders = [];
-              const willFollow = location && request.redirect === "follow" && redirectStatusSet.has(status);
+              const willFollow = location2 && request.redirect === "follow" && redirectStatusSet.has(status);
               if (request.method !== "HEAD" && request.method !== "CONNECT" && !nullBodyStatus.includes(status) && !willFollow) {
                 const contentEncoding = headersList.get("content-encoding", true);
                 const codings = contentEncoding ? contentEncoding.toLowerCase().split(",") : [];
                 const maxContentEncodings = 5;
                 if (codings.length > maxContentEncodings) {
-                  reject(new Error(`too many content-encodings in response: ${codings.length}, maximum allowed is ${maxContentEncodings}`));
+                  reject2(new Error(`too many content-encodings in response: ${codings.length}, maximum allowed is ${maxContentEncodings}`));
                   return true;
                 }
                 for (let i = codings.length - 1; i >= 0; --i) {
@@ -38438,7 +38313,7 @@ var require_fetch = __commonJS({
               }
               this.body?.destroy(error2);
               fetchParams.controller.terminate(error2);
-              reject(error2);
+              reject2(error2);
             },
             onUpgrade(status, rawHeaders, socket) {
               if (status !== 101) {
@@ -38461,7 +38336,7 @@ var require_fetch = __commonJS({
       }
     }
     module.exports = {
-      fetch: fetch4,
+      fetch: fetch5,
       Fetch,
       fetching,
       finalizeAndReportTiming
@@ -39373,17 +39248,17 @@ var require_cache = __commonJS({
         const prefix = "Cache.add";
         webidl.argumentLengthCheck(arguments, 1, prefix);
         request = webidl.converters.RequestInfo(request, prefix, "request");
-        const requests = [request];
-        const responseArrayPromise = this.addAll(requests);
+        const requests2 = [request];
+        const responseArrayPromise = this.addAll(requests2);
         return await responseArrayPromise;
       }
-      async addAll(requests) {
+      async addAll(requests2) {
         webidl.brandCheck(this, _Cache);
         const prefix = "Cache.addAll";
         webidl.argumentLengthCheck(arguments, 1, prefix);
         const responsePromises = [];
         const requestList = [];
-        for (let request of requests) {
+        for (let request of requests2) {
           if (request === void 0) {
             throw webidl.errors.conversionFailed({
               prefix,
@@ -39404,7 +39279,7 @@ var require_cache = __commonJS({
           }
         }
         const fetchControllers = [];
-        for (const request of requests) {
+        for (const request of requests2) {
           const r = new Request2(request)[kState];
           if (!urlIsHttpHttpsScheme(r.url)) {
             throw webidl.errors.exception({
@@ -39626,20 +39501,20 @@ var require_cache = __commonJS({
           }
         }
         const promise = createDeferredPromise();
-        const requests = [];
+        const requests2 = [];
         if (request === void 0) {
           for (const requestResponse of this.#relevantRequestResponseList) {
-            requests.push(requestResponse[0]);
+            requests2.push(requestResponse[0]);
           }
         } else {
           const requestResponses = this.#queryCache(r, options);
           for (const requestResponse of requestResponses) {
-            requests.push(requestResponse[0]);
+            requests2.push(requestResponse[0]);
           }
         }
         queueMicrotask(() => {
           const requestList = [];
-          for (const request2 of requests) {
+          for (const request2 of requests2) {
             const requestObject = fromInnerRequest(
               request2,
               new AbortController().signal,
@@ -40982,13 +40857,13 @@ var require_frame = __commonJS({
     "use strict";
     var { maxUnsigned16Bit } = require_constants5();
     var BUFFER_SIZE = 16386;
-    var crypto2;
+    var crypto3;
     var buffer = null;
     var bufIdx = BUFFER_SIZE;
     try {
-      crypto2 = __require("node:crypto");
+      crypto3 = __require("node:crypto");
     } catch {
-      crypto2 = {
+      crypto3 = {
         // not full compatibility, but minimum.
         randomFillSync: function randomFillSync(buffer2, _offset, _size) {
           for (let i = 0; i < buffer2.length; ++i) {
@@ -41001,7 +40876,7 @@ var require_frame = __commonJS({
     function generateMask() {
       if (bufIdx === BUFFER_SIZE) {
         bufIdx = 0;
-        crypto2.randomFillSync(buffer ??= Buffer.allocUnsafe(BUFFER_SIZE), 0, BUFFER_SIZE);
+        crypto3.randomFillSync(buffer ??= Buffer.allocUnsafe(BUFFER_SIZE), 0, BUFFER_SIZE);
       }
       return [buffer[bufIdx++], buffer[bufIdx++], buffer[bufIdx++], buffer[bufIdx++]];
     }
@@ -41073,9 +40948,9 @@ var require_connection = __commonJS({
     var { Headers: Headers2, getHeadersList } = require_headers();
     var { getDecodeSplit } = require_util3();
     var { WebsocketFrameSend } = require_frame();
-    var crypto2;
+    var crypto3;
     try {
-      crypto2 = __require("node:crypto");
+      crypto3 = __require("node:crypto");
     } catch {
     }
     function establishWebSocketConnection(url, protocols, client, ws, onEstablish, options) {
@@ -41095,7 +40970,7 @@ var require_connection = __commonJS({
         const headersList = getHeadersList(new Headers2(options.headers));
         request.headersList = headersList;
       }
-      const keyValue = crypto2.randomBytes(16).toString("base64");
+      const keyValue = crypto3.randomBytes(16).toString("base64");
       request.headersList.append("sec-websocket-key", keyValue);
       request.headersList.append("sec-websocket-version", "13");
       for (const protocol of protocols) {
@@ -41125,7 +41000,7 @@ var require_connection = __commonJS({
             return;
           }
           const secWSAccept = response.headersList.get("Sec-WebSocket-Accept");
-          const digest3 = crypto2.createHash("sha1").update(keyValue + uid).digest("base64");
+          const digest3 = crypto3.createHash("sha1").update(keyValue + uid).digest("base64");
           if (secWSAccept !== digest3) {
             failWebsocketConnection(ws, "Incorrect hash received in Sec-WebSocket-Accept header.");
             return;
@@ -42810,7 +42685,7 @@ var require_undici = __commonJS({
     module.exports.setGlobalDispatcher = setGlobalDispatcher;
     module.exports.getGlobalDispatcher = getGlobalDispatcher;
     var fetchImpl = require_fetch().fetch;
-    module.exports.fetch = async function fetch4(init, options = void 0) {
+    module.exports.fetch = async function fetch5(init, options = void 0) {
       try {
         return await fetchImpl(init, options);
       } catch (err3) {
@@ -43058,6 +42933,18 @@ async function resolveBlobAuth(options) {
   }
   throw new BlobError(
     "No blob credentials found. Pass a `token` option, set `BLOB_READ_WRITE_TOKEN`, or use `oidcToken` (or `VERCEL_OIDC_TOKEN`) with `storeId` or `BLOB_STORE_ID`."
+  );
+}
+function getReadWriteBlobTokenFromOptionsOrEnv(options) {
+  if (options == null ? void 0 : options.token) {
+    return options.token;
+  }
+  const readWrite = readEnv("BLOB_READ_WRITE_TOKEN");
+  if (readWrite) {
+    return readWrite;
+  }
+  throw new BlobError(
+    "No read-write token found. Either configure the `BLOB_READ_WRITE_TOKEN` environment variable, or pass a `token` option to your calls."
   );
 }
 function getDownloadUrl(blobUrl) {
@@ -43651,7 +43538,7 @@ function uploadAllParts({
 }) {
   debug("mpu: upload init", "key:", key);
   const internalAbortController = new AbortController();
-  return new Promise((resolve3, reject) => {
+  return new Promise((resolve3, reject2) => {
     const partsToUpload = [];
     const completedParts = [];
     const reader = stream2.getReader();
@@ -43850,9 +43737,9 @@ function uploadAllParts({
       internalAbortController.abort();
       reader.releaseLock();
       if (error2 instanceof TypeError && (error2.message === "Failed to fetch" || error2.message === "fetch failed")) {
-        reject(new BlobServiceNotAvailable());
+        reject2(new BlobServiceNotAvailable());
       } else {
-        reject(error2);
+        reject2(error2);
       }
     }
   });
@@ -43950,7 +43837,7 @@ function createPutMethod({
   getPresignedUrlPayload,
   extraChecks
 }) {
-  return async function put2(pathname, body, optionsInput) {
+  return async function put3(pathname, body, optionsInput) {
     var _a3;
     if (!body) {
       throw new BlobError("body is required");
@@ -44710,7 +44597,7 @@ var init_chunk_YYMLUMXS = __esm({
           body = init.body;
         }
       }
-      return new Promise((resolve3, reject) => {
+      return new Promise((resolve3, reject2) => {
         const xhr = new XMLHttpRequest();
         xhr.open(init.method || "GET", input.toString(), true);
         if (onUploadProgress) {
@@ -44723,7 +44610,7 @@ var init_chunk_YYMLUMXS = __esm({
         xhr.onload = () => {
           var _a3;
           if ((_a3 = init.signal) == null ? void 0 : _a3.aborted) {
-            reject(new DOMException("The user aborted the request.", "AbortError"));
+            reject2(new DOMException("The user aborted the request.", "AbortError"));
             return;
           }
           const headers = new Headers();
@@ -44742,13 +44629,13 @@ var init_chunk_YYMLUMXS = __esm({
           resolve3(response);
         };
         xhr.onerror = () => {
-          reject(new TypeError("Network request failed"));
+          reject2(new TypeError("Network request failed"));
         };
         xhr.ontimeout = () => {
-          reject(new TypeError("Network request timed out"));
+          reject2(new TypeError("Network request timed out"));
         };
         xhr.onabort = () => {
-          reject(new DOMException("The user aborted a request.", "AbortError"));
+          reject2(new DOMException("The user aborted a request.", "AbortError"));
         };
         if (init.headers) {
           const headers = new Headers(init.headers);
@@ -44911,674 +44798,6 @@ var init_chunk_YYMLUMXS = __esm({
     MAX_PRESIGN_IF_MATCH_LENGTH = 256;
     IF_MATCH_CONTROL_CHARS_RE = /[\x00-\x1f\x7f]/;
     utf8Encoder = new TextEncoder();
-  }
-});
-
-// node_modules/@vercel/blob/dist/index.js
-var dist_exports = {};
-__export(dist_exports, {
-  BlobAccessError: () => BlobAccessError,
-  BlobClientTokenExpiredError: () => BlobClientTokenExpiredError,
-  BlobContentTypeNotAllowedError: () => BlobContentTypeNotAllowedError,
-  BlobError: () => BlobError,
-  BlobFileTooLargeError: () => BlobFileTooLargeError,
-  BlobNotFoundError: () => BlobNotFoundError,
-  BlobPathnameMismatchError: () => BlobPathnameMismatchError,
-  BlobPreconditionFailedError: () => BlobPreconditionFailedError,
-  BlobRequestAbortedError: () => BlobRequestAbortedError,
-  BlobServiceNotAvailable: () => BlobServiceNotAvailable,
-  BlobServiceRateLimited: () => BlobServiceRateLimited,
-  BlobStoreNotFoundError: () => BlobStoreNotFoundError,
-  BlobStoreSuspendedError: () => BlobStoreSuspendedError,
-  BlobUnknownError: () => BlobUnknownError,
-  completeMultipartUpload: () => completeMultipartUpload2,
-  copy: () => copy,
-  createFolder: () => createFolder,
-  createMultipartUpload: () => createMultipartUpload2,
-  createMultipartUploader: () => createMultipartUploader,
-  del: () => del,
-  get: () => get,
-  getDownloadUrl: () => getDownloadUrl,
-  head: () => head,
-  issueSignedToken: () => issueSignedToken,
-  list: () => list,
-  parseStoreIdFromDelegationToken: () => parseStoreIdFromDelegationToken,
-  parseStoreIdFromPresignedUrl: () => parseStoreIdFromPresignedUrl,
-  presignUrl: () => presignUrl,
-  put: () => put,
-  putFromUrl: () => putFromUrl,
-  putImage: () => putImage,
-  rename: () => rename,
-  uploadPart: () => uploadPart2
-});
-async function del(urlOrPathname, options) {
-  const urls = Array.isArray(urlOrPathname) ? urlOrPathname : [urlOrPathname];
-  if ((options == null ? void 0 : options.ifMatch) && urls.length > 1) {
-    throw new BlobError("ifMatch can only be used when deleting a single URL.");
-  }
-  const headers = {
-    "content-type": "application/json"
-  };
-  if (options == null ? void 0 : options.ifMatch) {
-    headers["x-if-match"] = options.ifMatch;
-  }
-  await requestApi(
-    "/delete",
-    {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ urls }),
-      signal: options == null ? void 0 : options.abortSignal
-    },
-    options
-  );
-}
-async function head(urlOrPathname, options) {
-  const searchParams = new URLSearchParams({ url: urlOrPathname });
-  const response = await requestApi(
-    `?${searchParams.toString()}`,
-    // HEAD can't have body as a response, so we use GET
-    {
-      method: "GET",
-      signal: options == null ? void 0 : options.abortSignal
-    },
-    options
-  );
-  return {
-    url: response.url,
-    downloadUrl: response.downloadUrl,
-    pathname: response.pathname,
-    size: response.size,
-    contentType: response.contentType,
-    contentDisposition: response.contentDisposition,
-    cacheControl: response.cacheControl,
-    uploadedAt: new Date(response.uploadedAt),
-    etag: response.etag
-  };
-}
-function extractPathnameFromUrl(url) {
-  try {
-    const parsedUrl = new URL(url);
-    return parsedUrl.pathname.slice(1);
-  } catch {
-    return url;
-  }
-}
-async function get(urlOrPathname, options) {
-  if (!urlOrPathname) {
-    throw new BlobError("url or pathname is required");
-  }
-  if (!options) {
-    throw new BlobError("missing options, see usage");
-  }
-  if (options.access !== "public" && options.access !== "private") {
-    throw new BlobError(
-      'access must be "private" or "public", see https://vercel.com/docs/vercel-blob'
-    );
-  }
-  const auth = await resolveBlobAuth(options);
-  if (auth.kind === "presigned") {
-    throw new BlobError("Presigned URLs are not supported for the get method");
-  }
-  let blobUrl;
-  let pathname;
-  const access = options.access;
-  if (isUrl(urlOrPathname)) {
-    blobUrl = urlOrPathname;
-    pathname = extractPathnameFromUrl(urlOrPathname);
-    try {
-      const { hostname } = new URL(blobUrl);
-      if (!hostname.endsWith(".blob.vercel-storage.com")) {
-        throw new BlobError(
-          "Invalid URL: the URL does not point to a Vercel Blob store. Use a pathname instead, see https://vercel.com/docs/vercel-blob"
-        );
-      }
-    } catch (error2) {
-      if (error2 instanceof BlobError) throw error2;
-      throw new BlobError("Invalid URL: unable to parse the provided URL");
-    }
-  } else {
-    if (!auth.storeId) {
-      throw new BlobError("Invalid token: unable to extract store ID");
-    }
-    pathname = urlOrPathname;
-    blobUrl = constructBlobUrl(auth.storeId, pathname, access);
-  }
-  const requestHeaders = {
-    ...options.ifNoneMatch ? { "If-None-Match": options.ifNoneMatch } : {},
-    authorization: `Bearer ${auth.token}`,
-    ...options.headers
-    // low-level escape hatch, applied last to override anything
-  };
-  let fetchUrl = blobUrl;
-  if (options.useCache === false && access === "private") {
-    const url = new URL(blobUrl);
-    url.searchParams.set("cache", "0");
-    fetchUrl = url.toString();
-  }
-  const response = await (0, import_undici2.fetch)(fetchUrl, {
-    method: "GET",
-    headers: requestHeaders,
-    signal: options.abortSignal
-  });
-  if (response.status === 304) {
-    const downloadUrlObj = new URL(blobUrl);
-    downloadUrlObj.searchParams.set("download", "1");
-    const lastModified2 = response.headers.get("last-modified");
-    return {
-      statusCode: 304,
-      stream: null,
-      headers: response.headers,
-      blob: {
-        url: blobUrl,
-        downloadUrl: downloadUrlObj.toString(),
-        pathname,
-        contentType: null,
-        contentDisposition: response.headers.get("content-disposition") || "",
-        cacheControl: response.headers.get("cache-control") || "",
-        size: null,
-        uploadedAt: lastModified2 ? new Date(lastModified2) : /* @__PURE__ */ new Date(),
-        etag: response.headers.get("etag") || ""
-      }
-    };
-  }
-  if (response.status === 404) {
-    return null;
-  }
-  if (!response.ok) {
-    throw new BlobError(
-      `Failed to fetch blob: ${response.status} ${response.statusText}`
-    );
-  }
-  const stream2 = response.body;
-  if (!stream2) {
-    throw new BlobError("Response body is null");
-  }
-  const contentLength = response.headers.get("content-length");
-  const lastModified = response.headers.get("last-modified");
-  const downloadUrl = new URL(blobUrl);
-  downloadUrl.searchParams.set("download", "1");
-  return {
-    statusCode: 200,
-    stream: stream2,
-    headers: response.headers,
-    blob: {
-      url: blobUrl,
-      downloadUrl: downloadUrl.toString(),
-      pathname,
-      contentType: response.headers.get("content-type") || "application/octet-stream",
-      contentDisposition: response.headers.get("content-disposition") || "",
-      cacheControl: response.headers.get("cache-control") || "",
-      size: contentLength ? parseInt(contentLength, 10) : 0,
-      uploadedAt: lastModified ? new Date(lastModified) : /* @__PURE__ */ new Date(),
-      etag: response.headers.get("etag") || ""
-    }
-  };
-}
-async function list(options) {
-  var _a3;
-  const searchParams = new URLSearchParams();
-  if (options == null ? void 0 : options.limit) {
-    searchParams.set("limit", options.limit.toString());
-  }
-  if (options == null ? void 0 : options.prefix) {
-    searchParams.set("prefix", options.prefix);
-  }
-  if (options == null ? void 0 : options.cursor) {
-    searchParams.set("cursor", options.cursor);
-  }
-  if (options == null ? void 0 : options.mode) {
-    searchParams.set("mode", options.mode);
-  }
-  const response = await requestApi(
-    `?${searchParams.toString()}`,
-    {
-      method: "GET",
-      signal: options == null ? void 0 : options.abortSignal
-    },
-    options
-  );
-  if ((options == null ? void 0 : options.mode) === "folded") {
-    return {
-      folders: (_a3 = response.folders) != null ? _a3 : [],
-      cursor: response.cursor,
-      hasMore: response.hasMore,
-      blobs: response.blobs.map(mapBlobResult)
-    };
-  }
-  return {
-    cursor: response.cursor,
-    hasMore: response.hasMore,
-    blobs: response.blobs.map(mapBlobResult)
-  };
-}
-function mapBlobResult(blobResult) {
-  return {
-    url: blobResult.url,
-    downloadUrl: blobResult.downloadUrl,
-    pathname: blobResult.pathname,
-    size: blobResult.size,
-    uploadedAt: new Date(blobResult.uploadedAt),
-    etag: blobResult.etag
-  };
-}
-async function copy(fromUrlOrPathname, toPathname, options) {
-  if (!options) {
-    throw new BlobError("missing options, see usage");
-  }
-  if (options.access !== "public" && options.access !== "private") {
-    throw new BlobError(
-      'access must be "private" or "public", see https://vercel.com/docs/vercel-blob'
-    );
-  }
-  if (toPathname.length > MAXIMUM_PATHNAME_LENGTH) {
-    throw new BlobError(
-      `pathname is too long, maximum length is ${MAXIMUM_PATHNAME_LENGTH}`
-    );
-  }
-  for (const invalidCharacter of disallowedPathnameCharacters) {
-    if (toPathname.includes(invalidCharacter)) {
-      throw new BlobError(
-        `pathname cannot contain "${invalidCharacter}", please encode it if needed`
-      );
-    }
-  }
-  const headers = {};
-  headers["x-vercel-blob-access"] = options.access;
-  if (options.addRandomSuffix !== void 0) {
-    headers["x-add-random-suffix"] = options.addRandomSuffix ? "1" : "0";
-  }
-  if (options.allowOverwrite !== void 0) {
-    headers["x-allow-overwrite"] = options.allowOverwrite ? "1" : "0";
-  }
-  if (options.contentType) {
-    headers["x-content-type"] = options.contentType;
-  }
-  if (options.cacheControlMaxAge !== void 0) {
-    headers["x-cache-control-max-age"] = options.cacheControlMaxAge.toString();
-  }
-  if (options.ifMatch) {
-    headers["x-if-match"] = options.ifMatch;
-  }
-  const params = new URLSearchParams({
-    pathname: toPathname,
-    fromUrl: fromUrlOrPathname
-  });
-  const response = await requestApi(
-    `?${params.toString()}`,
-    {
-      method: "PUT",
-      headers,
-      signal: options.abortSignal
-    },
-    options
-  );
-  return {
-    url: response.url,
-    downloadUrl: response.downloadUrl,
-    pathname: response.pathname,
-    contentType: response.contentType,
-    contentDisposition: response.contentDisposition,
-    etag: response.etag
-  };
-}
-async function rename(fromUrlOrPathname, toPathname, options) {
-  if (!options) {
-    throw new BlobError("missing options, see usage");
-  }
-  if (options.access !== "public" && options.access !== "private") {
-    throw new BlobError(
-      'access must be "private" or "public", see https://vercel.com/docs/vercel-blob'
-    );
-  }
-  if (toPathname.length > MAXIMUM_PATHNAME_LENGTH) {
-    throw new BlobError(
-      `pathname is too long, maximum length is ${MAXIMUM_PATHNAME_LENGTH}`
-    );
-  }
-  for (const invalidCharacter of disallowedPathnameCharacters) {
-    if (toPathname.includes(invalidCharacter)) {
-      throw new BlobError(
-        `pathname cannot contain "${invalidCharacter}", please encode it if needed`
-      );
-    }
-  }
-  const headers = {};
-  headers["x-vercel-blob-access"] = options.access;
-  if (options.addRandomSuffix !== void 0) {
-    headers["x-add-random-suffix"] = options.addRandomSuffix ? "1" : "0";
-  }
-  if (options.allowOverwrite !== void 0) {
-    headers["x-allow-overwrite"] = options.allowOverwrite ? "1" : "0";
-  }
-  if (options.contentType) {
-    headers["x-content-type"] = options.contentType;
-  }
-  if (options.cacheControlMaxAge !== void 0) {
-    headers["x-cache-control-max-age"] = options.cacheControlMaxAge.toString();
-  }
-  if (options.ifMatch) {
-    headers["x-if-match"] = options.ifMatch;
-  }
-  const params = new URLSearchParams({
-    pathname: toPathname,
-    fromUrl: fromUrlOrPathname
-  });
-  const response = await requestApi(
-    `/rename?${params.toString()}`,
-    {
-      method: "POST",
-      headers,
-      signal: options.abortSignal
-    },
-    options
-  );
-  return {
-    url: response.url,
-    downloadUrl: response.downloadUrl,
-    pathname: response.pathname,
-    contentType: response.contentType,
-    contentDisposition: response.contentDisposition,
-    etag: response.etag
-  };
-}
-function toPutBlobResult(response) {
-  return {
-    url: response.url,
-    downloadUrl: response.downloadUrl,
-    pathname: response.pathname,
-    contentType: response.contentType,
-    contentDisposition: response.contentDisposition,
-    etag: response.etag
-  };
-}
-async function putImage(pathname, bodyOrUrl, options) {
-  if (!(options == null ? void 0 : options.optimizeImage)) {
-    throw new BlobError("optimizeImage is required, see usage");
-  }
-  const { optimizeImage } = options;
-  if (bodyOrUrl instanceof URL) {
-    if (bodyOrUrl.protocol !== "http:" && bodyOrUrl.protocol !== "https:") {
-      throw new BlobError("the source URL must use the http(s) protocol");
-    }
-    const putOptions2 = await createPutOptions({ pathname, options });
-    const headers2 = createPutHeaders(
-      ["cacheControlMaxAge", "addRandomSuffix", "allowOverwrite", "ifMatch"],
-      putOptions2
-    );
-    const params2 = new URLSearchParams({
-      pathname,
-      url: bodyOrUrl.toString()
-    });
-    addOptimizeImageParams(params2, optimizeImage);
-    const response2 = await requestApi(
-      `/put-from-url?${params2.toString()}`,
-      {
-        method: "POST",
-        headers: headers2,
-        signal: putOptions2.abortSignal
-      },
-      putOptions2
-    );
-    return toPutBlobResult(response2);
-  }
-  if (!bodyOrUrl) {
-    throw new BlobError("body is required");
-  }
-  if (isPlainObject(bodyOrUrl)) {
-    throw new BlobError(
-      "Body must be a string, buffer or stream. You sent a plain JavaScript object, double check what you're trying to upload."
-    );
-  }
-  const putOptions = await createPutOptions({ pathname, options });
-  const headers = createPutHeaders(
-    ["cacheControlMaxAge", "addRandomSuffix", "allowOverwrite", "ifMatch"],
-    putOptions
-  );
-  validateOptimizeImageSourceContentType(
-    typeof Blob !== "undefined" && bodyOrUrl instanceof Blob ? bodyOrUrl.type : void 0
-  );
-  const params = new URLSearchParams({ pathname });
-  addOptimizeImageParams(params, optimizeImage);
-  const response = await requestApi(
-    `/put-optimized?${params.toString()}`,
-    {
-      method: "POST",
-      body: bodyOrUrl,
-      headers,
-      signal: putOptions.abortSignal
-    },
-    putOptions
-  );
-  return toPutBlobResult(response);
-}
-async function putFromUrl(pathname, url, options) {
-  const putOptions = await createPutOptions({ pathname, options });
-  if (!url) {
-    throw new BlobError("url is required");
-  }
-  if (!putOptions.optimizeImage) {
-    throw new BlobError("optimizeImage is required, see usage");
-  }
-  const headers = createPutHeaders(
-    ["cacheControlMaxAge", "addRandomSuffix", "allowOverwrite", "ifMatch"],
-    putOptions
-  );
-  const params = new URLSearchParams({ pathname, url });
-  addOptimizeImageParams(params, putOptions.optimizeImage);
-  const response = await requestApi(
-    `/put-from-url?${params.toString()}`,
-    {
-      method: "POST",
-      headers,
-      signal: putOptions.abortSignal
-    },
-    putOptions
-  );
-  return {
-    url: response.url,
-    downloadUrl: response.downloadUrl,
-    pathname: response.pathname,
-    contentType: response.contentType,
-    contentDisposition: response.contentDisposition,
-    etag: response.etag
-  };
-}
-var import_undici2, put, createMultipartUpload2, createMultipartUploader, uploadPart2, completeMultipartUpload2;
-var init_dist = __esm({
-  "node_modules/@vercel/blob/dist/index.js"() {
-    init_chunk_YYMLUMXS();
-    import_undici2 = __toESM(require_undici(), 1);
-    put = createPutMethod({
-      allowedOptions: [
-        "cacheControlMaxAge",
-        "addRandomSuffix",
-        "allowOverwrite",
-        "contentType",
-        "ifMatch"
-      ]
-    });
-    createMultipartUpload2 = createCreateMultipartUploadMethod({
-      allowedOptions: [
-        "cacheControlMaxAge",
-        "addRandomSuffix",
-        "allowOverwrite",
-        "contentType",
-        "ifMatch"
-      ]
-    });
-    createMultipartUploader = createCreateMultipartUploaderMethod({
-      allowedOptions: [
-        "cacheControlMaxAge",
-        "addRandomSuffix",
-        "allowOverwrite",
-        "contentType",
-        "ifMatch"
-      ]
-    });
-    uploadPart2 = createUploadPartMethod({
-      allowedOptions: [
-        "cacheControlMaxAge",
-        "addRandomSuffix",
-        "allowOverwrite",
-        "contentType"
-      ]
-    });
-    completeMultipartUpload2 = createCompleteMultipartUploadMethod({
-      allowedOptions: [
-        "cacheControlMaxAge",
-        "addRandomSuffix",
-        "allowOverwrite",
-        "contentType"
-      ]
-    });
-  }
-});
-
-// server/storage.ts
-var storage_exports = {};
-__export(storage_exports, {
-  deleteFile: () => deleteFile,
-  deletionPath: () => deletionPath,
-  listObjects: () => listObjects,
-  putFile: () => putFile,
-  putObject: () => putObject,
-  readFileStream: () => readFileStream,
-  readObject: () => readObject,
-  readStoredFile: () => readStoredFile,
-  removeStoredFile: () => removeStoredFile,
-  replaceStoredFile: () => replaceStoredFile,
-  storageWasDeleted: () => storageWasDeleted
-});
-import { randomBytes as randomBytes2, createHash as createHash2 } from "node:crypto";
-import { fileURLToPath } from "node:url";
-import { join, dirname, basename, resolve } from "node:path";
-import { mkdir, writeFile, readFile, unlink, readdir, rename as rename2, link } from "node:fs/promises";
-async function putObject(path, bytes2, overwrite = false) {
-  checkDeadline();
-  if (env.BLOB_READ_WRITE_TOKEN) {
-    const { put: put2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
-    return (await put2(path, bytes2, { access: "private", contentType: "application/octet-stream", addRandomSuffix: false, allowOverwrite: overwrite, token: env.BLOB_READ_WRITE_TOKEN, ...Number.isFinite(activeDeadline()) ? { abortSignal: ioSignal() } : {} })).url;
-  }
-  if (env.isProd) throw new Error("BLOB_READ_WRITE_TOKEN is required");
-  const localRoot = resolve(root()), p2 = join(localRoot, path);
-  const scratchDir = join(dirname(localRoot), `.${basename(localRoot)}-pending`);
-  await mkdir(dirname(p2), { recursive: true });
-  await mkdir(scratchDir, { recursive: true });
-  const scratch = join(scratchDir, randomBytes2(24).toString("hex"));
-  let failed = false;
-  let failure;
-  try {
-    await writeFile(scratch, bytes2, { flag: "wx" });
-    checkDeadline();
-    if (overwrite) await rename2(scratch, p2);
-    else await link(scratch, p2);
-  } catch (e) {
-    failed = true;
-    failure = e;
-  }
-  try {
-    await unlink(scratch);
-  } catch (e) {
-    if (e.code !== "ENOENT" && !failed) {
-      failed = true;
-      failure = e;
-    }
-  }
-  if (failed) throw failure;
-  return `dev:${path}`;
-}
-async function readObject(key) {
-  checkDeadline();
-  if (key.startsWith("dev:") || !env.BLOB_READ_WRITE_TOKEN) {
-    if (env.isProd) throw new Error("Private storage is not configured");
-    try {
-      return await readFile(join(root(), key.replace(/^dev:/, "")));
-    } catch (e) {
-      if (e.code === "ENOENT") return null;
-      throw e;
-    }
-  }
-  const { get: get2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
-  const r = await get2(key, { access: "private", token: env.BLOB_READ_WRITE_TOKEN, useCache: false, ...Number.isFinite(activeDeadline()) ? { abortSignal: ioSignal() } : {} });
-  if (!r) return null;
-  if (r.statusCode !== 200) throw new Error(`Storage read returned ${r.statusCode}`);
-  return Buffer.from(await new Response(r.stream).arrayBuffer());
-}
-async function listObjects(prefix) {
-  if (env.BLOB_READ_WRITE_TOKEN) {
-    const { list: list2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
-    let cursor;
-    const keys = [];
-    do {
-      const r = await list2({ prefix, cursor, token: env.BLOB_READ_WRITE_TOKEN });
-      keys.push(...r.blobs.map((b2) => b2.url));
-      cursor = r.hasMore ? r.cursor : void 0;
-    } while (cursor);
-    return keys;
-  }
-  if (env.isProd) throw new Error("Private storage is not configured");
-  try {
-    return (await readdir(join(root(), prefix))).map((n) => `dev:${prefix}${n}`);
-  } catch (e) {
-    if (e.code === "ENOENT") return [];
-    throw e;
-  }
-}
-async function putFile(filename, data, _contentType, sensitive = false) {
-  const bytes2 = Buffer.from(data), stored = sensitive ? seal(bytes2) : bytes2;
-  const key = `${randomBytes2(12).toString("hex")}-${filename.replace(/[^\w.-]+/g, "_")}${sensitive ? ".encrypted" : ""}`;
-  return { storageKey: await putObject(env.BLOB_READ_WRITE_TOKEN ? `docs/${key}` : key, stored), sizeBytes: bytes2.length };
-}
-async function removeStoredFile(key) {
-  checkDeadline();
-  if (key.startsWith("dev:")) {
-    try {
-      await unlink(join(root(), key.slice(4)));
-    } catch (e) {
-      if (e.code !== "ENOENT") throw e;
-    }
-    return;
-  }
-  const { del: del2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
-  await del2(key, { token: env.BLOB_READ_WRITE_TOKEN, ...Number.isFinite(activeDeadline()) ? { abortSignal: ioSignal() } : {} });
-}
-async function deleteFile(key) {
-  try {
-    await removeStoredFile(key);
-  } catch (e) {
-    console.error("[storage] delete failed:", e);
-  }
-}
-async function storageWasDeleted(key) {
-  return await readObject(deletionPath(key)) !== null;
-}
-async function readStoredFile(key) {
-  if (await storageWasDeleted(key)) throw new Error("This document has been deleted");
-  const data = await readObject(key);
-  if (!data) throw new Error("Stored document is missing");
-  if (key.endsWith(".encrypted") && !isEncrypted(data)) throw new Error("Encrypted document envelope is missing");
-  return data;
-}
-async function readFileStream(key) {
-  const data = await readStoredFile(key);
-  return isEncrypted(data) ? unseal(data) : data;
-}
-async function replaceStoredFile(key, data) {
-  const path = key.startsWith("dev:") ? key.slice(4) : new URL(key).pathname.slice(1);
-  await putObject(path, data, true);
-  const got = await readObject(key);
-  if (!got?.equals(data)) throw new Error("Stored replacement failed byte verification");
-}
-var root, digest, deletionPath;
-var init_storage = __esm({
-  "server/storage.ts"() {
-    init_operation_deadline();
-    init_env();
-    init_encryption();
-    root = () => process.env.DEV_STORAGE_DIR || fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
-    digest = (s) => createHash2("sha256").update(s).digest("hex");
-    deletionPath = (key) => `deletions/${digest(key)}.json`;
   }
 });
 
@@ -45919,6 +45138,75 @@ var init_series_format_migration = __esm({
       RETURN purchase_series_unwrap(replace(identifier,marker,''));
     END $$`
     ];
+  }
+});
+
+// server/env.ts
+var OFFLINE, ext, env;
+var init_env = __esm({
+  "server/env.ts"() {
+    OFFLINE = process.env.E2E_OFFLINE === "1";
+    ext = (v2) => OFFLINE ? "" : v2 ?? "";
+    env = {
+      OFFLINE,
+      DATABASE_URL: ext(process.env.DATABASE_URL),
+      SESSION_SECRET: process.env.SESSION_SECRET ?? "dev-only-secret-change-me",
+      SQUARE_APPLICATION_ID: ext(process.env.SQUARE_APPLICATION_ID),
+      SQUARE_ACCESS_TOKEN: ext(process.env.SQUARE_ACCESS_TOKEN),
+      SQUARE_LOCATION_ID: ext(process.env.SQUARE_LOCATION_ID),
+      SQUARE_ENV: process.env.SQUARE_ENV === "production" ? "production" : "sandbox",
+      SQUARE_WEBHOOK_SIGNATURE_KEY: ext(process.env.SQUARE_WEBHOOK_SIGNATURE_KEY),
+      RESEND_API_KEY: ext(process.env.RESEND_API_KEY),
+      MAIL_FROM: process.env.MAIL_FROM ?? "MyFloridaSeriesLLC <onboarding@resend.dev>",
+      ADMIN_NOTIFY_EMAIL: process.env.ADMIN_NOTIFY_EMAIL ?? "",
+      ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
+      /** Shared secret for scheduled maintenance jobs. Required in production. */
+      CRON_SECRET: process.env.CRON_SECRET ?? "",
+      // Dropbox app-folder credentials for the nightly client-file mirror.
+      DROPBOX_APP_KEY: ext(process.env.DROPBOX_APP_KEY),
+      DROPBOX_APP_SECRET: ext(process.env.DROPBOX_APP_SECRET),
+      DROPBOX_REFRESH_TOKEN: ext(process.env.DROPBOX_REFRESH_TOKEN),
+      BLOB_READ_WRITE_TOKEN: ext(process.env.BLOB_READ_WRITE_TOKEN),
+      SMARTY_AUTH_ID: ext(process.env.SMARTY_AUTH_ID),
+      SMARTY_AUTH_TOKEN: ext(process.env.SMARTY_AUTH_TOKEN),
+      /** Public origin for links in emails and Square redirects. */
+      PUBLIC_BASE_URL: process.env.PUBLIC_BASE_URL ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:8000"),
+      isProd: !!process.env.VERCEL
+    };
+  }
+});
+
+// server/operation-deadline.ts
+import { AsyncLocalStorage } from "node:async_hooks";
+function checkDeadline(deadline = activeDeadline()) {
+  if (Date.now() >= deadline) throw new DOMException("Operation deadline reached", "TimeoutError");
+}
+function ioSignal(maxMs = 2e4, deadline = activeDeadline()) {
+  checkDeadline(deadline);
+  return AbortSignal.timeout(Math.max(1, Math.min(maxMs, deadline - Date.now())));
+}
+async function withDeadline(deadline, work) {
+  const until = Math.min(deadline, activeDeadline());
+  checkDeadline(until);
+  return deadlines.run(until, async () => {
+    const result = await work();
+    checkDeadline(until);
+    return result;
+  });
+}
+function providerFailure(response, action) {
+  const error2 = new Error(`${action} failed (${response.status})`);
+  if (response.status === 429 || response.status === 503) {
+    const header = response.headers.get("retry-after"), seconds = header !== null ? Number(header) : NaN;
+    error2.retryAfterMs = Number.isFinite(seconds) ? Math.max(0, seconds * 1e3) : header && Number.isFinite(Date.parse(header)) ? Math.max(0, Date.parse(header) - Date.now()) : 1e3;
+  }
+  return error2;
+}
+var deadlines, activeDeadline;
+var init_operation_deadline = __esm({
+  "server/operation-deadline.ts"() {
+    deadlines = new AsyncLocalStorage();
+    activeDeadline = () => deadlines.getStore() ?? Infinity;
   }
 });
 
@@ -51168,7 +50456,7 @@ __export(db_exports, {
   DOCUMENT_COMPANY_BACKFILL_STATEMENTS: () => DOCUMENT_COMPANY_BACKFILL_STATEMENTS,
   getDb: () => getDb
 });
-import { createHash as createHash3 } from "node:crypto";
+import { createHash } from "node:crypto";
 async function createDb() {
   if (env.DATABASE_URL) {
     const { neon } = await Promise.resolve().then(() => (init_serverless(), serverless_exports));
@@ -51211,7 +50499,7 @@ async function createDb() {
   };
 }
 function migrationChecksum(statements) {
-  return createHash3("sha256").update(statements.join("\n;;\n")).digest("hex");
+  return createHash("sha256").update(statements.join("\n;;\n")).digest("hex");
 }
 async function initialize() {
   const database = await createDb();
@@ -51749,6 +51037,758 @@ CREATE TABLE IF NOT EXISTS fl_sync_state (
   }
 });
 
+// server/encryption.ts
+import { createCipheriv, createDecipheriv, randomBytes, createHash as createHash2 } from "node:crypto";
+function encryptionKeys() {
+  try {
+    const active = process.env.DOCUMENT_ENCRYPTION_ACTIVE_KEY || "dev";
+    const raw2 = process.env.DOCUMENT_ENCRYPTION_KEYS;
+    if (!raw2) {
+      if (env.isProd && !env.OFFLINE) throw new Error("Document encryption keys are not configured; refusing plaintext storage.");
+      return { active: "dev", keys: { dev: createHash2("sha256").update("offline-document-test-key").digest() } };
+    }
+    const parsed = JSON.parse(raw2), keys = /* @__PURE__ */ Object.create(null);
+    if (!parsed || Array.isArray(parsed) || typeof parsed !== "object") throw new Error("Invalid encryption key configuration");
+    for (const [id, value] of Object.entries(parsed)) {
+      if (!/^[a-zA-Z0-9_-]{1,40}$/.test(id) || typeof value !== "string") throw new Error("Invalid encryption key configuration");
+      const bytes2 = Buffer.from(value, "base64");
+      if (bytes2.length !== 32) throw new Error("Encryption keys must contain 32 random bytes");
+      keys[id] = bytes2;
+    }
+    if (!keys[active]) throw new Error("The active encryption key is missing");
+    return { active, keys };
+  } catch (error2) {
+    throw new EncryptionKeyError(error2 instanceof Error ? error2.message : "Invalid encryption key configuration");
+  }
+}
+function isEncrypted(data) {
+  return data.subarray(0, MAGIC.length).toString() === MAGIC;
+}
+function encryptedKeyId(data) {
+  return isEncrypted(data) ? JSON.parse(data.subarray(MAGIC.length).toString()).key : null;
+}
+function seal(data) {
+  const { active, keys } = encryptionKeys(), iv = randomBytes(12);
+  const cipher = createCipheriv("aes-256-gcm", keys[active], iv);
+  cipher.setAAD(Buffer.from(`${MAGIC}${active}`));
+  const bytes2 = Buffer.concat([cipher.update(data), cipher.final()]);
+  return Buffer.from(MAGIC + JSON.stringify({ key: active, iv: iv.toString("base64"), tag: cipher.getAuthTag().toString("base64"), data: bytes2.toString("base64") }));
+}
+function unseal(data) {
+  if (!isEncrypted(data)) throw new Error("Expected an encrypted document");
+  const p2 = JSON.parse(data.subarray(MAGIC.length).toString()), { keys } = encryptionKeys();
+  if (!keys[p2.key]) throw new EncryptionKeyError(`Required encryption key ${p2.key} is unavailable`);
+  const decipher = createDecipheriv("aes-256-gcm", keys[p2.key], Buffer.from(p2.iv, "base64"));
+  decipher.setAAD(Buffer.from(`${MAGIC}${p2.key}`));
+  decipher.setAuthTag(Buffer.from(p2.tag, "base64"));
+  return Buffer.concat([decipher.update(Buffer.from(p2.data, "base64")), decipher.final()]);
+}
+var MAGIC, EncryptionKeyError;
+var init_encryption = __esm({
+  "server/encryption.ts"() {
+    init_env();
+    MAGIC = "FPSLLC-ENC-1\n";
+    EncryptionKeyError = class extends Error {
+    };
+  }
+});
+
+// src/lib/englishText.ts
+function englishTextError(value) {
+  return UNSUPPORTED.test(value) ? ENGLISH_TEXT_ERROR : null;
+}
+function englishTextProblems(value, path = "") {
+  if (typeof value === "string") return englishTextError(value) ? { [path]: ENGLISH_TEXT_ERROR } : {};
+  if (!value || typeof value !== "object") return {};
+  const result = {};
+  for (const [key, child] of Object.entries(value)) {
+    if (/^(password|newPassword|currentPassword|confirmPassword|nameCheck|token|sourceId|verificationToken|idempotencyKey)$/i.test(key)) continue;
+    Object.assign(result, englishTextProblems(child, path ? `${path}.${key}` : key));
+  }
+  return result;
+}
+function assertEnglishText(value) {
+  const errors = englishTextProblems(value);
+  if (Object.keys(errors).length) throw new InputValidationError(`${ENGLISH_TEXT_ERROR} Fields: ${Object.keys(errors).join(", ")}`);
+}
+var ENGLISH_TEXT_ERROR, UNSUPPORTED, InputValidationError;
+var init_englishText = __esm({
+  "src/lib/englishText.ts"() {
+    ENGLISH_TEXT_ERROR = "Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.";
+    UNSUPPORTED = /[^\x20-\x7E\r\n\t‘’“”–—…•·§©®™£€]/u;
+    InputValidationError = class extends Error {
+    };
+  }
+});
+
+// node_modules/@vercel/blob/dist/index.js
+var dist_exports = {};
+__export(dist_exports, {
+  BlobAccessError: () => BlobAccessError,
+  BlobClientTokenExpiredError: () => BlobClientTokenExpiredError,
+  BlobContentTypeNotAllowedError: () => BlobContentTypeNotAllowedError,
+  BlobError: () => BlobError,
+  BlobFileTooLargeError: () => BlobFileTooLargeError,
+  BlobNotFoundError: () => BlobNotFoundError,
+  BlobPathnameMismatchError: () => BlobPathnameMismatchError,
+  BlobPreconditionFailedError: () => BlobPreconditionFailedError,
+  BlobRequestAbortedError: () => BlobRequestAbortedError,
+  BlobServiceNotAvailable: () => BlobServiceNotAvailable,
+  BlobServiceRateLimited: () => BlobServiceRateLimited,
+  BlobStoreNotFoundError: () => BlobStoreNotFoundError,
+  BlobStoreSuspendedError: () => BlobStoreSuspendedError,
+  BlobUnknownError: () => BlobUnknownError,
+  completeMultipartUpload: () => completeMultipartUpload3,
+  copy: () => copy,
+  createFolder: () => createFolder,
+  createMultipartUpload: () => createMultipartUpload3,
+  createMultipartUploader: () => createMultipartUploader2,
+  del: () => del,
+  get: () => get,
+  getDownloadUrl: () => getDownloadUrl,
+  head: () => head,
+  issueSignedToken: () => issueSignedToken,
+  list: () => list,
+  parseStoreIdFromDelegationToken: () => parseStoreIdFromDelegationToken,
+  parseStoreIdFromPresignedUrl: () => parseStoreIdFromPresignedUrl,
+  presignUrl: () => presignUrl,
+  put: () => put2,
+  putFromUrl: () => putFromUrl,
+  putImage: () => putImage,
+  rename: () => rename,
+  uploadPart: () => uploadPart3
+});
+async function del(urlOrPathname, options) {
+  const urls = Array.isArray(urlOrPathname) ? urlOrPathname : [urlOrPathname];
+  if ((options == null ? void 0 : options.ifMatch) && urls.length > 1) {
+    throw new BlobError("ifMatch can only be used when deleting a single URL.");
+  }
+  const headers = {
+    "content-type": "application/json"
+  };
+  if (options == null ? void 0 : options.ifMatch) {
+    headers["x-if-match"] = options.ifMatch;
+  }
+  await requestApi(
+    "/delete",
+    {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ urls }),
+      signal: options == null ? void 0 : options.abortSignal
+    },
+    options
+  );
+}
+async function head(urlOrPathname, options) {
+  const searchParams = new URLSearchParams({ url: urlOrPathname });
+  const response = await requestApi(
+    `?${searchParams.toString()}`,
+    // HEAD can't have body as a response, so we use GET
+    {
+      method: "GET",
+      signal: options == null ? void 0 : options.abortSignal
+    },
+    options
+  );
+  return {
+    url: response.url,
+    downloadUrl: response.downloadUrl,
+    pathname: response.pathname,
+    size: response.size,
+    contentType: response.contentType,
+    contentDisposition: response.contentDisposition,
+    cacheControl: response.cacheControl,
+    uploadedAt: new Date(response.uploadedAt),
+    etag: response.etag
+  };
+}
+function extractPathnameFromUrl(url) {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.pathname.slice(1);
+  } catch {
+    return url;
+  }
+}
+async function get(urlOrPathname, options) {
+  if (!urlOrPathname) {
+    throw new BlobError("url or pathname is required");
+  }
+  if (!options) {
+    throw new BlobError("missing options, see usage");
+  }
+  if (options.access !== "public" && options.access !== "private") {
+    throw new BlobError(
+      'access must be "private" or "public", see https://vercel.com/docs/vercel-blob'
+    );
+  }
+  const auth = await resolveBlobAuth(options);
+  if (auth.kind === "presigned") {
+    throw new BlobError("Presigned URLs are not supported for the get method");
+  }
+  let blobUrl;
+  let pathname;
+  const access = options.access;
+  if (isUrl(urlOrPathname)) {
+    blobUrl = urlOrPathname;
+    pathname = extractPathnameFromUrl(urlOrPathname);
+    try {
+      const { hostname } = new URL(blobUrl);
+      if (!hostname.endsWith(".blob.vercel-storage.com")) {
+        throw new BlobError(
+          "Invalid URL: the URL does not point to a Vercel Blob store. Use a pathname instead, see https://vercel.com/docs/vercel-blob"
+        );
+      }
+    } catch (error2) {
+      if (error2 instanceof BlobError) throw error2;
+      throw new BlobError("Invalid URL: unable to parse the provided URL");
+    }
+  } else {
+    if (!auth.storeId) {
+      throw new BlobError("Invalid token: unable to extract store ID");
+    }
+    pathname = urlOrPathname;
+    blobUrl = constructBlobUrl(auth.storeId, pathname, access);
+  }
+  const requestHeaders = {
+    ...options.ifNoneMatch ? { "If-None-Match": options.ifNoneMatch } : {},
+    authorization: `Bearer ${auth.token}`,
+    ...options.headers
+    // low-level escape hatch, applied last to override anything
+  };
+  let fetchUrl = blobUrl;
+  if (options.useCache === false && access === "private") {
+    const url = new URL(blobUrl);
+    url.searchParams.set("cache", "0");
+    fetchUrl = url.toString();
+  }
+  const response = await (0, import_undici3.fetch)(fetchUrl, {
+    method: "GET",
+    headers: requestHeaders,
+    signal: options.abortSignal
+  });
+  if (response.status === 304) {
+    const downloadUrlObj = new URL(blobUrl);
+    downloadUrlObj.searchParams.set("download", "1");
+    const lastModified2 = response.headers.get("last-modified");
+    return {
+      statusCode: 304,
+      stream: null,
+      headers: response.headers,
+      blob: {
+        url: blobUrl,
+        downloadUrl: downloadUrlObj.toString(),
+        pathname,
+        contentType: null,
+        contentDisposition: response.headers.get("content-disposition") || "",
+        cacheControl: response.headers.get("cache-control") || "",
+        size: null,
+        uploadedAt: lastModified2 ? new Date(lastModified2) : /* @__PURE__ */ new Date(),
+        etag: response.headers.get("etag") || ""
+      }
+    };
+  }
+  if (response.status === 404) {
+    return null;
+  }
+  if (!response.ok) {
+    throw new BlobError(
+      `Failed to fetch blob: ${response.status} ${response.statusText}`
+    );
+  }
+  const stream2 = response.body;
+  if (!stream2) {
+    throw new BlobError("Response body is null");
+  }
+  const contentLength = response.headers.get("content-length");
+  const lastModified = response.headers.get("last-modified");
+  const downloadUrl = new URL(blobUrl);
+  downloadUrl.searchParams.set("download", "1");
+  return {
+    statusCode: 200,
+    stream: stream2,
+    headers: response.headers,
+    blob: {
+      url: blobUrl,
+      downloadUrl: downloadUrl.toString(),
+      pathname,
+      contentType: response.headers.get("content-type") || "application/octet-stream",
+      contentDisposition: response.headers.get("content-disposition") || "",
+      cacheControl: response.headers.get("cache-control") || "",
+      size: contentLength ? parseInt(contentLength, 10) : 0,
+      uploadedAt: lastModified ? new Date(lastModified) : /* @__PURE__ */ new Date(),
+      etag: response.headers.get("etag") || ""
+    }
+  };
+}
+async function list(options) {
+  var _a3;
+  const searchParams = new URLSearchParams();
+  if (options == null ? void 0 : options.limit) {
+    searchParams.set("limit", options.limit.toString());
+  }
+  if (options == null ? void 0 : options.prefix) {
+    searchParams.set("prefix", options.prefix);
+  }
+  if (options == null ? void 0 : options.cursor) {
+    searchParams.set("cursor", options.cursor);
+  }
+  if (options == null ? void 0 : options.mode) {
+    searchParams.set("mode", options.mode);
+  }
+  const response = await requestApi(
+    `?${searchParams.toString()}`,
+    {
+      method: "GET",
+      signal: options == null ? void 0 : options.abortSignal
+    },
+    options
+  );
+  if ((options == null ? void 0 : options.mode) === "folded") {
+    return {
+      folders: (_a3 = response.folders) != null ? _a3 : [],
+      cursor: response.cursor,
+      hasMore: response.hasMore,
+      blobs: response.blobs.map(mapBlobResult)
+    };
+  }
+  return {
+    cursor: response.cursor,
+    hasMore: response.hasMore,
+    blobs: response.blobs.map(mapBlobResult)
+  };
+}
+function mapBlobResult(blobResult) {
+  return {
+    url: blobResult.url,
+    downloadUrl: blobResult.downloadUrl,
+    pathname: blobResult.pathname,
+    size: blobResult.size,
+    uploadedAt: new Date(blobResult.uploadedAt),
+    etag: blobResult.etag
+  };
+}
+async function copy(fromUrlOrPathname, toPathname, options) {
+  if (!options) {
+    throw new BlobError("missing options, see usage");
+  }
+  if (options.access !== "public" && options.access !== "private") {
+    throw new BlobError(
+      'access must be "private" or "public", see https://vercel.com/docs/vercel-blob'
+    );
+  }
+  if (toPathname.length > MAXIMUM_PATHNAME_LENGTH) {
+    throw new BlobError(
+      `pathname is too long, maximum length is ${MAXIMUM_PATHNAME_LENGTH}`
+    );
+  }
+  for (const invalidCharacter of disallowedPathnameCharacters) {
+    if (toPathname.includes(invalidCharacter)) {
+      throw new BlobError(
+        `pathname cannot contain "${invalidCharacter}", please encode it if needed`
+      );
+    }
+  }
+  const headers = {};
+  headers["x-vercel-blob-access"] = options.access;
+  if (options.addRandomSuffix !== void 0) {
+    headers["x-add-random-suffix"] = options.addRandomSuffix ? "1" : "0";
+  }
+  if (options.allowOverwrite !== void 0) {
+    headers["x-allow-overwrite"] = options.allowOverwrite ? "1" : "0";
+  }
+  if (options.contentType) {
+    headers["x-content-type"] = options.contentType;
+  }
+  if (options.cacheControlMaxAge !== void 0) {
+    headers["x-cache-control-max-age"] = options.cacheControlMaxAge.toString();
+  }
+  if (options.ifMatch) {
+    headers["x-if-match"] = options.ifMatch;
+  }
+  const params = new URLSearchParams({
+    pathname: toPathname,
+    fromUrl: fromUrlOrPathname
+  });
+  const response = await requestApi(
+    `?${params.toString()}`,
+    {
+      method: "PUT",
+      headers,
+      signal: options.abortSignal
+    },
+    options
+  );
+  return {
+    url: response.url,
+    downloadUrl: response.downloadUrl,
+    pathname: response.pathname,
+    contentType: response.contentType,
+    contentDisposition: response.contentDisposition,
+    etag: response.etag
+  };
+}
+async function rename(fromUrlOrPathname, toPathname, options) {
+  if (!options) {
+    throw new BlobError("missing options, see usage");
+  }
+  if (options.access !== "public" && options.access !== "private") {
+    throw new BlobError(
+      'access must be "private" or "public", see https://vercel.com/docs/vercel-blob'
+    );
+  }
+  if (toPathname.length > MAXIMUM_PATHNAME_LENGTH) {
+    throw new BlobError(
+      `pathname is too long, maximum length is ${MAXIMUM_PATHNAME_LENGTH}`
+    );
+  }
+  for (const invalidCharacter of disallowedPathnameCharacters) {
+    if (toPathname.includes(invalidCharacter)) {
+      throw new BlobError(
+        `pathname cannot contain "${invalidCharacter}", please encode it if needed`
+      );
+    }
+  }
+  const headers = {};
+  headers["x-vercel-blob-access"] = options.access;
+  if (options.addRandomSuffix !== void 0) {
+    headers["x-add-random-suffix"] = options.addRandomSuffix ? "1" : "0";
+  }
+  if (options.allowOverwrite !== void 0) {
+    headers["x-allow-overwrite"] = options.allowOverwrite ? "1" : "0";
+  }
+  if (options.contentType) {
+    headers["x-content-type"] = options.contentType;
+  }
+  if (options.cacheControlMaxAge !== void 0) {
+    headers["x-cache-control-max-age"] = options.cacheControlMaxAge.toString();
+  }
+  if (options.ifMatch) {
+    headers["x-if-match"] = options.ifMatch;
+  }
+  const params = new URLSearchParams({
+    pathname: toPathname,
+    fromUrl: fromUrlOrPathname
+  });
+  const response = await requestApi(
+    `/rename?${params.toString()}`,
+    {
+      method: "POST",
+      headers,
+      signal: options.abortSignal
+    },
+    options
+  );
+  return {
+    url: response.url,
+    downloadUrl: response.downloadUrl,
+    pathname: response.pathname,
+    contentType: response.contentType,
+    contentDisposition: response.contentDisposition,
+    etag: response.etag
+  };
+}
+function toPutBlobResult(response) {
+  return {
+    url: response.url,
+    downloadUrl: response.downloadUrl,
+    pathname: response.pathname,
+    contentType: response.contentType,
+    contentDisposition: response.contentDisposition,
+    etag: response.etag
+  };
+}
+async function putImage(pathname, bodyOrUrl, options) {
+  if (!(options == null ? void 0 : options.optimizeImage)) {
+    throw new BlobError("optimizeImage is required, see usage");
+  }
+  const { optimizeImage } = options;
+  if (bodyOrUrl instanceof URL) {
+    if (bodyOrUrl.protocol !== "http:" && bodyOrUrl.protocol !== "https:") {
+      throw new BlobError("the source URL must use the http(s) protocol");
+    }
+    const putOptions2 = await createPutOptions({ pathname, options });
+    const headers2 = createPutHeaders(
+      ["cacheControlMaxAge", "addRandomSuffix", "allowOverwrite", "ifMatch"],
+      putOptions2
+    );
+    const params2 = new URLSearchParams({
+      pathname,
+      url: bodyOrUrl.toString()
+    });
+    addOptimizeImageParams(params2, optimizeImage);
+    const response2 = await requestApi(
+      `/put-from-url?${params2.toString()}`,
+      {
+        method: "POST",
+        headers: headers2,
+        signal: putOptions2.abortSignal
+      },
+      putOptions2
+    );
+    return toPutBlobResult(response2);
+  }
+  if (!bodyOrUrl) {
+    throw new BlobError("body is required");
+  }
+  if (isPlainObject(bodyOrUrl)) {
+    throw new BlobError(
+      "Body must be a string, buffer or stream. You sent a plain JavaScript object, double check what you're trying to upload."
+    );
+  }
+  const putOptions = await createPutOptions({ pathname, options });
+  const headers = createPutHeaders(
+    ["cacheControlMaxAge", "addRandomSuffix", "allowOverwrite", "ifMatch"],
+    putOptions
+  );
+  validateOptimizeImageSourceContentType(
+    typeof Blob !== "undefined" && bodyOrUrl instanceof Blob ? bodyOrUrl.type : void 0
+  );
+  const params = new URLSearchParams({ pathname });
+  addOptimizeImageParams(params, optimizeImage);
+  const response = await requestApi(
+    `/put-optimized?${params.toString()}`,
+    {
+      method: "POST",
+      body: bodyOrUrl,
+      headers,
+      signal: putOptions.abortSignal
+    },
+    putOptions
+  );
+  return toPutBlobResult(response);
+}
+async function putFromUrl(pathname, url, options) {
+  const putOptions = await createPutOptions({ pathname, options });
+  if (!url) {
+    throw new BlobError("url is required");
+  }
+  if (!putOptions.optimizeImage) {
+    throw new BlobError("optimizeImage is required, see usage");
+  }
+  const headers = createPutHeaders(
+    ["cacheControlMaxAge", "addRandomSuffix", "allowOverwrite", "ifMatch"],
+    putOptions
+  );
+  const params = new URLSearchParams({ pathname, url });
+  addOptimizeImageParams(params, putOptions.optimizeImage);
+  const response = await requestApi(
+    `/put-from-url?${params.toString()}`,
+    {
+      method: "POST",
+      headers,
+      signal: putOptions.abortSignal
+    },
+    putOptions
+  );
+  return {
+    url: response.url,
+    downloadUrl: response.downloadUrl,
+    pathname: response.pathname,
+    contentType: response.contentType,
+    contentDisposition: response.contentDisposition,
+    etag: response.etag
+  };
+}
+var import_undici3, put2, createMultipartUpload3, createMultipartUploader2, uploadPart3, completeMultipartUpload3;
+var init_dist = __esm({
+  "node_modules/@vercel/blob/dist/index.js"() {
+    init_chunk_YYMLUMXS();
+    import_undici3 = __toESM(require_undici(), 1);
+    put2 = createPutMethod({
+      allowedOptions: [
+        "cacheControlMaxAge",
+        "addRandomSuffix",
+        "allowOverwrite",
+        "contentType",
+        "ifMatch"
+      ]
+    });
+    createMultipartUpload3 = createCreateMultipartUploadMethod({
+      allowedOptions: [
+        "cacheControlMaxAge",
+        "addRandomSuffix",
+        "allowOverwrite",
+        "contentType",
+        "ifMatch"
+      ]
+    });
+    createMultipartUploader2 = createCreateMultipartUploaderMethod({
+      allowedOptions: [
+        "cacheControlMaxAge",
+        "addRandomSuffix",
+        "allowOverwrite",
+        "contentType",
+        "ifMatch"
+      ]
+    });
+    uploadPart3 = createUploadPartMethod({
+      allowedOptions: [
+        "cacheControlMaxAge",
+        "addRandomSuffix",
+        "allowOverwrite",
+        "contentType"
+      ]
+    });
+    completeMultipartUpload3 = createCompleteMultipartUploadMethod({
+      allowedOptions: [
+        "cacheControlMaxAge",
+        "addRandomSuffix",
+        "allowOverwrite",
+        "contentType"
+      ]
+    });
+  }
+});
+
+// server/storage.ts
+var storage_exports = {};
+__export(storage_exports, {
+  deleteFile: () => deleteFile,
+  deletionPath: () => deletionPath,
+  listObjects: () => listObjects,
+  putFile: () => putFile,
+  putObject: () => putObject,
+  readFileStream: () => readFileStream,
+  readObject: () => readObject,
+  readStoredFile: () => readStoredFile,
+  removeStoredFile: () => removeStoredFile,
+  replaceStoredFile: () => replaceStoredFile,
+  storageWasDeleted: () => storageWasDeleted
+});
+import { randomBytes as randomBytes3, createHash as createHash4 } from "node:crypto";
+import { fileURLToPath } from "node:url";
+import { join, dirname, basename, resolve } from "node:path";
+import { mkdir, writeFile, readFile, unlink, readdir, rename as rename2, link } from "node:fs/promises";
+async function putObject(path, bytes2, overwrite = false) {
+  checkDeadline();
+  if (env.BLOB_READ_WRITE_TOKEN) {
+    const { put: put3 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
+    return (await put3(path, bytes2, { access: "private", contentType: "application/octet-stream", addRandomSuffix: false, allowOverwrite: overwrite, token: env.BLOB_READ_WRITE_TOKEN, ...Number.isFinite(activeDeadline()) ? { abortSignal: ioSignal() } : {} })).url;
+  }
+  if (env.isProd) throw new Error("BLOB_READ_WRITE_TOKEN is required");
+  const localRoot = resolve(root()), p2 = join(localRoot, path);
+  const scratchDir = join(dirname(localRoot), `.${basename(localRoot)}-pending`);
+  await mkdir(dirname(p2), { recursive: true });
+  await mkdir(scratchDir, { recursive: true });
+  const scratch = join(scratchDir, randomBytes3(24).toString("hex"));
+  let failed = false;
+  let failure;
+  try {
+    await writeFile(scratch, bytes2, { flag: "wx" });
+    checkDeadline();
+    if (overwrite) await rename2(scratch, p2);
+    else await link(scratch, p2);
+  } catch (e) {
+    failed = true;
+    failure = e;
+  }
+  try {
+    await unlink(scratch);
+  } catch (e) {
+    if (e.code !== "ENOENT" && !failed) {
+      failed = true;
+      failure = e;
+    }
+  }
+  if (failed) throw failure;
+  return `dev:${path}`;
+}
+async function readObject(key) {
+  checkDeadline();
+  if (key.startsWith("dev:") || !env.BLOB_READ_WRITE_TOKEN) {
+    if (env.isProd) throw new Error("Private storage is not configured");
+    try {
+      return await readFile(join(root(), key.replace(/^dev:/, "")));
+    } catch (e) {
+      if (e.code === "ENOENT") return null;
+      throw e;
+    }
+  }
+  const { get: get2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
+  const r = await get2(key, { access: "private", token: env.BLOB_READ_WRITE_TOKEN, useCache: false, ...Number.isFinite(activeDeadline()) ? { abortSignal: ioSignal() } : {} });
+  if (!r) return null;
+  if (r.statusCode !== 200) throw new Error(`Storage read returned ${r.statusCode}`);
+  return Buffer.from(await new Response(r.stream).arrayBuffer());
+}
+async function listObjects(prefix) {
+  if (env.BLOB_READ_WRITE_TOKEN) {
+    const { list: list2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
+    let cursor;
+    const keys = [];
+    do {
+      const r = await list2({ prefix, cursor, token: env.BLOB_READ_WRITE_TOKEN });
+      keys.push(...r.blobs.map((b2) => b2.url));
+      cursor = r.hasMore ? r.cursor : void 0;
+    } while (cursor);
+    return keys;
+  }
+  if (env.isProd) throw new Error("Private storage is not configured");
+  try {
+    return (await readdir(join(root(), prefix))).map((n) => `dev:${prefix}${n}`);
+  } catch (e) {
+    if (e.code === "ENOENT") return [];
+    throw e;
+  }
+}
+async function putFile(filename, data, _contentType, sensitive = false) {
+  const bytes2 = Buffer.from(data), stored = sensitive ? seal(bytes2) : bytes2;
+  const key = `${randomBytes3(12).toString("hex")}-${filename.replace(/[^\w.-]+/g, "_")}${sensitive ? ".encrypted" : ""}`;
+  return { storageKey: await putObject(env.BLOB_READ_WRITE_TOKEN ? `docs/${key}` : key, stored), sizeBytes: bytes2.length };
+}
+async function removeStoredFile(key) {
+  checkDeadline();
+  if (key.startsWith("dev:")) {
+    try {
+      await unlink(join(root(), key.slice(4)));
+    } catch (e) {
+      if (e.code !== "ENOENT") throw e;
+    }
+    return;
+  }
+  const { del: del2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
+  await del2(key, { token: env.BLOB_READ_WRITE_TOKEN, ...Number.isFinite(activeDeadline()) ? { abortSignal: ioSignal() } : {} });
+}
+async function deleteFile(key) {
+  try {
+    await removeStoredFile(key);
+  } catch (e) {
+    console.error("[storage] delete failed:", e);
+  }
+}
+async function storageWasDeleted(key) {
+  return await readObject(deletionPath(key)) !== null;
+}
+async function readStoredFile(key) {
+  if (await storageWasDeleted(key)) throw new Error("This document has been deleted");
+  const data = await readObject(key);
+  if (!data) throw new Error("Stored document is missing");
+  if (key.endsWith(".encrypted") && !isEncrypted(data)) throw new Error("Encrypted document envelope is missing");
+  return data;
+}
+async function readFileStream(key) {
+  const data = await readStoredFile(key);
+  return isEncrypted(data) ? unseal(data) : data;
+}
+async function replaceStoredFile(key, data) {
+  const path = key.startsWith("dev:") ? key.slice(4) : new URL(key).pathname.slice(1);
+  await putObject(path, data, true);
+  const got = await readObject(key);
+  if (!got?.equals(data)) throw new Error("Stored replacement failed byte verification");
+}
+var root, digest, deletionPath;
+var init_storage = __esm({
+  "server/storage.ts"() {
+    init_operation_deadline();
+    init_env();
+    init_encryption();
+    root = () => process.env.DEV_STORAGE_DIR || fileURLToPath(new URL("../.dev-data/blob/", import.meta.url));
+    digest = (s) => createHash4("sha256").update(s).digest("hex");
+    deletionPath = (key) => `deletions/${digest(key)}.json`;
+  }
+});
+
 // server/office-recovery-sources.ts
 var office_recovery_sources_exports = {};
 __export(office_recovery_sources_exports, {
@@ -51760,7 +51800,7 @@ __export(office_recovery_sources_exports, {
   recoveryTuple: () => recoveryTuple,
   storageIdentity: () => storageIdentity
 });
-import { createHash as createHash4 } from "node:crypto";
+import { createHash as createHash5 } from "node:crypto";
 function storageIdentity(key) {
   if (key.startsWith("dev:")) return { namespace: "dev", canonicalKey: key.slice(4) };
   try {
@@ -51807,7 +51847,7 @@ function officeFileIdentities(tables, options = {}) {
       if (family !== "service" && published && (!owner || owner.client_id !== clientId || owner.order_id !== op.target_id)) identityConflict();
       const historical = published && (family === "service" ? !!archived && !refs.some((d2) => !d2.deleted_at) : refs.every((d2) => !!d2.meta?.officeHistory));
       const base = { operationId: op.id, slot, clientId, orderId: order2 ? String(order2.id) : null, ...service ? { serviceId: String(service.id) } : {}, file, historical, published, sensitive: !!file.meta?.sensitive || file.key.endsWith(".encrypted"), ...storageIdentity(file.key) };
-      const identity = { ...base, recoveryPath: "/OfficeRecovery/v1/" + createHash4("sha256").update(JSON.stringify(recoveryTuple(base))).digest("hex") + ".backup" };
+      const identity = { ...base, recoveryPath: "/OfficeRecovery/v1/" + createHash5("sha256").update(JSON.stringify(recoveryTuple(base))).digest("hex") + ".backup" };
       const prior = result.get(file.key);
       if (prior && JSON.stringify(recoveryTuple(prior)) !== JSON.stringify(recoveryTuple(identity))) identityConflict();
       result.set(file.key, identity);
@@ -51850,219 +51890,6 @@ var init_office_recovery_sources = __esm({
       throw new OfficeRecoveryError("The saved recovery identity is inconsistent. No files were changed.", "RECOVERY_IDENTITY_CONFLICT");
     };
     uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  }
-});
-
-// server/office-file-recovery.ts
-var office_file_recovery_exports = {};
-__export(office_file_recovery_exports, {
-  OfficeRecoveryError: () => OfficeRecoveryError,
-  assertOfficeFileLive: () => assertOfficeFileLive,
-  claimOfficeVerification: () => claimOfficeVerification,
-  ensureOfficeMirrorCopy: () => ensureOfficeMirrorCopy,
-  ensureOfficeRecoveryCopy: () => ensureOfficeRecoveryCopy,
-  officeRecoveryTables: () => officeRecoveryTables,
-  recoverOfficeFile: () => recoverOfficeFile,
-  verifiedOfficeBytes: () => verifiedOfficeBytes,
-  verifyOfficeDelivery: () => verifyOfficeDelivery
-});
-async function officeRecoveryTables(db) {
-  const [r] = await db.query(`SELECT json_build_object(
-  'clients',(SELECT coalesce(json_agg(c),'[]') FROM (SELECT id,name,email FROM clients) c),
-  'orders',(SELECT coalesce(json_agg(o),'[]') FROM orders o),
-  'service_orders',(SELECT coalesce(json_agg(s),'[]') FROM service_orders s),
-  'documents',(SELECT coalesce(json_agg(d),'[]') FROM documents d),
-  'office_operations',(SELECT coalesce(json_agg(w),'[]') FROM office_operations w)) AS tables`);
-  return r.tables;
-}
-function verifiedOfficeBytes(i, raw2) {
-  if (!raw2) return null;
-  if (i.sensitive && !isEncrypted(raw2)) return null;
-  if (isEncrypted(raw2)) {
-    let key;
-    try {
-      key = encryptedKeyId(raw2);
-    } catch {
-      return null;
-    }
-    let keys;
-    try {
-      keys = encryptionKeys();
-    } catch (e) {
-      return unavailable(e);
-    }
-    if (!key || !keys.keys[key]) return unavailable("The original encryption key is missing.");
-  }
-  let plain;
-  try {
-    plain = isEncrypted(raw2) ? unseal(raw2) : raw2;
-  } catch {
-    return null;
-  }
-  return plain.length === i.file.size && hashBytes(plain) === i.file.sha ? plain : null;
-}
-async function assertOfficeFileLive(i) {
-  try {
-    if (officeIdentityDeleted(i, await readRecoveryJournal()) || await storageWasDeleted(i.file.key)) throw new OfficeRecoveryError("This document was deleted or this upload was retired.", "DOCUMENT_DELETED");
-  } catch (e) {
-    if (e instanceof OfficeRecoveryError) throw e;
-    return unavailable(e);
-  }
-}
-async function recoverOfficeFile(i, options = {}) {
-  await assertOfficeFileLive(i);
-  if (options.supplied && (options.supplied.length !== i.file.size || hashBytes(options.supplied) !== i.file.sha)) throw new OfficeRecoveryError("Select the original PDF. This file does not match the saved original.", "OFFICE_CONFLICT");
-  let journal;
-  try {
-    journal = await readRecoveryJournal();
-  } catch (e) {
-    return unavailable(e);
-  }
-  const sources = collectOfficeRecoverySources(i, journal, options.documents);
-  let raw2;
-  try {
-    raw2 = await readObject(i.file.key);
-  } catch (e) {
-    return unavailable(e);
-  }
-  const plain = verifiedOfficeBytes(i, raw2);
-  if (plain) {
-    await assertOfficeFileLive(i);
-    return { plain, raw: raw2, source: i.file.key };
-  }
-  let sourceError;
-  for (const path of sources) {
-    try {
-      raw2 = await readMirror(path);
-    } catch (e) {
-      sourceError = e;
-      continue;
-    }
-    const original = verifiedOfficeBytes(i, raw2);
-    if (!original) continue;
-    await assertOfficeFileLive(i);
-    if (options.repair !== false) {
-      try {
-        await replaceStoredFile(i.file.key, raw2);
-      } catch (e) {
-        return unavailable(e);
-      }
-      await assertOfficeFileLive(i);
-      let stored;
-      try {
-        stored = await readObject(i.file.key);
-      } catch (e) {
-        return unavailable(e);
-      }
-      if (!verifiedOfficeBytes(i, stored)) return unavailable("Original readback failed.");
-    }
-    return { plain: original, raw: raw2, source: path };
-  }
-  if (sourceError) return unavailable(sourceError);
-  throw new OfficeRecoveryError("Select the original PDF. No verified original was found in registered controlled sources.", "UPLOAD_REQUIRED");
-}
-async function claimOfficeVerification(db, op) {
-  const lease = crypto.randomUUID();
-  const [held] = await db.query(`UPDATE office_operations SET lease=$2,lease_until=now()+interval '3 minutes'
- WHERE id=$1 AND input_hash=$3 AND (phase IN ('committed','done') OR (phase='superseded' AND payload->>'previousPhase' IN ('committed','done')))
- AND (lease_until IS NULL OR lease_until<now()) RETURNING *`, [op.id, lease, op.input_hash]);
-  if (!held) throw new OfficeRecoveryError("Another request is using this document. Wait, then retry.", "OFFICE_BUSY");
-  return held;
-}
-async function verifyOfficeDelivery(db, op, supplied) {
-  const tables = await officeRecoveryTables(db), identities = officeFileIdentities(tables, { includeUnknown: true });
-  const legacyInput = !!supplied && (op.kind === "service" ? officeHash({ pdf: supplied.bytes.toString("base64"), assignedEin: String(op.payload.assignedEin || ""), titleOverride: String(op.payload.titleOverride || ""), notify: Boolean(op.payload.notify) }) === op.input_hash : op.kind === "articles" && !op.payload.existingId && officeHash({ documentNumber: String(op.payload.documentNumber || ""), pdf: supplied.bytes.toString("base64") }) === op.input_hash);
-  for (const slot of ["articles", "statement", "upload"]) {
-    const f = op.files[slot];
-    if (!f) continue;
-    const i = identities.get(f.key);
-    if (!i || !f.sha && !legacyInput) throw new OfficeRecoveryError("The original document fingerprint is unavailable. Select the original PDF.", "UPLOAD_REQUIRED");
-    if (supplied && supplied.slot === slot && (f.sha && hashBytes(supplied.bytes) !== f.sha || supplied.bytes.length !== f.size)) throw new OfficeRecoveryError("Select the original PDF.", "OFFICE_CONFLICT");
-  }
-  for (const slot of ["articles", "statement", "upload"]) {
-    const f = op.files[slot];
-    if (!f) continue;
-    const [held2] = await db.query("SELECT id FROM office_operations WHERE id=$1 AND lease=$2 AND lease_until>now()", [op.id, op.lease]);
-    if (!held2) throw new OfficeRecoveryError("The recovery reservation expired. Retry.", "OFFICE_BUSY");
-    const identity = identities.get(f.key);
-    if (identity?.file.sha) await recoverOfficeFile(identity, { documents: tables.documents });
-    else {
-      await assertOfficeFileLive(identity);
-      const plain = await readOfficeFile(f);
-      await assertOfficeFileLive(identity);
-      if (supplied?.slot === slot && !plain.equals(supplied.bytes)) throw new OfficeRecoveryError("Select the original PDF.", "UPLOAD_REQUIRED");
-    }
-  }
-  const [held] = await db.query("SELECT id FROM office_operations WHERE id=$1 AND lease=$2 AND lease_until>now()", [op.id, op.lease]);
-  if (!held) throw new OfficeRecoveryError("The recovery reservation expired before verification completed. Retry.", "OFFICE_BUSY");
-}
-async function ensureOfficeRecoveryCopy(i) {
-  await ensureOfficeCopyAt(i, i.recoveryPath);
-}
-async function ensureOfficeMirrorCopy(i, path = i.file.mirrorPath ?? `/OfficeOperations/${i.operationId}/${i.slot}`) {
-  return ensureOfficeCopyAt(i, path);
-}
-async function ensureOfficeCopyAt(i, path) {
-  await assertOfficeFileLive(i);
-  const copy2 = { documentId: i.file.id, storageKey: i.file.key, ...i.serviceId ? { serviceId: i.serviceId } : {}, mirrorPath: i.file.mirrorPath ?? `/OfficeOperations/${i.operationId}/${i.slot}`, extraMirrorPaths: [path, i.recoveryPath, `/OfficeOperations/${i.operationId}/${i.slot}`] };
-  try {
-    if (!await recordDocumentCopy(copy2)) throw new OfficeRecoveryError("This document was deleted.", "DOCUMENT_DELETED");
-  } catch (e) {
-    if (e instanceof OfficeRecoveryError) throw e;
-    return unavailable(e);
-  }
-  let before;
-  try {
-    before = await readMirrorVersion(path);
-  } catch (e) {
-    return unavailable(e);
-  }
-  if (verifiedOfficeBytes(i, before?.data ?? null)) {
-    await assertOfficeFileLive(i);
-    return { sha: hashBytes(before.data), copied: false };
-  }
-  const original = await recoverOfficeFile(i);
-  await assertOfficeFileLive(i);
-  try {
-    await compareWriteMirror(path, original.raw, before?.rev ?? null);
-  } catch (e) {
-    return unavailable(e);
-  }
-  try {
-    await assertOfficeFileLive(i);
-  } catch (e) {
-    if (e instanceof OfficeRecoveryError && e.code === "DOCUMENT_DELETED") {
-      try {
-        await deleteMirror(path);
-      } catch {
-      }
-    }
-    throw e;
-  }
-  let saved;
-  try {
-    saved = await readMirrorVersion(path);
-  } catch (e) {
-    return unavailable(e);
-  }
-  if (!verifiedOfficeBytes(i, saved?.data ?? null)) return unavailable("The recovery copy could not be verified.");
-  return { sha: hashBytes(saved.data), copied: true };
-}
-var unavailable;
-var init_office_file_recovery = __esm({
-  "server/office-file-recovery.ts"() {
-    init_office_operation();
-    init_storage();
-    init_encryption();
-    init_dropbox();
-    init_backup_deletions();
-    init_office_recovery_sources();
-    init_office_recovery_sources();
-    unavailable = (cause) => {
-      const error2 = new OfficeRecoveryError("A recovery source is unavailable. Retry after storage access is restored. " + String(cause).slice(0, 120), "RECOVERY_UNAVAILABLE", 503);
-      if (typeof cause?.retryAfterMs === "number") error2.retryAfterMs = cause.retryAfterMs;
-      throw error2;
-    };
   }
 });
 
@@ -52233,7 +52060,7 @@ __export(dropbox_exports, {
   readMirrorVersion: () => readMirrorVersion,
   runFileMirror: () => runFileMirror
 });
-import { createHash as createHash5 } from "node:crypto";
+import { createHash as createHash6 } from "node:crypto";
 async function accessToken() {
   checkDeadline();
   if (cachedToken && Date.now() < cachedToken.expiresAt - 6e4) return cachedToken.token;
@@ -52488,7 +52315,7 @@ var init_dropbox = __esm({
       /[\u007f-\uffff]/g,
       (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0")
     );
-    hashBytes = (data) => createHash5("sha256").update(data).digest("hex");
+    hashBytes = (data) => createHash6("sha256").update(data).digest("hex");
     devMirror = async (path) => {
       const { fileURLToPath: fileURLToPath2 } = await import("node:url");
       return (process.env.DEV_MIRROR_DIR || fileURLToPath2(new URL("../.dev-data/dropbox-mirror", import.meta.url))) + path;
@@ -52778,7 +52605,7 @@ var init_backup_deletions = __esm({
 });
 
 // server/office-operation.ts
-import { createHash as createHash6 } from "node:crypto";
+import { createHash as createHash7 } from "node:crypto";
 async function findOfficeOperation(db, kind, target2) {
   return (await db.query("SELECT * FROM office_operations WHERE kind=$1 AND target_id=$2", [kind, target2]))[0];
 }
@@ -52965,8 +52792,8 @@ async function claimRetirement(db, prior, inputHash, payload) {
   if (existing && (existing.inputHash !== inputHash || existing.predecessorHash !== prior.input_hash)) throw new OfficeConflict("A different replacement is already reserved. Continue that replacement before correcting it.", "OFFICE_CONFLICT");
   const decisions = [];
   if (!existing) {
-    const slots = /* @__PURE__ */ new Set([...Object.keys(prior.files), ...Object.keys(prior.payload.fileIntents ?? {}), ...prior.kind === "service" ? ["upload"] : ["articles", ...prior.payload.weSigned ? ["statement"] : []]]);
-    for (const slot of slots) {
+    const slots2 = /* @__PURE__ */ new Set([...Object.keys(prior.files), ...Object.keys(prior.payload.fileIntents ?? {}), ...prior.kind === "service" ? ["upload"] : ["articles", ...prior.payload.weSigned ? ["statement"] : []]]);
+    for (const slot of slots2) {
       const f = prior.files[slot], intent = prior.payload.fileIntents?.[slot];
       const keys = f ? [f.key] : intent ? [intent.key] : [`${env.BLOB_READ_WRITE_TOKEN ? "" : "dev:"}office-work/${prior.id}/${slot}.pdf`, `${env.BLOB_READ_WRITE_TOKEN ? "" : "dev:"}office-work/${prior.id}/${slot}.pdf.encrypted`];
       for (const key of keys) decisions.push({ storageKey: key, documentId: f?.id ?? intent?.id ?? prior.id, mirrorPath: f?.mirrorPath ?? intent?.mirrorPath ?? `/OfficeOperations/${prior.id}/${slot}`, extraMirrorPaths: [`/OfficeOperations/${prior.id}/${slot}`], reason: "superseded", requestedAt: (/* @__PURE__ */ new Date()).toISOString(), ...prior.kind === "service" ? { serviceId: prior.target_id } : {} });
@@ -53080,8 +52907,221 @@ var init_office_operation = __esm({
       }
       code;
     };
-    officeHash = (value) => createHash6("sha256").update(JSON.stringify(value)).digest("hex");
-    digest2 = (bytes2) => createHash6("sha256").update(bytes2).digest("hex");
+    officeHash = (value) => createHash7("sha256").update(JSON.stringify(value)).digest("hex");
+    digest2 = (bytes2) => createHash7("sha256").update(bytes2).digest("hex");
+  }
+});
+
+// server/office-file-recovery.ts
+var office_file_recovery_exports = {};
+__export(office_file_recovery_exports, {
+  OfficeRecoveryError: () => OfficeRecoveryError,
+  assertOfficeFileLive: () => assertOfficeFileLive,
+  claimOfficeVerification: () => claimOfficeVerification,
+  ensureOfficeMirrorCopy: () => ensureOfficeMirrorCopy,
+  ensureOfficeRecoveryCopy: () => ensureOfficeRecoveryCopy,
+  officeRecoveryTables: () => officeRecoveryTables,
+  recoverOfficeFile: () => recoverOfficeFile,
+  verifiedOfficeBytes: () => verifiedOfficeBytes,
+  verifyOfficeDelivery: () => verifyOfficeDelivery
+});
+async function officeRecoveryTables(db) {
+  const [r] = await db.query(`SELECT json_build_object(
+  'clients',(SELECT coalesce(json_agg(c),'[]') FROM (SELECT id,name,email FROM clients) c),
+  'orders',(SELECT coalesce(json_agg(o),'[]') FROM orders o),
+  'service_orders',(SELECT coalesce(json_agg(s),'[]') FROM service_orders s),
+  'documents',(SELECT coalesce(json_agg(d),'[]') FROM documents d),
+  'office_operations',(SELECT coalesce(json_agg(w),'[]') FROM office_operations w)) AS tables`);
+  return r.tables;
+}
+function verifiedOfficeBytes(i, raw2) {
+  if (!raw2) return null;
+  if (i.sensitive && !isEncrypted(raw2)) return null;
+  if (isEncrypted(raw2)) {
+    let key;
+    try {
+      key = encryptedKeyId(raw2);
+    } catch {
+      return null;
+    }
+    let keys;
+    try {
+      keys = encryptionKeys();
+    } catch (e) {
+      return unavailable(e);
+    }
+    if (!key || !keys.keys[key]) return unavailable("The original encryption key is missing.");
+  }
+  let plain;
+  try {
+    plain = isEncrypted(raw2) ? unseal(raw2) : raw2;
+  } catch {
+    return null;
+  }
+  return plain.length === i.file.size && hashBytes(plain) === i.file.sha ? plain : null;
+}
+async function assertOfficeFileLive(i) {
+  try {
+    if (officeIdentityDeleted(i, await readRecoveryJournal()) || await storageWasDeleted(i.file.key)) throw new OfficeRecoveryError("This document was deleted or this upload was retired.", "DOCUMENT_DELETED");
+  } catch (e) {
+    if (e instanceof OfficeRecoveryError) throw e;
+    return unavailable(e);
+  }
+}
+async function recoverOfficeFile(i, options = {}) {
+  await assertOfficeFileLive(i);
+  if (options.supplied && (options.supplied.length !== i.file.size || hashBytes(options.supplied) !== i.file.sha)) throw new OfficeRecoveryError("Select the original PDF. This file does not match the saved original.", "OFFICE_CONFLICT");
+  let journal;
+  try {
+    journal = await readRecoveryJournal();
+  } catch (e) {
+    return unavailable(e);
+  }
+  const sources = collectOfficeRecoverySources(i, journal, options.documents);
+  let raw2;
+  try {
+    raw2 = await readObject(i.file.key);
+  } catch (e) {
+    return unavailable(e);
+  }
+  const plain = verifiedOfficeBytes(i, raw2);
+  if (plain) {
+    await assertOfficeFileLive(i);
+    return { plain, raw: raw2, source: i.file.key };
+  }
+  let sourceError;
+  for (const path of sources) {
+    try {
+      raw2 = await readMirror(path);
+    } catch (e) {
+      sourceError = e;
+      continue;
+    }
+    const original = verifiedOfficeBytes(i, raw2);
+    if (!original) continue;
+    await assertOfficeFileLive(i);
+    if (options.repair !== false) {
+      try {
+        await replaceStoredFile(i.file.key, raw2);
+      } catch (e) {
+        return unavailable(e);
+      }
+      await assertOfficeFileLive(i);
+      let stored;
+      try {
+        stored = await readObject(i.file.key);
+      } catch (e) {
+        return unavailable(e);
+      }
+      if (!verifiedOfficeBytes(i, stored)) return unavailable("Original readback failed.");
+    }
+    return { plain: original, raw: raw2, source: path };
+  }
+  if (sourceError) return unavailable(sourceError);
+  throw new OfficeRecoveryError("Select the original PDF. No verified original was found in registered controlled sources.", "UPLOAD_REQUIRED");
+}
+async function claimOfficeVerification(db, op) {
+  const lease = crypto.randomUUID();
+  const [held] = await db.query(`UPDATE office_operations SET lease=$2,lease_until=now()+interval '3 minutes'
+ WHERE id=$1 AND input_hash=$3 AND (phase IN ('committed','done') OR (phase='superseded' AND payload->>'previousPhase' IN ('committed','done')))
+ AND (lease_until IS NULL OR lease_until<now()) RETURNING *`, [op.id, lease, op.input_hash]);
+  if (!held) throw new OfficeRecoveryError("Another request is using this document. Wait, then retry.", "OFFICE_BUSY");
+  return held;
+}
+async function verifyOfficeDelivery(db, op, supplied) {
+  const tables = await officeRecoveryTables(db), identities = officeFileIdentities(tables, { includeUnknown: true });
+  const legacyInput = !!supplied && (op.kind === "service" ? officeHash({ pdf: supplied.bytes.toString("base64"), assignedEin: String(op.payload.assignedEin || ""), titleOverride: String(op.payload.titleOverride || ""), notify: Boolean(op.payload.notify) }) === op.input_hash : op.kind === "articles" && !op.payload.existingId && officeHash({ documentNumber: String(op.payload.documentNumber || ""), pdf: supplied.bytes.toString("base64") }) === op.input_hash);
+  for (const slot of ["articles", "statement", "upload"]) {
+    const f = op.files[slot];
+    if (!f) continue;
+    const i = identities.get(f.key);
+    if (!i || !f.sha && !legacyInput) throw new OfficeRecoveryError("The original document fingerprint is unavailable. Select the original PDF.", "UPLOAD_REQUIRED");
+    if (supplied && supplied.slot === slot && (f.sha && hashBytes(supplied.bytes) !== f.sha || supplied.bytes.length !== f.size)) throw new OfficeRecoveryError("Select the original PDF.", "OFFICE_CONFLICT");
+  }
+  for (const slot of ["articles", "statement", "upload"]) {
+    const f = op.files[slot];
+    if (!f) continue;
+    const [held2] = await db.query("SELECT id FROM office_operations WHERE id=$1 AND lease=$2 AND lease_until>now()", [op.id, op.lease]);
+    if (!held2) throw new OfficeRecoveryError("The recovery reservation expired. Retry.", "OFFICE_BUSY");
+    const identity = identities.get(f.key);
+    if (identity?.file.sha) await recoverOfficeFile(identity, { documents: tables.documents });
+    else {
+      await assertOfficeFileLive(identity);
+      const plain = await readOfficeFile(f);
+      await assertOfficeFileLive(identity);
+      if (supplied?.slot === slot && !plain.equals(supplied.bytes)) throw new OfficeRecoveryError("Select the original PDF.", "UPLOAD_REQUIRED");
+    }
+  }
+  const [held] = await db.query("SELECT id FROM office_operations WHERE id=$1 AND lease=$2 AND lease_until>now()", [op.id, op.lease]);
+  if (!held) throw new OfficeRecoveryError("The recovery reservation expired before verification completed. Retry.", "OFFICE_BUSY");
+}
+async function ensureOfficeRecoveryCopy(i) {
+  await ensureOfficeCopyAt(i, i.recoveryPath);
+}
+async function ensureOfficeMirrorCopy(i, path = i.file.mirrorPath ?? `/OfficeOperations/${i.operationId}/${i.slot}`) {
+  return ensureOfficeCopyAt(i, path);
+}
+async function ensureOfficeCopyAt(i, path) {
+  await assertOfficeFileLive(i);
+  const copy2 = { documentId: i.file.id, storageKey: i.file.key, ...i.serviceId ? { serviceId: i.serviceId } : {}, mirrorPath: i.file.mirrorPath ?? `/OfficeOperations/${i.operationId}/${i.slot}`, extraMirrorPaths: [path, i.recoveryPath, `/OfficeOperations/${i.operationId}/${i.slot}`] };
+  try {
+    if (!await recordDocumentCopy(copy2)) throw new OfficeRecoveryError("This document was deleted.", "DOCUMENT_DELETED");
+  } catch (e) {
+    if (e instanceof OfficeRecoveryError) throw e;
+    return unavailable(e);
+  }
+  let before;
+  try {
+    before = await readMirrorVersion(path);
+  } catch (e) {
+    return unavailable(e);
+  }
+  if (verifiedOfficeBytes(i, before?.data ?? null)) {
+    await assertOfficeFileLive(i);
+    return { sha: hashBytes(before.data), copied: false };
+  }
+  const original = await recoverOfficeFile(i);
+  await assertOfficeFileLive(i);
+  try {
+    await compareWriteMirror(path, original.raw, before?.rev ?? null);
+  } catch (e) {
+    return unavailable(e);
+  }
+  try {
+    await assertOfficeFileLive(i);
+  } catch (e) {
+    if (e instanceof OfficeRecoveryError && e.code === "DOCUMENT_DELETED") {
+      try {
+        await deleteMirror(path);
+      } catch {
+      }
+    }
+    throw e;
+  }
+  let saved;
+  try {
+    saved = await readMirrorVersion(path);
+  } catch (e) {
+    return unavailable(e);
+  }
+  if (!verifiedOfficeBytes(i, saved?.data ?? null)) return unavailable("The recovery copy could not be verified.");
+  return { sha: hashBytes(saved.data), copied: true };
+}
+var unavailable;
+var init_office_file_recovery = __esm({
+  "server/office-file-recovery.ts"() {
+    init_office_operation();
+    init_storage();
+    init_encryption();
+    init_dropbox();
+    init_backup_deletions();
+    init_office_recovery_sources();
+    init_office_recovery_sources();
+    unavailable = (cause) => {
+      const error2 = new OfficeRecoveryError("A recovery source is unavailable. Retry after storage access is restored. " + String(cause).slice(0, 120), "RECOVERY_UNAVAILABLE", 503);
+      if (typeof cause?.retryAfterMs === "number") error2.retryAfterMs = cause.retryAfterMs;
+      throw error2;
+    };
   }
 });
 
@@ -57836,7 +57876,7 @@ var require_inflate = __commonJS({
       var state;
       var input, output;
       var next;
-      var put2;
+      var put3;
       var have, left;
       var hold;
       var bits;
@@ -57863,7 +57903,7 @@ var require_inflate = __commonJS({
       if (state.mode === TYPE2) {
         state.mode = TYPEDO2;
       }
-      put2 = strm.next_out;
+      put3 = strm.next_out;
       output = strm.output;
       left = strm.avail_out;
       next = strm.next_in;
@@ -58163,7 +58203,7 @@ var require_inflate = __commonJS({
             /* falls through */
             case DICT2:
               if (state.havedict === 0) {
-                strm.next_out = put2;
+                strm.next_out = put3;
                 strm.avail_out = left;
                 strm.next_in = next;
                 strm.avail_in = have;
@@ -58259,11 +58299,11 @@ var require_inflate = __commonJS({
                 if (copy2 === 0) {
                   break inf_leave;
                 }
-                utils.arraySet(output, input, next, copy2, put2);
+                utils.arraySet(output, input, next, copy2, put3);
                 have -= copy2;
                 next += copy2;
                 left -= copy2;
-                put2 += copy2;
+                put3 += copy2;
                 state.length -= copy2;
                 break;
               }
@@ -58448,14 +58488,14 @@ var require_inflate = __commonJS({
             /* falls through */
             case LEN2:
               if (have >= 6 && left >= 258) {
-                strm.next_out = put2;
+                strm.next_out = put3;
                 strm.avail_out = left;
                 strm.next_in = next;
                 strm.avail_in = have;
                 state.hold = hold;
                 state.bits = bits;
                 inflate_fast2(strm, _out);
-                put2 = strm.next_out;
+                put3 = strm.next_out;
                 output = strm.output;
                 left = strm.avail_out;
                 next = strm.next_in;
@@ -58647,7 +58687,7 @@ var require_inflate = __commonJS({
                 from_source = state.window;
               } else {
                 from_source = output;
-                from = put2 - state.offset;
+                from = put3 - state.offset;
                 copy2 = state.length;
               }
               if (copy2 > left) {
@@ -58656,7 +58696,7 @@ var require_inflate = __commonJS({
               left -= copy2;
               state.length -= copy2;
               do {
-                output[put2++] = from_source[from++];
+                output[put3++] = from_source[from++];
               } while (--copy2);
               if (state.length === 0) {
                 state.mode = LEN2;
@@ -58666,7 +58706,7 @@ var require_inflate = __commonJS({
               if (left === 0) {
                 break inf_leave;
               }
-              output[put2++] = state.length;
+              output[put3++] = state.length;
               left--;
               state.mode = LEN2;
               break;
@@ -58685,7 +58725,7 @@ var require_inflate = __commonJS({
                 state.total += _out;
                 if (_out) {
                   strm.adler = state.check = /*UPDATE(state.check, put - _out, _out);*/
-                  state.flags ? crc323(state.check, output, _out, put2 - _out) : adler322(state.check, output, _out, put2 - _out);
+                  state.flags ? crc323(state.check, output, _out, put3 - _out) : adler322(state.check, output, _out, put3 - _out);
                 }
                 _out = left;
                 if ((state.flags ? hold : zswap322(hold)) !== state.check) {
@@ -58732,7 +58772,7 @@ var require_inflate = __commonJS({
               return Z_STREAM_ERROR2;
           }
         }
-      strm.next_out = put2;
+      strm.next_out = put3;
       strm.avail_out = left;
       strm.next_in = next;
       strm.avail_in = have;
@@ -63019,7 +63059,7 @@ var init_pako_esm = __esm({
       let state;
       let input, output;
       let next;
-      let put2;
+      let put3;
       let have, left;
       let hold;
       let bits;
@@ -63046,7 +63086,7 @@ var init_pako_esm = __esm({
       if (state.mode === TYPE) {
         state.mode = TYPEDO;
       }
-      put2 = strm.next_out;
+      put3 = strm.next_out;
       output = strm.output;
       left = strm.avail_out;
       next = strm.next_in;
@@ -63350,7 +63390,7 @@ var init_pako_esm = __esm({
             /* falls through */
             case DICT:
               if (state.havedict === 0) {
-                strm.next_out = put2;
+                strm.next_out = put3;
                 strm.avail_out = left;
                 strm.next_in = next;
                 strm.avail_in = have;
@@ -63446,11 +63486,11 @@ var init_pako_esm = __esm({
                 if (copy2 === 0) {
                   break inf_leave;
                 }
-                output.set(input.subarray(next, next + copy2), put2);
+                output.set(input.subarray(next, next + copy2), put3);
                 have -= copy2;
                 next += copy2;
                 left -= copy2;
-                put2 += copy2;
+                put3 += copy2;
                 state.length -= copy2;
                 break;
               }
@@ -63635,14 +63675,14 @@ var init_pako_esm = __esm({
             /* falls through */
             case LEN:
               if (have >= 6 && left >= 258) {
-                strm.next_out = put2;
+                strm.next_out = put3;
                 strm.avail_out = left;
                 strm.next_in = next;
                 strm.avail_in = have;
                 state.hold = hold;
                 state.bits = bits;
                 inffast(strm, _out);
-                put2 = strm.next_out;
+                put3 = strm.next_out;
                 output = strm.output;
                 left = strm.avail_out;
                 next = strm.next_in;
@@ -63834,7 +63874,7 @@ var init_pako_esm = __esm({
                 from_source = state.window;
               } else {
                 from_source = output;
-                from = put2 - state.offset;
+                from = put3 - state.offset;
                 copy2 = state.length;
               }
               if (copy2 > left) {
@@ -63843,7 +63883,7 @@ var init_pako_esm = __esm({
               left -= copy2;
               state.length -= copy2;
               do {
-                output[put2++] = from_source[from++];
+                output[put3++] = from_source[from++];
               } while (--copy2);
               if (state.length === 0) {
                 state.mode = LEN;
@@ -63853,7 +63893,7 @@ var init_pako_esm = __esm({
               if (left === 0) {
                 break inf_leave;
               }
-              output[put2++] = state.length;
+              output[put3++] = state.length;
               left--;
               state.mode = LEN;
               break;
@@ -63872,7 +63912,7 @@ var init_pako_esm = __esm({
                 state.total += _out;
                 if (state.wrap & 4 && _out) {
                   strm.adler = state.check = /*UPDATE_CHECK(state.check, put - _out, _out);*/
-                  state.flags ? crc32_1(state.check, output, _out, put2 - _out) : adler32_1(state.check, output, _out, put2 - _out);
+                  state.flags ? crc32_1(state.check, output, _out, put3 - _out) : adler32_1(state.check, output, _out, put3 - _out);
                 }
                 _out = left;
                 if (state.wrap & 4 && (state.flags ? hold : zswap32(hold)) !== state.check) {
@@ -63919,7 +63959,7 @@ var init_pako_esm = __esm({
               return Z_STREAM_ERROR$1;
           }
         }
-      strm.next_out = put2;
+      strm.next_out = put3;
       strm.avail_out = left;
       strm.next_in = next;
       strm.avail_in = have;
@@ -65942,19 +65982,19 @@ function __awaiter(thisArg, _arguments, P, generator) {
       resolve3(value);
     });
   }
-  return new (P || (P = Promise))(function(resolve3, reject) {
+  return new (P || (P = Promise))(function(resolve3, reject2) {
     function fulfilled(value) {
       try {
         step(generator.next(value));
       } catch (e) {
-        reject(e);
+        reject2(e);
       }
     }
     function rejected(value) {
       try {
         step(generator["throw"](value));
       } catch (e) {
-        reject(e);
+        reject2(e);
       }
     }
     function step(result) {
@@ -69490,13 +69530,13 @@ var init_CustomFontSubsetEmbedder = __esm({
         if (typeof this.subset.encode === "function") {
           return Promise.resolve(this.subset.encode());
         }
-        return new Promise((resolve3, reject) => {
+        return new Promise((resolve3, reject2) => {
           if (typeof this.subset.encodeStream !== "function") {
-            reject(new Error("Registered fontkit subsetter must provide encode() or encodeStream()"));
+            reject2(new Error("Registered fontkit subsetter must provide encode() or encodeStream()"));
             return;
           }
           const parts = [];
-          this.subset.encodeStream().on("data", (bytes2) => parts.push(bytes2)).on("end", () => resolve3(mergeUint8Arrays(parts))).on("error", (err3) => reject(err3));
+          this.subset.encodeStream().on("data", (bytes2) => parts.push(bytes2)).on("end", () => resolve3(mergeUint8Arrays(parts))).on("error", (err3) => reject2(err3));
         });
       }
     };
@@ -72652,7 +72692,7 @@ var require_inflate3 = __commonJS({
       var state;
       var input, output;
       var next;
-      var put2;
+      var put3;
       var have, left;
       var hold;
       var bits;
@@ -72679,7 +72719,7 @@ var require_inflate3 = __commonJS({
       if (state.mode === TYPE2) {
         state.mode = TYPEDO2;
       }
-      put2 = strm.next_out;
+      put3 = strm.next_out;
       output = strm.output;
       left = strm.avail_out;
       next = strm.next_in;
@@ -72979,7 +73019,7 @@ var require_inflate3 = __commonJS({
             /* falls through */
             case DICT2:
               if (state.havedict === 0) {
-                strm.next_out = put2;
+                strm.next_out = put3;
                 strm.avail_out = left;
                 strm.next_in = next;
                 strm.avail_in = have;
@@ -73075,11 +73115,11 @@ var require_inflate3 = __commonJS({
                 if (copy2 === 0) {
                   break inf_leave;
                 }
-                utils.arraySet(output, input, next, copy2, put2);
+                utils.arraySet(output, input, next, copy2, put3);
                 have -= copy2;
                 next += copy2;
                 left -= copy2;
-                put2 += copy2;
+                put3 += copy2;
                 state.length -= copy2;
                 break;
               }
@@ -73264,14 +73304,14 @@ var require_inflate3 = __commonJS({
             /* falls through */
             case LEN2:
               if (have >= 6 && left >= 258) {
-                strm.next_out = put2;
+                strm.next_out = put3;
                 strm.avail_out = left;
                 strm.next_in = next;
                 strm.avail_in = have;
                 state.hold = hold;
                 state.bits = bits;
                 inflate_fast2(strm, _out);
-                put2 = strm.next_out;
+                put3 = strm.next_out;
                 output = strm.output;
                 left = strm.avail_out;
                 next = strm.next_in;
@@ -73463,7 +73503,7 @@ var require_inflate3 = __commonJS({
                 from_source = state.window;
               } else {
                 from_source = output;
-                from = put2 - state.offset;
+                from = put3 - state.offset;
                 copy2 = state.length;
               }
               if (copy2 > left) {
@@ -73472,7 +73512,7 @@ var require_inflate3 = __commonJS({
               left -= copy2;
               state.length -= copy2;
               do {
-                output[put2++] = from_source[from++];
+                output[put3++] = from_source[from++];
               } while (--copy2);
               if (state.length === 0) {
                 state.mode = LEN2;
@@ -73482,7 +73522,7 @@ var require_inflate3 = __commonJS({
               if (left === 0) {
                 break inf_leave;
               }
-              output[put2++] = state.length;
+              output[put3++] = state.length;
               left--;
               state.mode = LEN2;
               break;
@@ -73501,7 +73541,7 @@ var require_inflate3 = __commonJS({
                 state.total += _out;
                 if (_out) {
                   strm.adler = state.check = /*UPDATE(state.check, put - _out, _out);*/
-                  state.flags ? crc323(state.check, output, _out, put2 - _out) : adler322(state.check, output, _out, put2 - _out);
+                  state.flags ? crc323(state.check, output, _out, put3 - _out) : adler322(state.check, output, _out, put3 - _out);
                 }
                 _out = left;
                 if ((state.flags ? hold : zswap322(hold)) !== state.check) {
@@ -73548,7 +73588,7 @@ var require_inflate3 = __commonJS({
               return Z_STREAM_ERROR2;
           }
         }
-      strm.next_out = put2;
+      strm.next_out = put3;
       strm.avail_out = left;
       strm.next_in = next;
       strm.avail_in = have;
@@ -96200,34 +96240,6 @@ var init_es = __esm({
   }
 });
 
-// src/lib/englishText.ts
-function englishTextError(value) {
-  return UNSUPPORTED.test(value) ? ENGLISH_TEXT_ERROR : null;
-}
-function englishTextProblems(value, path = "") {
-  if (typeof value === "string") return englishTextError(value) ? { [path]: ENGLISH_TEXT_ERROR } : {};
-  if (!value || typeof value !== "object") return {};
-  const result = {};
-  for (const [key, child] of Object.entries(value)) {
-    if (/^(password|newPassword|currentPassword|confirmPassword|nameCheck|token|sourceId|verificationToken|idempotencyKey)$/i.test(key)) continue;
-    Object.assign(result, englishTextProblems(child, path ? `${path}.${key}` : key));
-  }
-  return result;
-}
-function assertEnglishText(value) {
-  const errors = englishTextProblems(value);
-  if (Object.keys(errors).length) throw new InputValidationError(`${ENGLISH_TEXT_ERROR} Fields: ${Object.keys(errors).join(", ")}`);
-}
-var ENGLISH_TEXT_ERROR, UNSUPPORTED, InputValidationError;
-var init_englishText = __esm({
-  "src/lib/englishText.ts"() {
-    ENGLISH_TEXT_ERROR = "Please use English letters (A\u2013Z). Numbers, spaces and standard punctuation are also allowed. Replace the highlighted characters to continue.";
-    UNSUPPORTED = /[^\x20-\x7E\r\n\t‘’“”–—…•·§©®™£€]/u;
-    InputValidationError = class extends Error {
-    };
-  }
-});
-
 // server/document-text.ts
 function encodeDocumentText(text) {
   return text.replace(/\$(?=[$&`'])|[&|[\]<>*#_\r\n]/g, (c) => `&#${c.charCodeAt(0)};`).replace(/Form document/g, "&#70;orm document").replace(/v1 draft/g, "v&#49; draft");
@@ -97444,706 +97456,6 @@ var init_s_election_recovery = __esm({
     escape5 = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   }
 });
-
-// server/app.ts
-init_office_operation();
-init_office_recovery_sources();
-
-// server/routes-office-recovery.ts
-init_db();
-
-// node_modules/hono/dist/utils/url.js
-var splitPath = (path) => {
-  const paths = path.split("/");
-  if (paths[0] === "") {
-    paths.shift();
-  }
-  return paths;
-};
-var splitRoutingPath = (routePath) => {
-  const { groups, path } = extractGroupsFromPath(routePath);
-  const paths = splitPath(path);
-  return replaceGroupMarks(paths, groups);
-};
-var extractGroupsFromPath = (path) => {
-  const groups = [];
-  path = path.replace(/\{[^}]+\}/g, (match2, index2) => {
-    const mark = `@${index2}`;
-    groups.push([mark, match2]);
-    return mark;
-  });
-  return { groups, path };
-};
-var replaceGroupMarks = (paths, groups) => {
-  for (let i = groups.length - 1; i >= 0; i--) {
-    const [mark] = groups[i];
-    for (let j = paths.length - 1; j >= 0; j--) {
-      if (paths[j].includes(mark)) {
-        paths[j] = paths[j].replace(mark, groups[i][1]);
-        break;
-      }
-    }
-  }
-  return paths;
-};
-var patternCache = {};
-var getPattern = (label, next) => {
-  if (label === "*") {
-    return "*";
-  }
-  const match2 = label.match(/^\:([^\{\}]+)(?:\{(.+)\})?$/);
-  if (match2) {
-    const cacheKey = `${label}#${next}`;
-    if (!patternCache[cacheKey]) {
-      if (match2[2]) {
-        patternCache[cacheKey] = next && next[0] !== ":" && next[0] !== "*" ? [cacheKey, match2[1], new RegExp(`^${match2[2]}(?=/${next})`)] : [label, match2[1], new RegExp(`^${match2[2]}$`)];
-      } else {
-        patternCache[cacheKey] = [label, match2[1], true];
-      }
-    }
-    return patternCache[cacheKey];
-  }
-  return null;
-};
-var tryDecode = (str, decoder) => {
-  try {
-    return decoder(str);
-  } catch {
-    return str.replace(/(?:%[0-9A-Fa-f]{2})+/g, (match2) => {
-      try {
-        return decoder(match2);
-      } catch {
-        return match2;
-      }
-    });
-  }
-};
-var tryDecodeURI = (str) => tryDecode(str, decodeURI);
-var getPath = (request) => {
-  const url = request.url;
-  const start = url.indexOf("/", url.indexOf(":") + 4);
-  let i = start;
-  for (; i < url.length; i++) {
-    const charCode = url.charCodeAt(i);
-    if (charCode === 37) {
-      const queryIndex = url.indexOf("?", i);
-      const hashIndex = url.indexOf("#", i);
-      const end = queryIndex === -1 ? hashIndex === -1 ? void 0 : hashIndex : hashIndex === -1 ? queryIndex : Math.min(queryIndex, hashIndex);
-      const path = url.slice(start, end);
-      return tryDecodeURI(path.includes("%25") ? path.replace(/%25/g, "%2525") : path);
-    } else if (charCode === 63 || charCode === 35) {
-      break;
-    }
-  }
-  return url.slice(start, i);
-};
-var getPathNoStrict = (request) => {
-  const result = getPath(request);
-  return result.length > 1 && result.at(-1) === "/" ? result.slice(0, -1) : result;
-};
-var mergePath = (base, sub, ...rest) => {
-  if (rest.length) {
-    sub = mergePath(sub, ...rest);
-  }
-  return `${base?.[0] === "/" ? "" : "/"}${base}${sub === "/" ? "" : `${base?.at(-1) === "/" ? "" : "/"}${sub?.[0] === "/" ? sub.slice(1) : sub}`}`;
-};
-var checkOptionalParameter = (path) => {
-  if (path.charCodeAt(path.length - 1) !== 63 || !path.includes(":")) {
-    return null;
-  }
-  const segments = path.split("/");
-  const results = [];
-  let basePath = "";
-  segments.forEach((segment) => {
-    if (segment !== "" && !/\:/.test(segment)) {
-      basePath += "/" + segment;
-    } else if (/\:/.test(segment)) {
-      if (segment.charCodeAt(segment.length - 1) === 63) {
-        if (results.length === 0 && basePath === "") {
-          results.push("/");
-        } else {
-          results.push(basePath);
-        }
-        const optionalSegment = segment.slice(0, -1);
-        basePath += "/" + optionalSegment;
-        results.push(basePath);
-      } else {
-        basePath += "/" + segment;
-      }
-    }
-  });
-  return results.filter((v2, i, a2) => a2.indexOf(v2) === i);
-};
-var tryDecodeURIComponent = (str) => str.indexOf("%") !== -1 ? tryDecode(str, decodeURIComponent_) : str;
-var _decodeURI = (value) => {
-  if (value.indexOf("+") !== -1) {
-    value = value.replace(/\+/g, " ");
-  }
-  return tryDecodeURIComponent(value);
-};
-var _getQueryParam = (url, key, multiple) => {
-  const hashIndex = url.indexOf("#", 8);
-  if (hashIndex !== -1) {
-    url = url.slice(0, hashIndex);
-  }
-  let encoded2;
-  if (!multiple && key && key.indexOf("%") === -1 && key.indexOf("+") === -1) {
-    let keyIndex2 = url.indexOf("?", 8);
-    if (keyIndex2 === -1) {
-      return void 0;
-    }
-    if (!url.startsWith(key, keyIndex2 + 1)) {
-      keyIndex2 = url.indexOf(`&${key}`, keyIndex2 + 1);
-    }
-    while (keyIndex2 !== -1) {
-      const trailingKeyCode = url.charCodeAt(keyIndex2 + key.length + 1);
-      if (trailingKeyCode === 61) {
-        const valueIndex = keyIndex2 + key.length + 2;
-        const endIndex = url.indexOf("&", valueIndex);
-        return _decodeURI(url.slice(valueIndex, endIndex === -1 ? void 0 : endIndex));
-      } else if (trailingKeyCode == 38 || isNaN(trailingKeyCode)) {
-        return "";
-      }
-      keyIndex2 = url.indexOf(`&${key}`, keyIndex2 + 1);
-    }
-    encoded2 = /[%+]/.test(url);
-    if (!encoded2) {
-      return void 0;
-    }
-  }
-  const results = /* @__PURE__ */ Object.create(null);
-  encoded2 ??= /[%+]/.test(url);
-  let keyIndex = url.indexOf("?", 8);
-  while (keyIndex !== -1) {
-    const nextKeyIndex = url.indexOf("&", keyIndex + 1);
-    let valueIndex = url.indexOf("=", keyIndex);
-    if (valueIndex > nextKeyIndex && nextKeyIndex !== -1) {
-      valueIndex = -1;
-    }
-    let name = url.slice(
-      keyIndex + 1,
-      valueIndex === -1 ? nextKeyIndex === -1 ? void 0 : nextKeyIndex : valueIndex
-    );
-    if (encoded2) {
-      name = _decodeURI(name);
-    }
-    keyIndex = nextKeyIndex;
-    if (name === "") {
-      continue;
-    }
-    let value;
-    if (valueIndex === -1) {
-      value = "";
-    } else {
-      value = url.slice(valueIndex + 1, nextKeyIndex === -1 ? void 0 : nextKeyIndex);
-      if (encoded2) {
-        value = _decodeURI(value);
-      }
-    }
-    if (multiple) {
-      if (!(results[name] && Array.isArray(results[name]))) {
-        results[name] = [];
-      }
-      ;
-      results[name].push(value);
-    } else {
-      results[name] ??= value;
-    }
-  }
-  return key ? results[key] : results;
-};
-var getQueryParam = _getQueryParam;
-var getQueryParams = (url, key) => {
-  return _getQueryParam(url, key, true);
-};
-var decodeURIComponent_ = decodeURIComponent;
-
-// node_modules/hono/dist/utils/cookie.js
-var validCookieNameRegEx = /^[\w!#$%&'*.^`|~+-]+$/;
-var relaxedCookieNameRegEx = /^[!#-:<>-[\]-~]+$/;
-var validCookieValueRegEx = /^[ !#-:<-[\]-~]*$/;
-var trimCookieWhitespace = (value) => {
-  let start = 0;
-  let end = value.length;
-  while (start < end) {
-    const charCode = value.charCodeAt(start);
-    if (charCode !== 32 && charCode !== 9) {
-      break;
-    }
-    start++;
-  }
-  while (end > start) {
-    const charCode = value.charCodeAt(end - 1);
-    if (charCode !== 32 && charCode !== 9) {
-      break;
-    }
-    end--;
-  }
-  return start === 0 && end === value.length ? value : value.slice(start, end);
-};
-var parse = (cookie, name) => {
-  if (name && cookie.indexOf(name) === -1) {
-    return {};
-  }
-  const pairs = cookie.split(";");
-  const parsedCookie = /* @__PURE__ */ Object.create(null);
-  for (const pairStr of pairs) {
-    const valueStartPos = pairStr.indexOf("=");
-    if (valueStartPos === -1) {
-      continue;
-    }
-    const cookieName = trimCookieWhitespace(pairStr.substring(0, valueStartPos));
-    if (name && name !== cookieName || !relaxedCookieNameRegEx.test(cookieName) || cookieName in parsedCookie) {
-      continue;
-    }
-    let cookieValue = trimCookieWhitespace(pairStr.substring(valueStartPos + 1));
-    if (cookieValue.startsWith('"') && cookieValue.endsWith('"')) {
-      cookieValue = cookieValue.slice(1, -1);
-    }
-    if (validCookieValueRegEx.test(cookieValue)) {
-      parsedCookie[cookieName] = tryDecodeURIComponent(cookieValue);
-      if (name) {
-        break;
-      }
-    }
-  }
-  return parsedCookie;
-};
-var _serialize = (name, value, opt = {}) => {
-  if (!validCookieNameRegEx.test(name)) {
-    throw new Error("Invalid cookie name");
-  }
-  let cookie = `${name}=${value}`;
-  if (name.startsWith("__Secure-") && !opt.secure) {
-    throw new Error("__Secure- Cookie must have Secure attributes");
-  }
-  if (name.startsWith("__Host-")) {
-    if (!opt.secure) {
-      throw new Error("__Host- Cookie must have Secure attributes");
-    }
-    if (opt.path !== "/") {
-      throw new Error('__Host- Cookie must have Path attributes with "/"');
-    }
-    if (opt.domain) {
-      throw new Error("__Host- Cookie must not have Domain attributes");
-    }
-  }
-  for (const key of ["domain", "path", "sameSite", "priority"]) {
-    if (opt[key] && /[;\r\n]/.test(opt[key])) {
-      throw new Error(`${key} must not contain ";", "\\r", or "\\n"`);
-    }
-  }
-  if (opt && typeof opt.maxAge === "number" && opt.maxAge >= 0) {
-    if (opt.maxAge > 3456e4) {
-      throw new Error(
-        "Cookies Max-Age SHOULD NOT be greater than 400 days (34560000 seconds) in duration."
-      );
-    }
-    cookie += `; Max-Age=${opt.maxAge | 0}`;
-  }
-  if (opt.domain && opt.prefix !== "host") {
-    cookie += `; Domain=${opt.domain}`;
-  }
-  if (opt.path) {
-    cookie += `; Path=${opt.path}`;
-  }
-  if (opt.expires) {
-    if (opt.expires.getTime() - Date.now() > 3456e7) {
-      throw new Error(
-        "Cookies Expires SHOULD NOT be greater than 400 days (34560000 seconds) in the future."
-      );
-    }
-    cookie += `; Expires=${opt.expires.toUTCString()}`;
-  }
-  if (opt.httpOnly) {
-    cookie += "; HttpOnly";
-  }
-  if (opt.secure) {
-    cookie += "; Secure";
-  }
-  if (opt.sameSite) {
-    cookie += `; SameSite=${opt.sameSite.charAt(0).toUpperCase() + opt.sameSite.slice(1)}`;
-  }
-  if (opt.priority) {
-    cookie += `; Priority=${opt.priority.charAt(0).toUpperCase() + opt.priority.slice(1)}`;
-  }
-  if (opt.partitioned) {
-    if (!opt.secure) {
-      throw new Error("Partitioned Cookie must have Secure attributes");
-    }
-    cookie += "; Partitioned";
-  }
-  return cookie;
-};
-var serialize = (name, value, opt) => {
-  value = encodeURIComponent(value);
-  return _serialize(name, value, opt);
-};
-
-// node_modules/hono/dist/helper/cookie/index.js
-var getCookie = (c, key, prefix) => {
-  const cookie = c.req.raw.headers.get("Cookie");
-  if (typeof key === "string") {
-    if (!cookie) {
-      return void 0;
-    }
-    let finalKey = key;
-    if (prefix === "secure") {
-      finalKey = "__Secure-" + key;
-    } else if (prefix === "host") {
-      finalKey = "__Host-" + key;
-    }
-    const obj2 = parse(cookie, finalKey);
-    return obj2[finalKey];
-  }
-  if (!cookie) {
-    return {};
-  }
-  const obj = parse(cookie);
-  return obj;
-};
-var generateCookie = (name, value, opt) => {
-  let cookie;
-  if (opt?.prefix === "secure") {
-    cookie = serialize("__Secure-" + name, value, { path: "/", ...opt, secure: true });
-  } else if (opt?.prefix === "host") {
-    cookie = serialize("__Host-" + name, value, {
-      ...opt,
-      path: "/",
-      secure: true,
-      domain: void 0
-    });
-  } else {
-    cookie = serialize(name, value, { path: "/", ...opt });
-  }
-  return cookie;
-};
-var setCookie = (c, name, value, opt) => {
-  const cookie = generateCookie(name, value, opt);
-  c.header("Set-Cookie", cookie, { append: true });
-};
-var deleteCookie = (c, name, opt) => {
-  const deletedCookie = getCookie(c, name, opt?.prefix);
-  setCookie(c, name, "", { ...opt, maxAge: 0 });
-  return deletedCookie;
-};
-
-// server/auth.ts
-init_db();
-
-// server/crypto.ts
-init_env();
-init_encryption();
-import {
-  randomBytes as randomBytes3,
-  scrypt as scryptCb,
-  timingSafeEqual,
-  createHash as createHash7,
-  createHmac,
-  createDecipheriv as createDecipheriv2,
-  hkdfSync
-} from "node:crypto";
-function scrypt(password, salt) {
-  return new Promise(
-    (resolve3, reject) => scryptCb(password, salt, 64, (err3, key) => err3 ? reject(err3) : resolve3(key))
-  );
-}
-async function hashPassword(password) {
-  const salt = randomBytes3(16);
-  const key = await scrypt(password, salt);
-  return `s1:${salt.toString("hex")}:${key.toString("hex")}`;
-}
-async function verifyPassword(password, stored) {
-  const [v2, saltHex, keyHex] = stored.split(":");
-  if (v2 !== "s1" || !saltHex || !keyHex) return false;
-  const key = await scrypt(password, Buffer.from(saltHex, "hex"));
-  const expected = Buffer.from(keyHex, "hex");
-  return key.length === expected.length && timingSafeEqual(key, expected);
-}
-function newToken() {
-  const token = randomBytes3(32).toString("base64url");
-  return { token, tokenHash: hashToken(token) };
-}
-function hashToken(token) {
-  return createHash7("sha256").update(token).digest("hex");
-}
-function hmacSha256Base64(key, message) {
-  return createHmac("sha256", key).update(message).digest("base64");
-}
-function secretKey() {
-  return Buffer.from(hkdfSync("sha256", process.env.LEGACY_SESSION_SECRET || env.SESSION_SECRET, "fpsllc-ein-v1", "ein-encryption", 32));
-}
-function encryptSecret(plain) {
-  return `v2:${seal(Buffer.from(plain)).toString("base64")}`;
-}
-var SecretFormatError = class extends Error {
-};
-function decryptSecret(stored) {
-  if (stored.startsWith("v2:")) return unseal(Buffer.from(stored.slice(3), "base64")).toString();
-  const [v2, ivHex, tagHex, ctHex] = stored.split(":");
-  if (v2 !== "v1" || !ivHex || !tagHex || !ctHex) throw new SecretFormatError("bad secret format");
-  const decipher = createDecipheriv2("aes-256-gcm", secretKey(), Buffer.from(ivHex, "hex"));
-  decipher.setAuthTag(Buffer.from(tagHex, "hex"));
-  return Buffer.concat([decipher.update(Buffer.from(ctHex, "hex")), decipher.final()]).toString("utf8");
-}
-
-// server/auth.ts
-init_env();
-var CLIENT_COOKIE = "fpsllc_session";
-var ADMIN_COOKIE = "fpsllc_admin";
-var SESSION_DAYS = 30;
-function sessionCredentials(hours) {
-  return { ...newToken(), expires: new Date(Date.now() + (hours ? hours * 36e5 : SESSION_DAYS * 864e5)) };
-}
-function setSessionCookie(c, credentials, isAdmin = false) {
-  setCookie(c, isAdmin ? ADMIN_COOKIE : CLIENT_COOKIE, credentials.token, {
-    httpOnly: true,
-    secure: env.isProd,
-    sameSite: "Lax",
-    path: "/",
-    expires: credentials.expires
-  });
-}
-async function createSession(c, opts) {
-  const db = await getDb();
-  const credentials = sessionCredentials(opts.hours);
-  if (opts.clientId) {
-    const rows = await db.query(
-      `INSERT INTO sessions
-      (token_hash, client_id, is_admin, viewing_as_admin, expires_at, password_version)
-      SELECT $1, id, $3, $4, $5, password_version FROM clients
-      WHERE id=$2 AND ($6::text IS NULL OR password_hash=$6) RETURNING token_hash`,
-      [
-        credentials.tokenHash,
-        opts.clientId,
-        opts.isAdmin ?? false,
-        opts.viewingAsAdmin ?? false,
-        credentials.expires.toISOString(),
-        opts.verifiedPasswordHash ?? null
-      ]
-    );
-    if (!rows.length) return false;
-  } else {
-    await db.query(
-      "INSERT INTO sessions (token_hash, client_id, is_admin, viewing_as_admin, expires_at) VALUES ($1, $2, $3, $4, $5)",
-      [credentials.tokenHash, null, opts.isAdmin ?? false, opts.viewingAsAdmin ?? false, credentials.expires.toISOString()]
-    );
-  }
-  setSessionCookie(c, credentials, opts.isAdmin);
-  return true;
-}
-async function lookup(c, cookieName) {
-  const token = getCookie(c, cookieName);
-  if (!token) return null;
-  const db = await getDb();
-  const tokenHash = hashToken(token);
-  const rows = await db.query(
-    `SELECT s.client_id, s.is_admin, s.viewing_as_admin FROM sessions s
-      LEFT JOIN clients c ON c.id=s.client_id
-      WHERE s.token_hash=$1 AND s.expires_at>now()
-        AND (s.client_id IS NULL OR s.password_version=c.password_version)`,
-    [tokenHash]
-  );
-  if (rows.length === 0) return null;
-  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash, viewingAsAdmin: rows[0].viewing_as_admin };
-}
-async function getSession(c) {
-  const s = await lookup(c, CLIENT_COOKIE);
-  return s?.clientId ? s : null;
-}
-async function getAdminSession(c) {
-  const s = await lookup(c, ADMIN_COOKIE);
-  return s?.isAdmin ? s : null;
-}
-async function destroySession(c, role = "client") {
-  const cookieName = role === "admin" ? ADMIN_COOKIE : CLIENT_COOKIE;
-  const token = getCookie(c, cookieName);
-  if (token) {
-    const db = await getDb();
-    await db.query("DELETE FROM sessions WHERE token_hash = $1", [hashToken(token)]);
-  }
-  deleteCookie(c, cookieName, { path: "/" });
-}
-async function rateLimit(key, max, windowMs, failMode = "open") {
-  try {
-    const db = await getDb();
-    const rows = await db.query(
-      `INSERT INTO rate_limits (key, window_start, count) VALUES ($1, now(), 1)
-       ON CONFLICT (key) DO UPDATE SET
-         count = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
-                      THEN 1 ELSE rate_limits.count + 1 END,
-         window_start = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
-                             THEN now() ELSE rate_limits.window_start END
-       RETURNING count`,
-      [key, windowMs / 1e3]
-    );
-    return rows[0].count <= max;
-  } catch (e) {
-    console.error(`[rateLimit] check failed, failing ${failMode}:`, e);
-    return failMode === "open";
-  }
-}
-function clientIp(c) {
-  return c.req.header("x-forwarded-for")?.split(",")[0].trim() || c.req.header("x-real-ip") || "local";
-}
-
-// src/lib/uploadLimits.ts
-var MAX_UPLOAD_BYTES = 40 * 1024 * 1024;
-
-// server/shared.ts
-var testHooks = {
-  /** Makes the next fulfillment throw once (dev suite scaffolding). */
-  failNextFulfillment: false,
-  /** When >= 0, the (N+1)th putFile in the next formation upload throws. */
-  failFormationPutAfter: -1,
-  /** Dev: the next card-on-file charge is declined with this Square code. */
-  declineNextRenewal: ""
-};
-var err = (message, code) => ({ error: { message, code } });
-function maskEmail(email) {
-  const [local, domain] = email.split("@");
-  return `${local.slice(0, 1)}${"\u2022".repeat(Math.max(2, local.length - 1))}@${domain ?? ""}`;
-}
-async function requireAdmin(c) {
-  return getAdminSession(c);
-}
-var looksLikePdf = async (f) => {
-  const bytes2 = new Uint8Array(await f.arrayBuffer());
-  if (bytes2.length < 8) return false;
-  const head2 = new TextDecoder().decode(bytes2.slice(0, 8));
-  if (!head2.startsWith("%PDF-")) return false;
-  const tail = new TextDecoder().decode(bytes2.slice(-1024));
-  return tail.includes("%%EOF");
-};
-
-// server/routes-office-recovery.ts
-init_office_file_recovery();
-init_office_recovery_sources();
-init_office_operation();
-init_office_history_recovery();
-init_dropbox();
-init_backup_deletions();
-init_storage();
-init_encryption();
-init_backup_attention();
-init_backup();
-var uuid2 = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
-function registerOfficeRecovery(app2) {
-  app2.post("/admin/backups/restart-after-history-change", async (c) => {
-    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const body = await c.req.json().catch(() => ({}));
-    if (body.acknowledge !== true) return c.json(err("Confirm starting a new snapshot with the disclosed historical gap.", "ACKNOWLEDGMENT_REQUIRED"), 400);
-    return c.json({ data: await restartBackupAfterHistoryChange(String(body.expectedJobKey ?? ""), String(body.historyId ?? "")) }, 202);
-  });
-  app2.get("/admin/backups/attention", async (c) => {
-    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const [progress] = await (await getDb()).query("SELECT error FROM backup_progress WHERE id='database'");
-    if (progress?.error?.includes("Backup alert persistence failed")) throw new OfficeRecoveryError("Backup alert persistence failed. Review backup recovery; document recovery remains available.", "RECOVERY_UNAVAILABLE", 503);
-    return c.json({ data: await backupAttention() });
-  });
-  app2.post("/admin/backups/attention/:problemId/retry", async (c) => {
-    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!/^[a-f0-9]{64}$/.test(c.req.param("problemId"))) return c.json(err("Not found", "NOT_FOUND"), 404);
-    const result = await deliverBackupAttention({ problemId: c.req.param("problemId") });
-    return result ? c.json({ data: result }) : c.json(err("Not found", "NOT_FOUND"), 404);
-  });
-  app2.get("/admin/orders/:id/office-recovery", async (c) => {
-    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!uuid2.test(c.req.param("id"))) return c.json(err("Not found", "NOT_FOUND"), 404);
-    const db = await getDb(), tables = await officeRecoveryTables(db), order2 = tables.orders.find((o) => o.id === c.req.param("id") && ["paid", "filed", "formed"].includes(String(o.status)));
-    if (!order2) return c.json(err("Not found", "NOT_FOUND"), 404);
-    const rows = [...officeFileIdentities(tables, { includeUnknown: true }).values()].filter((i) => i.orderId === order2.id && i.clientId === order2.client_id);
-    return c.json({ data: rows.map((i) => ({ operationId: i.operationId, slot: i.slot, title: i.file.title, historical: i.historical, sha: i.file.sha, size: i.file.size })) });
-  });
-  app2.post("/admin/orders/:id/office-recovery/:operationId/:slot", async (c) => {
-    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!uuid2.test(c.req.param("id")) || !uuid2.test(c.req.param("operationId"))) return c.json(err("Not found", "NOT_FOUND"), 404);
-    if (!["articles", "statement", "upload"].includes(c.req.param("slot"))) return c.json(err("Invalid document slot", "INVALID_SLOT"), 400);
-    const db = await getDb(), tables = await officeRecoveryTables(db);
-    const order2 = tables.orders.find((o) => o.id === c.req.param("id") && ["paid", "filed", "formed"].includes(String(o.status)));
-    const i = [...officeFileIdentities(tables, { includeUnknown: true }).values()].find((i2) => i2.operationId === c.req.param("operationId") && i2.slot === c.req.param("slot") && i2.orderId === order2?.id && i2.clientId === order2?.client_id);
-    if (!i || !order2) return c.json(err("Not found", "NOT_FOUND"), 404);
-    if (!i.file.sha) return c.json(err("The original document fingerprint is unavailable.", "RECOVERY_IDENTITY_UNAVAILABLE"), 409);
-    const form = await c.req.parseBody(), file = form.file;
-    if (file instanceof File && (file.size > MAX_UPLOAD_BYTES || !await looksLikePdf(file))) return c.json(err("Choose a readable PDF under 20 MB", "NOT_A_PDF"), 400);
-    const supplied = file instanceof File ? Buffer.from(await file.arrayBuffer()) : void 0;
-    const original = tables.office_operations.find((o) => o.id === i.operationId);
-    const held = await claimOfficeVerification(db, original);
-    try {
-      await assertOfficeFileLive(i);
-      if (supplied) {
-        if (supplied.length !== i.file.size || hashBytes(supplied) !== i.file.sha) throw new OfficeRecoveryError("Select the exact original PDF.", "OFFICE_CONFLICT");
-        if (!await recordDocumentCopy({ documentId: i.file.id, storageKey: i.file.key, serviceId: i.serviceId, mirrorPath: i.file.mirrorPath ?? `/OfficeOperations/${i.operationId}/${i.slot}` })) throw new OfficeRecoveryError("This document was deleted.", "DOCUMENT_DELETED");
-        await replaceStoredFile(i.file.key, i.sensitive ? seal(supplied) : supplied);
-      }
-      await recoverOfficeFile(i);
-      await ensureOfficeRecoveryCopy(i);
-      await assertOfficeFileLive(i);
-      const [reservation] = await db.query("SELECT id FROM office_operations WHERE id=$1 AND lease=$2 AND lease_until>now()", [held.id, held.lease]);
-      if (!reservation) throw new OfficeRecoveryError("The recovery reservation expired. Retry.", "OFFICE_BUSY");
-      return c.json({ data: { state: "recovered", message: "Original document recovered. Current filing information is unchanged." } });
-    } finally {
-      await releaseOfficeOperation(db, held);
-    }
-  });
-  app2.post("/admin/office-operations/:id/continue", async (c) => {
-    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!uuid2.test(c.req.param("id"))) return c.json(err("Not found", "NOT_FOUND"), 404);
-    const db = await getDb();
-    const [op] = await db.query("SELECT * FROM office_operations WHERE id=$1", [c.req.param("id")]);
-    if (!op) return c.json(err("Not found", "NOT_FOUND"), 404);
-    const claim = op.payload.retirement;
-    if (!claim) return c.json(err("This operation has no saved replacement to continue.", "OFFICE_CONFLICT"), 409);
-    if (op.phase === "superseded") {
-      const [next2] = await db.query("SELECT * FROM office_operations WHERE id=$1", [claim.successorId]);
-      if (!next2) return c.json(err("The saved successor is unavailable.", "OFFICE_CONFLICT"), 409);
-      return c.json({ data: { state: "awaiting_original", operationId: next2.id } }, 202);
-    }
-    if (op.phase !== "retiring") return c.json(err("The operation has changed.", "OFFICE_CONFLICT"), 409);
-    const next = await retireOfficeAttempt(db, op, claim.inputHash, claim.payload);
-    return c.json({ data: { state: "awaiting_original", operationId: next.id, message: "Replacement reserved. Attach the original replacement PDF or correct this pending attempt." } }, 202);
-  });
-  app2.get("/admin/backups/history-recovery", async (c) => {
-    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const orderId = c.req.query("orderId"), historyId2 = c.req.query("historyId");
-    if (orderId && !uuid2.test(orderId) || historyId2 && !/^[a-f0-9]{64}$/.test(historyId2)) return c.json(err("Invalid history filter", "INVALID_FILTER"), 400);
-    const rows = (await enumerateOfficeHistory(await getDb())).filter((r) => (!orderId || r.orderId === orderId) && (!historyId2 || r.historyId === historyId2));
-    let cursor = null;
-    try {
-      if (c.req.query("cursor")) {
-        cursor = JSON.parse(Buffer.from(c.req.query("cursor"), "base64url").toString());
-        if (!Array.isArray(cursor) || cursor.length !== 3 || cursor.some((s) => typeof s !== "string")) throw Error();
-      }
-    } catch {
-      return c.json(err("Invalid cursor", "INVALID_CURSOR"), 400);
-    }
-    const limit = Math.min(100, Math.max(1, Number(c.req.query("limit") ?? 50) || 50));
-    const key = (r) => [r.createdAt, r.identity.operationId, r.slot];
-    const compare = (a2, b2) => a2[0].localeCompare(b2[0]) || a2[1].localeCompare(b2[1]) || a2[2].localeCompare(b2[2]);
-    const remaining = rows.filter((r) => !cursor || compare(key(r), cursor) > 0), page = remaining.slice(0, limit);
-    return c.json({ data: { rows: page.map(({ identity, ...row }) => ({ ...row, operationId: identity.operationId })), nextCursor: remaining.length > limit ? Buffer.from(JSON.stringify(key(page[page.length - 1]))).toString("base64url") : null } });
-  });
-  app2.post("/admin/backups/history-recovery/:historyId/check", async (c) => {
-    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const result = await checkedHistory(c.req.param("historyId"));
-    return result ? c.json({ data: result }) : c.json(err("Not found", "NOT_FOUND"), 404);
-  });
-  app2.post("/admin/backups/history-recovery/:historyId/unrecoverable", async (c) => {
-    const admin = await requireAdmin(c);
-    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const body = await c.req.json().catch(() => ({}));
-    if (body.acknowledge !== true) return c.json(err("Confirm this exact historical original is unavailable.", "ACKNOWLEDGMENT_REQUIRED"), 400);
-    const result = await acknowledgeHistoryGap(await getDb(), c.req.param("historyId"), String(body.expectedRevision ?? ""), admin.tokenHash);
-    return result ? c.json({ data: result }) : c.json(err("Not found", "NOT_FOUND"), 404);
-  });
-  app2.post("/admin/backups/history-recovery/:historyId/original", async (c) => {
-    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const form = await c.req.parseBody(), file = form.file;
-    if (file instanceof File && (file.size > MAX_UPLOAD_BYTES || !await looksLikePdf(file))) return c.json(err("Choose a readable original PDF under 20 MB.", "NOT_A_PDF"), 400);
-    const result = await restoreHistoricalOriginal(await getDb(), c.req.param("historyId"), file instanceof File ? Buffer.from(await file.arrayBuffer()) : void 0);
-    return result ? c.json({ data: result }) : c.json(err("Not found", "NOT_FOUND"), 404);
-  });
-}
 
 // node_modules/hono/dist/http-exception.js
 var HTTPException = class extends Error {
@@ -102219,6 +101531,1116 @@ var coerce = {
 };
 var NEVER = INVALID;
 
+// server/office-uploads.ts
+import { createDecipheriv as createDecipheriv3, createHash as createHash9, randomBytes as randomBytes4 } from "node:crypto";
+
+// node_modules/@vercel/blob/dist/client.js
+init_chunk_YYMLUMXS();
+var import_undici2 = __toESM(require_undici(), 1);
+import * as crypto2 from "crypto";
+function createPutExtraChecks(methodName) {
+  return function extraChecks(options) {
+    if (!options.token.startsWith("vercel_blob_client_")) {
+      throw new BlobError(`${methodName} must be called with a client token`);
+    }
+    if (
+      // @ts-expect-error -- Runtime check for DX.
+      options.addRandomSuffix !== void 0 || // @ts-expect-error -- Runtime check for DX.
+      options.allowOverwrite !== void 0 || // @ts-expect-error -- Runtime check for DX.
+      options.cacheControlMaxAge !== void 0
+    ) {
+      throw new BlobError(
+        `${methodName} doesn't allow \`addRandomSuffix\`, \`cacheControlMaxAge\` or \`allowOverwrite\`. Configure these options at the server side when generating client tokens.`
+      );
+    }
+  };
+}
+var put = createPutMethod({
+  allowedOptions: ["contentType"],
+  extraChecks: createPutExtraChecks("client/`put`")
+});
+var createMultipartUpload2 = createCreateMultipartUploadMethod({
+  allowedOptions: ["contentType"],
+  extraChecks: createPutExtraChecks("client/`createMultipartUpload`")
+});
+var createMultipartUploader = createCreateMultipartUploaderMethod(
+  {
+    allowedOptions: ["contentType"],
+    extraChecks: createPutExtraChecks("client/`createMultipartUpload`")
+  }
+);
+var uploadPart2 = createUploadPartMethod({
+  allowedOptions: ["contentType"],
+  extraChecks: createPutExtraChecks("client/`multipartUpload`")
+});
+var completeMultipartUpload2 = createCompleteMultipartUploadMethod(
+  {
+    allowedOptions: ["contentType"],
+    extraChecks: createPutExtraChecks("client/`completeMultipartUpload`")
+  }
+);
+var upload = createPutMethod({
+  allowedOptions: ["contentType"],
+  extraChecks(options) {
+    if (options.handleUploadUrl === void 0) {
+      throw new BlobError(
+        "client/`upload` requires the 'handleUploadUrl' parameter"
+      );
+    }
+    if (
+      // @ts-expect-error -- Runtime check for DX.
+      options.addRandomSuffix !== void 0 || // @ts-expect-error -- Runtime check for DX.
+      options.allowOverwrite !== void 0 || // @ts-expect-error -- Runtime check for DX.
+      options.cacheControlMaxAge !== void 0 || // @ts-expect-error -- Runtime check for DX.
+      options.ifMatch !== void 0
+    ) {
+      throw new BlobError(
+        "client/`upload` doesn't allow `addRandomSuffix`, `cacheControlMaxAge`, `allowOverwrite` or `ifMatch`. Configure these options at the server side when generating client tokens."
+      );
+    }
+  },
+  async getToken(pathname, options) {
+    var _a3, _b2;
+    return retrieveClientToken({
+      handleUploadUrl: options.handleUploadUrl,
+      pathname,
+      clientPayload: (_a3 = options.clientPayload) != null ? _a3 : null,
+      multipart: (_b2 = options.multipart) != null ? _b2 : false,
+      headers: options.headers
+    });
+  }
+});
+var uploadPresigned = createPutMethod({
+  allowedOptions: ["contentType"],
+  extraChecks(options) {
+    if (options.handleUploadUrl === void 0) {
+      throw new BlobError(
+        "client/`upload` requires the 'handleUploadUrl' parameter"
+      );
+    }
+    if (
+      // @ts-expect-error -- Runtime check for DX.
+      options.addRandomSuffix !== void 0 || // @ts-expect-error -- Runtime check for DX.
+      options.allowOverwrite !== void 0 || // @ts-expect-error -- Runtime check for DX.
+      options.cacheControlMaxAge !== void 0 || // @ts-expect-error -- Runtime check for DX.
+      options.ifMatch !== void 0
+    ) {
+      throw new BlobError(
+        "client/`uploadPresigned` doesn't allow `addRandomSuffix`, `cacheControlMaxAge`, `allowOverwrite` or `ifMatch`. Configure these options at the server side when generating presigned URLs."
+      );
+    }
+  },
+  async getPresignedUrlPayload(pathname, options) {
+    var _a3, _b2;
+    return retrievePresignedUrlPayload({
+      pathname,
+      handleUploadUrl: options.handleUploadUrl,
+      clientPayload: (_a3 = options.clientPayload) != null ? _a3 : null,
+      multipart: (_b2 = options.multipart) != null ? _b2 : false,
+      headers: options.headers
+    });
+  }
+});
+async function importKey(token) {
+  return globalThis.crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(token),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"]
+  );
+}
+async function signPayload(payload, token) {
+  if (!globalThis.crypto) {
+    return crypto2.createHmac("sha256", token).update(payload).digest("hex");
+  }
+  const signature = await globalThis.crypto.subtle.sign(
+    "HMAC",
+    await importKey(token),
+    new TextEncoder().encode(payload)
+  );
+  return Buffer.from(new Uint8Array(signature)).toString("hex");
+}
+var EventTypes = {
+  generateClientToken: "blob.generate-client-token",
+  generatePresignedUrl: "blob.generate-presigned-url",
+  uploadCompleted: "blob.upload-completed"
+};
+async function retrieveClientToken(options) {
+  const { handleUploadUrl, pathname } = options;
+  const url = isAbsoluteUrl(handleUploadUrl) ? handleUploadUrl : toAbsoluteUrl(handleUploadUrl);
+  const event = {
+    type: EventTypes.generateClientToken,
+    payload: {
+      pathname,
+      clientPayload: options.clientPayload,
+      multipart: options.multipart
+    }
+  };
+  const res = await (0, import_undici2.fetch)(url, {
+    method: "POST",
+    body: JSON.stringify(event),
+    headers: {
+      "content-type": "application/json",
+      ...options.headers
+    },
+    signal: options.abortSignal
+  });
+  if (!res.ok) {
+    throw new BlobError("Failed to  retrieve the client token");
+  }
+  try {
+    const { clientToken } = await res.json();
+    return clientToken;
+  } catch {
+    throw new BlobError("Failed to retrieve the client token");
+  }
+}
+async function retrievePresignedUrlPayload(options) {
+  const { handleUploadUrl, pathname } = options;
+  const url = isAbsoluteUrl(handleUploadUrl) ? handleUploadUrl : toAbsoluteUrl(handleUploadUrl);
+  const event = {
+    type: EventTypes.generatePresignedUrl,
+    payload: {
+      pathname,
+      clientPayload: options.clientPayload,
+      multipart: options.multipart
+    }
+  };
+  const res = await (0, import_undici2.fetch)(url, {
+    method: "POST",
+    body: JSON.stringify(event),
+    headers: {
+      "content-type": "application/json",
+      ...options.headers
+    },
+    signal: options.abortSignal
+  });
+  if (!res.ok) {
+    throw new BlobError("Failed to retrieve the presigned URL");
+  }
+  try {
+    const { presignedUrlPayload } = await res.json();
+    if (presignedUrlPayload) {
+      return presignedUrlPayload;
+    }
+    throw new BlobError("Missing presignedUrlPayload");
+  } catch (error2) {
+    if (error2 instanceof BlobError) {
+      throw error2;
+    }
+    throw new BlobError("Failed to retrieve the presigned URL");
+  }
+}
+function toAbsoluteUrl(url) {
+  return new URL(url, location.href).href;
+}
+function isAbsoluteUrl(url) {
+  try {
+    return Boolean(new URL(url));
+  } catch {
+    return false;
+  }
+}
+async function generateClientTokenFromReadWriteToken({
+  token,
+  ...argsWithoutToken
+}) {
+  var _a3;
+  if (typeof window !== "undefined") {
+    throw new BlobError(
+      '"generateClientTokenFromReadWriteToken" must be called from a server environment'
+    );
+  }
+  if (argsWithoutToken.ifMatch && argsWithoutToken.allowOverwrite === false) {
+    throw new BlobError(
+      "ifMatch and allowOverwrite: false are contradictory. ifMatch is used for conditional overwrites, which requires allowOverwrite to be true."
+    );
+  }
+  if (argsWithoutToken.ifMatch && argsWithoutToken.allowOverwrite === void 0) {
+    argsWithoutToken.allowOverwrite = true;
+  }
+  const timestamp = /* @__PURE__ */ new Date();
+  timestamp.setSeconds(timestamp.getSeconds() + 30);
+  const readWriteToken = getReadWriteBlobTokenFromOptionsOrEnv({ token });
+  const storeId = parseStoreIdFromReadWriteToken(readWriteToken) || null;
+  if (!storeId) {
+    throw new BlobError(
+      token ? "Invalid `token` parameter" : "Invalid `BLOB_READ_WRITE_TOKEN`"
+    );
+  }
+  const payload = Buffer.from(
+    JSON.stringify({
+      ...argsWithoutToken,
+      validUntil: (_a3 = argsWithoutToken.validUntil) != null ? _a3 : timestamp.getTime()
+    })
+  ).toString("base64");
+  const securedKey = await signPayload(payload, readWriteToken);
+  if (!securedKey) {
+    throw new BlobError("Unable to sign client token");
+  }
+  return `vercel_blob_client_${storeId}_${Buffer.from(
+    `${securedKey}.${payload}`
+  ).toString("base64")}`;
+}
+
+// server/office-uploads.ts
+init_db();
+init_env();
+
+// node_modules/hono/dist/utils/url.js
+var splitPath = (path) => {
+  const paths = path.split("/");
+  if (paths[0] === "") {
+    paths.shift();
+  }
+  return paths;
+};
+var splitRoutingPath = (routePath) => {
+  const { groups, path } = extractGroupsFromPath(routePath);
+  const paths = splitPath(path);
+  return replaceGroupMarks(paths, groups);
+};
+var extractGroupsFromPath = (path) => {
+  const groups = [];
+  path = path.replace(/\{[^}]+\}/g, (match2, index2) => {
+    const mark = `@${index2}`;
+    groups.push([mark, match2]);
+    return mark;
+  });
+  return { groups, path };
+};
+var replaceGroupMarks = (paths, groups) => {
+  for (let i = groups.length - 1; i >= 0; i--) {
+    const [mark] = groups[i];
+    for (let j = paths.length - 1; j >= 0; j--) {
+      if (paths[j].includes(mark)) {
+        paths[j] = paths[j].replace(mark, groups[i][1]);
+        break;
+      }
+    }
+  }
+  return paths;
+};
+var patternCache = {};
+var getPattern = (label, next) => {
+  if (label === "*") {
+    return "*";
+  }
+  const match2 = label.match(/^\:([^\{\}]+)(?:\{(.+)\})?$/);
+  if (match2) {
+    const cacheKey = `${label}#${next}`;
+    if (!patternCache[cacheKey]) {
+      if (match2[2]) {
+        patternCache[cacheKey] = next && next[0] !== ":" && next[0] !== "*" ? [cacheKey, match2[1], new RegExp(`^${match2[2]}(?=/${next})`)] : [label, match2[1], new RegExp(`^${match2[2]}$`)];
+      } else {
+        patternCache[cacheKey] = [label, match2[1], true];
+      }
+    }
+    return patternCache[cacheKey];
+  }
+  return null;
+};
+var tryDecode = (str, decoder) => {
+  try {
+    return decoder(str);
+  } catch {
+    return str.replace(/(?:%[0-9A-Fa-f]{2})+/g, (match2) => {
+      try {
+        return decoder(match2);
+      } catch {
+        return match2;
+      }
+    });
+  }
+};
+var tryDecodeURI = (str) => tryDecode(str, decodeURI);
+var getPath = (request) => {
+  const url = request.url;
+  const start = url.indexOf("/", url.indexOf(":") + 4);
+  let i = start;
+  for (; i < url.length; i++) {
+    const charCode = url.charCodeAt(i);
+    if (charCode === 37) {
+      const queryIndex = url.indexOf("?", i);
+      const hashIndex = url.indexOf("#", i);
+      const end = queryIndex === -1 ? hashIndex === -1 ? void 0 : hashIndex : hashIndex === -1 ? queryIndex : Math.min(queryIndex, hashIndex);
+      const path = url.slice(start, end);
+      return tryDecodeURI(path.includes("%25") ? path.replace(/%25/g, "%2525") : path);
+    } else if (charCode === 63 || charCode === 35) {
+      break;
+    }
+  }
+  return url.slice(start, i);
+};
+var getPathNoStrict = (request) => {
+  const result = getPath(request);
+  return result.length > 1 && result.at(-1) === "/" ? result.slice(0, -1) : result;
+};
+var mergePath = (base, sub, ...rest) => {
+  if (rest.length) {
+    sub = mergePath(sub, ...rest);
+  }
+  return `${base?.[0] === "/" ? "" : "/"}${base}${sub === "/" ? "" : `${base?.at(-1) === "/" ? "" : "/"}${sub?.[0] === "/" ? sub.slice(1) : sub}`}`;
+};
+var checkOptionalParameter = (path) => {
+  if (path.charCodeAt(path.length - 1) !== 63 || !path.includes(":")) {
+    return null;
+  }
+  const segments = path.split("/");
+  const results = [];
+  let basePath = "";
+  segments.forEach((segment) => {
+    if (segment !== "" && !/\:/.test(segment)) {
+      basePath += "/" + segment;
+    } else if (/\:/.test(segment)) {
+      if (segment.charCodeAt(segment.length - 1) === 63) {
+        if (results.length === 0 && basePath === "") {
+          results.push("/");
+        } else {
+          results.push(basePath);
+        }
+        const optionalSegment = segment.slice(0, -1);
+        basePath += "/" + optionalSegment;
+        results.push(basePath);
+      } else {
+        basePath += "/" + segment;
+      }
+    }
+  });
+  return results.filter((v2, i, a2) => a2.indexOf(v2) === i);
+};
+var tryDecodeURIComponent = (str) => str.indexOf("%") !== -1 ? tryDecode(str, decodeURIComponent_) : str;
+var _decodeURI = (value) => {
+  if (value.indexOf("+") !== -1) {
+    value = value.replace(/\+/g, " ");
+  }
+  return tryDecodeURIComponent(value);
+};
+var _getQueryParam = (url, key, multiple) => {
+  const hashIndex = url.indexOf("#", 8);
+  if (hashIndex !== -1) {
+    url = url.slice(0, hashIndex);
+  }
+  let encoded2;
+  if (!multiple && key && key.indexOf("%") === -1 && key.indexOf("+") === -1) {
+    let keyIndex2 = url.indexOf("?", 8);
+    if (keyIndex2 === -1) {
+      return void 0;
+    }
+    if (!url.startsWith(key, keyIndex2 + 1)) {
+      keyIndex2 = url.indexOf(`&${key}`, keyIndex2 + 1);
+    }
+    while (keyIndex2 !== -1) {
+      const trailingKeyCode = url.charCodeAt(keyIndex2 + key.length + 1);
+      if (trailingKeyCode === 61) {
+        const valueIndex = keyIndex2 + key.length + 2;
+        const endIndex = url.indexOf("&", valueIndex);
+        return _decodeURI(url.slice(valueIndex, endIndex === -1 ? void 0 : endIndex));
+      } else if (trailingKeyCode == 38 || isNaN(trailingKeyCode)) {
+        return "";
+      }
+      keyIndex2 = url.indexOf(`&${key}`, keyIndex2 + 1);
+    }
+    encoded2 = /[%+]/.test(url);
+    if (!encoded2) {
+      return void 0;
+    }
+  }
+  const results = /* @__PURE__ */ Object.create(null);
+  encoded2 ??= /[%+]/.test(url);
+  let keyIndex = url.indexOf("?", 8);
+  while (keyIndex !== -1) {
+    const nextKeyIndex = url.indexOf("&", keyIndex + 1);
+    let valueIndex = url.indexOf("=", keyIndex);
+    if (valueIndex > nextKeyIndex && nextKeyIndex !== -1) {
+      valueIndex = -1;
+    }
+    let name = url.slice(
+      keyIndex + 1,
+      valueIndex === -1 ? nextKeyIndex === -1 ? void 0 : nextKeyIndex : valueIndex
+    );
+    if (encoded2) {
+      name = _decodeURI(name);
+    }
+    keyIndex = nextKeyIndex;
+    if (name === "") {
+      continue;
+    }
+    let value;
+    if (valueIndex === -1) {
+      value = "";
+    } else {
+      value = url.slice(valueIndex + 1, nextKeyIndex === -1 ? void 0 : nextKeyIndex);
+      if (encoded2) {
+        value = _decodeURI(value);
+      }
+    }
+    if (multiple) {
+      if (!(results[name] && Array.isArray(results[name]))) {
+        results[name] = [];
+      }
+      ;
+      results[name].push(value);
+    } else {
+      results[name] ??= value;
+    }
+  }
+  return key ? results[key] : results;
+};
+var getQueryParam = _getQueryParam;
+var getQueryParams = (url, key) => {
+  return _getQueryParam(url, key, true);
+};
+var decodeURIComponent_ = decodeURIComponent;
+
+// node_modules/hono/dist/utils/cookie.js
+var validCookieNameRegEx = /^[\w!#$%&'*.^`|~+-]+$/;
+var relaxedCookieNameRegEx = /^[!#-:<>-[\]-~]+$/;
+var validCookieValueRegEx = /^[ !#-:<-[\]-~]*$/;
+var trimCookieWhitespace = (value) => {
+  let start = 0;
+  let end = value.length;
+  while (start < end) {
+    const charCode = value.charCodeAt(start);
+    if (charCode !== 32 && charCode !== 9) {
+      break;
+    }
+    start++;
+  }
+  while (end > start) {
+    const charCode = value.charCodeAt(end - 1);
+    if (charCode !== 32 && charCode !== 9) {
+      break;
+    }
+    end--;
+  }
+  return start === 0 && end === value.length ? value : value.slice(start, end);
+};
+var parse = (cookie, name) => {
+  if (name && cookie.indexOf(name) === -1) {
+    return {};
+  }
+  const pairs = cookie.split(";");
+  const parsedCookie = /* @__PURE__ */ Object.create(null);
+  for (const pairStr of pairs) {
+    const valueStartPos = pairStr.indexOf("=");
+    if (valueStartPos === -1) {
+      continue;
+    }
+    const cookieName = trimCookieWhitespace(pairStr.substring(0, valueStartPos));
+    if (name && name !== cookieName || !relaxedCookieNameRegEx.test(cookieName) || cookieName in parsedCookie) {
+      continue;
+    }
+    let cookieValue = trimCookieWhitespace(pairStr.substring(valueStartPos + 1));
+    if (cookieValue.startsWith('"') && cookieValue.endsWith('"')) {
+      cookieValue = cookieValue.slice(1, -1);
+    }
+    if (validCookieValueRegEx.test(cookieValue)) {
+      parsedCookie[cookieName] = tryDecodeURIComponent(cookieValue);
+      if (name) {
+        break;
+      }
+    }
+  }
+  return parsedCookie;
+};
+var _serialize = (name, value, opt = {}) => {
+  if (!validCookieNameRegEx.test(name)) {
+    throw new Error("Invalid cookie name");
+  }
+  let cookie = `${name}=${value}`;
+  if (name.startsWith("__Secure-") && !opt.secure) {
+    throw new Error("__Secure- Cookie must have Secure attributes");
+  }
+  if (name.startsWith("__Host-")) {
+    if (!opt.secure) {
+      throw new Error("__Host- Cookie must have Secure attributes");
+    }
+    if (opt.path !== "/") {
+      throw new Error('__Host- Cookie must have Path attributes with "/"');
+    }
+    if (opt.domain) {
+      throw new Error("__Host- Cookie must not have Domain attributes");
+    }
+  }
+  for (const key of ["domain", "path", "sameSite", "priority"]) {
+    if (opt[key] && /[;\r\n]/.test(opt[key])) {
+      throw new Error(`${key} must not contain ";", "\\r", or "\\n"`);
+    }
+  }
+  if (opt && typeof opt.maxAge === "number" && opt.maxAge >= 0) {
+    if (opt.maxAge > 3456e4) {
+      throw new Error(
+        "Cookies Max-Age SHOULD NOT be greater than 400 days (34560000 seconds) in duration."
+      );
+    }
+    cookie += `; Max-Age=${opt.maxAge | 0}`;
+  }
+  if (opt.domain && opt.prefix !== "host") {
+    cookie += `; Domain=${opt.domain}`;
+  }
+  if (opt.path) {
+    cookie += `; Path=${opt.path}`;
+  }
+  if (opt.expires) {
+    if (opt.expires.getTime() - Date.now() > 3456e7) {
+      throw new Error(
+        "Cookies Expires SHOULD NOT be greater than 400 days (34560000 seconds) in the future."
+      );
+    }
+    cookie += `; Expires=${opt.expires.toUTCString()}`;
+  }
+  if (opt.httpOnly) {
+    cookie += "; HttpOnly";
+  }
+  if (opt.secure) {
+    cookie += "; Secure";
+  }
+  if (opt.sameSite) {
+    cookie += `; SameSite=${opt.sameSite.charAt(0).toUpperCase() + opt.sameSite.slice(1)}`;
+  }
+  if (opt.priority) {
+    cookie += `; Priority=${opt.priority.charAt(0).toUpperCase() + opt.priority.slice(1)}`;
+  }
+  if (opt.partitioned) {
+    if (!opt.secure) {
+      throw new Error("Partitioned Cookie must have Secure attributes");
+    }
+    cookie += "; Partitioned";
+  }
+  return cookie;
+};
+var serialize = (name, value, opt) => {
+  value = encodeURIComponent(value);
+  return _serialize(name, value, opt);
+};
+
+// node_modules/hono/dist/helper/cookie/index.js
+var getCookie = (c, key, prefix) => {
+  const cookie = c.req.raw.headers.get("Cookie");
+  if (typeof key === "string") {
+    if (!cookie) {
+      return void 0;
+    }
+    let finalKey = key;
+    if (prefix === "secure") {
+      finalKey = "__Secure-" + key;
+    } else if (prefix === "host") {
+      finalKey = "__Host-" + key;
+    }
+    const obj2 = parse(cookie, finalKey);
+    return obj2[finalKey];
+  }
+  if (!cookie) {
+    return {};
+  }
+  const obj = parse(cookie);
+  return obj;
+};
+var generateCookie = (name, value, opt) => {
+  let cookie;
+  if (opt?.prefix === "secure") {
+    cookie = serialize("__Secure-" + name, value, { path: "/", ...opt, secure: true });
+  } else if (opt?.prefix === "host") {
+    cookie = serialize("__Host-" + name, value, {
+      ...opt,
+      path: "/",
+      secure: true,
+      domain: void 0
+    });
+  } else {
+    cookie = serialize(name, value, { path: "/", ...opt });
+  }
+  return cookie;
+};
+var setCookie = (c, name, value, opt) => {
+  const cookie = generateCookie(name, value, opt);
+  c.header("Set-Cookie", cookie, { append: true });
+};
+var deleteCookie = (c, name, opt) => {
+  const deletedCookie = getCookie(c, name, opt?.prefix);
+  setCookie(c, name, "", { ...opt, maxAge: 0 });
+  return deletedCookie;
+};
+
+// server/auth.ts
+init_db();
+
+// server/crypto.ts
+init_env();
+init_encryption();
+import {
+  randomBytes as randomBytes2,
+  scrypt as scryptCb,
+  timingSafeEqual as timingSafeEqual2,
+  createHash as createHash3,
+  createHmac as createHmac2,
+  createDecipheriv as createDecipheriv2,
+  hkdfSync
+} from "node:crypto";
+function scrypt(password, salt) {
+  return new Promise(
+    (resolve3, reject2) => scryptCb(password, salt, 64, (err3, key) => err3 ? reject2(err3) : resolve3(key))
+  );
+}
+async function hashPassword(password) {
+  const salt = randomBytes2(16);
+  const key = await scrypt(password, salt);
+  return `s1:${salt.toString("hex")}:${key.toString("hex")}`;
+}
+async function verifyPassword(password, stored) {
+  const [v2, saltHex, keyHex] = stored.split(":");
+  if (v2 !== "s1" || !saltHex || !keyHex) return false;
+  const key = await scrypt(password, Buffer.from(saltHex, "hex"));
+  const expected = Buffer.from(keyHex, "hex");
+  return key.length === expected.length && timingSafeEqual2(key, expected);
+}
+function newToken() {
+  const token = randomBytes2(32).toString("base64url");
+  return { token, tokenHash: hashToken(token) };
+}
+function hashToken(token) {
+  return createHash3("sha256").update(token).digest("hex");
+}
+function hmacSha256Base64(key, message) {
+  return createHmac2("sha256", key).update(message).digest("base64");
+}
+function secretKey() {
+  return Buffer.from(hkdfSync("sha256", process.env.LEGACY_SESSION_SECRET || env.SESSION_SECRET, "fpsllc-ein-v1", "ein-encryption", 32));
+}
+function encryptSecret(plain) {
+  return `v2:${seal(Buffer.from(plain)).toString("base64")}`;
+}
+var SecretFormatError = class extends Error {
+};
+function decryptSecret(stored) {
+  if (stored.startsWith("v2:")) return unseal(Buffer.from(stored.slice(3), "base64")).toString();
+  const [v2, ivHex, tagHex, ctHex] = stored.split(":");
+  if (v2 !== "v1" || !ivHex || !tagHex || !ctHex) throw new SecretFormatError("bad secret format");
+  const decipher = createDecipheriv2("aes-256-gcm", secretKey(), Buffer.from(ivHex, "hex"));
+  decipher.setAuthTag(Buffer.from(tagHex, "hex"));
+  return Buffer.concat([decipher.update(Buffer.from(ctHex, "hex")), decipher.final()]).toString("utf8");
+}
+
+// server/auth.ts
+init_env();
+var CLIENT_COOKIE = "fpsllc_session";
+var ADMIN_COOKIE = "fpsllc_admin";
+var SESSION_DAYS = 30;
+function sessionCredentials(hours) {
+  return { ...newToken(), expires: new Date(Date.now() + (hours ? hours * 36e5 : SESSION_DAYS * 864e5)) };
+}
+function setSessionCookie(c, credentials, isAdmin = false) {
+  setCookie(c, isAdmin ? ADMIN_COOKIE : CLIENT_COOKIE, credentials.token, {
+    httpOnly: true,
+    secure: env.isProd,
+    sameSite: "Lax",
+    path: "/",
+    expires: credentials.expires
+  });
+}
+async function createSession(c, opts) {
+  const db = await getDb();
+  const credentials = sessionCredentials(opts.hours);
+  if (opts.clientId) {
+    const rows = await db.query(
+      `INSERT INTO sessions
+      (token_hash, client_id, is_admin, viewing_as_admin, expires_at, password_version)
+      SELECT $1, id, $3, $4, $5, password_version FROM clients
+      WHERE id=$2 AND ($6::text IS NULL OR password_hash=$6) RETURNING token_hash`,
+      [
+        credentials.tokenHash,
+        opts.clientId,
+        opts.isAdmin ?? false,
+        opts.viewingAsAdmin ?? false,
+        credentials.expires.toISOString(),
+        opts.verifiedPasswordHash ?? null
+      ]
+    );
+    if (!rows.length) return false;
+  } else {
+    await db.query(
+      "INSERT INTO sessions (token_hash, client_id, is_admin, viewing_as_admin, expires_at) VALUES ($1, $2, $3, $4, $5)",
+      [credentials.tokenHash, null, opts.isAdmin ?? false, opts.viewingAsAdmin ?? false, credentials.expires.toISOString()]
+    );
+  }
+  setSessionCookie(c, credentials, opts.isAdmin);
+  return true;
+}
+async function lookup(c, cookieName) {
+  const token = getCookie(c, cookieName);
+  if (!token) return null;
+  const db = await getDb();
+  const tokenHash = hashToken(token);
+  const rows = await db.query(
+    `SELECT s.client_id, s.is_admin, s.viewing_as_admin FROM sessions s
+      LEFT JOIN clients c ON c.id=s.client_id
+      WHERE s.token_hash=$1 AND s.expires_at>now()
+        AND (s.client_id IS NULL OR s.password_version=c.password_version)`,
+    [tokenHash]
+  );
+  if (rows.length === 0) return null;
+  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash, viewingAsAdmin: rows[0].viewing_as_admin };
+}
+async function getSession(c) {
+  const s = await lookup(c, CLIENT_COOKIE);
+  return s?.clientId ? s : null;
+}
+async function getAdminSession(c) {
+  const s = await lookup(c, ADMIN_COOKIE);
+  return s?.isAdmin ? s : null;
+}
+async function destroySession(c, role = "client") {
+  const cookieName = role === "admin" ? ADMIN_COOKIE : CLIENT_COOKIE;
+  const token = getCookie(c, cookieName);
+  if (token) {
+    const db = await getDb();
+    await db.query("DELETE FROM sessions WHERE token_hash = $1", [hashToken(token)]);
+  }
+  deleteCookie(c, cookieName, { path: "/" });
+}
+async function rateLimit(key, max, windowMs, failMode = "open") {
+  try {
+    const db = await getDb();
+    const rows = await db.query(
+      `INSERT INTO rate_limits (key, window_start, count) VALUES ($1, now(), 1)
+       ON CONFLICT (key) DO UPDATE SET
+         count = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
+                      THEN 1 ELSE rate_limits.count + 1 END,
+         window_start = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
+                             THEN now() ELSE rate_limits.window_start END
+       RETURNING count`,
+      [key, windowMs / 1e3]
+    );
+    return rows[0].count <= max;
+  } catch (e) {
+    console.error(`[rateLimit] check failed, failing ${failMode}:`, e);
+    return failMode === "open";
+  }
+}
+function clientIp(c) {
+  return c.req.header("x-forwarded-for")?.split(",")[0].trim() || c.req.header("x-real-ip") || "local";
+}
+
+// src/lib/uploadLimits.ts
+var MAX_UPLOAD_BYTES = 40 * 1024 * 1024;
+
+// server/shared.ts
+var testHooks = {
+  /** Makes the next fulfillment throw once (dev suite scaffolding). */
+  failNextFulfillment: false,
+  /** When >= 0, the (N+1)th putFile in the next formation upload throws. */
+  failFormationPutAfter: -1,
+  /** Dev: the next card-on-file charge is declined with this Square code. */
+  declineNextRenewal: ""
+};
+var err = (message, code) => ({ error: { message, code } });
+function maskEmail(email) {
+  const [local, domain] = email.split("@");
+  return `${local.slice(0, 1)}${"\u2022".repeat(Math.max(2, local.length - 1))}@${domain ?? ""}`;
+}
+async function requireAdmin(c) {
+  return getAdminSession(c);
+}
+var looksLikePdf = async (f) => {
+  const bytes2 = new Uint8Array(await f.arrayBuffer());
+  if (bytes2.length < 8) return false;
+  const head2 = new TextDecoder().decode(bytes2.slice(0, 8));
+  if (!head2.startsWith("%PDF-")) return false;
+  const tail = new TextDecoder().decode(bytes2.slice(-1024));
+  return tail.includes("%%EOF");
+};
+
+// server/office-uploads.ts
+init_englishText();
+init_encryption();
+init_storage();
+init_operation_deadline();
+init_office_file_recovery();
+init_office_recovery_sources();
+init_office_history_recovery();
+var uuid2 = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
+var spec = external_exports.object({ field: external_exports.string().min(1), name: external_exports.string().min(1), size: external_exports.number().int().min(8).max(MAX_UPLOAD_BYTES), sha: external_exports.string().regex(/^[a-f0-9]{64}$/) }).strict();
+var initial = external_exports.object({ route: external_exports.string(), fields: external_exports.array(external_exports.tuple([external_exports.string(), external_exports.string()])), files: external_exports.array(spec).min(1) }).strict();
+var requests = /* @__PURE__ */ new WeakMap();
+function reject(message, code, status = 400) {
+  throw new HTTPException(status, { res: Response.json(err(message, code), { status }) });
+}
+function slots(route) {
+  if (/^\/api\/admin\/library\/[^/]+$/.test(route) || route === "/api/admin/documents") return ["file"];
+  if (new RegExp(`^/api/admin/documents/${uuid2}/replace$`).test(route)) return ["file"];
+  if (new RegExp(`^/api/admin/services/${uuid2}/fulfill$`).test(route)) return ["file"];
+  if (new RegExp(`^/api/admin/orders/${uuid2}/(?:articles|correct-articles)$`).test(route)) return ["articles"];
+  if (new RegExp(`^/api/admin/orders/${uuid2}/certificates$`).test(route)) return ["certStatus", "certifiedCopy"];
+  if (new RegExp(`^/api/admin/orders/${uuid2}/formation-documents$`).test(route)) return ["articles", "psd", "certStatus", "certifiedCopy"];
+  if (new RegExp(`^/api/admin/orders/${uuid2}/agent-copy$`).test(route)) return ["file"];
+  if (new RegExp(`^/api/admin/orders/${uuid2}/office-recovery/${uuid2}/(?:articles|statement|upload)$`).test(route)) return ["file"];
+  if (/^\/api\/admin\/backups\/history-recovery\/[a-f0-9]{64}\/original$/.test(route)) return ["file"];
+  return null;
+}
+async function authorizeTarget(route, fields2) {
+  const db = await getDb(), order2 = route.match(new RegExp(`^/api/admin/orders/(${uuid2})/`)), service = route.match(new RegExp(`^/api/admin/services/(${uuid2})/`)), document2 = route.match(new RegExp(`^/api/admin/documents/(${uuid2})/replace$`));
+  if (order2 || service) {
+    const table = order2 ? "orders" : "service_orders";
+    const [r] = await db.query(`SELECT id FROM ${table} WHERE id=$1 AND paid_at IS NOT NULL AND status NOT IN ('pending_payment','duplicate_payment')`, [(order2 || service)[1]]);
+    if (!r) reject("Target not found.", "NOT_FOUND", 404);
+  }
+  if (document2) {
+    const [r] = await db.query("SELECT id FROM documents WHERE id=$1 AND deleted_at IS NULL AND NOT EXISTS(SELECT 1 FROM recovery_holds WHERE id=documents.id AND status='held')", [document2[1]]);
+    if (!r) reject("Document not found.", "NOT_FOUND", 404);
+  }
+  if (route === "/api/admin/documents") {
+    const values2 = Object.fromEntries(fields2), [client] = await db.query("SELECT id FROM clients WHERE id=$1", [values2.clientId]);
+    if (!client) reject("Client not found.", "NOT_FOUND", 404);
+    if (values2.orderId && !(await db.query("SELECT id FROM orders WHERE id=$1 AND client_id=$2 AND paid_at IS NOT NULL", [values2.orderId, values2.clientId])).length) reject("Company not found.", "NOT_FOUND", 404);
+  }
+  if (route.includes("/office-recovery/") || route.includes("/history-recovery/")) {
+    const tables = await officeRecoveryTables(db), identities = [...officeFileIdentities(tables, { includeUnknown: true }).values()];
+    const found = route.includes("/history-recovery/") ? identities.some((i) => historyId(i) === route.split("/").at(-2)) : identities.some((i) => i.orderId === order2?.[1] && i.operationId === route.split("/").at(-2) && i.slot === route.split("/").at(-1));
+    if (!found) reject("Recovery document not found.", "NOT_FOUND", 404);
+  }
+}
+async function cleanupOfficeUploads(options = {}) {
+  const db = await getDb();
+  const rows = await db.query(`SELECT * FROM office_upload_stages WHERE ($1::uuid IS NULL OR id=$1) AND (cleanup_pending OR expires_at<now()) AND (lease_until IS NULL OR lease_until<now()) ORDER BY cleanup_checked_at NULLS FIRST,created_at LIMIT 50`, [options.id ?? null]);
+  for (const stage of rows) {
+    if (Date.now() >= Math.min(options.deadline ?? Infinity, activeDeadline())) break;
+    const [claimed] = await db.query("UPDATE office_upload_stages SET state=CASE WHEN state IN ('issued','validating') THEN 'expired' ELSE state END,lease=$2,lease_until=now()+interval '15 minutes' WHERE id=$1 AND (lease_until IS NULL OR lease_until<now()) RETURNING id", [stage.id, crypto.randomUUID()]);
+    if (!claimed) continue;
+    try {
+      for (const file of stage.files) {
+        await removeStoredFile(env.BLOB_READ_WRITE_TOKEN ? file.path : "dev:" + file.path);
+        if (env.BLOB_READ_WRITE_TOKEN) {
+          const { get: get2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
+          const left = await get2(file.path, { access: "private", token: env.BLOB_READ_WRITE_TOKEN, useCache: false, abortSignal: ioSignal() });
+          if (left) {
+            if (left.statusCode === 200) await left.stream.cancel();
+            throw Error("Upload cleanup is not confirmed");
+          }
+        } else if (await readObject("dev:" + file.path)) throw Error("Upload cleanup is not confirmed");
+      }
+      await db.query("UPDATE office_upload_stages SET cleanup_pending=false,cleanup_checked_at=now(),lease=NULL,lease_until=NULL WHERE id=$1", [stage.id]);
+    } catch (error2) {
+      await db.query("UPDATE office_upload_stages SET cleanup_pending=true,cleanup_checked_at=now(),lease=NULL,lease_until=NULL WHERE id=$1", [stage.id]);
+      if (options.id) throw error2;
+    }
+  }
+}
+async function uploadGrants(stage) {
+  const until = Date.parse(stage.token_expires_at), grants = [];
+  for (const f of stage.files) {
+    const token = env.BLOB_READ_WRITE_TOKEN && until > Date.now() ? await generateClientTokenFromReadWriteToken({ token: env.BLOB_READ_WRITE_TOKEN, pathname: f.path, maximumSizeInBytes: f.size + 16, allowedContentTypes: ["application/octet-stream"], validUntil: until, addRandomSuffix: false, allowOverwrite: false }) : null;
+    grants.push({ id: f.id, field: f.field, path: f.path, key: unseal(Buffer.from(f.key, "base64")).toString("base64"), iv: f.iv, token });
+  }
+  return { id: stage.id, files: grants };
+}
+function registerOfficeUploads(app2) {
+  app2.post("/admin/uploads", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const parsed = initial.safeParse(await c.req.json());
+    if (!parsed.success) return c.json(err("Select PDFs no larger than 40 MB per file and valid upload metadata.", "INVALID_UPLOAD"), 400);
+    const body = parsed.data, allowed = slots(body.route);
+    if (!allowed || body.files.some((f) => !allowed.includes(f.field))) return c.json(err("Upload destination is not supported.", "INVALID_UPLOAD"), 400);
+    if (body.fields.some(([key]) => allowed.includes(key))) return c.json(err("A file field cannot also contain text.", "INVALID_UPLOAD"), 400);
+    if (body.files.some((f, i) => f.field !== "psd" && body.files.findIndex((g) => g.field === f.field) !== i)) return c.json(err("Duplicate document field.", "INVALID_UPLOAD"), 400);
+    const problems = englishTextProblems(Object.fromEntries(body.fields));
+    if (Object.keys(problems).length) return c.json({ ...err(ENGLISH_TEXT_ERROR, "INVALID_INPUT"), fields: problems }, 400);
+    await authorizeTarget(body.route, body.fields);
+    const id = crypto.randomUUID(), until = Date.now() + 15 * 60 * 1e3;
+    const files = body.files.map((f) => {
+      const fileId = crypto.randomUUID();
+      return { ...f, id: fileId, path: `office-uploads/${id}/${fileId}.encrypted`, key: seal(randomBytes4(32)).toString("base64"), iv: randomBytes4(12).toString("base64") };
+    });
+    await (await getDb()).query("INSERT INTO office_upload_stages(id,session_hash,route,fields,files,token_expires_at,expires_at) VALUES($1,$2,$3,$4::jsonb,$5::jsonb,$6,now()+interval '24 hours')", [id, admin.tokenHash, body.route, JSON.stringify(body.fields), JSON.stringify(files), new Date(until).toISOString()]);
+    c.header("cache-control", "no-store");
+    return c.json({ data: await uploadGrants({ id, files, token_expires_at: new Date(until).toISOString() }) });
+  });
+  app2.get("/admin/uploads/:id", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const id = c.req.param("id");
+    if (!new RegExp(`^${uuid2}$`).test(id)) return c.json(err("Upload not found.", "NOT_FOUND"), 404);
+    const [stage] = await (await getDb()).query("SELECT * FROM office_upload_stages WHERE id=$1 AND session_hash=$2", [id, admin.tokenHash]);
+    if (!stage) return c.json(err("Upload not found.", "NOT_FOUND"), 404);
+    c.header("cache-control", "no-store");
+    if (stage.state === "complete") return c.json({ data: { id, state: stage.state } });
+    if (["processing", "unconfirmed"].includes(stage.state)) return c.json(err("The previous operation may have completed. Check the saved office record before submitting it again.", "UPLOAD_UNCONFIRMED"), 409);
+    if (stage.state === "validating" && stage.lease_until && Date.parse(stage.lease_until) > Date.now()) return c.json(err("This upload is being checked. Retry the same upload later.", "UPLOAD_BUSY"), 409);
+    if (!["issued", "validating"].includes(stage.state) || Date.parse(stage.expires_at) <= Date.now()) return c.json(err("This upload expired or was rejected. Select the file again.", "UPLOAD_EXPIRED"), 409);
+    await authorizeTarget(stage.route, stage.fields);
+    return c.json({ data: { ...await uploadGrants(stage), state: stage.state } });
+  });
+  app2.use("/admin/*", async (c, next) => {
+    const id = c.req.header("x-office-upload");
+    if (!id) return next();
+    if (c.req.method !== "POST" || !slots(c.req.path) || !new RegExp(`^${uuid2}$`).test(id)) return c.json(err("Invalid upload reference.", "INVALID_UPLOAD"), 400);
+    const finalBody = await c.req.json().catch(() => null);
+    if (!finalBody || Object.keys(finalBody).length !== 1 || finalBody.uploadId !== id) return c.json(err("Upload metadata cannot be changed after authorization.", "INVALID_UPLOAD"), 400);
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const db = await getDb(), [stage] = await db.query("SELECT * FROM office_upload_stages WHERE id=$1 AND session_hash=$2 AND route=$3", [id, admin.tokenHash, c.req.path]);
+    if (!stage) return c.json(err("Upload not found.", "NOT_FOUND"), 404);
+    if (stage.state === "complete" && stage.result_status !== null && stage.result_body !== null) return new Response(stage.result_body, { status: stage.result_status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
+    if (["processing", "unconfirmed"].includes(stage.state)) return c.json(err("The previous operation may have completed. Check the saved office record before submitting it again.", "UPLOAD_UNCONFIRMED"), 409);
+    if (!["issued", "validating"].includes(stage.state) || Date.parse(stage.expires_at) <= Date.now()) return c.json(err("This upload expired or was rejected. Select the file again.", "UPLOAD_EXPIRED"), 409);
+    await authorizeTarget(stage.route, stage.fields);
+    const request = { stage, claimed: false };
+    requests.set(c, request);
+    try {
+      await next();
+      if (request.claimed) {
+        if (c.error || c.res.status >= 500) {
+          await db.query("UPDATE office_upload_stages SET state='unconfirmed',lease=NULL,lease_until=NULL WHERE id=$1 AND lease=$2", [id, stage.lease]);
+        } else {
+          const result = await c.res.clone().text();
+          const [saved] = await db.query("UPDATE office_upload_stages SET state='complete',result_status=$3,result_body=$4,cleanup_pending=true,lease=NULL,lease_until=NULL WHERE id=$1 AND lease=$2 RETURNING id", [id, stage.lease, c.res.status, result]);
+          if (!saved) reject("The office result could not be confirmed. Check the saved record before retrying.", "UPLOAD_UNCONFIRMED", 409);
+          await cleanupOfficeUploads({ id }).catch(() => {
+          });
+        }
+      }
+    } finally {
+      requests.delete(c);
+    }
+  });
+}
+
+// server/app.ts
+init_office_operation();
+init_office_recovery_sources();
+
+// server/routes-office-recovery.ts
+init_db();
+init_office_file_recovery();
+init_office_recovery_sources();
+init_office_operation();
+init_office_history_recovery();
+init_dropbox();
+init_backup_deletions();
+init_storage();
+init_encryption();
+init_backup_attention();
+init_backup();
+var uuid3 = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
+function registerOfficeRecovery(app2) {
+  app2.post("/admin/backups/restart-after-history-change", async (c) => {
+    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const body = await c.req.json().catch(() => ({}));
+    if (body.acknowledge !== true) return c.json(err("Confirm starting a new snapshot with the disclosed historical gap.", "ACKNOWLEDGMENT_REQUIRED"), 400);
+    return c.json({ data: await restartBackupAfterHistoryChange(String(body.expectedJobKey ?? ""), String(body.historyId ?? "")) }, 202);
+  });
+  app2.get("/admin/backups/attention", async (c) => {
+    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const [progress] = await (await getDb()).query("SELECT error FROM backup_progress WHERE id='database'");
+    if (progress?.error?.includes("Backup alert persistence failed")) throw new OfficeRecoveryError("Backup alert persistence failed. Review backup recovery; document recovery remains available.", "RECOVERY_UNAVAILABLE", 503);
+    return c.json({ data: await backupAttention() });
+  });
+  app2.post("/admin/backups/attention/:problemId/retry", async (c) => {
+    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    if (!/^[a-f0-9]{64}$/.test(c.req.param("problemId"))) return c.json(err("Not found", "NOT_FOUND"), 404);
+    const result = await deliverBackupAttention({ problemId: c.req.param("problemId") });
+    return result ? c.json({ data: result }) : c.json(err("Not found", "NOT_FOUND"), 404);
+  });
+  app2.get("/admin/orders/:id/office-recovery", async (c) => {
+    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    if (!uuid3.test(c.req.param("id"))) return c.json(err("Not found", "NOT_FOUND"), 404);
+    const db = await getDb(), tables = await officeRecoveryTables(db), order2 = tables.orders.find((o) => o.id === c.req.param("id") && ["paid", "filed", "formed"].includes(String(o.status)));
+    if (!order2) return c.json(err("Not found", "NOT_FOUND"), 404);
+    const rows = [...officeFileIdentities(tables, { includeUnknown: true }).values()].filter((i) => i.orderId === order2.id && i.clientId === order2.client_id);
+    return c.json({ data: rows.map((i) => ({ operationId: i.operationId, slot: i.slot, title: i.file.title, historical: i.historical, sha: i.file.sha, size: i.file.size })) });
+  });
+  app2.post("/admin/orders/:id/office-recovery/:operationId/:slot", async (c) => {
+    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    if (!uuid3.test(c.req.param("id")) || !uuid3.test(c.req.param("operationId"))) return c.json(err("Not found", "NOT_FOUND"), 404);
+    if (!["articles", "statement", "upload"].includes(c.req.param("slot"))) return c.json(err("Invalid document slot", "INVALID_SLOT"), 400);
+    const db = await getDb(), tables = await officeRecoveryTables(db);
+    const order2 = tables.orders.find((o) => o.id === c.req.param("id") && ["paid", "filed", "formed"].includes(String(o.status)));
+    const i = [...officeFileIdentities(tables, { includeUnknown: true }).values()].find((i2) => i2.operationId === c.req.param("operationId") && i2.slot === c.req.param("slot") && i2.orderId === order2?.id && i2.clientId === order2?.client_id);
+    if (!i || !order2) return c.json(err("Not found", "NOT_FOUND"), 404);
+    if (!i.file.sha) return c.json(err("The original document fingerprint is unavailable.", "RECOVERY_IDENTITY_UNAVAILABLE"), 409);
+    const form = await c.req.parseBody(), file = form.file;
+    if (file instanceof File && (file.size > MAX_UPLOAD_BYTES || !await looksLikePdf(file))) return c.json(err("Choose a readable PDF under 20 MB", "NOT_A_PDF"), 400);
+    const supplied = file instanceof File ? Buffer.from(await file.arrayBuffer()) : void 0;
+    const original = tables.office_operations.find((o) => o.id === i.operationId);
+    const held = await claimOfficeVerification(db, original);
+    try {
+      await assertOfficeFileLive(i);
+      if (supplied) {
+        if (supplied.length !== i.file.size || hashBytes(supplied) !== i.file.sha) throw new OfficeRecoveryError("Select the exact original PDF.", "OFFICE_CONFLICT");
+        if (!await recordDocumentCopy({ documentId: i.file.id, storageKey: i.file.key, serviceId: i.serviceId, mirrorPath: i.file.mirrorPath ?? `/OfficeOperations/${i.operationId}/${i.slot}` })) throw new OfficeRecoveryError("This document was deleted.", "DOCUMENT_DELETED");
+        await replaceStoredFile(i.file.key, i.sensitive ? seal(supplied) : supplied);
+      }
+      await recoverOfficeFile(i);
+      await ensureOfficeRecoveryCopy(i);
+      await assertOfficeFileLive(i);
+      const [reservation] = await db.query("SELECT id FROM office_operations WHERE id=$1 AND lease=$2 AND lease_until>now()", [held.id, held.lease]);
+      if (!reservation) throw new OfficeRecoveryError("The recovery reservation expired. Retry.", "OFFICE_BUSY");
+      return c.json({ data: { state: "recovered", message: "Original document recovered. Current filing information is unchanged." } });
+    } finally {
+      await releaseOfficeOperation(db, held);
+    }
+  });
+  app2.post("/admin/office-operations/:id/continue", async (c) => {
+    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    if (!uuid3.test(c.req.param("id"))) return c.json(err("Not found", "NOT_FOUND"), 404);
+    const db = await getDb();
+    const [op] = await db.query("SELECT * FROM office_operations WHERE id=$1", [c.req.param("id")]);
+    if (!op) return c.json(err("Not found", "NOT_FOUND"), 404);
+    const claim = op.payload.retirement;
+    if (!claim) return c.json(err("This operation has no saved replacement to continue.", "OFFICE_CONFLICT"), 409);
+    if (op.phase === "superseded") {
+      const [next2] = await db.query("SELECT * FROM office_operations WHERE id=$1", [claim.successorId]);
+      if (!next2) return c.json(err("The saved successor is unavailable.", "OFFICE_CONFLICT"), 409);
+      return c.json({ data: { state: "awaiting_original", operationId: next2.id } }, 202);
+    }
+    if (op.phase !== "retiring") return c.json(err("The operation has changed.", "OFFICE_CONFLICT"), 409);
+    const next = await retireOfficeAttempt(db, op, claim.inputHash, claim.payload);
+    return c.json({ data: { state: "awaiting_original", operationId: next.id, message: "Replacement reserved. Attach the original replacement PDF or correct this pending attempt." } }, 202);
+  });
+  app2.get("/admin/backups/history-recovery", async (c) => {
+    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const orderId = c.req.query("orderId"), historyId2 = c.req.query("historyId");
+    if (orderId && !uuid3.test(orderId) || historyId2 && !/^[a-f0-9]{64}$/.test(historyId2)) return c.json(err("Invalid history filter", "INVALID_FILTER"), 400);
+    const rows = (await enumerateOfficeHistory(await getDb())).filter((r) => (!orderId || r.orderId === orderId) && (!historyId2 || r.historyId === historyId2));
+    let cursor = null;
+    try {
+      if (c.req.query("cursor")) {
+        cursor = JSON.parse(Buffer.from(c.req.query("cursor"), "base64url").toString());
+        if (!Array.isArray(cursor) || cursor.length !== 3 || cursor.some((s) => typeof s !== "string")) throw Error();
+      }
+    } catch {
+      return c.json(err("Invalid cursor", "INVALID_CURSOR"), 400);
+    }
+    const limit = Math.min(100, Math.max(1, Number(c.req.query("limit") ?? 50) || 50));
+    const key = (r) => [r.createdAt, r.identity.operationId, r.slot];
+    const compare = (a2, b2) => a2[0].localeCompare(b2[0]) || a2[1].localeCompare(b2[1]) || a2[2].localeCompare(b2[2]);
+    const remaining = rows.filter((r) => !cursor || compare(key(r), cursor) > 0), page = remaining.slice(0, limit);
+    return c.json({ data: { rows: page.map(({ identity, ...row }) => ({ ...row, operationId: identity.operationId })), nextCursor: remaining.length > limit ? Buffer.from(JSON.stringify(key(page[page.length - 1]))).toString("base64url") : null } });
+  });
+  app2.post("/admin/backups/history-recovery/:historyId/check", async (c) => {
+    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const result = await checkedHistory(c.req.param("historyId"));
+    return result ? c.json({ data: result }) : c.json(err("Not found", "NOT_FOUND"), 404);
+  });
+  app2.post("/admin/backups/history-recovery/:historyId/unrecoverable", async (c) => {
+    const admin = await requireAdmin(c);
+    if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const body = await c.req.json().catch(() => ({}));
+    if (body.acknowledge !== true) return c.json(err("Confirm this exact historical original is unavailable.", "ACKNOWLEDGMENT_REQUIRED"), 400);
+    const result = await acknowledgeHistoryGap(await getDb(), c.req.param("historyId"), String(body.expectedRevision ?? ""), admin.tokenHash);
+    return result ? c.json({ data: result }) : c.json(err("Not found", "NOT_FOUND"), 404);
+  });
+  app2.post("/admin/backups/history-recovery/:historyId/original", async (c) => {
+    if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
+    const form = await c.req.parseBody(), file = form.file;
+    if (file instanceof File && (file.size > MAX_UPLOAD_BYTES || !await looksLikePdf(file))) return c.json(err("Choose a readable original PDF under 20 MB.", "NOT_A_PDF"), 400);
+    const result = await restoreHistoricalOriginal(await getDb(), c.req.param("historyId"), file instanceof File ? Buffer.from(await file.arrayBuffer()) : void 0);
+    return result ? c.json({ data: result }) : c.json(err("Not found", "NOT_FOUND"), 404);
+  });
+}
+
 // server/ra-checkout.ts
 init_db();
 init_env();
@@ -102226,7 +102648,7 @@ init_env();
 // server/square.ts
 init_db();
 init_env();
-import { createHash as createHash9, randomBytes as randomBytes4, timingSafeEqual as timingSafeEqual2 } from "node:crypto";
+import { createHash as createHash10, randomBytes as randomBytes5, timingSafeEqual as timingSafeEqual3 } from "node:crypto";
 var API_BASE = env.SQUARE_ENV === "production" ? "https://connect.squareup.com" : "https://connect.squareupsandbox.com";
 async function createCheckout(opts) {
   const redirectUrl = opts.redirectUrl ?? `${env.PUBLIC_BASE_URL}/order/confirmed?ref=${opts.orderId}`;
@@ -102268,7 +102690,7 @@ async function createCheckout(opts) {
       method: "POST",
       headers: squareHeaders(),
       signal: AbortSignal.timeout(15e3),
-      body: JSON.stringify({ ...body2, idempotency_key: createHash9("sha256").update(`checkout:${opts.orderId}:${withPrefill}`).digest("hex").slice(0, 40) })
+      body: JSON.stringify({ ...body2, idempotency_key: createHash10("sha256").update(`checkout:${opts.orderId}:${withPrefill}`).digest("hex").slice(0, 40) })
     });
   };
   const attemptWithRetry = async (withPrefill) => {
@@ -102306,7 +102728,7 @@ async function saveCardFromPayment(opts) {
     if (sim === "wallet") return { ok: false, reason: "wallet payment" };
     return {
       ok: true,
-      card: { customerId: `dev-cust-${opts.referenceId.slice(0, 8)}`, cardId: `dev-card-${randomBytes4(4).toString("hex")}`, last4: sim === "prepaid" ? "0005" : "1111", brand: sim === "prepaid" ? "MASTERCARD" : "VISA", prepaid: sim === "prepaid" }
+      card: { customerId: `dev-cust-${opts.referenceId.slice(0, 8)}`, cardId: `dev-card-${randomBytes5(4).toString("hex")}`, last4: sim === "prepaid" ? "0005" : "1111", brand: sim === "prepaid" ? "MASTERCARD" : "VISA", prepaid: sim === "prepaid" }
     };
   }
   const custRes = await fetch(`${API_BASE}/v2/customers`, {
@@ -102314,7 +102736,7 @@ async function saveCardFromPayment(opts) {
     headers: squareHeaders(),
     signal: AbortSignal.timeout(3e4),
     body: JSON.stringify({
-      idempotency_key: createHash9("sha256").update(`customer:${opts.paymentId}`).digest("hex").slice(0, 40),
+      idempotency_key: createHash10("sha256").update(`customer:${opts.paymentId}`).digest("hex").slice(0, 40),
       given_name: opts.givenName || void 0,
       family_name: opts.familyName || void 0,
       email_address: opts.email,
@@ -102328,7 +102750,7 @@ async function saveCardFromPayment(opts) {
     headers: squareHeaders(),
     signal: AbortSignal.timeout(3e4),
     body: JSON.stringify({
-      idempotency_key: createHash9("sha256").update(`card:${opts.paymentId}`).digest("hex").slice(0, 40),
+      idempotency_key: createHash10("sha256").update(`card:${opts.paymentId}`).digest("hex").slice(0, 40),
       source_id: opts.paymentId,
       card: { customer_id: custBody.customer.id, cardholder_name: [opts.givenName, opts.familyName].filter(Boolean).join(" ") || void 0, reference_id: opts.referenceId }
     })
@@ -102354,7 +102776,7 @@ function verifyWebhookSignature(opts) {
   );
   const expectedBytes = Buffer.from(expected, "utf8");
   const suppliedBytes = Buffer.from(opts.signatureHeader, "utf8");
-  return expectedBytes.length === suppliedBytes.length && timingSafeEqual2(expectedBytes, suppliedBytes);
+  return expectedBytes.length === suppliedBytes.length && timingSafeEqual3(expectedBytes, suppliedBytes);
 }
 async function agentSquarePayment(action, opts) {
   if (!env.SQUARE_ACCESS_TOKEN) {
@@ -102384,7 +102806,7 @@ var SquareDecline = class extends Error {
   code;
 };
 async function storeRenewalCard(opts) {
-  const key = (kind) => createHash9("sha256").update(`${kind}:${opts.attemptId}`).digest("hex").slice(0, 40);
+  const key = (kind) => createHash10("sha256").update(`${kind}:${opts.attemptId}`).digest("hex").slice(0, 40);
   if (!env.SQUARE_ACCESS_TOKEN) {
     if (opts.source.includes("decline")) throw new SquareDecline("CARD_DECLINED");
     return { customerId: opts.customerId || `dev-customer-${opts.referenceId}`, cardId: `dev-card-${opts.attemptId}`, last4: opts.source.includes("prepaid") ? "0005" : "4242", brand: "VISA", prepaid: opts.source.includes("prepaid") };
@@ -104864,7 +105286,7 @@ function managerProblem(managers) {
 }
 
 // server/owners-manual.ts
-import { createHash as createHash10 } from "node:crypto";
+import { createHash as createHash11 } from "node:crypto";
 
 // ../docs/owners-manual.md
 var owners_manual_default = `<!-- MASTER. This file is the Owner's Manual. Edit it here.
@@ -105428,7 +105850,7 @@ async function publish(force) {
   const meta = typeof current?.meta === "string" ? JSON.parse(current.meta) : current?.meta;
   if (!force && meta?.pinned) return { published: false, pinned: true };
   const { renderManualPdf: renderManualPdf2, MANUAL_RENDERER_VERSION: MANUAL_RENDERER_VERSION2 } = await Promise.resolve().then(() => (init_manual_pdf(), manual_pdf_exports));
-  const hash2 = createHash10("sha256").update(owners_manual_default).update(`renderer:${MANUAL_RENDERER_VERSION2}`).digest("hex").slice(0, 16);
+  const hash2 = createHash11("sha256").update(owners_manual_default).update(`renderer:${MANUAL_RENDERER_VERSION2}`).digest("hex").slice(0, 16);
   if (!force && meta?.hash === hash2) return { published: false };
   const { pdf, pages, edition } = await renderManualPdf2(owners_manual_default);
   const stored = await putFile("owners-manual.pdf", pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength), "application/pdf");
@@ -109938,13 +110360,13 @@ function replaceOnce(s, from, to, label) {
   return typeof from === "string" ? s.replace(from, to) : s.replace(from, to);
 }
 var money2 = (n) => `$${Math.round(n).toLocaleString("en-US")}`;
-function fillSection(s, heading, slots, label) {
+function fillSection(s, heading, slots2, label) {
   const re = new RegExp(`## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=
 ## |$)`);
   const m2 = s.match(re);
   if (!m2) throw new Error(`OA template section missing: ${label}`);
   let sec = m2[0];
-  for (const [slot, val] of Object.entries(slots)) {
+  for (const [slot, val] of Object.entries(slots2)) {
     if (!sec.includes(slot)) throw new Error(`OA slot missing in ${label}: ${slot}`);
     sec = sec.split(slot).join(val);
   }
@@ -112124,7 +112546,7 @@ function registerPortalRoutes(app2) {
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const body = external_exports.object({ kind: external_exports.enum(["certificate-of-status", "certified-copy"]) }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json(err("Choose which document you need.", "INVALID_INPUT"), 400);
-    const spec = CERT_TYPES[body.data.kind];
+    const spec2 = CERT_TYPES[body.data.kind];
     const purchaseCompanyId = await resolveCompanyOrder(session.clientId, c.req.query("company"));
     if (c.req.query("company") !== void 0 && !purchaseCompanyId) return c.json(err(COMPANY_NOT_FOUND, "COMPANY_NOT_FOUND"), 400);
     const llcName = await clientLlcName(session.clientId, purchaseCompanyId);
@@ -112140,9 +112562,9 @@ function registerPortalRoutes(app2) {
       [session.clientId, body.data.kind, purchaseCompanyId]
     );
     if (open.length > 0) {
-      return c.json(err(`A ${spec.name.toLowerCase()} is already on order \u2014 See Orders in progress.`, "ALREADY_ORDERED"), 400);
+      return c.json(err(`A ${spec2.name.toLowerCase()} is already on order \u2014 See Orders in progress.`, "ALREADY_ORDERED"), 400);
     }
-    const serviceOrderId = await claimServicePurchase(session.clientId, purchaseCompanyId, body.data.kind, llcName, {}, spec.fee);
+    const serviceOrderId = await claimServicePurchase(session.clientId, purchaseCompanyId, body.data.kind, llcName, {}, spec2.fee);
     if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
       return c.json(err("Too many requests. Try again later.", "RATE_LIMITED"), 429);
     }
@@ -112152,20 +112574,20 @@ function registerPortalRoutes(app2) {
       service: true,
       llcName,
       priced: {
-        serviceFeeCents: spec.fee,
+        serviceFeeCents: spec2.fee,
         stateFeesCents: 0,
-        totalCents: spec.fee,
-        lineItems: [{ name: `${spec.name} \u2014 ${llcName}`, amountCents: spec.fee }]
+        totalCents: spec2.fee,
+        lineItems: [{ name: `${spec2.name} \u2014 ${llcName}`, amountCents: spec2.fee }]
       },
       buyerEmail: clients[0]?.email ?? "",
       redirectUrl: `${env.PUBLIC_BASE_URL}/portal?company=${purchaseCompanyId}&paid=${serviceOrderId}`,
-      description: `${spec.name} \u2014 ${llcName}`
+      description: `${spec2.name} \u2014 ${llcName}`
     });
     await db.query("UPDATE service_orders SET square_order_id = $1 WHERE id = $2", [
       checkout.squareOrderId,
       serviceOrderId
     ]);
-    return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: spec.fee } });
+    return c.json({ data: { serviceOrderId, checkoutUrl: checkout.url, totalCents: spec2.fee } });
   });
   app2.post("/portal/services/ein", async (c) => {
     const session = await getSession(c);
@@ -112546,9 +112968,9 @@ function registerPortalRoutes(app2) {
       return c.json(err("That address is already in use on another account.", "EMAIL_TAKEN"), 400);
     }
     const { token, tokenHash } = newToken();
-    const verify = verifyNewEmail(`${env.PUBLIC_BASE_URL}/portal/verify-email?token=${token}`);
+    const verify2 = verifyNewEmail(`${env.PUBLIC_BASE_URL}/portal/verify-email?token=${token}`);
     try {
-      await sendMail({ to: newEmail, ...verify });
+      await sendMail({ to: newEmail, ...verify2 });
     } catch (e) {
       console.error("[account] verify email failed:", e);
       return c.json(err("We could not send the confirmation link. Please try again.", "EMAIL_SEND_FAILED"), 503);
@@ -114620,8 +115042,8 @@ var Context = class {
    * })
    * ```
    */
-  redirect = (location, status) => {
-    const locationString = String(location);
+  redirect = (location2, status) => {
+    const locationString = String(location2);
     this.header(
       "Location",
       // Multibyes should be encoded
@@ -115608,7 +116030,7 @@ init_storage();
 init_dropbox();
 init_backup_deletions();
 init_office_recovery_sources();
-import { createHash as createHash11 } from "node:crypto";
+import { createHash as createHash12 } from "node:crypto";
 var DocumentUploadError = class extends Error {
   constructor(message, code, status) {
     super(message);
@@ -115618,7 +116040,7 @@ var DocumentUploadError = class extends Error {
   code;
   status;
 };
-var hash = (bytes2) => createHash11("sha256").update(bytes2).digest("hex");
+var hash = (bytes2) => createHash12("sha256").update(bytes2).digest("hex");
 var changed = () => new DocumentUploadError("This upload already saved different information. Retry the original upload or choose New upload.", "DOCUMENT_CHANGED", 409);
 var deleted = () => new DocumentUploadError("This document has been deleted.", "NOT_FOUND", 404);
 async function saveDocumentSubmission(db, input) {
@@ -116325,9 +116747,9 @@ function registerAdminRoutes(app2) {
     const buf = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
     return { title, buf };
   }
-  async function issueStatement(db, o, documentNumber, put2 = putFile, retirePrior = true) {
+  async function issueStatement(db, o, documentNumber, put3 = putFile, retirePrior = true) {
     const { title, buf } = await prepareStatement(o, documentNumber);
-    const stored = await put2(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
+    const stored = await put3(`${title.replace(/[^\w-]+/g, "_")}.pdf`, buf, "application/pdf");
     const prior = await db.query(
       "SELECT id, storage_key FROM documents WHERE order_id = $1 AND kind = 'statement'",
       [o.id]
@@ -117737,6 +118159,7 @@ app.use("/admin/*", async (c, next) => {
   if (!paid) return c.json(err("Not found", "NOT_FOUND"), 404);
   return next();
 });
+registerOfficeUploads(app);
 registerPaymentRoutes(app);
 registerAgentCheckout(app);
 registerAgentOffice(app);

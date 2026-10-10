@@ -1,3 +1,4 @@
+import {registerOfficeUploads} from './office-uploads';
 import {OfficeConflict} from './office-operation';
 import {OfficeRecoveryError} from './office-recovery-sources';
 import {registerOfficeRecovery} from './routes-office-recovery';
@@ -44,6 +45,7 @@ app.use("/admin/*", async (c, next) => {
  return next();
 });
 
+registerOfficeUploads(app);
 registerPaymentRoutes(app);
 registerAgentCheckout(app);
 registerAgentOffice(app);
