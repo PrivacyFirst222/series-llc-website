@@ -3849,3 +3849,39 @@ The recorded preservation workflow bound candidate files and test evidence to fi
 ### FIXED BY
 
 Local checkpoints d348f0f291c1 and f41c3952514e preserve the independently verified pre-current-batch baseline and the unfinished current edits/bookkeeping, respectively. All 1,552 baseline paths and all 1,554 current candidate paths were checked against their commit trees; all 149 originally changed paths were preserved. The working tree is clean, website candidate bytes are unchanged, and the original history, patch, new files and manifests are saved in chunk45-final-implementation-2026-10-02/git-checkpoints/20261003T021209Z outside the repository. Existing hook suspension and disabled pushes remain unchanged. No product test, year simulation, campaign, acceptance, deployment or release was performed. The workspace instructions now require truthful local checkpoints at meaningful work boundaries and before handoff; this bookkeeping repair does not complete the unfinished product repairs or approve AM-06.
+
+## P103 — My reviews controlled single steps, so nothing stopped a week of hosted-test work that never tested the site
+
+### THE FAILURE
+
+Adam, 9 Oct 2026: "You are supposed to critique the plan to make it achieve the stated objectives in the shortest period of time and in the least number of steps.  ChatGPT totally fucked up and ran tests all week that didn't stay on point and didn't accomplish the objective of testing the site to make sure it's solid before launch.  Your job is to make sure the plan won't permit that"
+
+Adam's standing objective, 1 Oct: "Minimize total time, unnecessary work, repeated qualification, and owner involvement needed to reach a defensible launch decision."
+
+What I did:
+- **4 Oct.** I approved "In parallel, prepare the hosted qualification", with no time box, no scope list and no definition of done for the hosted step.
+- **Every review from 1 to 4 Oct.** Each was a judgment on one message. None set a finish line or a total budget for qualification, and none set a rule that work not tied to a launch gate must stop.
+
+What followed without any review from me:
+- `hosted-execution-2026-10-04/RECOVERY-20261005` grew to 3,875 items: 1,840 on 5 Oct, 1,605 on 6 Oct, 382 on 7 Oct, 44 on 8 Oct and 1 on 9 Oct.
+- The governing plan, `PLAN-A735.md`, reached 882,081 bytes and 101,665 words. Its header is amendment A333, which retains A332 "verbatim".
+- From 8 to 9 Oct the work was billing-page navigation, "accounting horizons", reset-finance cost algebra and activation critical-section engineering, all for the disposable test environment.
+- `CURRENT.json` still says `"hostedQualification": false`.
+- PLANNING-MISTAKES.md grew from 81,044 bytes (2 Oct) to 770,657 bytes.
+
+### WHY IT HAPPENED
+
+My safeguards only act when Adam pastes a message to me. Rule 1, the Objectives/Runs/Rule-status opening and the 10-minute flag are all per-review checks. Between reviews, Codex ran for five days on an automation I never reviewed. I never noticed that every protection I had built depended on being invoked.
+
+My Rule 1 checks measure test runs, by duration and by whether they will be repeated. The drift was not test runs. It was engineering and bookkeeping: inventories, readbacks, cost collectors and plan amendments. To my checks, "prepare the hosted qualification" looked free because it ran no long tests, so I granted it with no bound.
+
+I accepted Codex's proof apparatus as the definition of "tested". That covered the controls, the 50 before-repair obligations, the 218 inherited records and the hosted contract's 500 × 2 MiB capacity runs. Because that structure was large and internally consistent, I asked whether each step was efficient within it. I never asked whether the structure itself was the shortest path to knowing the site is solid. P98 recorded the same deference to Codex procedure, and Rule 1's "procedure is a proposal" line did not change it. That line asks me to challenge rules one at a time, and the problem was the whole structure.
+
+### FIXED BY
+
+The plan I give Adam replaces PLAN-A735 rather than amending it. It has:
+- a fixed list of launch gates, each with a time box;
+- a rule that any task naming no gate is out of scope;
+- a hard stop that reports to Adam when a time box is exceeded;
+- no inheritance by "retain verbatim";
+- no unreviewed automation.
