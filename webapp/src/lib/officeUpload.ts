@@ -5,9 +5,12 @@ interface Grant {id:string;field:string;path:string;key:string;iv:string;token:s
 interface Ticket {id:string;state?:string;files?:Grant[]}
 const hex=(buffer:ArrayBuffer)=>Array.from(new Uint8Array(buffer),b=>b.toString(16).padStart(2,'0')).join('');
 const decode=(value:string)=>Uint8Array.from(atob(value),c=>c.charCodeAt(0));
-async function data(response:Response):Promise<Ticket>{
+async function data(response:Response,receiptKey:string):Promise<Ticket>{
  const body=await response.json();
- if(!response.ok)throw new Error(body.error?.message??'The upload could not be authorized.');
+ if(!response.ok){
+  if(body.error?.code==='UPLOAD_EXPIRED')sessionStorage.removeItem(receiptKey);
+  throw new Error(body.error?.message??'The upload could not be authorized.');
+ }
  return body.data;
 }
 /** The business request contains a receipt only. Plaintext never reaches Blob. */
@@ -25,7 +28,7 @@ export async function officeUpload(route:string,options:RequestInit):Promise<Res
  const receiptKey='office-upload:'+hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(description)));
  const credentials=options.credentials??'same-origin',signal=options.signal;
  const prior=sessionStorage.getItem(receiptKey);
- const ticket=await data(await fetch(prior?`/api/admin/uploads/${encodeURIComponent(prior)}`:'/api/admin/uploads',prior?{credentials,signal}:{method:'POST',credentials,signal,headers:{'content-type':'application/vnd.fpsllc-upload+json'},body:description}));
+ const ticket=await data(await fetch(prior?`/api/admin/uploads/${encodeURIComponent(prior)}`:'/api/admin/uploads',prior?{credentials,signal}:{method:'POST',credentials,signal,headers:{'content-type':'application/vnd.fpsllc-upload+json'},body:description}),receiptKey);
  // A failed browser persistence write stops before any business submission.
  sessionStorage.setItem(receiptKey,ticket.id);
  if(ticket.state!=='complete'){
