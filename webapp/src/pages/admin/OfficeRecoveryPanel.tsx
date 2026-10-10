@@ -1,3 +1,5 @@
+import {officeUpload} from '@/lib/officeUpload';
+import {UPLOAD_LIMIT_LABEL} from '@/lib/uploadLimits';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useMutation,useQuery,useQueryClient} from '@tanstack/react-query';
@@ -7,7 +9,7 @@ import {Button} from '@/components/ui/button';
 interface HistoryRow {historyId:string;expectedRevision:string;title:string;slot:string;status:string;clientName?:string;companyName?:string;orderId:string|null;serviceId?:string}
 async function uploadOriginal(path:string,file:File|null){
  const data=new FormData();if(file)data.set('file',file);
- const r=await fetch(path,{method:'POST',credentials:'same-origin',body:data}),body=await r.json();
+ const r=await officeUpload(path,{method:'POST',credentials:'same-origin',body:data}),body=await r.json();
  if(!r.ok)throw Error(body.error?.message??'Recovery did not complete.');return body.data;
 }
 function HistoryOriginal({row,onChange}:{row:HistoryRow;onChange:()=>void}){
@@ -28,7 +30,7 @@ function HistoryOriginal({row,onChange}:{row:HistoryRow;onChange:()=>void}){
   <p className="break-all text-xs">Historical revision: {row.historyId}</p>
   <div className="flex flex-wrap gap-2"><Button size="sm" variant="outline" disabled={action.isPending} onClick={()=>action.mutate('check')}>Check original</Button>
   <Button size="sm" variant="outline" disabled={action.isPending} onClick={()=>action.mutate('recover')}>Recover original</Button></div>
-  <label className="block text-sm">Exact historical original PDF<input className="block w-full" type="file" accept="application/pdf" onChange={e=>setFile(e.target.files?.[0]??null)}/></label>
+  <label className="block text-sm">Exact historical original PDF<><input className="block w-full" type="file" accept="application/pdf" onChange={e=>setFile(e.target.files?.[0]??null)}/><span className="text-xs text-muted-foreground">{UPLOAD_LIMIT_LABEL}</span></></label>
   <label className="flex gap-2 text-sm"><input type="checkbox" checked={ack} onChange={e=>setAck(e.target.checked)}/>I confirm this historical original is unavailable. Future backups will disclose that this version is missing.</label>
   <Button size="sm" variant="outline" disabled={!ack||action.isPending} onClick={()=>action.mutate('unrecoverable')}>Record original as unrecoverable</Button>
   {message?<p role={action.isError?'alert':'status'} className="text-sm">{message}</p>:null}
@@ -59,7 +61,7 @@ export function OfficeRecoveryPanel({orderId}:{orderId:string}){
   <Button variant="outline" size="sm" onClick={()=>setOpen(!open)} aria-expanded={open}>Recover saved original</Button>
   {open?<>
    <label className="block text-sm">Document<select className="block w-full rounded border p-2" value={slot} onChange={e=>setSlot(e.target.value)}><option value="">Select a document</option>{query.data?.filter(d=>!d.historical).map(d=><option key={d.operationId+'/'+d.slot} value={d.operationId+'/'+d.slot}>{d.title}</option>)}</select></label>
-   <label className="block text-sm">Original PDF (if you have it)<input className="block w-full" type="file" accept="application/pdf" onChange={e=>setFile(e.target.files?.[0]??null)}/></label>
+   <label className="block text-sm">Original PDF (if you have it)<><input className="block w-full" type="file" accept="application/pdf" onChange={e=>setFile(e.target.files?.[0]??null)}/><span className="text-xs text-muted-foreground">{UPLOAD_LIMIT_LABEL}</span></></label>
    <Button disabled={repair.isPending} onClick={()=>repair.mutate()}>Recover original</Button>
    {query.error?<p role="alert">{query.error.message}</p>:null}
    <HistoryRecoveryPanel orderId={orderId}/>
