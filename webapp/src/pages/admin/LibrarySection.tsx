@@ -128,7 +128,7 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
     <>
       <BackupAttentionBanner/>
       <HistoryRecoveryPanel/>
-      {progressQuery.data?.status==='finalizing'?`Files verified; finalizing backup status. ${progressQuery.data.error || 'Automatic continuation runs every five minutes while work remains.'}`:progressQuery.data?.status==='complete_with_history_gaps'?<p role="status">Restorable backup with historical gaps</p>:null}
+      {progressQuery.data?.status==='complete_with_history_gaps'?<p role="status">Restorable backup with historical gaps</p>:null}
       <div className="mt-4 rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center gap-2">
           <BookOpen className="h-4 w-4 text-trust" />
