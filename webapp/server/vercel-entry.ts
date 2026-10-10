@@ -6,6 +6,9 @@
 // adapter package) so its behavior is pinned and testable under plain Node.
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { app } from "./app";
+import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import type { ReadableStream as NodeReadableStream } from "node:stream/web";
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   try {
@@ -46,9 +49,20 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     });
     const cookies = response.headers.getSetCookie();
     if (cookies.length > 0) res.setHeader("set-cookie", cookies);
-    res.end(Buffer.from(await response.arrayBuffer()));
+    if (method === "HEAD" || response.status === 204 || response.status === 304 || !response.body) {
+      await response.body?.cancel();
+      res.end();
+    } else {
+      // pipeline applies backpressure and cancels the source on disconnect.
+      // Do not materialize the response: large authenticated PDFs must stream.
+      await pipeline(Readable.fromWeb(response.body as unknown as NodeReadableStream), res);
+    }
   } catch (e) {
     console.error("[api]", e);
+    if (res.headersSent || res.destroyed) {
+      res.destroy(e instanceof Error ? e : new Error(String(e)));
+      return;
+    }
     res.statusCode = 500;
     res.setHeader("content-type", "application/json");
     res.end(JSON.stringify({ error: { message: "Something went wrong on our end.", code: "INTERNAL" } }));

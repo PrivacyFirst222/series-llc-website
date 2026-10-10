@@ -514,7 +514,7 @@ var require_errors = __commonJS({
       toVercelCliError: () => toVercelCliError
     });
     module.exports = __toCommonJS(errors_exports);
-    var import_promises2 = __require("node:fs/promises");
+    var import_promises3 = __require("node:fs/promises");
     var VercelCliError2 = class extends Error {
       constructor(options) {
         super(options.message);
@@ -560,7 +560,7 @@ var require_errors = __commonJS({
     }
     async function assertValidCwd(cwd) {
       try {
-        if (!(await (0, import_promises2.stat)(cwd)).isDirectory()) {
+        if (!(await (0, import_promises3.stat)(cwd)).isDirectory()) {
           throw new Error("not a directory");
         }
       } catch {
@@ -2765,12 +2765,12 @@ var require_fsutils = __commonJS({
       statIfExists: () => statIfExists
     });
     module.exports = __toCommonJS(fsutils_exports);
-    var import_promises2 = __require("node:fs/promises");
+    var import_promises3 = __require("node:fs/promises");
     var import_node_path2 = __toESM2(__require("node:path"));
     var import_errutils = require_errutils();
     async function getCanonicalPath(filePath) {
       try {
-        return await (0, import_promises2.realpath)(filePath);
+        return await (0, import_promises3.realpath)(filePath);
       } catch {
         return filePath;
       }
@@ -2793,7 +2793,7 @@ var require_fsutils = __commonJS({
     }
     async function statIfExists(filePath) {
       try {
-        return { stats: await (0, import_promises2.stat)(filePath) };
+        return { stats: await (0, import_promises3.stat)(filePath) };
       } catch (error2) {
         if ((0, import_errutils.isMissingPathError)(error2)) {
           return { missing: true };
@@ -2859,7 +2859,7 @@ var require_safety = __commonJS({
       getUnsafeStatsReason: () => getUnsafeStatsReason
     });
     module.exports = __toCommonJS(safety_exports);
-    var import_promises2 = __require("node:fs/promises");
+    var import_promises3 = __require("node:fs/promises");
     var import_node_path2 = __toESM2(__require("node:path"));
     var import_errutils = require_errutils();
     var import_fsutils = require_fsutils();
@@ -2953,14 +2953,14 @@ var require_safety = __commonJS({
       return reason ? `${filePath} is ${reason}` : null;
     }
     async function getUnsafeDirectoryReason(directory) {
-      const stats = await (0, import_promises2.stat)(directory);
+      const stats = await (0, import_promises3.stat)(directory);
       if (!stats.isDirectory()) {
         return "not a directory";
       }
       return getUnsafeStatsReason(stats);
     }
     async function getUnsafeFileReason(filePath) {
-      const stats = await (0, import_promises2.stat)(filePath);
+      const stats = await (0, import_promises3.stat)(filePath);
       if (!stats.isFile()) {
         return "not a file";
       }
@@ -3027,7 +3027,7 @@ var require_lookup = __commonJS({
       toVercelCliInvocation: () => toVercelCliInvocation
     });
     module.exports = __toCommonJS(lookup_exports);
-    var import_promises2 = __require("node:fs/promises");
+    var import_promises3 = __require("node:fs/promises");
     var import_node_path2 = __toESM2(__require("node:path"));
     var import_envpath = require_envpath();
     var import_errutils = require_errutils();
@@ -3136,9 +3136,9 @@ var require_lookup = __commonJS({
     }
     async function canAccessCommandCandidate(candidate, localBinSearch, diagnostics) {
       try {
-        await (0, import_promises2.access)(
+        await (0, import_promises3.access)(
           candidate,
-          process.platform === "win32" ? import_promises2.constants.F_OK : import_promises2.constants.F_OK | import_promises2.constants.X_OK
+          process.platform === "win32" ? import_promises3.constants.F_OK : import_promises3.constants.F_OK | import_promises3.constants.X_OK
         );
         return true;
       } catch (error2) {
@@ -3168,10 +3168,10 @@ var require_lookup = __commonJS({
       );
     }
     async function resolveCommandCandidate(command, candidate, localBinSearch, diagnostics) {
-      if (!(await (0, import_promises2.stat)(candidate)).isFile()) {
+      if (!(await (0, import_promises3.stat)(candidate)).isFile()) {
         return null;
       }
-      const realPath = await (0, import_promises2.realpath)(candidate);
+      const realPath = await (0, import_promises3.realpath)(candidate);
       const localBinCandidate = await classifyPathLocalBinCandidate(
         candidate,
         localBinSearch.directories
@@ -3266,7 +3266,7 @@ var require_lookup = __commonJS({
     async function getProjectRootMarker(directory) {
       const gitPath = import_node_path2.default.join(directory, ".git");
       try {
-        await (0, import_promises2.stat)(gitPath);
+        await (0, import_promises3.stat)(gitPath);
         return { path: gitPath };
       } catch {
       }
@@ -3277,14 +3277,14 @@ var require_lookup = __commonJS({
       let canonicalFilePath = resolvedFilePath;
       try {
         canonicalFilePath = import_node_path2.default.join(
-          await (0, import_promises2.realpath)(import_node_path2.default.dirname(resolvedFilePath)),
+          await (0, import_promises3.realpath)(import_node_path2.default.dirname(resolvedFilePath)),
           import_node_path2.default.basename(resolvedFilePath)
         );
       } catch {
       }
       for (let localBinDirectory of localBinDirectories) {
         try {
-          localBinDirectory = await (0, import_promises2.realpath)(localBinDirectory);
+          localBinDirectory = await (0, import_promises3.realpath)(localBinDirectory);
         } catch {
         }
         if (canonicalFilePath.startsWith(`${localBinDirectory}${import_node_path2.default.sep}`)) {
@@ -3297,7 +3297,7 @@ var require_lookup = __commonJS({
       const candidateDirectory = import_node_path2.default.resolve(import_node_path2.default.dirname(filePath));
       const directories = [candidateDirectory];
       try {
-        const canonicalDirectory = await (0, import_promises2.realpath)(candidateDirectory);
+        const canonicalDirectory = await (0, import_promises3.realpath)(candidateDirectory);
         if (!directories.includes(canonicalDirectory)) {
           directories.push(canonicalDirectory);
         }
@@ -3356,8 +3356,8 @@ var require_lookup = __commonJS({
     }
     async function getLocalVercelPackage(nodeModulesDirectory) {
       const packageDirectory = import_node_path2.default.join(nodeModulesDirectory, "vercel");
-      const realNodeModulesDirectory = await (0, import_promises2.realpath)(nodeModulesDirectory);
-      const realPackageDirectory = await (0, import_promises2.realpath)(packageDirectory);
+      const realNodeModulesDirectory = await (0, import_promises3.realpath)(nodeModulesDirectory);
+      const realPackageDirectory = await (0, import_promises3.realpath)(packageDirectory);
       if (!(0, import_fsutils.isSubpath)(realNodeModulesDirectory, realPackageDirectory)) {
         return {
           reason: "local vercel package resolves outside local node_modules"
@@ -3380,7 +3380,7 @@ var require_lookup = __commonJS({
     }
     async function readLocalVercelPackageJson(realPackageDirectory) {
       const packageJsonPath = import_node_path2.default.join(realPackageDirectory, "package.json");
-      const realPackageJsonPath = await (0, import_promises2.realpath)(packageJsonPath);
+      const realPackageJsonPath = await (0, import_promises3.realpath)(packageJsonPath);
       if (!(0, import_fsutils.isSubpath)(realPackageDirectory, realPackageJsonPath)) {
         return { reason: "local vercel package.json resolves outside package" };
       }
@@ -3394,7 +3394,7 @@ var require_lookup = __commonJS({
         };
       }
       const packageJson = JSON.parse(
-        await (0, import_promises2.readFile)(realPackageJsonPath, "utf8")
+        await (0, import_promises3.readFile)(realPackageJsonPath, "utf8")
       );
       if (packageJson.name !== "vercel") {
         return {
@@ -3410,7 +3410,7 @@ var require_lookup = __commonJS({
         return { reason: "local vercel package does not declare bin.vercel" };
       }
       const declaredBinPath = import_node_path2.default.resolve(realPackageDirectory, binTarget);
-      const realDeclaredBinPath = await (0, import_promises2.realpath)(declaredBinPath);
+      const realDeclaredBinPath = await (0, import_promises3.realpath)(declaredBinPath);
       if (!(0, import_fsutils.isSubpath)(realPackageDirectory, realDeclaredBinPath)) {
         return { reason: "local vercel package bin resolves outside package" };
       }
@@ -3426,7 +3426,7 @@ var require_lookup = __commonJS({
       }
       if (process.platform !== "win32" && !(0, import_fsutils.isNodeScript)(realDeclaredBinPath)) {
         try {
-          await (0, import_promises2.access)(realDeclaredBinPath, import_promises2.constants.F_OK | import_promises2.constants.X_OK);
+          await (0, import_promises3.access)(realDeclaredBinPath, import_promises3.constants.F_OK | import_promises3.constants.X_OK);
         } catch (error2) {
           return {
             reason: `local vercel package bin is not executable: ${(0, import_errutils.getErrorMessage)(error2)}`
@@ -30823,7 +30823,7 @@ var require_client_h2 = __commonJS({
   "node_modules/undici/lib/dispatcher/client-h2.js"(exports, module) {
     "use strict";
     var assert = __require("node:assert");
-    var { pipeline } = __require("node:stream");
+    var { pipeline: pipeline2 } = __require("node:stream");
     var util2 = require_util2();
     var {
       RequestContentLengthMismatchError,
@@ -31270,7 +31270,7 @@ var require_client_h2 = __commonJS({
     }
     function writeStream(abort, socket, expectsPayload, h2stream, body, client, request, contentLength) {
       assert(contentLength !== 0 || client[kRunning] === 0, "stream body cannot be pipelined");
-      const pipe = pipeline(
+      const pipe = pipeline2(
         body,
         h2stream,
         (err3) => {
@@ -33342,7 +33342,7 @@ var require_readable = __commonJS({
   "node_modules/undici/lib/api/readable.js"(exports, module) {
     "use strict";
     var assert = __require("node:assert");
-    var { Readable: Readable2 } = __require("node:stream");
+    var { Readable: Readable3 } = __require("node:stream");
     var { RequestAbortedError, NotSupportedError, InvalidArgumentError, AbortError } = require_errors5();
     var util2 = require_util2();
     var { ReadableStreamFrom } = require_util2();
@@ -33354,7 +33354,7 @@ var require_readable = __commonJS({
     var kContentLength = /* @__PURE__ */ Symbol("kContentLength");
     var noop = () => {
     };
-    var BodyReadable = class extends Readable2 {
+    var BodyReadable = class extends Readable3 {
       constructor({
         resume,
         abort,
@@ -33696,7 +33696,7 @@ var require_api_request = __commonJS({
   "node_modules/undici/lib/api/api-request.js"(exports, module) {
     "use strict";
     var assert = __require("node:assert");
-    var { Readable: Readable2 } = require_readable();
+    var { Readable: Readable3 } = require_readable();
     var { InvalidArgumentError, RequestAbortedError } = require_errors5();
     var util2 = require_util2();
     var { getResolveErrorBodyCallback } = require_util4();
@@ -33791,7 +33791,7 @@ var require_api_request = __commonJS({
         const parsedHeaders = responseHeaders === "raw" ? util2.parseHeaders(rawHeaders) : headers;
         const contentType = parsedHeaders["content-type"];
         const contentLength = parsedHeaders["content-length"];
-        const res = new Readable2({
+        const res = new Readable3({
           resume,
           abort,
           contentType,
@@ -34106,7 +34106,7 @@ var require_api_pipeline = __commonJS({
   "node_modules/undici/lib/api/api-pipeline.js"(exports, module) {
     "use strict";
     var {
-      Readable: Readable2,
+      Readable: Readable3,
       Duplex: Duplex2,
       PassThrough
     } = __require("node:stream");
@@ -34120,7 +34120,7 @@ var require_api_pipeline = __commonJS({
     var { addSignal, removeSignal } = require_abort_signal();
     var assert = __require("node:assert");
     var kResume = /* @__PURE__ */ Symbol("resume");
-    var PipelineRequest = class extends Readable2 {
+    var PipelineRequest = class extends Readable3 {
       constructor() {
         super({ autoDestroy: true });
         this[kResume] = null;
@@ -34137,7 +34137,7 @@ var require_api_pipeline = __commonJS({
         callback(err3);
       }
     };
-    var PipelineResponse = class extends Readable2 {
+    var PipelineResponse = class extends Readable3 {
       constructor(resume) {
         super({ autoDestroy: true });
         this[kResume] = resume;
@@ -34288,7 +34288,7 @@ var require_api_pipeline = __commonJS({
         util2.destroy(ret, err3);
       }
     };
-    function pipeline(opts, handler2) {
+    function pipeline2(opts, handler2) {
       try {
         const pipelineHandler = new PipelineHandler(opts, handler2);
         this.dispatch({ ...opts, body: pipelineHandler.req }, pipelineHandler);
@@ -34297,7 +34297,7 @@ var require_api_pipeline = __commonJS({
         return new PassThrough().destroy(err3);
       }
     }
-    module.exports = pipeline;
+    module.exports = pipeline2;
   }
 });
 
@@ -37462,7 +37462,7 @@ var require_fetch = __commonJS({
       subresourceSet
     } = require_constants3();
     var EE = __require("node:events");
-    var { Readable: Readable2, pipeline, finished } = __require("node:stream");
+    var { Readable: Readable3, pipeline: pipeline2, finished } = __require("node:stream");
     var { addAbortListener, isErrored, isReadable, bufferToLowerCasedHeaderName } = require_util2();
     var { dataURLProcessor, serializeAMimeType, minimizeSupportedMimeType } = require_data_url();
     var { getGlobalDispatcher } = require_global2();
@@ -38363,7 +38363,7 @@ var require_fetch = __commonJS({
                 headersList.append(bufferToLowerCasedHeaderName(rawHeaders[i]), rawHeaders[i + 1].toString("latin1"), true);
               }
               location = headersList.get("location", true);
-              this.body = new Readable2({ read: resume });
+              this.body = new Readable3({ read: resume });
               const decoders = [];
               const willFollow = location && request.redirect === "follow" && redirectStatusSet.has(status);
               if (request.method !== "HEAD" && request.method !== "CONNECT" && !nullBodyStatus.includes(status) && !willFollow) {
@@ -38406,7 +38406,7 @@ var require_fetch = __commonJS({
                 status,
                 statusText,
                 headersList,
-                body: decoders.length ? pipeline(this.body, ...decoders, (err3) => {
+                body: decoders.length ? pipeline2(this.body, ...decoders, (err3) => {
                   if (err3) {
                     this.onError(err3);
                   }
@@ -42424,7 +42424,7 @@ ${value}`;
 var require_eventsource = __commonJS({
   "node_modules/undici/lib/web/eventsource/eventsource.js"(exports, module) {
     "use strict";
-    var { pipeline } = __require("node:stream");
+    var { pipeline: pipeline2 } = __require("node:stream");
     var { fetching } = require_fetch();
     var { makeRequest } = require_request2();
     var { webidl } = require_webidl();
@@ -42582,7 +42582,7 @@ var require_eventsource = __commonJS({
               ));
             }
           });
-          pipeline(
+          pipeline2(
             response.body.stream,
             eventSourceStream,
             (error2) => {
@@ -117741,6 +117741,8 @@ app.onError((e, c) => {
 });
 
 // server/vercel-entry.ts
+import { Readable as Readable2 } from "node:stream";
+import { pipeline } from "node:stream/promises";
 async function handler(req, res) {
   try {
     const proto = req.headers["x-forwarded-proto"] ?? "https";
@@ -117775,9 +117777,18 @@ async function handler(req, res) {
     });
     const cookies = response.headers.getSetCookie();
     if (cookies.length > 0) res.setHeader("set-cookie", cookies);
-    res.end(Buffer.from(await response.arrayBuffer()));
+    if (method === "HEAD" || response.status === 204 || response.status === 304 || !response.body) {
+      await response.body?.cancel();
+      res.end();
+    } else {
+      await pipeline(Readable2.fromWeb(response.body), res);
+    }
   } catch (e) {
     console.error("[api]", e);
+    if (res.headersSent || res.destroyed) {
+      res.destroy(e instanceof Error ? e : new Error(String(e)));
+      return;
+    }
     res.statusCode = 500;
     res.setHeader("content-type", "application/json");
     res.end(JSON.stringify({ error: { message: "Something went wrong on our end.", code: "INTERNAL" } }));
