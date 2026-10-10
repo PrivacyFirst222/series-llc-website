@@ -1,3 +1,5 @@
+import {officeUpload} from '@/lib/officeUpload';
+import {UPLOAD_LIMIT_LABEL} from '@/lib/uploadLimits';
 import {ContinueOfficeReplacement,HistoryRecoveryPanel} from './OfficeRecoveryPanel';
 import { formatDate } from "@/lib/datetime";
 import { jointDisplayName } from "@/lib/jointOwner";
@@ -156,7 +158,7 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
       if (args.ein) fd.set("ein", args.ein);
       if (args.correctionOf) fd.set("correctionOf",args.correctionOf);
       if(reviewRestored)fd.set("reviewRestoredOriginal","true");
-      const res = await fetch(`/api/admin/services/${args.id}/fulfill`, {
+      const res = await officeUpload(`/api/admin/services/${args.id}/fulfill`, {
         method: "POST",
         body: fd,
         credentials: "same-origin",
@@ -447,13 +449,13 @@ function ServiceFulfillDialogContent({viewing, onClose}: {
                     ? "Attach the certified copy from the Division"
                     : "Attach the filed Designation"}
           </label>
-          <input
+          <><input
             id="service-attachment-file"
             type="file"
             accept="application/pdf,.pdf"
             onChange={(e) => setAttachment(e.target.files?.[0] ?? null)}
             className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-full file:border file:border-border file:bg-secondary file:px-4 file:py-1.5 file:text-sm file:font-medium"
-          />
+          /><span className="text-xs text-muted-foreground">{UPLOAD_LIMIT_LABEL}</span></>
           {viewing?.type === "ein" || (correcting&&viewing?.type === "s-election") ? (
             <div className="space-y-1" data-testid="assigned-ein">
               <label htmlFor="assigned-ein" className="text-sm font-medium">EIN as issued (9 digits)</label>
