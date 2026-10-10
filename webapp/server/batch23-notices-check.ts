@@ -72,8 +72,8 @@ async function child() {
    }else{if(kind==="decline")testHooks.declineNextRenewal="CARD_DECLINED";await runRenewals(kind==="decline"||kind==="receipt"?addDays(due,-15):today);}
    const expected={notice:"registered agent", "resignation-due":"resignation due", decline:"declined",receipt:"renewed", "resignation-receipt":"resignation payment", "resignation-copy":"Registered-agent resignation —"}[kind]!;
    const observed=oneMail(mark,expected,current);const [saved]=await db.query("SELECT contact_email,ra_resignation_emailed_at FROM orders WHERE id=$1",[order.id]);
-   const exactAttachment=kind!=="resignation-copy"||mails.slice(mark).some(m=>m.attachments?.[0]&&Buffer.from(m.attachments[0].content,"base64").equals(Buffer.from(bytes)));
-   report(`${mode}: ${kind} uses current address`,observed.ok&&saved.contact_email===old&&exactAttachment&&(routeStatus===undefined||routeStatus===200),{...observed,originalEmail:saved.contact_email,routeStatus,exactAttachment});
+   const portalNotice=kind!=="resignation-copy"||mails.slice(mark).some(m=>!m.attachments&&m.html.includes(env.PUBLIC_BASE_URL+"/portal")&&m.html.includes("Submission does not end the appointment immediately."));
+   report(`${mode}: ${kind} uses current address`,observed.ok&&saved.contact_email===old&&portalNotice&&(routeStatus===undefined||routeStatus===200),{...observed,originalEmail:saved.contact_email,routeStatus,portalNotice});
    if(kind==="resignation-copy"){
     const retryMark=mails.length;const data=new FormData();data.append("reuse","true");const r=await app.request(`/api/admin/orders/${order.id}/agent-copy`,{method:"POST",headers:{Cookie:`fpsllc_admin=${admin.token}`},body:data});const retry=oneMail(retryMark,expected,current);report(`${mode}: resend existing resignation copy uses current address`,r.status===200&&retry.ok,{status:r.status,...retry});
    }
