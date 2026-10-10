@@ -1,3 +1,5 @@
+import {officeUpload} from '@/lib/officeUpload';
+import {UPLOAD_LIMIT_LABEL} from '@/lib/uploadLimits';
 import {OfficeRecoveryPanel,ContinueOfficeReplacement} from './OfficeRecoveryPanel';
 import {PublishedArticlesCorrection,type ArticlesCorrectionState} from './PublishedArticlesCorrection';
 import { AgentServicePanel } from "./AgentServicePanel";
@@ -80,7 +82,7 @@ function ReplaceButton({ docId, orderId, onError }: { docId: string; orderId: st
     mutationFn: async (file: File) => {
       const fd = new FormData();
       fd.set("file", file);
-      const res = await fetch(`/api/admin/documents/${docId}/replace`, { method: "POST", body: fd, credentials: "include" });
+      const res = await officeUpload(`/api/admin/documents/${docId}/replace`, { method: "POST", body: fd, credentials: "include" });
       const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
       if (!res.ok) throw new Error(body?.error?.message ?? "The replacement did not go through. Try again.");
     },
@@ -89,7 +91,7 @@ function ReplaceButton({ docId, orderId, onError }: { docId: string; orderId: st
   });
   return (
     <>
-      <input ref={inputRef} type="file" accept="application/pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) replace.mutate(f); e.target.value = ""; }} />
+      <><input ref={inputRef} type="file" accept="application/pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) replace.mutate(f); e.target.value = ""; }} /><span className="text-xs text-muted-foreground">{UPLOAD_LIMIT_LABEL}</span></>
       <Button type="button" variant="ghost" size="sm" className="h-7 rounded-full px-2 text-xs" disabled={replace.isPending} onClick={() => inputRef.current?.click()} data-testid="replace-document">
         {replace.isPending ? "Replacing…" : "Replace"}
       </Button>
@@ -331,7 +333,7 @@ export default function OrderDetail({
       }
       fd.append("documentNumber", chosenNumber);
       if(reviewRestoredArticles)fd.append("reviewRestoredOriginal","true");
-      const res = await fetch(`/api/admin/orders/${orderId}/articles`, { method: "POST", body: fd, credentials: "include" });
+      const res = await officeUpload(`/api/admin/orders/${orderId}/articles`, { method: "POST", body: fd, credentials: "include" });
       const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
       if (!res.ok) throw new Error(body?.error?.message ?? "The upload did not go through. Try again.");
       return body;
@@ -426,7 +428,7 @@ export default function OrderDetail({
       if (certStatus) fd.append("certStatus", certStatus);
       const certifiedCopy = certifiedCopyRef.current?.files?.[0];
       if (certifiedCopy) fd.append("certifiedCopy", certifiedCopy);
-      const res = await fetch(`/api/admin/orders/${orderId}/certificates`, { method: "POST", body: fd, credentials: "include" });
+      const res = await officeUpload(`/api/admin/orders/${orderId}/certificates`, { method: "POST", body: fd, credentials: "include" });
       const body = (await res.json().catch(() => null)) as { error?: { message?: string }; data?: { notified?: boolean } } | null;
       if (!res.ok) throw new Error(body?.error?.message ?? "The upload did not go through. Try again.");
       return body?.data?.notified === true;
@@ -455,7 +457,7 @@ export default function OrderDetail({
         fd.append("psd", row.file);
         fd.append("psdSeries", JSON.stringify(row.covers));
       }
-      const res = await fetch(`/api/admin/orders/${orderId}/formation-documents`, {
+      const res = await officeUpload(`/api/admin/orders/${orderId}/formation-documents`, {
         method: "POST",
         body: fd,
         credentials: "include",
@@ -612,14 +614,14 @@ export default function OrderDetail({
                   <label htmlFor="upload-articles-first" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
                     Filed Articles of Organization (from the Division)
                   </label>
-                  <input
+                  <><input
                     id="upload-articles-first"
                     ref={articlesFirstRef}
                     type="file"
                     accept="application/pdf"
                     className="mt-1 block w-full text-sm"
                     onChange={() => setUploadError(null)}
-                  />
+                  /><span className="text-xs text-muted-foreground">{UPLOAD_LIMIT_LABEL}</span></>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <Button
                       variant="outline"
@@ -721,14 +723,14 @@ export default function OrderDetail({
                       <label htmlFor="upload-cert-status" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
                         {d.hasCertStatus ? "Upload a Certificate of Status (another copy)" : "Upload a Certificate of Status (purchased, still owed)"}
                       </label>
-                      <input
+                      <><input
                         id="upload-cert-status"
                         ref={certStatusRef}
                         type="file"
                         accept="application/pdf"
                         className="mt-1 block w-full text-sm"
                         onChange={noteCertChosen}
-                      />
+                      /><span className="text-xs text-muted-foreground">{UPLOAD_LIMIT_LABEL}</span></>
                     </div>
                   ) : null}
                   {d.certifiedCopyPurchased ? (
@@ -736,14 +738,14 @@ export default function OrderDetail({
                       <label htmlFor="upload-certified-copy" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
                         {d.hasCertifiedCopy ? "Upload a Certified Copy of the Articles (another copy)" : "Upload a Certified Copy of the Articles (purchased, still owed)"}
                       </label>
-                      <input
+                      <><input
                         id="upload-certified-copy"
                         ref={certifiedCopyRef}
                         type="file"
                         accept="application/pdf"
                         className="mt-1 block w-full text-sm"
                         onChange={noteCertChosen}
-                      />
+                      /><span className="text-xs text-muted-foreground">{UPLOAD_LIMIT_LABEL}</span></>
                     </div>
                   ) : null}
                   {certificateError ? (
@@ -777,7 +779,7 @@ export default function OrderDetail({
                       <label htmlFor={`upload-psd-${i}`} className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
                         Protected Series Designation {psdRows.length > 1 ? i + 1 : ""}
                       </label>
-                      <input
+                      <><input
                         id={`upload-psd-${i}`}
                         type="file"
                         accept="application/pdf"
@@ -789,7 +791,7 @@ export default function OrderDetail({
                           );
                           setUploadError(null);
                         }}
-                      />
+                      /><span className="text-xs text-muted-foreground">{UPLOAD_LIMIT_LABEL}</span></>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {d.series.map((s) => (
                           <label
