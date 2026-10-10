@@ -128,7 +128,7 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
     <>
       <BackupAttentionBanner/>
       <HistoryRecoveryPanel/>
-      {progressQuery.data?.status==='complete_with_history_gaps'?<p role="status">Restorable backup with historical gaps</p>:null}
+      {progressQuery.data?.status==='finalizing'?`Files verified; finalizing backup status. ${progressQuery.data.error || 'Automatic continuation runs every five minutes while work remains.'}`:progressQuery.data?.status==='complete_with_history_gaps'?<p role="status">Restorable backup with historical gaps</p>:null}
       <div className="mt-4 rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center gap-2">
           <BookOpen className="h-4 w-4 text-trust" />
@@ -203,7 +203,7 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
           retained tax documents remain encrypted. Backups are kept. Restore instructions: docs/db-restore.md.
         </p>
         <p className="mt-2 text-xs" role="status" data-testid="backup-progress">
-          {progressQuery.isError ? "Backup status unavailable — completeness has not been verified." : progressQuery.data?.status==='capacity_blocked'?'Backup capacity is blocked — the current snapshot has been unfinished for at least 24 hours in four-worker mode. Release qualification is refused. Completed backups remain available.':progressQuery.data?.status==='complete_with_history_gaps'?'Restorable backup with historical gaps — current documents are verified; the recorded historical originals are unavailable.':progressQuery.data?.complete ? `Complete — records and retained document copies verified at ${new Date(progressQuery.data.completedAt!).toLocaleString()}.` : `Incomplete — ${progressQuery.data?.pending ?? "unknown"} files pending. ${progressQuery.data?.error || "Automatic continuation runs every five minutes while work remains."}`}
+          {progressQuery.isError ? "Backup status unavailable — completeness has not been verified." : progressQuery.data?.status==='capacity_blocked'?'Backup capacity is blocked — the current snapshot has been unfinished for at least 24 hours in four-worker mode. Release qualification is refused. Completed backups remain available.':progressQuery.data?.status==='finalizing'?`Files verified; finalizing backup status. ${progressQuery.data.error || 'Automatic continuation runs every five minutes while work remains.'}`:progressQuery.data?.status==='complete_with_history_gaps'?'Restorable backup with historical gaps — current documents are verified; the recorded historical originals are unavailable.':progressQuery.data?.complete ? `Complete — records and retained document copies verified at ${new Date(progressQuery.data.completedAt!).toLocaleString()}.` : `Incomplete — ${progressQuery.data?.pending ?? "unknown"} files pending. ${progressQuery.data?.error || "Automatic continuation runs every five minutes while work remains."}`}
         </p>
         {progressQuery.data?.historyCurrentConflicts?.length?<section className="my-3 space-y-2 rounded border p-3" aria-label="Restart backup after history change">
           <p>This snapshot needs a missing file that was current when it started. After recording that file as an unavailable historical original, start a new snapshot of the corrected documents.</p>
