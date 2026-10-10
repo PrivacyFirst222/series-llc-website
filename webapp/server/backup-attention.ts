@@ -36,10 +36,15 @@ export async function observeBackupProblem(reference:string,reason:string):Promi
  throw Error('Backup attention record busy');
 }
 export async function resolveBackupProblem(reference:string){
- for(const id of (await index()).ids)for(let n=0;n<12;n++){
-  const raw=await load(id);if(!raw||!raw.episode.active||raw.episode.reference!==reference)break;
-  const e={...raw.episode,active:false,resolvedAt:new Date().toISOString()};
-  if(await compareWriteMirror(root+id+'.json',encoded(e),raw.rev))break;
+ for(const id of (await index()).ids){
+  let resolved=false;
+  for(let n=0;n<12;n++){
+   const raw=await load(id);
+   if(!raw||!raw.episode.active||raw.episode.reference!==reference){resolved=true;break;}
+   const e={...raw.episode,active:false,resolvedAt:new Date().toISOString()};
+   if(await compareWriteMirror(root+id+'.json',encoded(e),raw.rev)){resolved=true;break;}
+  }
+  if(!resolved)throw Error('Backup attention resolution busy');
  }
 }
 /** Notification storage must not prevent a successful document recovery. */

@@ -53532,11 +53532,21 @@ async function observeBackupProblem(reference, reason) {
   throw Error("Backup attention record busy");
 }
 async function resolveBackupProblem(reference) {
-  for (const id of (await index()).ids) for (let n = 0; n < 12; n++) {
-    const raw2 = await load(id);
-    if (!raw2 || !raw2.episode.active || raw2.episode.reference !== reference) break;
-    const e = { ...raw2.episode, active: false, resolvedAt: (/* @__PURE__ */ new Date()).toISOString() };
-    if (await compareWriteMirror(root2 + id + ".json", encoded(e), raw2.rev)) break;
+  for (const id of (await index()).ids) {
+    let resolved = false;
+    for (let n = 0; n < 12; n++) {
+      const raw2 = await load(id);
+      if (!raw2 || !raw2.episode.active || raw2.episode.reference !== reference) {
+        resolved = true;
+        break;
+      }
+      const e = { ...raw2.episode, active: false, resolvedAt: (/* @__PURE__ */ new Date()).toISOString() };
+      if (await compareWriteMirror(root2 + id + ".json", encoded(e), raw2.rev)) {
+        resolved = true;
+        break;
+      }
+    }
+    if (!resolved) throw Error("Backup attention resolution busy");
   }
 }
 async function resolveBackupProblemAfterRecovery(db, reference) {
