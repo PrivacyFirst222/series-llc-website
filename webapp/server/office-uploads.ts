@@ -115,6 +115,14 @@ export async function cleanupOfficeUploads(options:{id?:string;deadline?:number}
   }catch(error){await db.query('UPDATE office_upload_stages SET cleanup_pending=true,cleanup_checked_at=now(),lease=NULL,lease_until=NULL WHERE id=$1',[stage.id]);if(options.id)throw error;}
  }
 }
+async function uploadGrants(stage:Pick<Stage,'id'|'files'|'token_expires_at'>){
+ const until=Date.parse(stage.token_expires_at),grants:{id:string;field:string;path:string;key:string;iv:string;token:string|null}[]=[];
+ for(const f of stage.files){
+  const token=env.BLOB_READ_WRITE_TOKEN&&until>Date.now()?await generateClientTokenFromReadWriteToken({token:env.BLOB_READ_WRITE_TOKEN,pathname:f.path,maximumSizeInBytes:f.size+16,allowedContentTypes:['application/octet-stream'],validUntil:until,addRandomSuffix:false,allowOverwrite:false}):null;
+  grants.push({id:f.id,field:f.field,path:f.path,key:unseal(Buffer.from(f.key,'base64')).toString('base64'),iv:f.iv,token});
+ }
+ return {id:stage.id,files:grants};
+}
 export function registerOfficeUploads(app:Hono){
  app.post('/admin/uploads',async c=>{
   const admin=await requireAdmin(c);if(!admin)return c.json(err('Not signed in','UNAUTHENTICATED'),401);
@@ -127,12 +135,22 @@ export function registerOfficeUploads(app:Hono){
   const id=crypto.randomUUID(),until=Date.now()+15*60*1000;
   const files:StagedFile[]=body.files.map(f=>{const fileId=crypto.randomUUID();return {...f,id:fileId,path:`office-uploads/${id}/${fileId}.encrypted`,key:seal(randomBytes(32)).toString('base64'),iv:randomBytes(12).toString('base64')};});
   await (await getDb()).query('INSERT INTO office_upload_stages(id,session_hash,route,fields,files,token_expires_at,expires_at) VALUES($1,$2,$3,$4::jsonb,$5::jsonb,$6,now()+interval \'24 hours\')',[id,admin.tokenHash,body.route,JSON.stringify(body.fields),JSON.stringify(files),new Date(until).toISOString()]);
-  const grants:{id:string;field:string;path:string;key:string;iv:string;token:string|null}[]=[];
-  for(const f of files){
-   const token=env.BLOB_READ_WRITE_TOKEN?await generateClientTokenFromReadWriteToken({token:env.BLOB_READ_WRITE_TOKEN,pathname:f.path,maximumSizeInBytes:f.size+16,allowedContentTypes:['application/octet-stream'],validUntil:until,addRandomSuffix:false,allowOverwrite:false}):null;
-   grants.push({id:f.id,field:f.field,path:f.path,key:unseal(Buffer.from(f.key,'base64')).toString('base64'),iv:f.iv,token});
-  }
-  c.header('cache-control','no-store');return c.json({data:{id,files:grants}});
+  c.header('cache-control','no-store');return c.json({data:await uploadGrants({id,files,token_expires_at:new Date(until).toISOString()})});
+ });
+ app.get('/admin/uploads/:id',async c=>{
+  const admin=await requireAdmin(c);if(!admin)return c.json(err('Not signed in','UNAUTHENTICATED'),401);
+  const id=c.req.param('id');if(!new RegExp(`^${uuid}$`).test(id))return c.json(err('Upload not found.','NOT_FOUND'),404);
+  const [stage]=await(await getDb()).query<Stage>('SELECT * FROM office_upload_stages WHERE id=$1 AND session_hash=$2',[id,admin.tokenHash]);
+  if(!stage)return c.json(err('Upload not found.','NOT_FOUND'),404);
+  c.header('cache-control','no-store');
+  if(stage.state==='complete')return c.json({data:{id,state:stage.state}});
+  if(['processing','unconfirmed'].includes(stage.state))return c.json(err('The previous operation may have completed. Check the saved office record before submitting it again.','UPLOAD_UNCONFIRMED'),409);
+  if(stage.state==='validating'&&stage.lease_until&&Date.parse(stage.lease_until)>Date.now())return c.json(err('This upload is being checked. Retry the same upload later.','UPLOAD_BUSY'),409);
+  if(!['issued','validating'].includes(stage.state)||Date.parse(stage.expires_at)<=Date.now())return c.json(err('This upload expired or was rejected. Select the file again.','UPLOAD_EXPIRED'),409);
+  await authorizeTarget(stage.route,stage.fields);
+  // Expired upload tokens are never extended. Already uploaded files can still
+  // be finalized; missing ones require a new, explicitly selected upload.
+  return c.json({data:{...await uploadGrants(stage),state:stage.state}});
  });
  app.use('/admin/*',async(c,next)=>{
   const id=c.req.header('x-office-upload');if(!id)return next();
@@ -153,7 +171,8 @@ export function registerOfficeUploads(app:Hono){
     if(c.error||c.res.status>=500){await db.query("UPDATE office_upload_stages SET state='unconfirmed',lease=NULL,lease_until=NULL WHERE id=$1 AND lease=$2",[id,stage.lease]);}
     else{
      const result=await c.res.clone().text();
-     await db.query("UPDATE office_upload_stages SET state='complete',result_status=$3,result_body=$4,cleanup_pending=true,lease=NULL,lease_until=NULL WHERE id=$1 AND lease=$2",[id,stage.lease,c.res.status,result]);
+     const [saved]=await db.query("UPDATE office_upload_stages SET state='complete',result_status=$3,result_body=$4,cleanup_pending=true,lease=NULL,lease_until=NULL WHERE id=$1 AND lease=$2 RETURNING id",[id,stage.lease,c.res.status,result]);
+     if(!saved)reject('The office result could not be confirmed. Check the saved record before retrying.','UPLOAD_UNCONFIRMED',409);
      await cleanupOfficeUploads({id}).catch(()=>{});
     }
    }
