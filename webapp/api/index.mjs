@@ -53985,7 +53985,7 @@ async function backupProgress() {
   const j = raw2 ? JSON.parse(raw2.toString()) : null;
   const frozen = j ? officeFileIdentities(j.dump.tables) : /* @__PURE__ */ new Map();
   const capacityBlocked = !!j && process.env.BACKUP_FILE_CONCURRENCY === "4" && Date.now() - Date.parse(j.dump.dumpedAt) >= 24 * 36e5;
-  return { ...!j && terminal?.status === "complete_with_history_gaps" ? terminal : {}, ...capacityBlocked ? { status: "capacity_blocked" } : {}, jobKey: j?.key ?? null, historyCurrentConflicts: j ? j.dump.files.filter((f) => j.errors[f.storageKey]?.startsWith("SNAPSHOT_CURRENT_FILE_MISSING")).map((f) => ({ historyId: historyId(frozen.get(f.storageKey)), title: frozen.get(f.storageKey).file.title })) : [], complete: !j && !!r?.completed_at && !r.error && terminal?.status !== "complete_with_history_gaps", startedAt: r?.started_at || null, completedAt: r?.completed_at || null, pending: j ? j.dump.files.filter((f) => !j.verified?.[f.storageKey]).length : 0, errors: j ? Object.values(j.errors) : [], error: r?.error || null };
+  return { ...!j && terminal?.status === "complete_with_history_gaps" ? terminal : {}, ...j?.phase === "publish" && !j.dump.files.some((f) => !j.verified?.[f.storageKey]) ? { status: "finalizing" } : {}, ...capacityBlocked ? { status: "capacity_blocked" } : {}, jobKey: j?.key ?? null, historyCurrentConflicts: j ? j.dump.files.filter((f) => j.errors[f.storageKey]?.startsWith("SNAPSHOT_CURRENT_FILE_MISSING")).map((f) => ({ historyId: historyId(frozen.get(f.storageKey)), title: frozen.get(f.storageKey).file.title })) : [], complete: !j && !!r?.completed_at && !r.error && terminal?.status !== "complete_with_history_gaps", startedAt: r?.started_at || null, completedAt: r?.completed_at || null, pending: j ? j.dump.files.filter((f) => !j.verified?.[f.storageKey]).length : 0, errors: j ? Object.values(j.errors) : [], error: r?.error || null };
 }
 async function runDbBackup(options = {}) {
   const entered = Date.now(), workDeadline = Math.min(options.workDeadline ?? entered + (options.budgetMs ?? 18e4), activeDeadline());
@@ -54057,6 +54057,31 @@ async function runBackupWithinDeadline(options, entered, workDeadline, checkpoin
     }
     job.nextEligibleAt ??= {};
     job.deadlineDeferred ??= {};
+    job.alertResolutions ??= {};
+    const saveJob = () => withDeadline(checkpointDeadline, () => putObject(JOB, Buffer.from(JSON.stringify(job)), true));
+    const isWorkDeadline = (error2) => error2 instanceof DOMException && error2.name === "TimeoutError" && ["Operation deadline reached", "The operation was aborted due to timeout"].includes(error2.message) && Date.now() >= deadline;
+    const resolveSavedAlerts = async () => {
+      for (const [key, reference] of Object.entries(job.alertResolutions)) {
+        if (key !== "$backup" && (!job.done[key] || job.errors[key])) {
+          delete job.alertResolutions[key];
+          continue;
+        }
+        if (Date.now() >= deadline) {
+          await saveJob();
+          return false;
+        }
+        try {
+          await withDeadline(deadline, () => resolveBackupProblem(reference));
+        } catch (error2) {
+          if (!isWorkDeadline(error2)) throw error2;
+          await saveJob();
+          return false;
+        }
+        delete job.alertResolutions[key];
+      }
+      return true;
+    };
+    await resolveSavedAlerts();
     const processFile = async (f, phase) => {
       const i = identities.get(f.storageKey);
       if ((job.nextEligibleAt[f.storageKey] ?? 0) > Date.now()) {
@@ -54127,6 +54152,7 @@ async function runBackupWithinDeadline(options, entered, workDeadline, checkpoin
             job.deadlineDeferred[f.storageKey] = phase;
             retryCursor ??= job.cursor;
           } else delete job.deadlineDeferred[f.storageKey];
+          delete job.alertResolutions[f.storageKey];
           const e = outcome.error;
           job.errors[f.storageKey] = e instanceof OfficeRecoveryError ? e.code + ": " + e.message : String(e);
           delete job.done[f.storageKey];
@@ -54151,24 +54177,26 @@ async function runBackupWithinDeadline(options, entered, workDeadline, checkpoin
           delete job.errors[f.storageKey];
           delete job.errors["notification:" + f.storageKey];
           delete job.nextEligibleAt[f.storageKey];
-          if (Date.now() < deadline) await withDeadline(deadline, () => resolveBackupProblem(i ? historyId(i) : hashBytes(Buffer.from(f.storageKey))));
+          job.alertResolutions[f.storageKey] = i ? historyId(i) : hashBytes(Buffer.from(f.storageKey));
         }
         job.cursor++;
       }
       if (retryCursor !== void 0) job.cursor = retryCursor;
-      await withDeadline(checkpointDeadline, () => putObject(JOB, Buffer.from(JSON.stringify(job)), true));
+      await saveJob();
+      await resolveSavedAlerts();
     }
     const pending = job.dump.files.filter((f) => !job.verified[f.storageKey]).length;
     let rowCounts = Object.fromEntries(BACKUP_TABLES.map((t) => [t, job.dump.tables[t].length]));
-    if (job.phase !== "publish" || pending) {
+    const deferBackup = async () => {
       await withDeadline(checkpointDeadline, async () => {
         if (Date.now() - Date.parse(job.dump.dumpedAt) >= 24 * 36e5) await observeBackupProblem("backup:" + job.key, "backup_stalled_24_hours");
         await putObject(JOB, Buffer.from(JSON.stringify(job)), true);
         if (options.dispatchAttention !== false && checkpointDeadline - Date.now() > 11e3) await deliverBackupAttention({ deadline: checkpointDeadline - 1e4 });
-        await db.query("UPDATE backup_progress SET error=$1 WHERE id='database'", [`${pending} file(s) pending; automatic continuation scheduled${Object.entries(job.errors).filter(([key]) => key.startsWith("notification:")).map(([, error2]) => " \xB7 " + error2).join("")}`]);
+        await db.query("UPDATE backup_progress SET error=$1 WHERE id='database'", [`${job.phase === "publish" && !pending ? "Files verified; finalizing backup status" : `${pending} file(s) pending`}; automatic continuation scheduled${Object.entries(job.errors).filter(([key]) => key.startsWith("notification:")).map(([, error2]) => " \xB7 " + error2).join("")}`]);
       });
-      return { key: job.key, sizeBytes: 0, rowCounts: {}, provisionalRowCounts: rowCounts, complete: false, pending, ...Date.now() - Date.parse(job.dump.dumpedAt) >= 24 * 36e5 && concurrency === "4" ? { status: "capacity_blocked" } : {} };
-    }
+      return { key: job.key, sizeBytes: 0, rowCounts: {}, provisionalRowCounts: rowCounts, complete: false, pending, ...job.phase === "publish" && !pending ? { status: "finalizing" } : {}, ...Date.now() - Date.parse(job.dump.dumpedAt) >= 24 * 36e5 && concurrency === "4" ? { status: "capacity_blocked" } : {} };
+    };
+    if (job.phase !== "publish" || pending || Date.now() >= deadline || Object.keys(job.alertResolutions).length) return deferBackup();
     checkDeadline(checkpointDeadline);
     if (!job.publicationSha) {
       const deleted2 = new Set((await readRecoveryJournal()).records.map((r) => r.storageKey));
@@ -54194,11 +54222,13 @@ async function runBackupWithinDeadline(options, entered, workDeadline, checkpoin
     const existing = await readObject(PREFIX + job.key);
     if (existing && !existing.equals(data)) throw new Error("Refusing to overwrite a different completed backup");
     if (!existing) await putObject(PREFIX + job.key, data, publishOptions.allowOverwrite);
+    job.alertResolutions.$backup = "backup:" + job.key;
+    await saveJob();
+    if (!await resolveSavedAlerts()) return deferBackup();
     await putObject("backup-jobs/last-result.json", Buffer.from(JSON.stringify({ key: job.key, status: job.dump.status ?? "complete", restorable: true, historyComplete: !job.dump.historyGaps?.length, historyGaps: job.dump.historyGaps ?? [] })), true);
     await db.query("UPDATE backup_progress SET completed_at=now(),error=NULL WHERE id='database'");
     const { removeStoredFile: removeStoredFile2 } = await Promise.resolve().then(() => (init_storage(), storage_exports));
     await removeStoredFile2(env.BLOB_READ_WRITE_TOKEN ? JOB : `dev:${JOB}`);
-    await resolveBackupProblem("backup:" + job.key);
     return { key: job.key, sizeBytes: data.length, rowCounts, complete: !job.dump.historyGaps?.length, pending: 0, status: job.dump.status ?? "complete", restorable: true, historyComplete: !job.dump.historyGaps?.length };
   } catch (e) {
     await db.query("UPDATE backup_progress SET error=$1,completed_at=NULL WHERE id='database'", [String(e)]);

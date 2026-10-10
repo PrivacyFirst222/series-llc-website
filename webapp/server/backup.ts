@@ -112,7 +112,7 @@ export async function listBackups(): Promise<BackupInfo[]> {
  *  visible. */
 
 export interface BackupDump {version:1|2; status?:'complete_with_history_gaps'; restorable?:boolean; historyComplete?:boolean; historyGaps?:HistoryGap[]; dumpedAt:string; tables:Record<string,Record<string,unknown>[]>; files:BackupFile[]; fileManifestVersion:1|2; deletionCheckpoint?:string[]; packageCheckpoint?:string[]}
-interface BackupJob {key:string; dump:BackupDump; done:Record<string,string>; errors:Record<string,string>; format?:2; phase?:'copy'|'verify'|'publish'; cursor?:number; verified?:Record<string,string>; nextEligibleAt?:Record<string,number>;publicationSha?:string;deadlineDeferred?:Record<string,'copy'|'verify'>}
+interface BackupJob {key:string; dump:BackupDump; done:Record<string,string>; errors:Record<string,string>; format?:2; phase?:'copy'|'verify'|'publish'; cursor?:number; verified?:Record<string,string>; nextEligibleAt?:Record<string,number>;publicationSha?:string;deadlineDeferred?:Record<string,'copy'|'verify'>;alertResolutions?:Record<string,string>}
 const JOB='backup-jobs/current.json';
 const backupKey=(iso:string)=>`db-${iso.slice(0,10)}-${iso.slice(11, 19).replace(/:/g, "")}.json.gz`;
 const publishOptions = { allowOverwrite: false };
@@ -138,7 +138,7 @@ export async function backupProgress(){
  const raw=await readObject(JOB);const j:BackupJob|null=raw?JSON.parse(raw.toString()):null;
  const frozen=j?officeFileIdentities(j.dump.tables):new Map();
  const capacityBlocked=!!j&&process.env.BACKUP_FILE_CONCURRENCY==='4'&&Date.now()-Date.parse(j.dump.dumpedAt)>=24*3600000;
- return {...(!j&&terminal?.status==='complete_with_history_gaps'?terminal:{}),...(capacityBlocked?{status:'capacity_blocked'}:{}),jobKey:j?.key??null,historyCurrentConflicts:j?j.dump.files.filter(f=>j.errors[f.storageKey]?.startsWith('SNAPSHOT_CURRENT_FILE_MISSING')).map(f=>({historyId:historyId(frozen.get(f.storageKey)!),title:frozen.get(f.storageKey)!.file.title})):[],complete:!j&&!!r?.completed_at&&!r.error&&terminal?.status!=='complete_with_history_gaps',startedAt:r?.started_at||null,completedAt:r?.completed_at||null,pending:j?j.dump.files.filter(f=>!j.verified?.[f.storageKey]).length:0,errors:j?Object.values(j.errors):[],error:r?.error||null};
+ return {...(!j&&terminal?.status==='complete_with_history_gaps'?terminal:{}),...(j?.phase==='publish'&&!j.dump.files.some(f=>!j.verified?.[f.storageKey])?{status:'finalizing'}:{}),...(capacityBlocked?{status:'capacity_blocked'}:{}),jobKey:j?.key??null,historyCurrentConflicts:j?j.dump.files.filter(f=>j.errors[f.storageKey]?.startsWith('SNAPSHOT_CURRENT_FILE_MISSING')).map(f=>({historyId:historyId(frozen.get(f.storageKey)!),title:frozen.get(f.storageKey)!.file.title})):[],complete:!j&&!!r?.completed_at&&!r.error&&terminal?.status!=='complete_with_history_gaps',startedAt:r?.started_at||null,completedAt:r?.completed_at||null,pending:j?j.dump.files.filter(f=>!j.verified?.[f.storageKey]).length:0,errors:j?Object.values(j.errors):[],error:r?.error||null};
 }
 export async function runDbBackup(options:{resumeOnly?:boolean;budgetMs?:number;deadline?:number;workDeadline?:number;dispatchAttention?:boolean}={}):Promise<{key:string;sizeBytes:number;rowCounts:Record<string,number>;provisionalRowCounts?:Record<string,number>;complete:boolean;pending:number;status?:string;restorable?:boolean;historyComplete?:boolean}>{
  const entered=Date.now(),workDeadline=Math.min(options.workDeadline??entered+(options.budgetMs??180000),activeDeadline());
@@ -198,7 +198,22 @@ async function runBackupWithinDeadline(options:{resumeOnly?:boolean;budgetMs?:nu
   job.phase??='copy';job.cursor??=0;job.verified??={};
   // A checkpoint names an expected original, never the bytes observed after damage.
   if(job.format!==2){job.done={};job.verified={};job.cursor=0;job.phase='copy';job.format=2;job.deadlineDeferred={};}
-  job.nextEligibleAt??={};job.deadlineDeferred??={};
+  job.nextEligibleAt??={};job.deadlineDeferred??={};job.alertResolutions??={};
+  const saveJob=()=>withDeadline(checkpointDeadline,()=>putObject(JOB,Buffer.from(JSON.stringify(job)),true));
+  const isWorkDeadline=(error:unknown)=>error instanceof DOMException&&error.name==='TimeoutError'
+   &&['Operation deadline reached','The operation was aborted due to timeout'].includes(error.message)&&Date.now()>=deadline;
+  const resolveSavedAlerts=async()=>{
+   for(const [key,reference] of Object.entries(job.alertResolutions!)){
+    // A later failed file check supersedes its queued successful resolution.
+    if(key!=='$backup'&&(!job.done[key]||job.errors[key])){delete job.alertResolutions![key];continue;}
+    if(Date.now()>=deadline){await saveJob();return false;}
+    try{await withDeadline(deadline,()=>resolveBackupProblem(reference));}
+    catch(error){if(!isWorkDeadline(error))throw error;await saveJob();return false;}
+    delete job.alertResolutions![key];
+   }
+   return true;
+  };
+  await resolveSavedAlerts();
   const processFile=async(f:BackupFile,phase:'copy'|'verify')=>{
    const i=identities.get(f.storageKey);
    if((job!.nextEligibleAt![f.storageKey]??0)>Date.now()){const error=new OfficeRecoveryError('Provider retry is not eligible yet.','RECOVERY_UNAVAILABLE',503);error.retryAfterMs=job!.nextEligibleAt![f.storageKey]-Date.now();return {f,error};}
@@ -249,7 +264,7 @@ async function runBackupWithinDeadline(options:{resumeOnly?:boolean;budgetMs?:nu
     const f=outcome.f,i=identities.get(f.storageKey);
     if('skipped' in outcome){job.cursor++;continue;}
     if('error' in outcome){
-     if(outcome.deferred){job.deadlineDeferred[f.storageKey]=phase;retryCursor??=job.cursor;}else delete job.deadlineDeferred[f.storageKey];const e=outcome.error;job.errors[f.storageKey]=e instanceof OfficeRecoveryError?e.code+': '+e.message:String(e);delete job.done[f.storageKey];delete job.verified[f.storageKey];
+     if(outcome.deferred){job.deadlineDeferred[f.storageKey]=phase;retryCursor??=job.cursor;}else delete job.deadlineDeferred[f.storageKey];delete job.alertResolutions[f.storageKey];const e=outcome.error;job.errors[f.storageKey]=e instanceof OfficeRecoveryError?e.code+': '+e.message:String(e);delete job.done[f.storageKey];delete job.verified[f.storageKey];
      const retryAfter=(e as {retryAfterMs?:number})?.retryAfterMs;if(retryAfter)job.nextEligibleAt[f.storageKey]=Date.now()+retryAfter;
      if(Date.now()<deadline&&!(e instanceof OfficeRecoveryError&&e.status===503)&&!(e instanceof DOMException&&e.name==='TimeoutError')){
       try{await withDeadline(deadline,()=>observeBackupProblem(i?historyId(i):hashBytes(Buffer.from(f.storageKey)),i?.historical?'needs_staff_decision':'required_file_unavailable'));delete job.errors['notification:'+f.storageKey];}
@@ -262,24 +277,27 @@ async function runBackupWithinDeadline(options:{resumeOnly?:boolean;budgetMs?:nu
      job.dump.historyGaps=(job.dump.historyGaps??[]).filter(g=>g.storageKey!==f.storageKey);
      if('gap' in outcome&&outcome.gap)job.dump.historyGaps.push(outcome.gap);
      delete job.errors[f.storageKey];delete job.errors['notification:'+f.storageKey];delete job.nextEligibleAt[f.storageKey];
-     if(Date.now()<deadline)await withDeadline(deadline,()=>resolveBackupProblem(i?historyId(i):hashBytes(Buffer.from(f.storageKey))));
+     job.alertResolutions[f.storageKey]=i?historyId(i):hashBytes(Buffer.from(f.storageKey));
     }
     job.cursor++;
    }
    if(retryCursor!==undefined)job.cursor=retryCursor;
-   await withDeadline(checkpointDeadline,()=>putObject(JOB,Buffer.from(JSON.stringify(job)),true));
+   // Persist every settled result and cursor before any resolution I/O.
+   await saveJob();
+   await resolveSavedAlerts();
   }
   const pending=job.dump.files.filter(f=>!job!.verified![f.storageKey]).length;
   let rowCounts=Object.fromEntries(BACKUP_TABLES.map(t=>[t,job!.dump.tables[t].length]));
-  if(job.phase!=='publish'||pending){
+  const deferBackup=async()=>{
    await withDeadline(checkpointDeadline,async()=>{
     if(Date.now()-Date.parse(job!.dump.dumpedAt)>=24*3600000)await observeBackupProblem('backup:'+job!.key,'backup_stalled_24_hours');
     await putObject(JOB,Buffer.from(JSON.stringify(job)),true);
     if(options.dispatchAttention!==false&&checkpointDeadline-Date.now()>11000)await deliverBackupAttention({deadline:checkpointDeadline-10000});
-    await db.query("UPDATE backup_progress SET error=$1 WHERE id='database'",[`${pending} file(s) pending; automatic continuation scheduled${Object.entries(job!.errors).filter(([key])=>key.startsWith('notification:')).map(([,error])=>' · '+error).join('')}`]);
+    await db.query("UPDATE backup_progress SET error=$1 WHERE id='database'",[`${job.phase==='publish'&&!pending?'Files verified; finalizing backup status':`${pending} file(s) pending`}; automatic continuation scheduled${Object.entries(job!.errors).filter(([key])=>key.startsWith('notification:')).map(([,error])=>' · '+error).join('')}`]);
    });
-   return {key:job.key,sizeBytes:0,rowCounts:{},provisionalRowCounts:rowCounts,complete:false,pending,...(Date.now()-Date.parse(job.dump.dumpedAt)>=24*3600000&&concurrency==='4'?{status:'capacity_blocked'}:{})};
-  }
+   return {key:job.key,sizeBytes:0,rowCounts:{},provisionalRowCounts:rowCounts,complete:false,pending,...(job.phase==='publish'&&!pending?{status:'finalizing'}:{}),...(Date.now()-Date.parse(job.dump.dumpedAt)>=24*3600000&&concurrency==='4'?{status:'capacity_blocked'}:{})};
+  };
+  if(job.phase!=='publish'||pending||Date.now()>=deadline||Object.keys(job.alertResolutions).length)return deferBackup();
   checkDeadline(checkpointDeadline);
   // Freeze publication before upload. A lost upload acknowledgment must retry
   // those exact bytes, even if a later deletion changes the external journal.
@@ -304,10 +322,12 @@ async function runBackupWithinDeadline(options:{resumeOnly?:boolean;budgetMs?:nu
   const existing=await readObject(PREFIX+job.key);
   if(existing&&!existing.equals(data))throw new Error('Refusing to overwrite a different completed backup');
   if(!existing)await putObject(PREFIX+job.key,data,publishOptions.allowOverwrite);
+  job.alertResolutions.$backup='backup:'+job.key;
+  await saveJob();
+  if(!await resolveSavedAlerts())return deferBackup();
   await putObject('backup-jobs/last-result.json',Buffer.from(JSON.stringify({key:job.key,status:job.dump.status??'complete',restorable:true,historyComplete:!job.dump.historyGaps?.length,historyGaps:job.dump.historyGaps??[]})),true);
   await db.query("UPDATE backup_progress SET completed_at=now(),error=NULL WHERE id='database'");
   const {removeStoredFile}=await import('./storage');await removeStoredFile(env.BLOB_READ_WRITE_TOKEN?JOB:`dev:${JOB}`);
-  await resolveBackupProblem('backup:'+job.key);
   return {key:job.key,sizeBytes:data.length,rowCounts,complete:!job.dump.historyGaps?.length,pending:0,status:job.dump.status??'complete',restorable:true,historyComplete:!job.dump.historyGaps?.length};
  }catch(e){await db.query("UPDATE backup_progress SET error=$1,completed_at=NULL WHERE id='database'",[String(e)]);throw e;}
  finally{await db.query("UPDATE backup_progress SET lease_until=NULL WHERE id='database' AND lease_until=$1::timestamptz",[locked[0].lease]);}
