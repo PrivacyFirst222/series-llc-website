@@ -1,3 +1,5 @@
+import {officeUpload} from '@/lib/officeUpload';
+import {UPLOAD_LIMIT_LABEL} from '@/lib/uploadLimits';
 import {BackupAttentionBanner,HistoryRecoveryPanel} from './OfficeRecoveryPanel';
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -54,7 +56,7 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
       fd.set("file", file);
       fd.set("title", "Series LLC Owner's Manual");
       fd.set("edition", edition.trim());
-      const res = await fetch("/api/admin/library/owners-manual", {
+      const res = await officeUpload("/api/admin/library/owners-manual", {
         method: "POST",
         body: fd,
         credentials: "same-origin",
@@ -145,13 +147,13 @@ export function LibrarySection({ enabled }: { enabled: boolean }) {
           Clients download the current published edition, stamped with their name and served copy-restricted.
         </p>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
-          <input
+          <><input
             aria-label="Replacement PDF for the manual"
             type="file"
             accept="application/pdf"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             className="block text-sm text-muted-foreground file:mr-3 file:rounded-full file:border file:border-border file:bg-secondary file:px-4 file:py-1.5 file:text-sm file:font-medium"
-          />
+          /><span className="text-xs text-muted-foreground">{UPLOAD_LIMIT_LABEL}</span></>
           <Input
             aria-label="Edition label"
             placeholder='Edition label, e.g. "Second Edition — January 2027"'
