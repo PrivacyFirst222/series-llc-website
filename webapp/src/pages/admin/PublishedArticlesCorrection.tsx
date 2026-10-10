@@ -1,3 +1,5 @@
+import {officeUpload} from '@/lib/officeUpload';
+import {UPLOAD_LIMIT_LABEL} from '@/lib/uploadLimits';
 import {ContinueOfficeReplacement} from './OfficeRecoveryPanel';
 import {useId,useState} from 'react';
 import {useMutation,useQueryClient} from '@tanstack/react-query';
@@ -17,7 +19,7 @@ export function PublishedArticlesCorrection({orderId,number,state,weSigned}:{ord
   const form=new FormData();form.set('articles',file);form.set('documentNumber',value.trim());form.set('documentId',state.documentId);form.set('revision',state.revision);
   if(reviewRestored)form.set('reviewRestoredOriginal','true');
   if(correctPending&&state.pendingOperation)form.set('replaceAttempt',state.pendingOperation);
-  const response=await fetch(`/api/admin/orders/${orderId}/correct-articles`,{method:'POST',credentials:'include',body:form});
+  const response=await officeUpload(`/api/admin/orders/${orderId}/correct-articles`,{method:'POST',credentials:'include',body:form});
   const result=await response.json();if(!response.ok)throw Error(result.error?.message??'The correction could not be saved. Retry with the same PDF.');
   return result.data as {notified:boolean};
  },onSuccess:async result=>{setMessage(result.notified?'Corrected documents saved. The email provider accepted the notice.':'Corrected documents saved. The notice was not confirmed; retry it below.');setOpen(false);await refresh();},onError:async()=>{await refresh();}});
@@ -33,7 +35,7 @@ export function PublishedArticlesCorrection({orderId,number,state,weSigned}:{ord
    <label className="block text-sm" htmlFor={`${id}-number`}>Correct Florida document number</label>
    <input id={`${id}-number`} className="w-full rounded border p-2" required pattern="L[0-9]{11}" value={value} onChange={e=>setValue(e.target.value)} disabled={save.isPending}/>
    <label className="block text-sm" htmlFor={`${id}-pdf`}>Corrected Articles PDF</label>
-   <input id={`${id}-pdf`} type="file" accept="application/pdf" required onChange={e=>setFile(e.target.files?.[0]??null)} disabled={save.isPending}/>
+   <><input id={`${id}-pdf`} type="file" accept="application/pdf" required onChange={e=>setFile(e.target.files?.[0]??null)} disabled={save.isPending}/><span className="text-xs text-muted-foreground">{UPLOAD_LIMIT_LABEL}</span></>
    {state.pendingOperation?<label className="flex gap-2 text-sm"><input type="checkbox" checked={correctPending} onChange={e=>setCorrectPending(e.target.checked)} disabled={save.isPending}/>Correct pending upload with different information</label>:null}
    {state.restoreReviewRequired?<label className="flex gap-2 text-sm"><input type="checkbox" checked={reviewRestored} onChange={e=>setReviewRestored(e.target.checked)}/>I reviewed this restored correction and am attaching the original PDF with the saved document number.</label>:null}
    <Button type="submit" disabled={save.isPending}>{save.isPending?'Saving corrected documents…':'Save corrected formation documents'}</Button>
