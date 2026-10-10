@@ -1,3 +1,5 @@
+import {officeUpload} from '@/lib/officeUpload';
+import {UPLOAD_LIMIT_LABEL} from '@/lib/uploadLimits';
 import { cardStatusWords } from "@/lib/agentBilling";
 import { AgentServicePanel } from "./AgentServicePanel";
 import { useState } from "react";
@@ -304,7 +306,7 @@ function UploadDialog({ client }: { client: AdminClient }) {
       if (kind === "legal_mail") form.set("receivedOn", receivedOn);
       if (orderId) form.set("orderId", orderId);
       form.set("file", file);
-      const res = await fetch("/api/admin/documents", {
+      const res = await officeUpload("/api/admin/documents", {
         method: "POST",
         body: form,
         credentials: "include",
@@ -404,13 +406,13 @@ function UploadDialog({ client }: { client: AdminClient }) {
           ) : null}
           <div className="space-y-2">
             <Label htmlFor="doc-file">File</Label>
-            <Input
+            <><Input
               id="doc-file"
               key={fileInputVersion}
               type="file"
               accept="application/pdf,.pdf"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            />
+            /><span className="text-xs text-muted-foreground">{UPLOAD_LIMIT_LABEL}</span></>
           </div>
           {kind === "legal_mail" ? (
             <div className="space-y-2">
