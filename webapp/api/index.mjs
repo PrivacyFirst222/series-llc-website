@@ -114127,6 +114127,7 @@ function registerAgentCheckout(app2) {
 }
 
 // server/ra-office.ts
+init_env();
 init_db();
 init_storage();
 init_email();
@@ -114212,24 +114213,49 @@ function registerAgentOffice(app2) {
     const db = await getDb();
     const [o] = await db.query("SELECT * FROM orders WHERE id=$1", [c.req.param("id")]);
     if (!o?.client_id || !o.ra_resignation_submitted) return c.json(err("Record the actual resignation submission first.", "BAD_STATE"), 400);
-    const form = await c.req.parseBody(), f = form.file;
-    let key;
+    const form = await parseOfficeUpload(c), f = form.file;
+    let key, documentId = o.ra_resignation_document;
     if (f instanceof File) {
-      if (f.size > MAX_UPLOAD_BYTES || !await looksLikePdf(f)) return c.json(err("Upload a readable resignation PDF, no larger than 20 MB.", "BAD_FILE"), 400);
+      if (f.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (40 MB per file).", "TOO_LARGE"), 400);
+      if (!await looksLikePdf(f)) return c.json(err("Upload a readable resignation PDF.", "BAD_FILE"), 400);
       const stored = await putFile(f.name, await f.arrayBuffer(), "application/pdf");
       key = stored.storageKey;
       const [d2] = await db.query("INSERT INTO documents(client_id,order_id,kind,title,storage_key,content_type,size_bytes) VALUES($1,$2,'ra-resignation',$3,$4,'application/pdf',$5) RETURNING id", [o.client_id, o.id, `Registered-agent resignation \u2014 ${o.llc_name}`, key, stored.sizeBytes]);
+      documentId = d2.id;
       await db.query("UPDATE orders SET ra_resignation_document=$2,ra_resignation_emailed_at=NULL WHERE id=$1", [o.id, d2.id]);
     } else {
       const [d2] = await db.query("SELECT storage_key FROM documents WHERE id=$1 AND order_id=$2", [o.ra_resignation_document, o.id]);
       if (!d2) return c.json(err("Choose the resignation PDF first.", "FILE_REQUIRED"), 400);
       key = d2.storage_key;
     }
+    const [available] = await db.query("SELECT id FROM documents WHERE id=$1 AND order_id=$2 AND client_id=$3 AND deleted_at IS NULL AND NOT EXISTS(SELECT 1 FROM recovery_holds WHERE id=documents.id AND status='held')", [documentId, o.id, o.client_id]);
+    if (!available) return c.json(err("The resignation document is not available to this client. No email was sent.", "DOCUMENT_UNAVAILABLE"), 409);
     try {
-      await sendMail({ to: await currentAgentNoticeEmail(db, o.id), subject: `Registered-agent resignation \u2014 ${o.llc_name}`, html: "<p>A copy of the submitted registered-agent resignation is attached and is also available in your portal. Submission does not end the appointment immediately. We will also mail the notice required by Florida law.</p>", attachments: [{ filename: "registered-agent-resignation.pdf", content: Buffer.from(await readFileStream(key)).toString("base64") }] });
-      await db.query("UPDATE orders SET ra_resignation_emailed_at=now() WHERE id=$1", [o.id]);
+      await readFileStream(key);
     } catch {
-      return c.json(err("The copy is in the portal, but email failed. Retry sending the existing copy.", "EMAIL_FAILED"), 503);
+      return c.json(err("The resignation document cannot be read. Recover it before sending a portal notification.", "DOCUMENT_UNAVAILABLE"), 409);
+    }
+    const to = await currentAgentNoticeEmail(db, o.id);
+    const [locked] = await db.query("UPDATE documents SET notice_lock_until=now()+interval '2 minutes' WHERE id=$1 AND (notice_lock_until IS NULL OR notice_lock_until<now()) RETURNING meta,notice_status", [documentId]);
+    if (!locked) return c.json(err("A notification is already being checked. Retry its result later.", "EMAIL_BUSY"), 409);
+    let attempted = false;
+    try {
+      const pending = locked.meta?.resignationNotice;
+      const uncertain = pending && ["sending", "unconfirmed"].includes(locked.notice_status);
+      if (uncertain && (pending.to !== to || Date.now() - Date.parse(pending.at) >= 23 * 60 * 60 * 1e3 || Date.parse(pending.at) > Date.now())) return c.json(err("The previous email result must be reconciled with the provider before another notification.", "EMAIL_UNCONFIRMED"), 409);
+      const escape6 = (v2) => v2.replace(/[&<>"']/g, (c2) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c2]);
+      const notice = uncertain ? pending : { key: "resignation-copy/" + crypto.randomUUID(), at: (/* @__PURE__ */ new Date()).toISOString(), to, subject: `Registered-agent resignation \u2014 ${o.llc_name}`, html: `<p>Your registered-agent resignation document for ${escape6(o.llc_name)} is available in your client portal. Sign in to download it.</p><p><a href="${escape6(env.PUBLIC_BASE_URL + "/portal")}">Sign in to your portal</a></p><p>Submission does not end the appointment immediately. We will also mail the notice required by Florida law.</p>` };
+      await db.query("UPDATE documents SET notice_status='sending',notice_recipient=$2,meta=jsonb_set(meta,'{resignationNotice}',$3::jsonb) WHERE id=$1", [documentId, to, JSON.stringify(notice)]);
+      attempted = true;
+      await sendMail({ to: notice.to, subject: notice.subject, html: notice.html, idempotencyKey: notice.key });
+      await db.query("UPDATE documents SET notice_status='sent',notice_sent_at=now(),notice_error=NULL WHERE id=$1", [documentId]);
+      await db.query("UPDATE orders SET ra_resignation_emailed_at=now() WHERE id=$1", [o.id]);
+    } catch (error2) {
+      const definitive = /^Error: Resend (400|401|403|404|422|429):/.test(String(error2));
+      if (attempted) await db.query("UPDATE documents SET notice_status=$2,notice_error=$3 WHERE id=$1", [documentId, definitive ? "failed" : "unconfirmed", definitive ? "Email provider rejected the notification." : "Email acceptance is unconfirmed; retry only the saved notification."]);
+      return c.json(err("The copy is in the portal, but email acceptance is not confirmed. Retry the existing notification; do not upload another copy.", "EMAIL_FAILED"), 503);
+    } finally {
+      await db.query("UPDATE documents SET notice_lock_until=NULL WHERE id=$1", [documentId]);
     }
     return c.json({ data: { ok: true } });
   });
