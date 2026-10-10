@@ -202,6 +202,7 @@ async function runBackupWithinDeadline(options:{resumeOnly?:boolean;budgetMs?:nu
   const saveJob=()=>withDeadline(checkpointDeadline,()=>putObject(JOB,Buffer.from(JSON.stringify(job)),true));
   const isWorkDeadline=(error:unknown)=>error instanceof DOMException&&error.name==='TimeoutError'
    &&['Operation deadline reached','The operation was aborted due to timeout'].includes(error.message)&&Date.now()>=deadline;
+  let finalAlertResolved=false;
   const resolveSavedAlerts=async()=>{
    for(const [key,reference] of Object.entries(job.alertResolutions!)){
     // A later failed file check supersedes its queued successful resolution.
@@ -210,6 +211,7 @@ async function runBackupWithinDeadline(options:{resumeOnly?:boolean;budgetMs?:nu
     try{await withDeadline(deadline,()=>resolveBackupProblem(reference));}
     catch(error){if(!isWorkDeadline(error))throw error;await saveJob();return false;}
     delete job.alertResolutions![key];
+    if(key==='$backup')finalAlertResolved=true;
    }
    return true;
   };
@@ -322,9 +324,11 @@ async function runBackupWithinDeadline(options:{resumeOnly?:boolean;budgetMs?:nu
   const existing=await readObject(PREFIX+job.key);
   if(existing&&!existing.equals(data))throw new Error('Refusing to overwrite a different completed backup');
   if(!existing)await putObject(PREFIX+job.key,data,publishOptions.allowOverwrite);
-  job.alertResolutions.$backup='backup:'+job.key;
-  await saveJob();
-  if(!await resolveSavedAlerts())return deferBackup();
+  if(!finalAlertResolved){
+   job.alertResolutions.$backup='backup:'+job.key;
+   await saveJob();
+   if(!await resolveSavedAlerts())return deferBackup();
+  }
   await putObject('backup-jobs/last-result.json',Buffer.from(JSON.stringify({key:job.key,status:job.dump.status??'complete',restorable:true,historyComplete:!job.dump.historyGaps?.length,historyGaps:job.dump.historyGaps??[]})),true);
   await db.query("UPDATE backup_progress SET completed_at=now(),error=NULL WHERE id='database'");
   const {removeStoredFile}=await import('./storage');await removeStoredFile(env.BLOB_READ_WRITE_TOKEN?JOB:`dev:${JOB}`);

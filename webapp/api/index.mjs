@@ -54060,6 +54060,7 @@ async function runBackupWithinDeadline(options, entered, workDeadline, checkpoin
     job.alertResolutions ??= {};
     const saveJob = () => withDeadline(checkpointDeadline, () => putObject(JOB, Buffer.from(JSON.stringify(job)), true));
     const isWorkDeadline = (error2) => error2 instanceof DOMException && error2.name === "TimeoutError" && ["Operation deadline reached", "The operation was aborted due to timeout"].includes(error2.message) && Date.now() >= deadline;
+    let finalAlertResolved = false;
     const resolveSavedAlerts = async () => {
       for (const [key, reference] of Object.entries(job.alertResolutions)) {
         if (key !== "$backup" && (!job.done[key] || job.errors[key])) {
@@ -54078,6 +54079,7 @@ async function runBackupWithinDeadline(options, entered, workDeadline, checkpoin
           return false;
         }
         delete job.alertResolutions[key];
+        if (key === "$backup") finalAlertResolved = true;
       }
       return true;
     };
@@ -54222,9 +54224,11 @@ async function runBackupWithinDeadline(options, entered, workDeadline, checkpoin
     const existing = await readObject(PREFIX + job.key);
     if (existing && !existing.equals(data)) throw new Error("Refusing to overwrite a different completed backup");
     if (!existing) await putObject(PREFIX + job.key, data, publishOptions.allowOverwrite);
-    job.alertResolutions.$backup = "backup:" + job.key;
-    await saveJob();
-    if (!await resolveSavedAlerts()) return deferBackup();
+    if (!finalAlertResolved) {
+      job.alertResolutions.$backup = "backup:" + job.key;
+      await saveJob();
+      if (!await resolveSavedAlerts()) return deferBackup();
+    }
     await putObject("backup-jobs/last-result.json", Buffer.from(JSON.stringify({ key: job.key, status: job.dump.status ?? "complete", restorable: true, historyComplete: !job.dump.historyGaps?.length, historyGaps: job.dump.historyGaps ?? [] })), true);
     await db.query("UPDATE backup_progress SET completed_at=now(),error=NULL WHERE id='database'");
     const { removeStoredFile: removeStoredFile2 } = await Promise.resolve().then(() => (init_storage(), storage_exports));
