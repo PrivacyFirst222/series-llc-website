@@ -1,3 +1,4 @@
+import {parseOfficeUpload} from './office-uploads';
 import {prepareCorrectionHistory} from './office-history-recovery';
 import type {Hono} from 'hono';
 import {getDb,type Db} from './db';
@@ -62,10 +63,11 @@ export function registerPublishedArticles(app:Hono,prepare:(o:FilingOrder,n:stri
   if(!o)return c.json(err('Not found','NOT_FOUND'),404);
   if(typeof o.payload==='string')o.payload=JSON.parse(o.payload);
   if(o.payload.filingPath==='CONVERT'||!['filed','formed'].includes(o.status))return c.json(err('Only filed formation Articles can be corrected.','BAD_STATE'),400);
-  const form=await c.req.parseBody(),file=form.articles;
+  const form=await parseOfficeUpload(c),file=form.articles;
   const number=String(form.documentNumber||'').trim(),from=String(form.documentId||''),revision=String(form.revision||'');
   if(!/^L\d{11}$/.test(number))return c.json(err('Enter the Florida document number: L followed by eleven digits.','DOCUMENT_NUMBER_SHAPE'),400);
-  if(!(file instanceof File)||file.size>MAX_UPLOAD_BYTES||!await looksLikePdf(file))return c.json(err('Choose the corrected Articles PDF, under 20 MB.','NOT_A_PDF'),400);
+  if(file instanceof File&&file.size>MAX_UPLOAD_BYTES)return c.json(err('File is too large (40 MB per file).','TOO_LARGE'),400);
+  if(!(file instanceof File)||!await looksLikePdf(file))return c.json(err('Choose a readable corrected Articles PDF.','NOT_A_PDF'),400);
   const bytes=Buffer.from(await file.arrayBuffer()),hash=officeHash({from,revision,number,pdf:bytes.toString('base64')});
   let op:OfficeOperation|undefined;
   try{
