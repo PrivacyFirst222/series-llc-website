@@ -102648,8 +102648,9 @@ function registerOfficeRecovery(app2) {
     const i = [...officeFileIdentities(tables, { includeUnknown: true }).values()].find((i2) => i2.operationId === c.req.param("operationId") && i2.slot === c.req.param("slot") && i2.orderId === order2?.id && i2.clientId === order2?.client_id);
     if (!i || !order2) return c.json(err("Not found", "NOT_FOUND"), 404);
     if (!i.file.sha) return c.json(err("The original document fingerprint is unavailable.", "RECOVERY_IDENTITY_UNAVAILABLE"), 409);
-    const form = await c.req.parseBody(), file = form.file;
-    if (file instanceof File && (file.size > MAX_UPLOAD_BYTES || !await looksLikePdf(file))) return c.json(err("Choose a readable PDF under 20 MB", "NOT_A_PDF"), 400);
+    const form = await parseOfficeUpload(c), file = form.file;
+    if (file instanceof File && file.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (40 MB per file).", "TOO_LARGE"), 400);
+    if (file instanceof File && !await looksLikePdf(file)) return c.json(err("Choose a readable PDF.", "NOT_A_PDF"), 400);
     const supplied = file instanceof File ? Buffer.from(await file.arrayBuffer()) : void 0;
     const original = tables.office_operations.find((o) => o.id === i.operationId);
     const held = await claimOfficeVerification(db, original);
@@ -102722,8 +102723,9 @@ function registerOfficeRecovery(app2) {
   });
   app2.post("/admin/backups/history-recovery/:historyId/original", async (c) => {
     if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const form = await c.req.parseBody(), file = form.file;
-    if (file instanceof File && (file.size > MAX_UPLOAD_BYTES || !await looksLikePdf(file))) return c.json(err("Choose a readable original PDF under 20 MB.", "NOT_A_PDF"), 400);
+    const form = await parseOfficeUpload(c), file = form.file;
+    if (file instanceof File && file.size > MAX_UPLOAD_BYTES) return c.json(err("File is too large (40 MB per file).", "TOO_LARGE"), 400);
+    if (file instanceof File && !await looksLikePdf(file)) return c.json(err("Choose a readable original PDF.", "NOT_A_PDF"), 400);
     const result = await restoreHistoricalOriginal(await getDb(), c.req.param("historyId"), file instanceof File ? Buffer.from(await file.arrayBuffer()) : void 0);
     return result ? c.json({ data: result }) : c.json(err("Not found", "NOT_FOUND"), 404);
   });

@@ -1,3 +1,4 @@
+import {parseOfficeUpload} from './office-uploads';
 import type {Hono} from 'hono';
 import {getDb} from './db';
 import {requireAdmin,err,MAX_UPLOAD_BYTES,looksLikePdf} from './shared';
@@ -48,8 +49,9 @@ export function registerOfficeRecovery(app:Hono){
   const i=[...officeFileIdentities(tables,{includeUnknown:true}).values()].find(i=>i.operationId===c.req.param('operationId')&&i.slot===c.req.param('slot')&&i.orderId===order?.id&&i.clientId===order?.client_id);
   if(!i||!order)return c.json(err('Not found','NOT_FOUND'),404);
   if(!i.file.sha)return c.json(err('The original document fingerprint is unavailable.','RECOVERY_IDENTITY_UNAVAILABLE'),409);
-  const form=await c.req.parseBody(),file=form.file;
-  if(file instanceof File&&(file.size>MAX_UPLOAD_BYTES||!await looksLikePdf(file)))return c.json(err('Choose a readable PDF under 20 MB','NOT_A_PDF'),400);
+  const form=await parseOfficeUpload(c),file=form.file;
+  if(file instanceof File&&file.size>MAX_UPLOAD_BYTES)return c.json(err('File is too large (40 MB per file).','TOO_LARGE'),400);
+  if(file instanceof File&&!await looksLikePdf(file))return c.json(err('Choose a readable PDF.','NOT_A_PDF'),400);
   const supplied=file instanceof File?Buffer.from(await file.arrayBuffer()):undefined;
   const original=tables.office_operations.find(o=>o.id===i.operationId) as unknown as OfficeOperation;
   const held=await claimOfficeVerification(db,original);
@@ -109,8 +111,9 @@ export function registerOfficeRecovery(app:Hono){
  });
  app.post('/admin/backups/history-recovery/:historyId/original',async c=>{
   if(!await requireAdmin(c))return c.json(err('Not signed in','UNAUTHENTICATED'),401);
-  const form=await c.req.parseBody(),file=form.file;
-  if(file instanceof File&&(file.size>MAX_UPLOAD_BYTES||!await looksLikePdf(file)))return c.json(err('Choose a readable original PDF under 20 MB.','NOT_A_PDF'),400);
+  const form=await parseOfficeUpload(c),file=form.file;
+  if(file instanceof File&&file.size>MAX_UPLOAD_BYTES)return c.json(err('File is too large (40 MB per file).','TOO_LARGE'),400);
+  if(file instanceof File&&!await looksLikePdf(file))return c.json(err('Choose a readable original PDF.','NOT_A_PDF'),400);
   const result=await restoreHistoricalOriginal(await getDb(),c.req.param('historyId'),file instanceof File?Buffer.from(await file.arrayBuffer()):undefined);
   return result?c.json({data:result}):c.json(err('Not found','NOT_FOUND'),404);
  });
