@@ -586,6 +586,17 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
     `ALTER TABLE orders ADD COLUMN IF NOT EXISTS office_upload_id uuid`,
     `CREATE TABLE IF NOT EXISTS office_operations (id uuid PRIMARY KEY DEFAULT gen_random_uuid(),kind text NOT NULL,target_id uuid NOT NULL,input_hash text NOT NULL,payload jsonb NOT NULL,files jsonb NOT NULL DEFAULT '{}'::jsonb,phase text NOT NULL DEFAULT 'open',result jsonb NOT NULL DEFAULT '{}'::jsonb,lease uuid,lease_until timestamptz,error text,notice_started_at timestamptz,created_at timestamptz NOT NULL DEFAULT now(),UNIQUE(kind,target_id))`,
   ]},
+  { id: 27, name: "encrypted-office-upload-staging", statements: [
+    `CREATE TABLE IF NOT EXISTS office_upload_stages (
+      id uuid PRIMARY KEY, session_hash text NOT NULL, route text NOT NULL,
+      fields jsonb NOT NULL, files jsonb NOT NULL, state text NOT NULL DEFAULT 'issued',
+      lease uuid, lease_until timestamptz, token_expires_at timestamptz NOT NULL,
+      expires_at timestamptz NOT NULL, result_status integer, result_body text,
+      cleanup_pending boolean NOT NULL DEFAULT false, cleanup_checked_at timestamptz,
+      created_at timestamptz NOT NULL DEFAULT now()
+    )`,
+    `CREATE INDEX IF NOT EXISTS office_upload_stages_cleanup ON office_upload_stages (cleanup_checked_at,expires_at)`,
+  ]},
   // Append future migrations here with the next id. Never edit an entry.
 ];
 
