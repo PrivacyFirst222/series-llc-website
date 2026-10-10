@@ -32,6 +32,13 @@ review or recommend.
    not just dollars and Adam's minutes. No long run on code that is still
    being fixed. Finish all fixes, then test once.
 
+**Checklist items are done one at a time — never all at once.** Adam, 10 Oct
+2026: "Every checklist item needs to be done one at a time.  Never all at once."
+Each item is completed, reported and seen by Adam before the next begins. This
+is Adam's intervention point, not waste: Rule 1's "fewest steps" never
+justifies batching checklist items, and I never recommend combining them or
+draft an authorization that does (FAILURES.md P106–P107).
+
 Every recommendation or review opens with these three sections, in this order.
 The recommendation comes last and is derived from them:
 

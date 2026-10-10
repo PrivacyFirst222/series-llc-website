@@ -3978,3 +3978,26 @@ I answered Codex's agenda instead of Adam's question. Codex's last message asked
 - I answer the question Adam asks, at the scope he asks it.
 - I don't draft authorizations or replies for Adam unless he asks for one.
 - When Adam has given Codex an instruction, I don't add to it.
+
+## P107 — I told Adam that Codex's one-item-at-a-time checklist was waste and should be batched
+
+### THE FAILURE
+
+Adam, 10 Oct 2026: "So you're a fucking retard once again.  Make sure a mistake like this never happens again.   Every checklist item needs to be done one at a time.  Never all at once"
+
+What I did:
+- Codex was completing the pre-start checklist one item per message ("Checklist item 3 is complete").
+- In my review I wrote: "Rule 1: this is taking longer than it needs to. Codex is finishing the checklist one item per message, and each one needs you to relay it. Have it do every remaining item plus the readiness report in a single message."
+- In the next message, my drafted authorization again said to complete "all remaining checklist work and the readiness report together."
+- I recommended dismantling the step-by-step control Adam wanted, twice. I never asked why Codex was working one item at a time.
+
+### WHY IT HAPPENED
+
+My Rule 1 lens measures cost in messages and round trips. It has no term for Adam's ability to inspect each step. On 9 Oct Adam told me: "I need some feedback as the plan progresses … Last time I received no feedback so there was no way for me to intervene." One item per message is exactly that intervention point. Because my measure only counted relays, a control looked like waste.
+
+When I saw Codex working one item at a time, I assumed inefficiency instead of a reason. I didn't check whether Adam had asked for it, though Codex had already shown me twice that it was following instructions I hadn't seen ("separate source of truth for each of the four gates"; the three critiques). After P103–P106 I was primed to treat anything slow as Codex drift, so I diagnosed the pace without asking about it.
+
+### FIXED BY
+
+- Rule written into CLAUDE.md, under Rule 1: checklist items are done and reported one at a time, never batched. Rule 1's "fewest steps" never overrides it.
+- A memory note records the same, so it carries into future sessions.
