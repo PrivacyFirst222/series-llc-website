@@ -1,3 +1,4 @@
+import { trainingTarget } from "./training";
 import { getDb, type Db } from './db';
 import { sendMail, raRenewalNoticeEmail, raRenewalDeclinedEmail, raRenewalReceiptEmail } from './email';
 import { agentCheckoutLink } from './ra-checkout';
@@ -16,6 +17,7 @@ export async function ensureAgentPaymentLink(db:Db,id:string):Promise<string>{
  return link;
 }
 export async function deliverAgentCorrespondence(id:string,today=easternDateIso()):Promise<boolean>{
+ if(await trainingTarget(id))return false;
  const db=await getDb();
  const claim=await db.query("UPDATE ra_renewals SET correspondence_lock_until=now()+interval '5 minutes' WHERE id=$1 AND (correspondence_lock_until IS NULL OR correspondence_lock_until<now()) RETURNING id",[id]);
  if(!claim.length)return false;

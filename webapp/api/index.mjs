@@ -104780,6 +104780,7 @@ function priceOrder(opts) {
 init_training();
 
 // server/agent-correspondence.ts
+init_training();
 init_db();
 init_email();
 
@@ -104896,6 +104897,7 @@ async function ensureAgentPaymentLink(db, id) {
   return link2;
 }
 async function deliverAgentCorrespondence(id, today = easternDateIso()) {
+  if (await trainingTarget(id)) return false;
   const db = await getDb();
   const claim = await db.query("UPDATE ra_renewals SET correspondence_lock_until=now()+interval '5 minutes' WHERE id=$1 AND (correspondence_lock_until IS NULL OR correspondence_lock_until<now()) RETURNING id", [id]);
   if (!claim.length) return false;
