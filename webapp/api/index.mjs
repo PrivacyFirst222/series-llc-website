@@ -47,6 +47,44 @@ var __toESM = (mod, isNodeMode, target2) => (target2 = mod != null ? __create(__
   mod
 ));
 
+// node_modules/hono/dist/http-exception.js
+var HTTPException;
+var init_http_exception = __esm({
+  "node_modules/hono/dist/http-exception.js"() {
+    HTTPException = class extends Error {
+      res;
+      status;
+      /**
+       * Creates an instance of `HTTPException`.
+       * @param status - HTTP status code for the exception. Defaults to 500.
+       * @param options - Additional options for the exception.
+       */
+      constructor(status = 500, options) {
+        super(options?.message, { cause: options?.cause });
+        this.res = options?.res;
+        this.status = status;
+      }
+      /**
+       * Returns the response object associated with the exception.
+       * If a response object is not provided, a new response is created with the error message and status code.
+       * @returns The response object.
+       */
+      getResponse() {
+        if (this.res) {
+          const newResponse = new Response(this.res.body, {
+            status: this.status,
+            headers: this.res.headers
+          });
+          return newResponse;
+        }
+        return new Response(this.message, {
+          status: this.status
+        });
+      }
+    };
+  }
+});
+
 // node_modules/is-node-process/lib/index.mjs
 function isNodeProcess() {
   if (typeof navigator !== "undefined" && navigator.product === "ReactNative") {
@@ -51089,6 +51127,399 @@ END $$`
   }
 });
 
+// node_modules/hono/dist/utils/url.js
+var splitPath, splitRoutingPath, extractGroupsFromPath, replaceGroupMarks, patternCache, getPattern, tryDecode, tryDecodeURI, getPath, getPathNoStrict, mergePath, checkOptionalParameter, tryDecodeURIComponent, _decodeURI, _getQueryParam, getQueryParam, getQueryParams, decodeURIComponent_;
+var init_url = __esm({
+  "node_modules/hono/dist/utils/url.js"() {
+    splitPath = (path) => {
+      const paths = path.split("/");
+      if (paths[0] === "") {
+        paths.shift();
+      }
+      return paths;
+    };
+    splitRoutingPath = (routePath) => {
+      const { groups, path } = extractGroupsFromPath(routePath);
+      const paths = splitPath(path);
+      return replaceGroupMarks(paths, groups);
+    };
+    extractGroupsFromPath = (path) => {
+      const groups = [];
+      path = path.replace(/\{[^}]+\}/g, (match2, index2) => {
+        const mark = `@${index2}`;
+        groups.push([mark, match2]);
+        return mark;
+      });
+      return { groups, path };
+    };
+    replaceGroupMarks = (paths, groups) => {
+      for (let i = groups.length - 1; i >= 0; i--) {
+        const [mark] = groups[i];
+        for (let j = paths.length - 1; j >= 0; j--) {
+          if (paths[j].includes(mark)) {
+            paths[j] = paths[j].replace(mark, groups[i][1]);
+            break;
+          }
+        }
+      }
+      return paths;
+    };
+    patternCache = {};
+    getPattern = (label, next) => {
+      if (label === "*") {
+        return "*";
+      }
+      const match2 = label.match(/^\:([^\{\}]+)(?:\{(.+)\})?$/);
+      if (match2) {
+        const cacheKey = `${label}#${next}`;
+        if (!patternCache[cacheKey]) {
+          if (match2[2]) {
+            patternCache[cacheKey] = next && next[0] !== ":" && next[0] !== "*" ? [cacheKey, match2[1], new RegExp(`^${match2[2]}(?=/${next})`)] : [label, match2[1], new RegExp(`^${match2[2]}$`)];
+          } else {
+            patternCache[cacheKey] = [label, match2[1], true];
+          }
+        }
+        return patternCache[cacheKey];
+      }
+      return null;
+    };
+    tryDecode = (str, decoder) => {
+      try {
+        return decoder(str);
+      } catch {
+        return str.replace(/(?:%[0-9A-Fa-f]{2})+/g, (match2) => {
+          try {
+            return decoder(match2);
+          } catch {
+            return match2;
+          }
+        });
+      }
+    };
+    tryDecodeURI = (str) => tryDecode(str, decodeURI);
+    getPath = (request) => {
+      const url = request.url;
+      const start = url.indexOf("/", url.indexOf(":") + 4);
+      let i = start;
+      for (; i < url.length; i++) {
+        const charCode = url.charCodeAt(i);
+        if (charCode === 37) {
+          const queryIndex = url.indexOf("?", i);
+          const hashIndex = url.indexOf("#", i);
+          const end = queryIndex === -1 ? hashIndex === -1 ? void 0 : hashIndex : hashIndex === -1 ? queryIndex : Math.min(queryIndex, hashIndex);
+          const path = url.slice(start, end);
+          return tryDecodeURI(path.includes("%25") ? path.replace(/%25/g, "%2525") : path);
+        } else if (charCode === 63 || charCode === 35) {
+          break;
+        }
+      }
+      return url.slice(start, i);
+    };
+    getPathNoStrict = (request) => {
+      const result = getPath(request);
+      return result.length > 1 && result.at(-1) === "/" ? result.slice(0, -1) : result;
+    };
+    mergePath = (base, sub, ...rest) => {
+      if (rest.length) {
+        sub = mergePath(sub, ...rest);
+      }
+      return `${base?.[0] === "/" ? "" : "/"}${base}${sub === "/" ? "" : `${base?.at(-1) === "/" ? "" : "/"}${sub?.[0] === "/" ? sub.slice(1) : sub}`}`;
+    };
+    checkOptionalParameter = (path) => {
+      if (path.charCodeAt(path.length - 1) !== 63 || !path.includes(":")) {
+        return null;
+      }
+      const segments = path.split("/");
+      const results = [];
+      let basePath = "";
+      segments.forEach((segment) => {
+        if (segment !== "" && !/\:/.test(segment)) {
+          basePath += "/" + segment;
+        } else if (/\:/.test(segment)) {
+          if (segment.charCodeAt(segment.length - 1) === 63) {
+            if (results.length === 0 && basePath === "") {
+              results.push("/");
+            } else {
+              results.push(basePath);
+            }
+            const optionalSegment = segment.slice(0, -1);
+            basePath += "/" + optionalSegment;
+            results.push(basePath);
+          } else {
+            basePath += "/" + segment;
+          }
+        }
+      });
+      return results.filter((v2, i, a2) => a2.indexOf(v2) === i);
+    };
+    tryDecodeURIComponent = (str) => str.indexOf("%") !== -1 ? tryDecode(str, decodeURIComponent_) : str;
+    _decodeURI = (value) => {
+      if (value.indexOf("+") !== -1) {
+        value = value.replace(/\+/g, " ");
+      }
+      return tryDecodeURIComponent(value);
+    };
+    _getQueryParam = (url, key, multiple) => {
+      const hashIndex = url.indexOf("#", 8);
+      if (hashIndex !== -1) {
+        url = url.slice(0, hashIndex);
+      }
+      let encoded2;
+      if (!multiple && key && key.indexOf("%") === -1 && key.indexOf("+") === -1) {
+        let keyIndex2 = url.indexOf("?", 8);
+        if (keyIndex2 === -1) {
+          return void 0;
+        }
+        if (!url.startsWith(key, keyIndex2 + 1)) {
+          keyIndex2 = url.indexOf(`&${key}`, keyIndex2 + 1);
+        }
+        while (keyIndex2 !== -1) {
+          const trailingKeyCode = url.charCodeAt(keyIndex2 + key.length + 1);
+          if (trailingKeyCode === 61) {
+            const valueIndex = keyIndex2 + key.length + 2;
+            const endIndex = url.indexOf("&", valueIndex);
+            return _decodeURI(url.slice(valueIndex, endIndex === -1 ? void 0 : endIndex));
+          } else if (trailingKeyCode == 38 || isNaN(trailingKeyCode)) {
+            return "";
+          }
+          keyIndex2 = url.indexOf(`&${key}`, keyIndex2 + 1);
+        }
+        encoded2 = /[%+]/.test(url);
+        if (!encoded2) {
+          return void 0;
+        }
+      }
+      const results = /* @__PURE__ */ Object.create(null);
+      encoded2 ??= /[%+]/.test(url);
+      let keyIndex = url.indexOf("?", 8);
+      while (keyIndex !== -1) {
+        const nextKeyIndex = url.indexOf("&", keyIndex + 1);
+        let valueIndex = url.indexOf("=", keyIndex);
+        if (valueIndex > nextKeyIndex && nextKeyIndex !== -1) {
+          valueIndex = -1;
+        }
+        let name = url.slice(
+          keyIndex + 1,
+          valueIndex === -1 ? nextKeyIndex === -1 ? void 0 : nextKeyIndex : valueIndex
+        );
+        if (encoded2) {
+          name = _decodeURI(name);
+        }
+        keyIndex = nextKeyIndex;
+        if (name === "") {
+          continue;
+        }
+        let value;
+        if (valueIndex === -1) {
+          value = "";
+        } else {
+          value = url.slice(valueIndex + 1, nextKeyIndex === -1 ? void 0 : nextKeyIndex);
+          if (encoded2) {
+            value = _decodeURI(value);
+          }
+        }
+        if (multiple) {
+          if (!(results[name] && Array.isArray(results[name]))) {
+            results[name] = [];
+          }
+          ;
+          results[name].push(value);
+        } else {
+          results[name] ??= value;
+        }
+      }
+      return key ? results[key] : results;
+    };
+    getQueryParam = _getQueryParam;
+    getQueryParams = (url, key) => {
+      return _getQueryParam(url, key, true);
+    };
+    decodeURIComponent_ = decodeURIComponent;
+  }
+});
+
+// node_modules/hono/dist/utils/cookie.js
+var validCookieNameRegEx, relaxedCookieNameRegEx, validCookieValueRegEx, trimCookieWhitespace, parse, _serialize, serialize;
+var init_cookie = __esm({
+  "node_modules/hono/dist/utils/cookie.js"() {
+    init_url();
+    validCookieNameRegEx = /^[\w!#$%&'*.^`|~+-]+$/;
+    relaxedCookieNameRegEx = /^[!#-:<>-[\]-~]+$/;
+    validCookieValueRegEx = /^[ !#-:<-[\]-~]*$/;
+    trimCookieWhitespace = (value) => {
+      let start = 0;
+      let end = value.length;
+      while (start < end) {
+        const charCode = value.charCodeAt(start);
+        if (charCode !== 32 && charCode !== 9) {
+          break;
+        }
+        start++;
+      }
+      while (end > start) {
+        const charCode = value.charCodeAt(end - 1);
+        if (charCode !== 32 && charCode !== 9) {
+          break;
+        }
+        end--;
+      }
+      return start === 0 && end === value.length ? value : value.slice(start, end);
+    };
+    parse = (cookie, name) => {
+      if (name && cookie.indexOf(name) === -1) {
+        return {};
+      }
+      const pairs = cookie.split(";");
+      const parsedCookie = /* @__PURE__ */ Object.create(null);
+      for (const pairStr of pairs) {
+        const valueStartPos = pairStr.indexOf("=");
+        if (valueStartPos === -1) {
+          continue;
+        }
+        const cookieName = trimCookieWhitespace(pairStr.substring(0, valueStartPos));
+        if (name && name !== cookieName || !relaxedCookieNameRegEx.test(cookieName) || cookieName in parsedCookie) {
+          continue;
+        }
+        let cookieValue = trimCookieWhitespace(pairStr.substring(valueStartPos + 1));
+        if (cookieValue.startsWith('"') && cookieValue.endsWith('"')) {
+          cookieValue = cookieValue.slice(1, -1);
+        }
+        if (validCookieValueRegEx.test(cookieValue)) {
+          parsedCookie[cookieName] = tryDecodeURIComponent(cookieValue);
+          if (name) {
+            break;
+          }
+        }
+      }
+      return parsedCookie;
+    };
+    _serialize = (name, value, opt = {}) => {
+      if (!validCookieNameRegEx.test(name)) {
+        throw new Error("Invalid cookie name");
+      }
+      let cookie = `${name}=${value}`;
+      if (name.startsWith("__Secure-") && !opt.secure) {
+        throw new Error("__Secure- Cookie must have Secure attributes");
+      }
+      if (name.startsWith("__Host-")) {
+        if (!opt.secure) {
+          throw new Error("__Host- Cookie must have Secure attributes");
+        }
+        if (opt.path !== "/") {
+          throw new Error('__Host- Cookie must have Path attributes with "/"');
+        }
+        if (opt.domain) {
+          throw new Error("__Host- Cookie must not have Domain attributes");
+        }
+      }
+      for (const key of ["domain", "path", "sameSite", "priority"]) {
+        if (opt[key] && /[;\r\n]/.test(opt[key])) {
+          throw new Error(`${key} must not contain ";", "\\r", or "\\n"`);
+        }
+      }
+      if (opt && typeof opt.maxAge === "number" && opt.maxAge >= 0) {
+        if (opt.maxAge > 3456e4) {
+          throw new Error(
+            "Cookies Max-Age SHOULD NOT be greater than 400 days (34560000 seconds) in duration."
+          );
+        }
+        cookie += `; Max-Age=${opt.maxAge | 0}`;
+      }
+      if (opt.domain && opt.prefix !== "host") {
+        cookie += `; Domain=${opt.domain}`;
+      }
+      if (opt.path) {
+        cookie += `; Path=${opt.path}`;
+      }
+      if (opt.expires) {
+        if (opt.expires.getTime() - Date.now() > 3456e7) {
+          throw new Error(
+            "Cookies Expires SHOULD NOT be greater than 400 days (34560000 seconds) in the future."
+          );
+        }
+        cookie += `; Expires=${opt.expires.toUTCString()}`;
+      }
+      if (opt.httpOnly) {
+        cookie += "; HttpOnly";
+      }
+      if (opt.secure) {
+        cookie += "; Secure";
+      }
+      if (opt.sameSite) {
+        cookie += `; SameSite=${opt.sameSite.charAt(0).toUpperCase() + opt.sameSite.slice(1)}`;
+      }
+      if (opt.priority) {
+        cookie += `; Priority=${opt.priority.charAt(0).toUpperCase() + opt.priority.slice(1)}`;
+      }
+      if (opt.partitioned) {
+        if (!opt.secure) {
+          throw new Error("Partitioned Cookie must have Secure attributes");
+        }
+        cookie += "; Partitioned";
+      }
+      return cookie;
+    };
+    serialize = (name, value, opt) => {
+      value = encodeURIComponent(value);
+      return _serialize(name, value, opt);
+    };
+  }
+});
+
+// node_modules/hono/dist/helper/cookie/index.js
+var getCookie, generateCookie, setCookie, deleteCookie;
+var init_cookie2 = __esm({
+  "node_modules/hono/dist/helper/cookie/index.js"() {
+    init_cookie();
+    getCookie = (c, key, prefix) => {
+      const cookie = c.req.raw.headers.get("Cookie");
+      if (typeof key === "string") {
+        if (!cookie) {
+          return void 0;
+        }
+        let finalKey = key;
+        if (prefix === "secure") {
+          finalKey = "__Secure-" + key;
+        } else if (prefix === "host") {
+          finalKey = "__Host-" + key;
+        }
+        const obj2 = parse(cookie, finalKey);
+        return obj2[finalKey];
+      }
+      if (!cookie) {
+        return {};
+      }
+      const obj = parse(cookie);
+      return obj;
+    };
+    generateCookie = (name, value, opt) => {
+      let cookie;
+      if (opt?.prefix === "secure") {
+        cookie = serialize("__Secure-" + name, value, { path: "/", ...opt, secure: true });
+      } else if (opt?.prefix === "host") {
+        cookie = serialize("__Host-" + name, value, {
+          ...opt,
+          path: "/",
+          secure: true,
+          domain: void 0
+        });
+      } else {
+        cookie = serialize(name, value, { path: "/", ...opt });
+      }
+      return cookie;
+    };
+    setCookie = (c, name, value, opt) => {
+      const cookie = generateCookie(name, value, opt);
+      c.header("Set-Cookie", cookie, { append: true });
+    };
+    deleteCookie = (c, name, opt) => {
+      const deletedCookie = getCookie(c, name, opt?.prefix);
+      setCookie(c, name, "", { ...opt, maxAge: 0 });
+      return deletedCookie;
+    };
+  }
+});
+
 // server/encryption.ts
 import { createCipheriv, createDecipheriv, randomBytes, createHash as createHash2 } from "node:crypto";
 function encryptionKeys() {
@@ -51142,6 +51573,175 @@ var init_encryption = __esm({
     MAGIC = "FPSLLC-ENC-1\n";
     EncryptionKeyError = class extends Error {
     };
+  }
+});
+
+// server/crypto.ts
+import {
+  randomBytes as randomBytes2,
+  scrypt as scryptCb,
+  timingSafeEqual as timingSafeEqual2,
+  createHash as createHash3,
+  createHmac as createHmac2,
+  createDecipheriv as createDecipheriv2,
+  hkdfSync
+} from "node:crypto";
+function scrypt(password, salt) {
+  return new Promise(
+    (resolve3, reject2) => scryptCb(password, salt, 64, (err3, key) => err3 ? reject2(err3) : resolve3(key))
+  );
+}
+async function hashPassword(password) {
+  const salt = randomBytes2(16);
+  const key = await scrypt(password, salt);
+  return `s1:${salt.toString("hex")}:${key.toString("hex")}`;
+}
+async function verifyPassword(password, stored) {
+  const [v2, saltHex, keyHex] = stored.split(":");
+  if (v2 !== "s1" || !saltHex || !keyHex) return false;
+  const key = await scrypt(password, Buffer.from(saltHex, "hex"));
+  const expected = Buffer.from(keyHex, "hex");
+  return key.length === expected.length && timingSafeEqual2(key, expected);
+}
+function newToken() {
+  const token = randomBytes2(32).toString("base64url");
+  return { token, tokenHash: hashToken(token) };
+}
+function hashToken(token) {
+  return createHash3("sha256").update(token).digest("hex");
+}
+function hmacSha256Base64(key, message) {
+  return createHmac2("sha256", key).update(message).digest("base64");
+}
+function secretKey() {
+  return Buffer.from(hkdfSync("sha256", process.env.LEGACY_SESSION_SECRET || env.SESSION_SECRET, "fpsllc-ein-v1", "ein-encryption", 32));
+}
+function encryptSecret(plain) {
+  return `v2:${seal(Buffer.from(plain)).toString("base64")}`;
+}
+function decryptSecret(stored) {
+  if (stored.startsWith("v2:")) return unseal(Buffer.from(stored.slice(3), "base64")).toString();
+  const [v2, ivHex, tagHex, ctHex] = stored.split(":");
+  if (v2 !== "v1" || !ivHex || !tagHex || !ctHex) throw new SecretFormatError("bad secret format");
+  const decipher = createDecipheriv2("aes-256-gcm", secretKey(), Buffer.from(ivHex, "hex"));
+  decipher.setAuthTag(Buffer.from(tagHex, "hex"));
+  return Buffer.concat([decipher.update(Buffer.from(ctHex, "hex")), decipher.final()]).toString("utf8");
+}
+var SecretFormatError;
+var init_crypto = __esm({
+  "server/crypto.ts"() {
+    init_env();
+    init_encryption();
+    SecretFormatError = class extends Error {
+    };
+  }
+});
+
+// server/auth.ts
+function sessionCredentials(hours) {
+  return { ...newToken(), expires: new Date(Date.now() + (hours ? hours * 36e5 : SESSION_DAYS * 864e5)) };
+}
+function setSessionCookie(c, credentials, isAdmin = false) {
+  setCookie(c, isAdmin ? ADMIN_COOKIE : CLIENT_COOKIE, credentials.token, {
+    httpOnly: true,
+    secure: env.isProd,
+    sameSite: "Lax",
+    path: "/",
+    expires: credentials.expires
+  });
+}
+async function createSession(c, opts) {
+  const db = await getDb();
+  const credentials = sessionCredentials(opts.hours);
+  if (opts.clientId) {
+    const rows = await db.query(
+      `INSERT INTO sessions
+      (token_hash, client_id, is_admin, viewing_as_admin, expires_at, password_version)
+      SELECT $1, id, $3, $4, $5, password_version FROM clients
+      WHERE id=$2 AND ($6::text IS NULL OR password_hash=$6) RETURNING token_hash`,
+      [
+        credentials.tokenHash,
+        opts.clientId,
+        opts.isAdmin ?? false,
+        opts.viewingAsAdmin ?? false,
+        credentials.expires.toISOString(),
+        opts.verifiedPasswordHash ?? null
+      ]
+    );
+    if (!rows.length) return false;
+  } else {
+    await db.query(
+      "INSERT INTO sessions (token_hash, client_id, is_admin, viewing_as_admin, expires_at) VALUES ($1, $2, $3, $4, $5)",
+      [credentials.tokenHash, null, opts.isAdmin ?? false, opts.viewingAsAdmin ?? false, credentials.expires.toISOString()]
+    );
+  }
+  setSessionCookie(c, credentials, opts.isAdmin);
+  return true;
+}
+async function lookup(c, cookieName) {
+  const token = getCookie(c, cookieName);
+  if (!token) return null;
+  const db = await getDb();
+  const tokenHash = hashToken(token);
+  const rows = await db.query(
+    `SELECT s.client_id, s.is_admin, s.viewing_as_admin FROM sessions s
+      LEFT JOIN clients c ON c.id=s.client_id
+      WHERE s.token_hash=$1 AND s.expires_at>now()
+        AND (s.client_id IS NULL OR s.password_version=c.password_version)`,
+    [tokenHash]
+  );
+  if (rows.length === 0) return null;
+  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash, viewingAsAdmin: rows[0].viewing_as_admin };
+}
+async function getSession(c) {
+  const s = await lookup(c, CLIENT_COOKIE);
+  return s?.clientId ? s : null;
+}
+async function getAdminSession(c) {
+  const s = await lookup(c, ADMIN_COOKIE);
+  return s?.isAdmin ? s : null;
+}
+async function destroySession(c, role = "client") {
+  const cookieName = role === "admin" ? ADMIN_COOKIE : CLIENT_COOKIE;
+  const token = getCookie(c, cookieName);
+  if (token) {
+    const db = await getDb();
+    await db.query("DELETE FROM sessions WHERE token_hash = $1", [hashToken(token)]);
+  }
+  deleteCookie(c, cookieName, { path: "/" });
+}
+async function rateLimit(key, max, windowMs, failMode = "open") {
+  try {
+    const db = await getDb();
+    const rows = await db.query(
+      `INSERT INTO rate_limits (key, window_start, count) VALUES ($1, now(), 1)
+       ON CONFLICT (key) DO UPDATE SET
+         count = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
+                      THEN 1 ELSE rate_limits.count + 1 END,
+         window_start = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
+                             THEN now() ELSE rate_limits.window_start END
+       RETURNING count`,
+      [key, windowMs / 1e3]
+    );
+    return rows[0].count <= max;
+  } catch (e) {
+    console.error(`[rateLimit] check failed, failing ${failMode}:`, e);
+    return failMode === "open";
+  }
+}
+function clientIp(c) {
+  return c.req.header("x-forwarded-for")?.split(",")[0].trim() || c.req.header("x-real-ip") || "local";
+}
+var CLIENT_COOKIE, ADMIN_COOKIE, SESSION_DAYS;
+var init_auth = __esm({
+  "server/auth.ts"() {
+    init_cookie2();
+    init_db();
+    init_crypto();
+    init_env();
+    CLIENT_COOKIE = "fpsllc_session";
+    ADMIN_COOKIE = "fpsllc_admin";
+    SESSION_DAYS = 30;
   }
 });
 
@@ -53191,6 +53791,76 @@ var init_agentBilling = __esm({
   }
 });
 
+// server/training.ts
+import { AsyncLocalStorage as AsyncLocalStorage2 } from "node:async_hooks";
+function trainingRefusal() {
+  throw new HTTPException(409, { res: Response.json({ error: {
+    code: "TRAINING_ONLY",
+    message: "Training account: real payments, card storage and account credentials are disabled. You can practice changes and document uploads. Emails are suppressed."
+  } }, { status: 409 }) });
+}
+async function trainingRecipient(email) {
+  if (!email) return false;
+  const db = await getDb();
+  return (await db.query("SELECT id FROM clients WHERE is_training AND lower(email)=lower($1)", [email])).length > 0;
+}
+async function trainingTarget(id) {
+  if (!id || !uuid2.test(id)) return false;
+  const db = await getDb();
+  const rows = await db.query(`WITH owned AS (
+    SELECT id AS target, id AS client_id FROM clients
+    UNION ALL SELECT id,client_id FROM orders
+    UNION ALL SELECT id,client_id FROM service_orders
+    UNION ALL SELECT id,client_id FROM documents
+    UNION ALL SELECT r.id,o.client_id FROM ra_renewals r JOIN orders o ON o.id=r.order_id
+  ), targets AS (
+    SELECT client_id FROM owned WHERE target=$1::uuid
+    UNION ALL SELECT x.client_id FROM office_operations op JOIN owned x ON x.target=op.target_id WHERE op.id=$1::uuid
+  ) SELECT 1 FROM targets JOIN clients c ON c.id=targets.client_id WHERE c.is_training LIMIT 1`, [id]);
+  return rows.length > 0;
+}
+var context, inTraining, withTraining, uuid2, trainingMiddleware;
+var init_training = __esm({
+  "server/training.ts"() {
+    init_http_exception();
+    init_db();
+    init_auth();
+    context = new AsyncLocalStorage2();
+    inTraining = () => context.getStore() === true;
+    withTraining = (work) => context.run(true, work);
+    uuid2 = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    trainingMiddleware = async (c, next) => {
+      const path = c.req.path;
+      let training = false;
+      if (path.startsWith("/api/admin/")) {
+        if (await getAdminSession(c)) {
+          const match2 = path.match(/^\/api\/admin\/(?:orders|services|clients|documents|office-operations)\/([0-9a-f-]{36})(?:\/|$)/i);
+          if (match2) training = await trainingTarget(match2[1]);
+          if (path === "/api/admin/documents" && c.req.method === "POST") {
+            const upload2 = c.req.header("x-office-upload");
+            if (upload2 && uuid2.test(upload2)) {
+              const [stage] = await (await getDb()).query("SELECT fields FROM office_upload_stages WHERE id=$1", [upload2]);
+              training = await trainingTarget(stage?.fields.find(([key]) => key === "clientId")?.[1]);
+            } else if (c.req.header("content-type")?.includes("multipart/form-data")) {
+              const body = await c.req.parseBody();
+              training = typeof body.clientId === "string" && await trainingTarget(body.clientId);
+            }
+          }
+        }
+      } else if (path.startsWith("/api/portal/") || path.startsWith("/api/auth/") || path.startsWith("/api/orders") || path === "/api/contact") {
+        const session = await getSession(c);
+        training = await trainingTarget(session?.clientId ?? void 0);
+      }
+      const capability = path.match(/^\/api\/(?:agent-checkout\/(?:order|renewal)|orders)\/([0-9a-f-]{36})(?:\/|$)/i);
+      if (capability) training ||= await trainingTarget(capability[1]);
+      if (!training) return next();
+      c.header("X-Training-Account", "true");
+      if (path.includes("/renewal-card") || path.startsWith("/api/agent-checkout/") || path.startsWith("/api/portal/account/") || /\/admin\/clients\/[^/]+\/email$/.test(path) || c.req.method === "POST" && (path === "/api/orders" || /^\/api\/portal\/services\/(ein|s-election|series|certificate)$/.test(path))) trainingRefusal();
+      return withTraining(next);
+    };
+  }
+});
+
 // server/email.ts
 async function recordMail(mail, ok, providerId, error2) {
   try {
@@ -53204,6 +53874,10 @@ async function recordMail(mail, ok, providerId, error2) {
   }
 }
 async function sendMail(mail, options = {}) {
+  if (inTraining() || await trainingRecipient(mail.to) || await trainingRecipient(mail.replyTo)) {
+    await recordMail(mail, false, "training-suppressed", "Training email suppressed; no provider request");
+    return "training-suppressed";
+  }
   if (!env.RESEND_API_KEY) {
     if (env.isProd) {
       await recordMail(mail, false, null, "Email provider is not configured");
@@ -53575,6 +54249,7 @@ var init_email = __esm({
     init_agentBilling();
     init_env();
     init_db();
+    init_training();
     devOutbox = [];
     wrap = (inner) => `
 <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1c2530;max-width:560px;margin:0 auto;padding:24px">
@@ -78127,7 +78802,7 @@ function calculateSHA384(data, offset, length) {
   );
 }
 var encodeRevision6Password, ARCFourCipher, calculateMD5, Word64, calculateSHA256, calculateSHA512, NullCipher, AESBaseCipher, AES128Cipher, AES256Cipher, PDF17, getNodeCrypto, jsPdf20Hash, jsPdf20Encrypt, PDF20, CipherTransform, CipherTransformFactory;
-var init_crypto = __esm({
+var init_crypto2 = __esm({
   "node_modules/@cantoo/pdf-lib/es/core/crypto.js"() {
     init_arrays();
     init_strings();
@@ -80817,7 +81492,7 @@ var init_crypto = __esm({
 var ALGORITHM_PROFILES, DEFAULT_ALGORITHM, AES256_EXTENSION_LEVEL, PDFSecurity, generateRandomFileId, aesEncryptFn, getPermissionsR2, getPermissionsR3, getUserPasswordR2, getUserPasswordR3R4, getOwnerPasswordR2R3R4, getEncryptionKeyR2R3R4, pdf20, r6PasswordEntry, r6WrappedKey, processPasswordR2R3R4, md5, rc4, aesCbcEncrypt, pkcs7Pad, lsbFirstBytes, ZERO_IV, EMPTY_BYTES, AESV2_SALT, PERMS_SUFFIX, PASSWORD_PADDING, PDFSecurity_default;
 var init_PDFSecurity = __esm({
   "node_modules/@cantoo/pdf-lib/es/core/security/PDFSecurity.js"() {
-    init_crypto();
+    init_crypto2();
     init_PDFHeader();
     init_PDFDict();
     init_PDFName();
@@ -91368,7 +92043,7 @@ var init_PDFDocument = __esm({
     init_PDFJavaScript();
     init_JavaScriptEmbedder();
     init_PDFJavaScriptAction();
-    init_crypto();
+    init_crypto2();
     init_PDFSvg();
     init_PDFSecurity();
     init_snapshot();
@@ -97509,38 +98184,8 @@ var init_s_election_recovery = __esm({
   }
 });
 
-// node_modules/hono/dist/http-exception.js
-var HTTPException = class extends Error {
-  res;
-  status;
-  /**
-   * Creates an instance of `HTTPException`.
-   * @param status - HTTP status code for the exception. Defaults to 500.
-   * @param options - Additional options for the exception.
-   */
-  constructor(status = 500, options) {
-    super(options?.message, { cause: options?.cause });
-    this.res = options?.res;
-    this.status = status;
-  }
-  /**
-   * Returns the response object associated with the exception.
-   * If a response object is not provided, a new response is created with the error message and status code.
-   * @returns The response object.
-   */
-  getResponse() {
-    if (this.res) {
-      const newResponse = new Response(this.res.body, {
-        status: this.status,
-        headers: this.res.headers
-      });
-      return newResponse;
-    }
-    return new Response(this.message, {
-      status: this.status
-    });
-  }
-};
+// server/office-uploads.ts
+init_http_exception();
 
 // node_modules/zod/v3/external.js
 var external_exports = {};
@@ -101840,540 +102485,8 @@ async function generateClientTokenFromReadWriteToken({
 init_db();
 init_env();
 
-// node_modules/hono/dist/utils/url.js
-var splitPath = (path) => {
-  const paths = path.split("/");
-  if (paths[0] === "") {
-    paths.shift();
-  }
-  return paths;
-};
-var splitRoutingPath = (routePath) => {
-  const { groups, path } = extractGroupsFromPath(routePath);
-  const paths = splitPath(path);
-  return replaceGroupMarks(paths, groups);
-};
-var extractGroupsFromPath = (path) => {
-  const groups = [];
-  path = path.replace(/\{[^}]+\}/g, (match2, index2) => {
-    const mark = `@${index2}`;
-    groups.push([mark, match2]);
-    return mark;
-  });
-  return { groups, path };
-};
-var replaceGroupMarks = (paths, groups) => {
-  for (let i = groups.length - 1; i >= 0; i--) {
-    const [mark] = groups[i];
-    for (let j = paths.length - 1; j >= 0; j--) {
-      if (paths[j].includes(mark)) {
-        paths[j] = paths[j].replace(mark, groups[i][1]);
-        break;
-      }
-    }
-  }
-  return paths;
-};
-var patternCache = {};
-var getPattern = (label, next) => {
-  if (label === "*") {
-    return "*";
-  }
-  const match2 = label.match(/^\:([^\{\}]+)(?:\{(.+)\})?$/);
-  if (match2) {
-    const cacheKey = `${label}#${next}`;
-    if (!patternCache[cacheKey]) {
-      if (match2[2]) {
-        patternCache[cacheKey] = next && next[0] !== ":" && next[0] !== "*" ? [cacheKey, match2[1], new RegExp(`^${match2[2]}(?=/${next})`)] : [label, match2[1], new RegExp(`^${match2[2]}$`)];
-      } else {
-        patternCache[cacheKey] = [label, match2[1], true];
-      }
-    }
-    return patternCache[cacheKey];
-  }
-  return null;
-};
-var tryDecode = (str, decoder) => {
-  try {
-    return decoder(str);
-  } catch {
-    return str.replace(/(?:%[0-9A-Fa-f]{2})+/g, (match2) => {
-      try {
-        return decoder(match2);
-      } catch {
-        return match2;
-      }
-    });
-  }
-};
-var tryDecodeURI = (str) => tryDecode(str, decodeURI);
-var getPath = (request) => {
-  const url = request.url;
-  const start = url.indexOf("/", url.indexOf(":") + 4);
-  let i = start;
-  for (; i < url.length; i++) {
-    const charCode = url.charCodeAt(i);
-    if (charCode === 37) {
-      const queryIndex = url.indexOf("?", i);
-      const hashIndex = url.indexOf("#", i);
-      const end = queryIndex === -1 ? hashIndex === -1 ? void 0 : hashIndex : hashIndex === -1 ? queryIndex : Math.min(queryIndex, hashIndex);
-      const path = url.slice(start, end);
-      return tryDecodeURI(path.includes("%25") ? path.replace(/%25/g, "%2525") : path);
-    } else if (charCode === 63 || charCode === 35) {
-      break;
-    }
-  }
-  return url.slice(start, i);
-};
-var getPathNoStrict = (request) => {
-  const result = getPath(request);
-  return result.length > 1 && result.at(-1) === "/" ? result.slice(0, -1) : result;
-};
-var mergePath = (base, sub, ...rest) => {
-  if (rest.length) {
-    sub = mergePath(sub, ...rest);
-  }
-  return `${base?.[0] === "/" ? "" : "/"}${base}${sub === "/" ? "" : `${base?.at(-1) === "/" ? "" : "/"}${sub?.[0] === "/" ? sub.slice(1) : sub}`}`;
-};
-var checkOptionalParameter = (path) => {
-  if (path.charCodeAt(path.length - 1) !== 63 || !path.includes(":")) {
-    return null;
-  }
-  const segments = path.split("/");
-  const results = [];
-  let basePath = "";
-  segments.forEach((segment) => {
-    if (segment !== "" && !/\:/.test(segment)) {
-      basePath += "/" + segment;
-    } else if (/\:/.test(segment)) {
-      if (segment.charCodeAt(segment.length - 1) === 63) {
-        if (results.length === 0 && basePath === "") {
-          results.push("/");
-        } else {
-          results.push(basePath);
-        }
-        const optionalSegment = segment.slice(0, -1);
-        basePath += "/" + optionalSegment;
-        results.push(basePath);
-      } else {
-        basePath += "/" + segment;
-      }
-    }
-  });
-  return results.filter((v2, i, a2) => a2.indexOf(v2) === i);
-};
-var tryDecodeURIComponent = (str) => str.indexOf("%") !== -1 ? tryDecode(str, decodeURIComponent_) : str;
-var _decodeURI = (value) => {
-  if (value.indexOf("+") !== -1) {
-    value = value.replace(/\+/g, " ");
-  }
-  return tryDecodeURIComponent(value);
-};
-var _getQueryParam = (url, key, multiple) => {
-  const hashIndex = url.indexOf("#", 8);
-  if (hashIndex !== -1) {
-    url = url.slice(0, hashIndex);
-  }
-  let encoded2;
-  if (!multiple && key && key.indexOf("%") === -1 && key.indexOf("+") === -1) {
-    let keyIndex2 = url.indexOf("?", 8);
-    if (keyIndex2 === -1) {
-      return void 0;
-    }
-    if (!url.startsWith(key, keyIndex2 + 1)) {
-      keyIndex2 = url.indexOf(`&${key}`, keyIndex2 + 1);
-    }
-    while (keyIndex2 !== -1) {
-      const trailingKeyCode = url.charCodeAt(keyIndex2 + key.length + 1);
-      if (trailingKeyCode === 61) {
-        const valueIndex = keyIndex2 + key.length + 2;
-        const endIndex = url.indexOf("&", valueIndex);
-        return _decodeURI(url.slice(valueIndex, endIndex === -1 ? void 0 : endIndex));
-      } else if (trailingKeyCode == 38 || isNaN(trailingKeyCode)) {
-        return "";
-      }
-      keyIndex2 = url.indexOf(`&${key}`, keyIndex2 + 1);
-    }
-    encoded2 = /[%+]/.test(url);
-    if (!encoded2) {
-      return void 0;
-    }
-  }
-  const results = /* @__PURE__ */ Object.create(null);
-  encoded2 ??= /[%+]/.test(url);
-  let keyIndex = url.indexOf("?", 8);
-  while (keyIndex !== -1) {
-    const nextKeyIndex = url.indexOf("&", keyIndex + 1);
-    let valueIndex = url.indexOf("=", keyIndex);
-    if (valueIndex > nextKeyIndex && nextKeyIndex !== -1) {
-      valueIndex = -1;
-    }
-    let name = url.slice(
-      keyIndex + 1,
-      valueIndex === -1 ? nextKeyIndex === -1 ? void 0 : nextKeyIndex : valueIndex
-    );
-    if (encoded2) {
-      name = _decodeURI(name);
-    }
-    keyIndex = nextKeyIndex;
-    if (name === "") {
-      continue;
-    }
-    let value;
-    if (valueIndex === -1) {
-      value = "";
-    } else {
-      value = url.slice(valueIndex + 1, nextKeyIndex === -1 ? void 0 : nextKeyIndex);
-      if (encoded2) {
-        value = _decodeURI(value);
-      }
-    }
-    if (multiple) {
-      if (!(results[name] && Array.isArray(results[name]))) {
-        results[name] = [];
-      }
-      ;
-      results[name].push(value);
-    } else {
-      results[name] ??= value;
-    }
-  }
-  return key ? results[key] : results;
-};
-var getQueryParam = _getQueryParam;
-var getQueryParams = (url, key) => {
-  return _getQueryParam(url, key, true);
-};
-var decodeURIComponent_ = decodeURIComponent;
-
-// node_modules/hono/dist/utils/cookie.js
-var validCookieNameRegEx = /^[\w!#$%&'*.^`|~+-]+$/;
-var relaxedCookieNameRegEx = /^[!#-:<>-[\]-~]+$/;
-var validCookieValueRegEx = /^[ !#-:<-[\]-~]*$/;
-var trimCookieWhitespace = (value) => {
-  let start = 0;
-  let end = value.length;
-  while (start < end) {
-    const charCode = value.charCodeAt(start);
-    if (charCode !== 32 && charCode !== 9) {
-      break;
-    }
-    start++;
-  }
-  while (end > start) {
-    const charCode = value.charCodeAt(end - 1);
-    if (charCode !== 32 && charCode !== 9) {
-      break;
-    }
-    end--;
-  }
-  return start === 0 && end === value.length ? value : value.slice(start, end);
-};
-var parse = (cookie, name) => {
-  if (name && cookie.indexOf(name) === -1) {
-    return {};
-  }
-  const pairs = cookie.split(";");
-  const parsedCookie = /* @__PURE__ */ Object.create(null);
-  for (const pairStr of pairs) {
-    const valueStartPos = pairStr.indexOf("=");
-    if (valueStartPos === -1) {
-      continue;
-    }
-    const cookieName = trimCookieWhitespace(pairStr.substring(0, valueStartPos));
-    if (name && name !== cookieName || !relaxedCookieNameRegEx.test(cookieName) || cookieName in parsedCookie) {
-      continue;
-    }
-    let cookieValue = trimCookieWhitespace(pairStr.substring(valueStartPos + 1));
-    if (cookieValue.startsWith('"') && cookieValue.endsWith('"')) {
-      cookieValue = cookieValue.slice(1, -1);
-    }
-    if (validCookieValueRegEx.test(cookieValue)) {
-      parsedCookie[cookieName] = tryDecodeURIComponent(cookieValue);
-      if (name) {
-        break;
-      }
-    }
-  }
-  return parsedCookie;
-};
-var _serialize = (name, value, opt = {}) => {
-  if (!validCookieNameRegEx.test(name)) {
-    throw new Error("Invalid cookie name");
-  }
-  let cookie = `${name}=${value}`;
-  if (name.startsWith("__Secure-") && !opt.secure) {
-    throw new Error("__Secure- Cookie must have Secure attributes");
-  }
-  if (name.startsWith("__Host-")) {
-    if (!opt.secure) {
-      throw new Error("__Host- Cookie must have Secure attributes");
-    }
-    if (opt.path !== "/") {
-      throw new Error('__Host- Cookie must have Path attributes with "/"');
-    }
-    if (opt.domain) {
-      throw new Error("__Host- Cookie must not have Domain attributes");
-    }
-  }
-  for (const key of ["domain", "path", "sameSite", "priority"]) {
-    if (opt[key] && /[;\r\n]/.test(opt[key])) {
-      throw new Error(`${key} must not contain ";", "\\r", or "\\n"`);
-    }
-  }
-  if (opt && typeof opt.maxAge === "number" && opt.maxAge >= 0) {
-    if (opt.maxAge > 3456e4) {
-      throw new Error(
-        "Cookies Max-Age SHOULD NOT be greater than 400 days (34560000 seconds) in duration."
-      );
-    }
-    cookie += `; Max-Age=${opt.maxAge | 0}`;
-  }
-  if (opt.domain && opt.prefix !== "host") {
-    cookie += `; Domain=${opt.domain}`;
-  }
-  if (opt.path) {
-    cookie += `; Path=${opt.path}`;
-  }
-  if (opt.expires) {
-    if (opt.expires.getTime() - Date.now() > 3456e7) {
-      throw new Error(
-        "Cookies Expires SHOULD NOT be greater than 400 days (34560000 seconds) in the future."
-      );
-    }
-    cookie += `; Expires=${opt.expires.toUTCString()}`;
-  }
-  if (opt.httpOnly) {
-    cookie += "; HttpOnly";
-  }
-  if (opt.secure) {
-    cookie += "; Secure";
-  }
-  if (opt.sameSite) {
-    cookie += `; SameSite=${opt.sameSite.charAt(0).toUpperCase() + opt.sameSite.slice(1)}`;
-  }
-  if (opt.priority) {
-    cookie += `; Priority=${opt.priority.charAt(0).toUpperCase() + opt.priority.slice(1)}`;
-  }
-  if (opt.partitioned) {
-    if (!opt.secure) {
-      throw new Error("Partitioned Cookie must have Secure attributes");
-    }
-    cookie += "; Partitioned";
-  }
-  return cookie;
-};
-var serialize = (name, value, opt) => {
-  value = encodeURIComponent(value);
-  return _serialize(name, value, opt);
-};
-
-// node_modules/hono/dist/helper/cookie/index.js
-var getCookie = (c, key, prefix) => {
-  const cookie = c.req.raw.headers.get("Cookie");
-  if (typeof key === "string") {
-    if (!cookie) {
-      return void 0;
-    }
-    let finalKey = key;
-    if (prefix === "secure") {
-      finalKey = "__Secure-" + key;
-    } else if (prefix === "host") {
-      finalKey = "__Host-" + key;
-    }
-    const obj2 = parse(cookie, finalKey);
-    return obj2[finalKey];
-  }
-  if (!cookie) {
-    return {};
-  }
-  const obj = parse(cookie);
-  return obj;
-};
-var generateCookie = (name, value, opt) => {
-  let cookie;
-  if (opt?.prefix === "secure") {
-    cookie = serialize("__Secure-" + name, value, { path: "/", ...opt, secure: true });
-  } else if (opt?.prefix === "host") {
-    cookie = serialize("__Host-" + name, value, {
-      ...opt,
-      path: "/",
-      secure: true,
-      domain: void 0
-    });
-  } else {
-    cookie = serialize(name, value, { path: "/", ...opt });
-  }
-  return cookie;
-};
-var setCookie = (c, name, value, opt) => {
-  const cookie = generateCookie(name, value, opt);
-  c.header("Set-Cookie", cookie, { append: true });
-};
-var deleteCookie = (c, name, opt) => {
-  const deletedCookie = getCookie(c, name, opt?.prefix);
-  setCookie(c, name, "", { ...opt, maxAge: 0 });
-  return deletedCookie;
-};
-
-// server/auth.ts
-init_db();
-
-// server/crypto.ts
-init_env();
-init_encryption();
-import {
-  randomBytes as randomBytes2,
-  scrypt as scryptCb,
-  timingSafeEqual as timingSafeEqual2,
-  createHash as createHash3,
-  createHmac as createHmac2,
-  createDecipheriv as createDecipheriv2,
-  hkdfSync
-} from "node:crypto";
-function scrypt(password, salt) {
-  return new Promise(
-    (resolve3, reject2) => scryptCb(password, salt, 64, (err3, key) => err3 ? reject2(err3) : resolve3(key))
-  );
-}
-async function hashPassword(password) {
-  const salt = randomBytes2(16);
-  const key = await scrypt(password, salt);
-  return `s1:${salt.toString("hex")}:${key.toString("hex")}`;
-}
-async function verifyPassword(password, stored) {
-  const [v2, saltHex, keyHex] = stored.split(":");
-  if (v2 !== "s1" || !saltHex || !keyHex) return false;
-  const key = await scrypt(password, Buffer.from(saltHex, "hex"));
-  const expected = Buffer.from(keyHex, "hex");
-  return key.length === expected.length && timingSafeEqual2(key, expected);
-}
-function newToken() {
-  const token = randomBytes2(32).toString("base64url");
-  return { token, tokenHash: hashToken(token) };
-}
-function hashToken(token) {
-  return createHash3("sha256").update(token).digest("hex");
-}
-function hmacSha256Base64(key, message) {
-  return createHmac2("sha256", key).update(message).digest("base64");
-}
-function secretKey() {
-  return Buffer.from(hkdfSync("sha256", process.env.LEGACY_SESSION_SECRET || env.SESSION_SECRET, "fpsllc-ein-v1", "ein-encryption", 32));
-}
-function encryptSecret(plain) {
-  return `v2:${seal(Buffer.from(plain)).toString("base64")}`;
-}
-var SecretFormatError = class extends Error {
-};
-function decryptSecret(stored) {
-  if (stored.startsWith("v2:")) return unseal(Buffer.from(stored.slice(3), "base64")).toString();
-  const [v2, ivHex, tagHex, ctHex] = stored.split(":");
-  if (v2 !== "v1" || !ivHex || !tagHex || !ctHex) throw new SecretFormatError("bad secret format");
-  const decipher = createDecipheriv2("aes-256-gcm", secretKey(), Buffer.from(ivHex, "hex"));
-  decipher.setAuthTag(Buffer.from(tagHex, "hex"));
-  return Buffer.concat([decipher.update(Buffer.from(ctHex, "hex")), decipher.final()]).toString("utf8");
-}
-
-// server/auth.ts
-init_env();
-var CLIENT_COOKIE = "fpsllc_session";
-var ADMIN_COOKIE = "fpsllc_admin";
-var SESSION_DAYS = 30;
-function sessionCredentials(hours) {
-  return { ...newToken(), expires: new Date(Date.now() + (hours ? hours * 36e5 : SESSION_DAYS * 864e5)) };
-}
-function setSessionCookie(c, credentials, isAdmin = false) {
-  setCookie(c, isAdmin ? ADMIN_COOKIE : CLIENT_COOKIE, credentials.token, {
-    httpOnly: true,
-    secure: env.isProd,
-    sameSite: "Lax",
-    path: "/",
-    expires: credentials.expires
-  });
-}
-async function createSession(c, opts) {
-  const db = await getDb();
-  const credentials = sessionCredentials(opts.hours);
-  if (opts.clientId) {
-    const rows = await db.query(
-      `INSERT INTO sessions
-      (token_hash, client_id, is_admin, viewing_as_admin, expires_at, password_version)
-      SELECT $1, id, $3, $4, $5, password_version FROM clients
-      WHERE id=$2 AND ($6::text IS NULL OR password_hash=$6) RETURNING token_hash`,
-      [
-        credentials.tokenHash,
-        opts.clientId,
-        opts.isAdmin ?? false,
-        opts.viewingAsAdmin ?? false,
-        credentials.expires.toISOString(),
-        opts.verifiedPasswordHash ?? null
-      ]
-    );
-    if (!rows.length) return false;
-  } else {
-    await db.query(
-      "INSERT INTO sessions (token_hash, client_id, is_admin, viewing_as_admin, expires_at) VALUES ($1, $2, $3, $4, $5)",
-      [credentials.tokenHash, null, opts.isAdmin ?? false, opts.viewingAsAdmin ?? false, credentials.expires.toISOString()]
-    );
-  }
-  setSessionCookie(c, credentials, opts.isAdmin);
-  return true;
-}
-async function lookup(c, cookieName) {
-  const token = getCookie(c, cookieName);
-  if (!token) return null;
-  const db = await getDb();
-  const tokenHash = hashToken(token);
-  const rows = await db.query(
-    `SELECT s.client_id, s.is_admin, s.viewing_as_admin FROM sessions s
-      LEFT JOIN clients c ON c.id=s.client_id
-      WHERE s.token_hash=$1 AND s.expires_at>now()
-        AND (s.client_id IS NULL OR s.password_version=c.password_version)`,
-    [tokenHash]
-  );
-  if (rows.length === 0) return null;
-  return { clientId: rows[0].client_id, isAdmin: rows[0].is_admin, tokenHash, viewingAsAdmin: rows[0].viewing_as_admin };
-}
-async function getSession(c) {
-  const s = await lookup(c, CLIENT_COOKIE);
-  return s?.clientId ? s : null;
-}
-async function getAdminSession(c) {
-  const s = await lookup(c, ADMIN_COOKIE);
-  return s?.isAdmin ? s : null;
-}
-async function destroySession(c, role = "client") {
-  const cookieName = role === "admin" ? ADMIN_COOKIE : CLIENT_COOKIE;
-  const token = getCookie(c, cookieName);
-  if (token) {
-    const db = await getDb();
-    await db.query("DELETE FROM sessions WHERE token_hash = $1", [hashToken(token)]);
-  }
-  deleteCookie(c, cookieName, { path: "/" });
-}
-async function rateLimit(key, max, windowMs, failMode = "open") {
-  try {
-    const db = await getDb();
-    const rows = await db.query(
-      `INSERT INTO rate_limits (key, window_start, count) VALUES ($1, now(), 1)
-       ON CONFLICT (key) DO UPDATE SET
-         count = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
-                      THEN 1 ELSE rate_limits.count + 1 END,
-         window_start = CASE WHEN rate_limits.window_start < now() - make_interval(secs => $2)
-                             THEN now() ELSE rate_limits.window_start END
-       RETURNING count`,
-      [key, windowMs / 1e3]
-    );
-    return rows[0].count <= max;
-  } catch (e) {
-    console.error(`[rateLimit] check failed, failing ${failMode}:`, e);
-    return failMode === "open";
-  }
-}
-function clientIp(c) {
-  return c.req.header("x-forwarded-for")?.split(",")[0].trim() || c.req.header("x-real-ip") || "local";
-}
+// server/shared.ts
+init_auth();
 
 // src/lib/uploadLimits.ts
 var MAX_UPLOAD_BYTES = 40 * 1024 * 1024;
@@ -102412,7 +102525,7 @@ init_operation_deadline();
 init_office_file_recovery();
 init_office_recovery_sources();
 init_office_history_recovery();
-var uuid2 = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
+var uuid3 = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
 var spec = external_exports.object({ field: external_exports.string().min(1), name: external_exports.string().min(1), size: external_exports.number().int().min(8).max(MAX_UPLOAD_BYTES), sha: external_exports.string().regex(/^[a-f0-9]{64}$/) }).strict();
 var initial = external_exports.object({ route: external_exports.string(), fields: external_exports.array(external_exports.tuple([external_exports.string(), external_exports.string()])), files: external_exports.array(spec).min(1) }).strict();
 var requests = /* @__PURE__ */ new WeakMap();
@@ -102422,18 +102535,18 @@ function reject(message, code, status = 400) {
 }
 function slots(route) {
   if (/^\/api\/admin\/library\/[^/]+$/.test(route) || route === "/api/admin/documents") return ["file"];
-  if (new RegExp(`^/api/admin/documents/${uuid2}/replace$`).test(route)) return ["file"];
-  if (new RegExp(`^/api/admin/services/${uuid2}/fulfill$`).test(route)) return ["file"];
-  if (new RegExp(`^/api/admin/orders/${uuid2}/(?:articles|correct-articles)$`).test(route)) return ["articles"];
-  if (new RegExp(`^/api/admin/orders/${uuid2}/certificates$`).test(route)) return ["certStatus", "certifiedCopy"];
-  if (new RegExp(`^/api/admin/orders/${uuid2}/formation-documents$`).test(route)) return ["articles", "psd", "certStatus", "certifiedCopy"];
-  if (new RegExp(`^/api/admin/orders/${uuid2}/agent-copy$`).test(route)) return ["file"];
-  if (new RegExp(`^/api/admin/orders/${uuid2}/office-recovery/${uuid2}/(?:articles|statement|upload)$`).test(route)) return ["file"];
+  if (new RegExp(`^/api/admin/documents/${uuid3}/replace$`).test(route)) return ["file"];
+  if (new RegExp(`^/api/admin/services/${uuid3}/fulfill$`).test(route)) return ["file"];
+  if (new RegExp(`^/api/admin/orders/${uuid3}/(?:articles|correct-articles)$`).test(route)) return ["articles"];
+  if (new RegExp(`^/api/admin/orders/${uuid3}/certificates$`).test(route)) return ["certStatus", "certifiedCopy"];
+  if (new RegExp(`^/api/admin/orders/${uuid3}/formation-documents$`).test(route)) return ["articles", "psd", "certStatus", "certifiedCopy"];
+  if (new RegExp(`^/api/admin/orders/${uuid3}/agent-copy$`).test(route)) return ["file"];
+  if (new RegExp(`^/api/admin/orders/${uuid3}/office-recovery/${uuid3}/(?:articles|statement|upload)$`).test(route)) return ["file"];
   if (/^\/api\/admin\/backups\/history-recovery\/[a-f0-9]{64}\/original$/.test(route)) return ["file"];
   return null;
 }
 async function authorizeTarget(route, fields2) {
-  const db = await getDb(), order2 = route.match(new RegExp(`^/api/admin/orders/(${uuid2})/`)), service = route.match(new RegExp(`^/api/admin/services/(${uuid2})/`)), document2 = route.match(new RegExp(`^/api/admin/documents/(${uuid2})/replace$`));
+  const db = await getDb(), order2 = route.match(new RegExp(`^/api/admin/orders/(${uuid3})/`)), service = route.match(new RegExp(`^/api/admin/services/(${uuid3})/`)), document2 = route.match(new RegExp(`^/api/admin/documents/(${uuid3})/replace$`));
   if (order2 || service) {
     const table = order2 ? "orders" : "service_orders";
     const [r] = await db.query(`SELECT id FROM ${table} WHERE id=$1 AND paid_at IS NOT NULL AND status NOT IN ('pending_payment','duplicate_payment')`, [(order2 || service)[1]]);
@@ -102601,7 +102714,7 @@ function registerOfficeUploads(app2) {
     const admin = await requireAdmin(c);
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const id = c.req.param("id");
-    if (!new RegExp(`^${uuid2}$`).test(id)) return c.json(err("Upload not found.", "NOT_FOUND"), 404);
+    if (!new RegExp(`^${uuid3}$`).test(id)) return c.json(err("Upload not found.", "NOT_FOUND"), 404);
     const [stage] = await (await getDb()).query("SELECT * FROM office_upload_stages WHERE id=$1 AND session_hash=$2", [id, admin.tokenHash]);
     if (!stage) return c.json(err("Upload not found.", "NOT_FOUND"), 404);
     c.header("cache-control", "no-store");
@@ -102615,7 +102728,7 @@ function registerOfficeUploads(app2) {
   app2.use("/admin/*", async (c, next) => {
     const id = c.req.header("x-office-upload");
     if (!id) return next();
-    if (c.req.method !== "POST" || !slots(c.req.path) || !new RegExp(`^${uuid2}$`).test(id)) return c.json(err("Invalid upload reference.", "INVALID_UPLOAD"), 400);
+    if (c.req.method !== "POST" || !slots(c.req.path) || !new RegExp(`^${uuid3}$`).test(id)) return c.json(err("Invalid upload reference.", "INVALID_UPLOAD"), 400);
     const finalBody = await c.req.json().catch(() => null);
     if (!finalBody || Object.keys(finalBody).length !== 1 || finalBody.uploadId !== id) return c.json(err("Upload metadata cannot be changed after authorization.", "INVALID_UPLOAD"), 400);
     const admin = await requireAdmin(c);
@@ -102647,64 +102760,8 @@ function registerOfficeUploads(app2) {
   });
 }
 
-// server/training.ts
-import { AsyncLocalStorage as AsyncLocalStorage2 } from "node:async_hooks";
-init_db();
-var context = new AsyncLocalStorage2();
-var withTraining = (work) => context.run(true, work);
-var uuid3 = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-function trainingRefusal() {
-  throw new HTTPException(409, { res: Response.json({ error: {
-    code: "TRAINING_ONLY",
-    message: "Training account: real payments, card storage and account credentials are disabled. You can practice changes and document uploads. Emails are suppressed."
-  } }, { status: 409 }) });
-}
-async function trainingTarget(id) {
-  if (!id || !uuid3.test(id)) return false;
-  const db = await getDb();
-  const rows = await db.query(`WITH owned AS (
-    SELECT id AS target, id AS client_id FROM clients
-    UNION ALL SELECT id,client_id FROM orders
-    UNION ALL SELECT id,client_id FROM service_orders
-    UNION ALL SELECT id,client_id FROM documents
-    UNION ALL SELECT r.id,o.client_id FROM ra_renewals r JOIN orders o ON o.id=r.order_id
-  ), targets AS (
-    SELECT client_id FROM owned WHERE target=$1::uuid
-    UNION ALL SELECT x.client_id FROM office_operations op JOIN owned x ON x.target=op.target_id WHERE op.id=$1::uuid
-  ) SELECT 1 FROM targets JOIN clients c ON c.id=targets.client_id WHERE c.is_training LIMIT 1`, [id]);
-  return rows.length > 0;
-}
-var trainingMiddleware = async (c, next) => {
-  const path = c.req.path;
-  let training = false;
-  if (path.startsWith("/api/admin/")) {
-    if (await getAdminSession(c)) {
-      const match2 = path.match(/^\/api\/admin\/(?:orders|services|clients|documents|office-operations)\/([0-9a-f-]{36})(?:\/|$)/i);
-      if (match2) training = await trainingTarget(match2[1]);
-      if (path === "/api/admin/documents" && c.req.method === "POST") {
-        const upload2 = c.req.header("x-office-upload");
-        if (upload2 && uuid3.test(upload2)) {
-          const [stage] = await (await getDb()).query("SELECT fields FROM office_upload_stages WHERE id=$1", [upload2]);
-          training = await trainingTarget(stage?.fields.find(([key]) => key === "clientId")?.[1]);
-        } else if (c.req.header("content-type")?.includes("multipart/form-data")) {
-          const body = await c.req.parseBody();
-          training = typeof body.clientId === "string" && await trainingTarget(body.clientId);
-        }
-      }
-    }
-  } else if (path.startsWith("/api/portal/") || path.startsWith("/api/auth/") || path.startsWith("/api/orders") || path === "/api/contact") {
-    const session = await getSession(c);
-    training = await trainingTarget(session?.clientId ?? void 0);
-  }
-  const capability = path.match(/^\/api\/(?:agent-checkout\/(?:order|renewal)|orders)\/([0-9a-f-]{36})(?:\/|$)/i);
-  if (capability) training ||= await trainingTarget(capability[1]);
-  if (!training) return next();
-  c.header("X-Training-Account", "true");
-  if (path.includes("/renewal-card") || path.startsWith("/api/agent-checkout/") || path.startsWith("/api/portal/account/") || /\/admin\/clients\/[^/]+\/email$/.test(path) || c.req.method === "POST" && (path === "/api/orders" || /^\/api\/portal\/services\/(ein|s-election|series|certificate)$/.test(path))) trainingRefusal();
-  return withTraining(next);
-};
-
 // server/app.ts
+init_training();
 init_office_operation();
 init_office_recovery_sources();
 
@@ -102840,13 +102897,18 @@ function registerOfficeRecovery(app2) {
   });
 }
 
+// server/app.ts
+init_http_exception();
+
 // server/ra-checkout.ts
 init_db();
 init_env();
+init_crypto();
 
 // server/square.ts
 init_db();
 init_env();
+init_crypto();
 import { createHash as createHash10, randomBytes as randomBytes5, timingSafeEqual as timingSafeEqual3 } from "node:crypto";
 var API_BASE = env.SQUARE_ENV === "production" ? "https://connect.squareup.com" : "https://connect.squareupsandbox.com";
 async function createCheckout(opts) {
@@ -105031,6 +105093,10 @@ async function fulfillPaidRenewal(renewalId, paymentId, simulate, cardAlreadySav
   await deliverAgentCorrespondence(renewalId);
 }
 
+// server/routes-payments.ts
+init_crypto();
+init_auth();
+
 // server/sunbiz.ts
 init_env();
 init_db();
@@ -105233,6 +105299,7 @@ init_email();
 init_agentBilling();
 
 // server/service-purchase.ts
+init_http_exception();
 init_db();
 async function seriesPurchaseIdentities(names, companyName) {
   const db = await getDb();
@@ -105304,6 +105371,7 @@ init_db();
 init_env();
 init_encryption();
 init_office_operation();
+init_crypto();
 init_storage();
 init_document_retention();
 init_backup_deletions();
@@ -105406,7 +105474,9 @@ async function verifyOfficeElectionPackage(db, op, serviceId, clientId, original
 
 // server/renewal-card.ts
 init_db();
+init_auth();
 init_env();
+init_crypto();
 init_agentBilling();
 var schema = external_exports.object({ attemptId: external_exports.string().uuid(), source: external_exports.string().min(1).max(4096).optional(), consent: external_exports.literal(true) });
 function registerRenewalCard(app2) {
@@ -106691,6 +106761,9 @@ function shareValue(mode, share) {
   const d2 = share.denominator ?? 0;
   return d2 > 0 ? (share.numerator ?? 0) / d2 * 100 : 0;
 }
+
+// server/routes-portal.ts
+init_crypto();
 
 // server/new-series.ts
 init_document_text();
@@ -111183,6 +111256,7 @@ function assembleAmendment(oa, am) {
 
 // server/routes-portal.ts
 init_pdf_render();
+init_auth();
 init_storage();
 init_email();
 var loginSchema = external_exports.object({ email: external_exports.string().email(), password: external_exports.string().min(1) });
@@ -114038,6 +114112,7 @@ function registerPaymentRoutes(app2) {
 }
 
 // server/ra-checkout.ts
+init_auth();
 init_agentBilling();
 async function target(kind, id) {
   const db = await getDb();
@@ -114434,6 +114509,9 @@ var compose = (middleware, onError, onNotFound) => {
   };
 };
 
+// node_modules/hono/dist/request.js
+init_http_exception();
+
 // node_modules/hono/dist/request/constants.js
 var GET_MATCH_RESULT = /* @__PURE__ */ Symbol();
 
@@ -114547,6 +114625,7 @@ var throwNestingLimitExceeded = () => {
 };
 
 // node_modules/hono/dist/request.js
+init_url();
 var HonoRequest = class {
   /**
    * `.raw` can get the raw Request object.
@@ -115307,6 +115386,7 @@ var UnsupportedPathError = class extends Error {
 var COMPOSED_HANDLER = "__COMPOSED_HANDLER";
 
 // node_modules/hono/dist/hono-base.js
+init_url();
 var notFoundHandler = (c) => {
   return c.text("404 Not Found", 404);
 };
@@ -115683,6 +115763,9 @@ var Hono = class _Hono {
   };
 };
 
+// node_modules/hono/dist/router/reg-exp-router/router.js
+init_url();
+
 // node_modules/hono/dist/router/utils.js
 var createNullObject = () => /* @__PURE__ */ Object.create(null);
 
@@ -116054,7 +116137,11 @@ var SmartRouter = class {
   }
 };
 
+// node_modules/hono/dist/router/trie-router/router.js
+init_url();
+
 // node_modules/hono/dist/router/trie-router/node.js
+init_url();
 var emptyParams = createNullObject();
 var order = 0;
 var Node2 = class _Node2 {
@@ -116667,7 +116754,9 @@ init_pdf_render();
 init_env();
 init_backup();
 init_dropbox();
+init_crypto();
 init_encryption();
+init_auth();
 init_storage();
 init_email();
 function registerAdminRoutes(app2) {
@@ -118070,6 +118159,7 @@ init_db();
 init_env();
 init_backup();
 init_dropbox();
+init_crypto();
 init_email();
 function registerOpsRoutes(app2) {
   if (!env.isProd) {

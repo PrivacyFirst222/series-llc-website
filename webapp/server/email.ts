@@ -2,6 +2,7 @@ import {ioSignal,activeDeadline,providerFailure} from './operation-deadline';
 import { RA_CANCELLATION } from "../src/lib/agentBilling";
 import { env } from "./env";
 import { getDb } from "./db";
+import { inTraining, trainingRecipient } from "./training";
 
 interface Mail {
   to: string;
@@ -34,6 +35,10 @@ async function recordMail(mail: Mail, ok: boolean, providerId: string | null, er
 /** Sends via Resend; development without a key records a simulated send,
  *  while production without a key refuses the send. */
 export async function sendMail(mail: Mail, options:{deadline?:number}={}): Promise<string> {
+  if (inTraining() || await trainingRecipient(mail.to) || await trainingRecipient(mail.replyTo)) {
+    await recordMail(mail, false, "training-suppressed", "Training email suppressed; no provider request");
+    return "training-suppressed";
+  }
   if (!env.RESEND_API_KEY) {
     if (env.isProd) {await recordMail(mail,false,null,"Email provider is not configured");throw new Error("Email provider is not configured");}
     console.log(`[email:dev] to=${mail.to} subject="${mail.subject}"\n${mail.html}`);
