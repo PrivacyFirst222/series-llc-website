@@ -103123,6 +103123,9 @@ async function squareRead(path) {
   return await response.json();
 }
 
+// server/routes-payments.ts
+init_training();
+
 // server/checkout-recovery.ts
 init_training();
 init_db();
@@ -104765,6 +104768,9 @@ function priceOrder(opts) {
   };
 }
 
+// server/renewals.ts
+init_training();
+
 // server/agent-correspondence.ts
 init_db();
 init_email();
@@ -105027,13 +105033,14 @@ async function runRenewals(today) {
   const db = await getDb(), out = { notices: 0, charged: 0, declined: 0, cancelled: 0, retried: 0 };
   const pending = await db.query("SELECT DISTINCT a.target_id FROM ra_payment_attempts a JOIN ra_renewals r ON r.id=a.target_id WHERE a.kind='renewal' AND a.status IN ('pending','approved','completed') AND r.status NOT IN ('charged','paid_by_link','cancelled') UNION SELECT ra_payment_target AS target_id FROM orders WHERE ra_payment_target IS NOT NULL");
   for (const a2 of pending) {
+    if (await trainingTarget(a2.target_id)) continue;
     try {
       await payAgentTarget("renewal", a2.target_id, { resumeOnly: true, billingDate: today, actor: "daily job" });
     } catch (error2) {
       console.error("[renewal] reconciliation needs attention", a2.target_id, error2);
     }
   }
-  const orders = await db.query("SELECT * FROM orders WHERE status='formed' AND ra_renewal_date IS NOT NULL AND payload->'registeredAgent'->>'choice'='SERVICE'");
+  const orders = await db.query("SELECT * FROM orders WHERE NOT EXISTS (SELECT 1 FROM clients c WHERE c.id=orders.client_id AND c.is_training) AND status='formed' AND ra_renewal_date IS NOT NULL AND payload->'registeredAgent'->>'choice'='SERVICE'");
   for (const o of orders) {
     if ((o.ra_ended_date || o.ra_replaced_at || o.ra_resignation_submitted) && !lateNoticeFee({ ...o, renewal_date: o.ra_renewal_date })) continue;
     const date2 = isoOf(o.ra_renewal_date);
@@ -105100,6 +105107,7 @@ async function runRenewals(today) {
   return out;
 }
 async function fulfillPaidRenewal(renewalId, paymentId, simulate, cardAlreadySaved = false, automatic2 = false) {
+  if (await trainingTarget(renewalId)) return;
   const db = await getDb();
   const [row] = await db.query(`SELECT r.*,o.contact_name,o.contact_email,o.llc_name,o.payload,o.ra_appointment_date,o.ra_resignation_submitted,o.ra_replaced_at,o.ra_ended_date,o.ra_cancellation_requested_at FROM ra_renewals r JOIN orders o ON o.id=r.order_id WHERE r.id=$1`, [renewalId]);
   if (!row || ["charged", "paid_by_link", "cancelled"].includes(row.status)) return;
@@ -113618,6 +113626,7 @@ async function writeOrderSummary(orderId) {
 // server/routes-payments.ts
 var orderingEnabled = () => env.isProd ? Boolean(env.DATABASE_URL && env.SQUARE_ACCESS_TOKEN) : true;
 async function fulfillPaidOrder(orderId, squarePaymentId, cardSim) {
+  if (await trainingTarget(orderId)) return;
   if (testHooks.failNextFulfillment) {
     testHooks.failNextFulfillment = false;
     throw new Error("injected fulfillment failure (dev test scaffolding)");
@@ -113704,6 +113713,7 @@ async function fulfillPaidOrder(orderId, squarePaymentId, cardSim) {
   }
 }
 async function fulfillPaidServiceOrder(serviceOrderId, squarePaymentId) {
+  if (await trainingTarget(serviceOrderId)) return;
   const db = await getDb();
   const peek = await db.query(
     "SELECT type FROM service_orders WHERE id = $1",

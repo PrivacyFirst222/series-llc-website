@@ -1,3 +1,4 @@
+import { trainingTarget } from "./training";
 import { checkCheckout, paymentAlert, deliverPaymentAlerts } from './checkout-recovery';
 import { notifyContact } from './office-notifications';
 import { agentCheckoutLink, payAgentTarget } from "./ra-checkout";
@@ -42,6 +43,7 @@ export const orderingEnabled = () =>
 /* ------------------------- payment fulfillment ------------------------- */
 
 export async function fulfillPaidOrder(orderId: string, squarePaymentId: string | null, cardSim?: CardSimulation): Promise<void> {
+  if (await trainingTarget(orderId)) return;
   if (testHooks.failNextFulfillment) {
     testHooks.failNextFulfillment = false;
     throw new Error("injected fulfillment failure (dev test scaffolding)");
@@ -141,6 +143,7 @@ export async function fulfillPaidOrder(orderId: string, squarePaymentId: string 
 
 /** Marks a portal service order paid and routes it to the right next state. */
 export async function fulfillPaidServiceOrder(serviceOrderId: string, squarePaymentId: string | null): Promise<void> {
+  if (await trainingTarget(serviceOrderId)) return;
   const db = await getDb();
   const peek = await db.query<{ type: string }>(
     "SELECT type FROM service_orders WHERE id = $1",
