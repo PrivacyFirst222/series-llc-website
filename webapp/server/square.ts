@@ -1,3 +1,4 @@
+import { blockTrainingPayment, inTraining, trainingRefusal } from "./training";
 import { getDb } from './db';
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { env } from "./env";
@@ -28,6 +29,7 @@ export async function createCheckout(opts: {
   redirectUrl?: string;
   description?: string;
 }): Promise<CheckoutLink> {
+  await blockTrainingPayment(opts.orderId, opts.buyerEmail);
   const redirectUrl = opts.redirectUrl ?? `${env.PUBLIC_BASE_URL}/order/confirmed?ref=${opts.orderId}`;
   if (!env.SQUARE_ACCESS_TOKEN) {
     return {
@@ -116,11 +118,14 @@ export interface SavedCard {
   prepaid: boolean;
 }
 
-const squareHeaders = () => ({
+const squareHeaders = () => {
+  if (inTraining()) trainingRefusal();
+  return ({
   Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
   "Content-Type": "application/json",
   "Square-Version": "2025-01-23",
 });
+};
 
 /** Saves the card a completed payment was made with, against a new Square
  *  customer (Square: "source_id can be a payment ID from a recent payment";
@@ -134,6 +139,7 @@ export async function saveCardFromPayment(opts: {
   referenceId: string;
   simulate?: CardSimulation;
 }): Promise<{ ok: true; card: SavedCard } | { ok: false; reason: string; detail?: string }> {
+  await blockTrainingPayment(opts.referenceId.split(":")[0], opts.email, opts.paymentId);
   if (!env.SQUARE_ACCESS_TOKEN) {
     const sim = opts.simulate ?? "credit";
     if (sim === "wallet") return { ok: false, reason: "wallet payment" };
@@ -176,6 +182,7 @@ export async function saveCardFromPayment(opts: {
 
 /** Forgets a saved card (a prepaid gift card is never kept). */
 export async function disableCard(cardId: string): Promise<void> {
+  await blockTrainingPayment(undefined, undefined, cardId);
   if (!env.SQUARE_ACCESS_TOKEN) return;
   const res = await fetch(`${API_BASE}/v2/cards/${encodeURIComponent(cardId)}/disable`, { method: "POST", headers: squareHeaders() });
   if (!res.ok) throw new Error(`Square disable card failed (${res.status})`);
@@ -192,6 +199,7 @@ export async function chargeCardOnFile(opts: {
   note: string;
   buyerEmail: string;
 }): Promise<{ ok: true; paymentId: string } | { ok: false; code: string; detail?: string }> {
+  await blockTrainingPayment(opts.referenceId.split(":")[0], opts.buyerEmail, opts.cardId);
   if (!env.SQUARE_ACCESS_TOKEN) {
     if (testHooks.declineNextRenewal) {
       const code = testHooks.declineNextRenewal;
@@ -240,6 +248,7 @@ export function verifyWebhookSignature(opts: {
 /** Registered-agent checkout authorizes first; capture waits for card eligibility/storage. */
 export interface AgentPayment { id: string; status: string; reference_id?:string; location_id?:string; amount_money?:{amount:number;currency:string}; order_id?: string; card_details?: { card?: { prepaid_type?: string } } }
 export async function agentSquarePayment(action: 'authorize' | 'get' | 'complete' | 'cancel', opts: { id?: string; key?: string; source?: string; customerId?: string; amount?: number; email?: string; reference?: string; customerInitiated?: boolean }): Promise<AgentPayment> {
+  await blockTrainingPayment(opts.reference, opts.email, opts.id);
   if (!env.SQUARE_ACCESS_TOKEN) {
     if (action === 'authorize' && (opts.source?.includes('decline') || testHooks.declineNextRenewal)) {
       const code = testHooks.declineNextRenewal || 'GENERIC_DECLINE'; testHooks.declineNextRenewal = ''; throw new SquareDecline(code);
@@ -264,6 +273,7 @@ export class SquareDecline extends Error { constructor(public code: string) { su
 /** Store-only card update. Stable request identities survive lost responses;
  * this function never calls the Payments API. */
 export async function storeRenewalCard(opts:{attemptId:string;source:string;customerId:string|null;referenceId:string;email:string;name:string}):Promise<SavedCard> {
+ await blockTrainingPayment(opts.referenceId.split(":")[0], opts.email);
  const key=(kind:string)=>createHash('sha256').update(`${kind}:${opts.attemptId}`).digest('hex').slice(0,40);
  if(!env.SQUARE_ACCESS_TOKEN){
   if(opts.source.includes('decline'))throw new SquareDecline('CARD_DECLINED');

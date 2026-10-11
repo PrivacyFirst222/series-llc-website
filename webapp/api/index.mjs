@@ -53819,6 +53819,20 @@ async function trainingTarget(id) {
   ) SELECT 1 FROM targets JOIN clients c ON c.id=targets.client_id WHERE c.is_training LIMIT 1`, [id]);
   return rows.length > 0;
 }
+async function blockTrainingPayment(id, email, providerId) {
+  if (inTraining() || await trainingTarget(id) || await trainingRecipient(email)) trainingRefusal();
+  if (providerId) {
+    const db = await getDb();
+    const rows = await db.query(`SELECT 1 FROM orders o JOIN clients c ON c.id=o.client_id
+      WHERE c.is_training AND (o.square_card_id=$1 OR o.square_payment_id=$1)
+      UNION ALL SELECT 1 FROM ra_payment_attempts a JOIN orders o ON o.id=a.target_id
+        JOIN clients c ON c.id=o.client_id WHERE c.is_training AND a.square_payment_id=$1
+      UNION ALL SELECT 1 FROM ra_payment_attempts a JOIN ra_renewals r ON r.id=a.target_id
+        JOIN orders o ON o.id=r.order_id JOIN clients c ON c.id=o.client_id
+        WHERE c.is_training AND a.square_payment_id=$1 LIMIT 1`, [providerId]);
+    if (rows.length) trainingRefusal();
+  }
+}
 var context, inTraining, withTraining, uuid2, trainingMiddleware;
 var init_training = __esm({
   "server/training.ts"() {
@@ -102906,12 +102920,14 @@ init_env();
 init_crypto();
 
 // server/square.ts
+init_training();
 init_db();
 init_env();
 init_crypto();
 import { createHash as createHash10, randomBytes as randomBytes5, timingSafeEqual as timingSafeEqual3 } from "node:crypto";
 var API_BASE = env.SQUARE_ENV === "production" ? "https://connect.squareup.com" : "https://connect.squareupsandbox.com";
 async function createCheckout(opts) {
+  await blockTrainingPayment(opts.orderId, opts.buyerEmail);
   const redirectUrl = opts.redirectUrl ?? `${env.PUBLIC_BASE_URL}/order/confirmed?ref=${opts.orderId}`;
   if (!env.SQUARE_ACCESS_TOKEN) {
     return {
@@ -102978,12 +102994,16 @@ async function createCheckout(opts) {
   await db.query(`UPDATE ${table} SET checkout_url=$2,square_order_id=$3 WHERE id=$1`, [opts.orderId, body.payment_link.url, body.payment_link.order_id]);
   return { url: body.payment_link.url, squareOrderId: body.payment_link.order_id };
 }
-var squareHeaders = () => ({
-  Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
-  "Content-Type": "application/json",
-  "Square-Version": "2025-01-23"
-});
+var squareHeaders = () => {
+  if (inTraining()) trainingRefusal();
+  return {
+    Authorization: `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
+    "Content-Type": "application/json",
+    "Square-Version": "2025-01-23"
+  };
+};
 async function saveCardFromPayment(opts) {
+  await blockTrainingPayment(opts.referenceId.split(":")[0], opts.email, opts.paymentId);
   if (!env.SQUARE_ACCESS_TOKEN) {
     const sim = opts.simulate ?? "credit";
     if (sim === "wallet") return { ok: false, reason: "wallet payment" };
@@ -103024,6 +103044,7 @@ async function saveCardFromPayment(opts) {
   };
 }
 async function disableCard(cardId) {
+  await blockTrainingPayment(void 0, void 0, cardId);
   if (!env.SQUARE_ACCESS_TOKEN) return;
   const res = await fetch(`${API_BASE}/v2/cards/${encodeURIComponent(cardId)}/disable`, { method: "POST", headers: squareHeaders() });
   if (!res.ok) throw new Error(`Square disable card failed (${res.status})`);
@@ -103040,6 +103061,7 @@ function verifyWebhookSignature(opts) {
   return expectedBytes.length === suppliedBytes.length && timingSafeEqual3(expectedBytes, suppliedBytes);
 }
 async function agentSquarePayment(action, opts) {
+  await blockTrainingPayment(opts.reference, opts.email, opts.id);
   if (!env.SQUARE_ACCESS_TOKEN) {
     if (action === "authorize" && (opts.source?.includes("decline") || testHooks.declineNextRenewal)) {
       const code = testHooks.declineNextRenewal || "GENERIC_DECLINE";
@@ -103067,6 +103089,7 @@ var SquareDecline = class extends Error {
   code;
 };
 async function storeRenewalCard(opts) {
+  await blockTrainingPayment(opts.referenceId.split(":")[0], opts.email);
   const key = (kind) => createHash10("sha256").update(`${kind}:${opts.attemptId}`).digest("hex").slice(0, 40);
   if (!env.SQUARE_ACCESS_TOKEN) {
     if (opts.source.includes("decline")) throw new SquareDecline("CARD_DECLINED");
