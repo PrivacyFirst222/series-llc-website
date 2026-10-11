@@ -27,6 +27,7 @@ import { LibrarySection } from "./LibrarySection";
 
 interface AgentBalance {reconcilingPayment?:boolean;id:string;purpose:string;status:string;amount_cents:number;date:string;charged_at:string|null;link_url:string|null;notice_error?:string|null}
 interface AdminClient {
+  is_training?: boolean;
   id: string;
   email: string;
   name: string;
@@ -124,7 +125,7 @@ function EmailsDialog({ client }: { client: AdminClient }) {
                 <div className="text-sm">
                   <div className="font-medium">{one.data.subject}</div>
                   <div className="text-muted-foreground">
-                    {whenSent(one.data.sent_at)} — {one.data.ok ? `Accepted by email provider${one.data.provider_id ? ` (id ${one.data.provider_id})` : ""}` : `failed: ${one.data.error ?? "unknown error"}`}
+                    {whenSent(one.data.sent_at)} — {one.data.provider_id === "training-suppressed" ? "Suppressed (training; no email sent)" : one.data.ok ? `Accepted by email provider${one.data.provider_id ? ` (id ${one.data.provider_id})` : ""}` : `failed: ${one.data.error ?? "unknown error"}`}
                   </div>
                 </div>
                 <iframe
@@ -157,7 +158,7 @@ function EmailsDialog({ client }: { client: AdminClient }) {
                 <button type="button" onClick={() => setSelected(m.id)} className="flex w-full flex-wrap items-center justify-between gap-2 px-1 py-2 text-left hover:bg-secondary/40">
                   <span className="font-medium">{m.subject}</span>
                   <span className="text-xs text-muted-foreground">
-                    {whenSent(m.sent_at)} — {m.ok ? "Accepted by email provider" : "failed"}
+                    {whenSent(m.sent_at)} — {m.provider_id === "training-suppressed" ? "Suppressed (training)" : m.ok ? "Accepted by email provider" : "failed"}
                   </span>
                 </button>
               </li>
@@ -323,7 +324,7 @@ function UploadDialog({ client }: { client: AdminClient }) {
       // What the route reports, not what the box said (14 Sep 2026).
       const sent = body?.data?.notified === true;
       const wanted = notify || kind === "legal_mail";
-      toast({ title: "Document uploaded", description: wanted ? (sent ? "The client was emailed." : body.data?.noticeStatus==='pending'||body.data?.noticeStatus==='sending' ? "The notification is pending. Check the document notice status; use Resend notice if needed." : "The email to the client could not be sent. Use Resend notice to retry the email.") : undefined });
+      toast({ title: "Document uploaded", description: client.is_training ? "Training upload saved. No email was sent." : wanted ? (sent ? "The client was emailed." : body.data?.noticeStatus==='pending'||body.data?.noticeStatus==='sending' ? "The notification is pending. Check the document notice status; use Resend notice if needed." : "The email to the client could not be sent. Use Resend notice to retry the email.") : undefined });
       sessionStorage.removeItem(receiptKey);setReceipt(null);
       queryClient.invalidateQueries({ queryKey: ["admin-clients"] });
       setOpen(false);
@@ -604,7 +605,7 @@ function ClientsTable({
             shown.map((cl) => (
               <tr key={cl.id} data-testid="client-row" className={variant === "ra" && raNeedsHand(cl) ? "bg-amber-50 dark:bg-amber-950/20" : undefined}>
                 <td className="px-3 py-3">
-                  <span className="font-medium" data-testid="client-name">{displayName(cl)}</span>
+                  <span className="font-medium" data-testid="client-name">{displayName(cl)}</span>{cl.is_training && <span className="ml-2 rounded bg-amber-100 px-2 py-1 text-xs text-amber-900">Training</span>}
                   {variant !== "ra" && cl.ra_cancellation_requested_at && (cl.ra_llcs ?? []).some(name => name.includes("cancellation requested")) ? (
                     <span className="ml-2 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
                       {(cl.ra_llcs||[]).filter(name=>name.includes("cancellation requested")).join("; ")}
@@ -722,6 +723,7 @@ export default function AdminDashboard() {
     <section className="container-wide section-y">
       <span className="eyebrow">Admin</span>
       <h1 className="display mt-3 text-3xl lg:text-4xl">Orders &amp; clients</h1>
+      {clients.some(cl => cl.is_training) && <p role="status" className="mt-4 rounded border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">Clients marked Training allow practice edits and document uploads. Real payments and emails are blocked for those accounts. Use View portal to practice.</p>}
 
       <Tabs defaultValue="formations" className="mt-6">
         <TabsList className="h-auto flex-wrap">
