@@ -46,6 +46,7 @@ interface PortalDoc {
   encrypted?: boolean;
 }
 
+interface TrainingMe extends Me { isTraining?: boolean }
 interface Me {
   email: string;
   name: string;
@@ -475,7 +476,7 @@ export default function PortalDashboard() {
 
   const meQuery = useQuery({
     queryKey: ["portal-me"],
-    queryFn: () => api.get<Me>("/api/auth/me"),
+    queryFn: () => api.get<TrainingMe>("/api/auth/me"),
     retry: false,
   });
 
@@ -741,6 +742,7 @@ export default function PortalDashboard() {
   return (
     <section className="container-wide section-y">
       <ViewingAsBanner />
+      {meQuery.data?.isTraining && <p role="status" className="mb-6 rounded border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">Training account — practice edits and document uploads are saved. Real payments, card storage and emails are blocked.</p>}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <span className="eyebrow">Client portal</span>
