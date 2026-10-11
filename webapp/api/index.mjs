@@ -1877,10 +1877,10 @@ var require_kill = __commonJS({
       }
       return forceKillAfterTimeout;
     };
-    var spawnedCancel = (spawned, context) => {
+    var spawnedCancel = (spawned, context2) => {
       const killResult = spawned.kill();
       if (killResult) {
-        context.isCanceled = true;
+        context2.isCanceled = true;
       }
     };
     var timeoutKill = (spawned, signal, reject2) => {
@@ -2331,9 +2331,9 @@ var require_execa = __commonJS({
       const spawnedPromise = getSpawnedPromise(spawned);
       const timedPromise = setupTimeout(spawned, parsed.options, spawnedPromise);
       const processDone = setExitHandler(spawned, parsed.options, timedPromise);
-      const context = { isCanceled: false };
+      const context2 = { isCanceled: false };
       spawned.kill = spawnedKill.bind(null, spawned.kill.bind(spawned));
-      spawned.cancel = spawnedCancel.bind(null, spawned, context);
+      spawned.cancel = spawnedCancel.bind(null, spawned, context2);
       const handlePromise = async () => {
         const [{ error: error2, exitCode, signal, timedOut }, stdoutResult, stderrResult, allResult] = await getSpawnedResult(spawned, parsed.options, processDone);
         const stdout = handleOutput(parsed.options, stdoutResult);
@@ -2351,7 +2351,7 @@ var require_execa = __commonJS({
             escapedCommand,
             parsed,
             timedOut,
-            isCanceled: context.isCanceled,
+            isCanceled: context2.isCanceled,
             killed: spawned.killed
           });
           if (!parsed.options.reject) {
@@ -4542,12 +4542,12 @@ var require_regexes = __commonJS({
     exports.duration = /^P(?:(\d+W)|(?!.*W)(?=\d|T\d)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+([.,]\d+)?S)?)?)$/;
     exports.extendedDuration = /^[-+]?P(?!$)(?:(?:[-+]?\d+Y)|(?:[-+]?\d+[.,]\d+Y$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:(?:[-+]?\d+W)|(?:[-+]?\d+[.,]\d+W$))?(?:(?:[-+]?\d+D)|(?:[-+]?\d+[.,]\d+D$))?(?:T(?=[\d+-])(?:(?:[-+]?\d+H)|(?:[-+]?\d+[.,]\d+H$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:[-+]?\d+(?:[.,]\d+)?S)?)??$/;
     exports.guid = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$/;
-    var uuid4 = (version) => {
+    var uuid5 = (version) => {
       if (!version)
         return /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/;
       return new RegExp(`^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-${version}[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$`);
     };
-    exports.uuid = uuid4;
+    exports.uuid = uuid5;
     exports.uuid4 = (0, exports.uuid)(4);
     exports.uuid6 = (0, exports.uuid)(6);
     exports.uuid7 = (0, exports.uuid)(7);
@@ -16771,7 +16771,7 @@ var require_schemas2 = __commonJS({
     exports.string = string;
     exports.email = email;
     exports.guid = guid;
-    exports.uuid = uuid4;
+    exports.uuid = uuid5;
     exports.uuidv4 = uuidv4;
     exports.uuidv6 = uuidv6;
     exports.uuidv7 = uuidv7;
@@ -17012,7 +17012,7 @@ var require_schemas2 = __commonJS({
       core.$ZodUUID.init(inst, def);
       exports.ZodStringFormat.init(inst, def);
     });
-    function uuid4(params) {
+    function uuid5(params) {
       return core._uuid(exports.ZodUUID, params);
     }
     function uuidv4(params) {
@@ -27504,18 +27504,18 @@ var require_webidl = __commonJS({
     webidl.errors.exception = function(message) {
       return new TypeError(`${message.header}: ${message.message}`);
     };
-    webidl.errors.conversionFailed = function(context) {
-      const plural = context.types.length === 1 ? "" : " one of";
-      const message = `${context.argument} could not be converted to${plural}: ${context.types.join(", ")}.`;
+    webidl.errors.conversionFailed = function(context2) {
+      const plural = context2.types.length === 1 ? "" : " one of";
+      const message = `${context2.argument} could not be converted to${plural}: ${context2.types.join(", ")}.`;
       return webidl.errors.exception({
-        header: context.prefix,
+        header: context2.prefix,
         message
       });
     };
-    webidl.errors.invalidArgument = function(context) {
+    webidl.errors.invalidArgument = function(context2) {
       return webidl.errors.exception({
-        header: context.prefix,
-        message: `"${context.value}" is an invalid ${context.type}.`
+        header: context2.prefix,
+        message: `"${context2.value}" is an invalid ${context2.type}.`
       });
     };
     webidl.brandCheck = function(V, I, opts) {
@@ -33645,17 +33645,17 @@ var require_api_request = __commonJS({
           }
         }
       }
-      onConnect(abort, context) {
+      onConnect(abort, context2) {
         if (this.reason) {
           abort(this.reason);
           return;
         }
         assert(this.callback);
         this.abort = abort;
-        this.context = context;
+        this.context = context2;
       }
       onHeaders(statusCode, rawHeaders, resume, statusMessage) {
-        const { callback, opaque, abort, context, responseHeaders, highWaterMark } = this;
+        const { callback, opaque, abort, context: context2, responseHeaders, highWaterMark } = this;
         const headers = responseHeaders === "raw" ? util2.parseRawHeaders(rawHeaders) : util2.parseHeaders(rawHeaders);
         if (statusCode < 200) {
           if (this.onInfo) {
@@ -33692,7 +33692,7 @@ var require_api_request = __commonJS({
               trailers: this.trailers,
               opaque,
               body: res,
-              context
+              context: context2
             });
           }
         }
@@ -33861,17 +33861,17 @@ var require_api_stream = __commonJS({
         }
         addSignal(this, signal);
       }
-      onConnect(abort, context) {
+      onConnect(abort, context2) {
         if (this.reason) {
           abort(this.reason);
           return;
         }
         assert(this.callback);
         this.abort = abort;
-        this.context = context;
+        this.context = context2;
       }
       onHeaders(statusCode, rawHeaders, resume, statusMessage) {
-        const { factory, opaque, context, callback, responseHeaders } = this;
+        const { factory, opaque, context: context2, callback, responseHeaders } = this;
         const headers = responseHeaders === "raw" ? util2.parseRawHeaders(rawHeaders) : util2.parseHeaders(rawHeaders);
         if (statusCode < 200) {
           if (this.onInfo) {
@@ -33899,7 +33899,7 @@ var require_api_stream = __commonJS({
             statusCode,
             headers,
             opaque,
-            context
+            context: context2
           });
           if (!res || typeof res.write !== "function" || typeof res.end !== "function" || typeof res.on !== "function") {
             throw new InvalidReturnValueError("expected Writable");
@@ -34091,7 +34091,7 @@ var require_api_pipeline = __commonJS({
         this.res = null;
         addSignal(this, signal);
       }
-      onConnect(abort, context) {
+      onConnect(abort, context2) {
         const { ret, res } = this;
         if (this.reason) {
           abort(this.reason);
@@ -34100,10 +34100,10 @@ var require_api_pipeline = __commonJS({
         assert(!res, "pipeline cannot be retried");
         assert(!ret.destroyed);
         this.abort = abort;
-        this.context = context;
+        this.context = context2;
       }
       onHeaders(statusCode, rawHeaders, resume) {
-        const { opaque, handler: handler2, context } = this;
+        const { opaque, handler: handler2, context: context2 } = this;
         if (statusCode < 200) {
           if (this.onInfo) {
             const headers = this.responseHeaders === "raw" ? util2.parseRawHeaders(rawHeaders) : util2.parseHeaders(rawHeaders);
@@ -34121,7 +34121,7 @@ var require_api_pipeline = __commonJS({
             headers,
             opaque,
             body: this.res,
-            context
+            context: context2
           });
         } catch (err3) {
           this.res.on("error", util2.nop);
@@ -34205,7 +34205,7 @@ var require_api_upgrade = __commonJS({
         this.context = null;
         addSignal(this, signal);
       }
-      onConnect(abort, context) {
+      onConnect(abort, context2) {
         if (this.reason) {
           abort(this.reason);
           return;
@@ -34219,7 +34219,7 @@ var require_api_upgrade = __commonJS({
       }
       onUpgrade(statusCode, rawHeaders, socket) {
         assert(statusCode === 101);
-        const { callback, opaque, context } = this;
+        const { callback, opaque, context: context2 } = this;
         removeSignal(this);
         this.callback = null;
         const headers = this.responseHeaders === "raw" ? util2.parseRawHeaders(rawHeaders) : util2.parseHeaders(rawHeaders);
@@ -34227,7 +34227,7 @@ var require_api_upgrade = __commonJS({
           headers,
           socket,
           opaque,
-          context
+          context: context2
         });
       }
       onError(err3) {
@@ -34296,20 +34296,20 @@ var require_api_connect = __commonJS({
         this.abort = null;
         addSignal(this, signal);
       }
-      onConnect(abort, context) {
+      onConnect(abort, context2) {
         if (this.reason) {
           abort(this.reason);
           return;
         }
         assert(this.callback);
         this.abort = abort;
-        this.context = context;
+        this.context = context2;
       }
       onHeaders() {
         throw new SocketError("bad connect", null);
       }
       onUpgrade(statusCode, rawHeaders, socket) {
-        const { callback, opaque, context } = this;
+        const { callback, opaque, context: context2 } = this;
         removeSignal(this);
         this.callback = null;
         let headers = rawHeaders;
@@ -34321,7 +34321,7 @@ var require_api_connect = __commonJS({
           headers,
           socket,
           opaque,
-          context
+          context: context2
         });
       }
       onError(err3) {
@@ -64357,10 +64357,10 @@ var init_PDFArray = __esm({
     init_CharCodes();
     init_errors2();
     PDFArray = class _PDFArray extends PDFObject_default {
-      constructor(context) {
+      constructor(context2) {
         super();
         this.array = [];
-        this.context = context;
+        this.context = context2;
       }
       size() {
         return this.array.length;
@@ -64416,8 +64416,8 @@ var init_PDFArray = __esm({
       asArray() {
         return this.array.slice();
       }
-      clone(context) {
-        const clone = _PDFArray.withContext(context || this.context);
+      clone(context2) {
+        const clone = _PDFArray.withContext(context2 || this.context);
         for (let idx = 0, len = this.size(); idx < len; idx++) {
           clone.push(this.array[idx]);
         }
@@ -64463,7 +64463,7 @@ var init_PDFArray = __esm({
         this.context.registerObjectChange(this);
       }
     };
-    PDFArray.withContext = (context) => new PDFArray(context);
+    PDFArray.withContext = (context2) => new PDFArray(context2);
     PDFArray_default = PDFArray;
   }
 });
@@ -64731,11 +64731,11 @@ var init_PDFDict = __esm({
     init_PDFObject();
     init_CharCodes();
     PDFDict = class _PDFDict extends PDFObject_default {
-      constructor(map2, context) {
+      constructor(map2, context2) {
         super();
         this.suppressEncryption = false;
         this.dict = map2;
-        this.context = context;
+        this.context = context2;
       }
       keys() {
         return Array.from(this.dict.keys());
@@ -64796,8 +64796,8 @@ var init_PDFDict = __esm({
         }
         return key;
       }
-      clone(context) {
-        const clone = _PDFDict.withContext(context || this.context);
+      clone(context2) {
+        const clone = _PDFDict.withContext(context2 || this.context);
         const entries = this.entries();
         for (let idx = 0, len = entries.length; idx < len; idx++) {
           const [key, value] = entries[idx];
@@ -64845,8 +64845,8 @@ var init_PDFDict = __esm({
         this.context.registerObjectChange(this);
       }
     };
-    PDFDict.withContext = (context) => new PDFDict(/* @__PURE__ */ new Map(), context);
-    PDFDict.fromMapWithContext = (map2, context) => new PDFDict(map2, context);
+    PDFDict.withContext = (context2) => new PDFDict(/* @__PURE__ */ new Map(), context2);
+    PDFDict.fromMapWithContext = (map2, context2) => new PDFDict(map2, context2);
     PDFDict_default = PDFDict;
   }
 });
@@ -65018,8 +65018,8 @@ var init_PDFRawStream = __esm({
       asUint8Array() {
         return this.contents.slice();
       }
-      clone(context) {
-        return _PDFRawStream.of(this.dict.clone(context), this.contents.slice());
+      clone(context2) {
+        return _PDFRawStream.of(this.dict.clone(context2), this.contents.slice());
       }
       getContentsString() {
         return arrayAsString(this.contents);
@@ -65208,11 +65208,11 @@ var init_PDFOperator = __esm({
         this.name = name;
         this.args = args || [];
       }
-      clone(context) {
+      clone(context2) {
         const args = new Array(this.args.length);
         for (let idx = 0, len = args.length; idx < len; idx++) {
           const arg = this.args[idx];
-          args[idx] = arg instanceof PDFObject_default ? arg.clone(context) : arg;
+          args[idx] = arg instanceof PDFObject_default ? arg.clone(context2) : arg;
         }
         return _PDFOperator.of(this.name, args);
       }
@@ -65388,13 +65388,13 @@ var init_PDFContentStream = __esm({
       push(...operators) {
         this.operators.push(...operators);
       }
-      clone(context) {
+      clone(context2) {
         const operators = new Array(this.operators.length);
         for (let idx = 0, len = this.operators.length; idx < len; idx++) {
-          operators[idx] = this.operators[idx].clone(context);
+          operators[idx] = this.operators[idx].clone(context2);
         }
         const { dict, encode: encode3 } = this;
-        return _PDFContentStream.of(dict.clone(context), operators, encode3);
+        return _PDFContentStream.of(dict.clone(context2), operators, encode3);
       }
       getContentsString() {
         let value = "";
@@ -65740,13 +65740,13 @@ var init_PDFPageLeaf = __esm({
     init_PDFNumber();
     init_PDFStream();
     PDFPageLeaf = class _PDFPageLeaf extends PDFDict_default {
-      constructor(map2, context, autoNormalizeCTM = true) {
-        super(map2, context);
+      constructor(map2, context2, autoNormalizeCTM = true) {
+        super(map2, context2);
         this.normalized = false;
         this.autoNormalizeCTM = autoNormalizeCTM;
       }
-      clone(context) {
-        const clone = _PDFPageLeaf.fromMapWithContext(/* @__PURE__ */ new Map(), context || this.context, this.autoNormalizeCTM);
+      clone(context2) {
+        const clone = _PDFPageLeaf.fromMapWithContext(/* @__PURE__ */ new Map(), context2 || this.context, this.autoNormalizeCTM);
         const entries = this.entries();
         for (let idx = 0, len = entries.length; idx < len; idx++) {
           const [key, value] = entries[idx];
@@ -65874,25 +65874,25 @@ var init_PDFPageLeaf = __esm({
       normalize() {
         if (this.normalized)
           return;
-        const { context } = this;
+        const { context: context2 } = this;
         const contentsRef = this.get(PDFName_default.Contents);
         const contents = this.context.lookup(contentsRef);
         if (contents instanceof PDFStream_default) {
-          this.set(PDFName_default.Contents, context.obj([contentsRef]));
+          this.set(PDFName_default.Contents, context2.obj([contentsRef]));
         }
         if (this.autoNormalizeCTM) {
           this.wrapContentStreams(this.context.getPushGraphicsStateContentStream(), this.context.getPopGraphicsStateContentStream());
         }
         const dictOrRef = this.getInheritableAttribute(PDFName_default.Resources);
-        const Resources = context.lookupMaybe(dictOrRef, PDFDict_default) || context.obj({});
+        const Resources = context2.lookupMaybe(dictOrRef, PDFDict_default) || context2.obj({});
         this.set(PDFName_default.Resources, Resources);
-        const Font2 = Resources.lookupMaybe(PDFName_default.Font, PDFDict_default) || context.obj({});
+        const Font2 = Resources.lookupMaybe(PDFName_default.Font, PDFDict_default) || context2.obj({});
         Resources.set(PDFName_default.Font, Font2);
-        const XObject = Resources.lookupMaybe(PDFName_default.XObject, PDFDict_default) || context.obj({});
+        const XObject = Resources.lookupMaybe(PDFName_default.XObject, PDFDict_default) || context2.obj({});
         Resources.set(PDFName_default.XObject, XObject);
-        const ExtGState = Resources.lookupMaybe(PDFName_default.ExtGState, PDFDict_default) || context.obj({});
+        const ExtGState = Resources.lookupMaybe(PDFName_default.ExtGState, PDFDict_default) || context2.obj({});
         Resources.set(PDFName_default.ExtGState, ExtGState);
-        const Annots = this.Annots() || context.obj([]);
+        const Annots = this.Annots() || context2.obj([]);
         this.set(PDFName_default.Annots, Annots);
         this.normalized = true;
       }
@@ -65917,15 +65917,15 @@ var init_PDFPageLeaf = __esm({
       "CropBox",
       "Rotate"
     ];
-    PDFPageLeaf.withContextAndParent = (context, parent) => {
+    PDFPageLeaf.withContextAndParent = (context2, parent) => {
       const dict = /* @__PURE__ */ new Map();
       dict.set(PDFName_default.Type, PDFName_default.Page);
       dict.set(PDFName_default.Parent, parent);
-      dict.set(PDFName_default.Resources, context.obj({}));
-      dict.set(PDFName_default.MediaBox, context.obj([0, 0, 612, 792]));
-      return new PDFPageLeaf(dict, context, false);
+      dict.set(PDFName_default.Resources, context2.obj({}));
+      dict.set(PDFName_default.MediaBox, context2.obj([0, 0, 612, 792]));
+      return new PDFPageLeaf(dict, context2, false);
     };
-    PDFPageLeaf.fromMapWithContext = (map2, context, autoNormalizeCTM = true) => new PDFPageLeaf(map2, context, autoNormalizeCTM);
+    PDFPageLeaf.fromMapWithContext = (map2, context2, autoNormalizeCTM = true) => new PDFPageLeaf(map2, context2, autoNormalizeCTM);
     PDFPageLeaf_default = PDFPageLeaf;
   }
 });
@@ -66306,8 +66306,8 @@ var init_PDFObjectStream = __esm({
     init_CharCodes();
     init_utils();
     PDFObjectStream = class _PDFObjectStream extends PDFFlateStream_default {
-      constructor(context, objects, encode3 = true) {
-        super(context.obj({}), encode3);
+      constructor(context2, objects, encode3 = true) {
+        super(context2.obj({}), encode3);
         this.objects = objects;
         this.offsets = this.computeObjectOffsets();
         this.offsetsString = this.computeOffsetsString();
@@ -66318,8 +66318,8 @@ var init_PDFObjectStream = __esm({
       getObjectsCount() {
         return this.objects.length;
       }
-      clone(context) {
-        return _PDFObjectStream.withContextAndObjects(context || this.dict.context, this.objects.slice(), this.encode);
+      clone(context2) {
+        return _PDFObjectStream.withContextAndObjects(context2 || this.dict.context, this.objects.slice(), this.encode);
       }
       getContentsString() {
         let value = this.offsetsString;
@@ -66362,7 +66362,7 @@ var init_PDFObjectStream = __esm({
         return offsets;
       }
     };
-    PDFObjectStream.withContextAndObjects = (context, objects, encode3 = true) => new PDFObjectStream(context, objects, encode3);
+    PDFObjectStream.withContextAndObjects = (context2, objects, encode3 = true) => new PDFObjectStream(context2, objects, encode3);
     PDFObjectStream_default = PDFObjectStream;
   }
 });
@@ -66417,14 +66417,14 @@ var IncrementalDocumentSnapshot;
 var init_IncrementalDocumentSnapshot = __esm({
   "node_modules/@cantoo/pdf-lib/es/api/snapshot/IncrementalDocumentSnapshot.js"() {
     IncrementalDocumentSnapshot = class {
-      constructor(lastObjectNumber, indirectObjects, pdfSize, prevStartXRef, context) {
+      constructor(lastObjectNumber, indirectObjects, pdfSize, prevStartXRef, context2) {
         this.deletedCount = 0;
         this.deleted = [];
         this.lastObjectNumber = lastObjectNumber;
         this.changedObjects = indirectObjects;
         this.pdfSize = pdfSize;
         this.prevStartXRef = prevStartXRef;
-        this.context = context;
+        this.context = context2;
       }
       shouldSave(objectNumber) {
         if (objectNumber > this.lastObjectNumber)
@@ -66492,7 +66492,7 @@ var init_PDFWriter = __esm({
     init_PDFName();
     init_PDFRawStream();
     PDFWriter = class {
-      constructor(context, objectsPerTick, snapshot) {
+      constructor(context2, objectsPerTick, snapshot) {
         this.parsedObjects = 0;
         this._largestSkippedObjectNum = 0;
         this._lastXRefObjectNumber = 0;
@@ -66500,7 +66500,7 @@ var init_PDFWriter = __esm({
           this.parsedObjects += n;
           return this.parsedObjects % this.objectsPerTick === 0;
         };
-        this.context = context;
+        this.context = context2;
         this.objectsPerTick = objectsPerTick;
         this.snapshot = snapshot;
       }
@@ -66667,8 +66667,8 @@ var init_PDFWriter = __esm({
         return object instanceof PDFRawStream_default && object.dict.lookup(PDFName_default.of("Type")) === PDFName_default.of("ObjStm");
       }
     };
-    PDFWriter.forContext = (context, objectsPerTick) => new PDFWriter(context, objectsPerTick, defaultDocumentSnapshot);
-    PDFWriter.forContextWithSnapshot = (context, objectsPerTick, snapshot) => new PDFWriter(context, objectsPerTick, snapshot);
+    PDFWriter.forContext = (context2, objectsPerTick) => new PDFWriter(context2, objectsPerTick, defaultDocumentSnapshot);
+    PDFWriter.forContextWithSnapshot = (context2, objectsPerTick, snapshot) => new PDFWriter(context2, objectsPerTick, snapshot);
     PDFWriter_default = PDFWriter;
   }
 });
@@ -67218,8 +67218,8 @@ var init_PDFWidgetAnnotation = __esm({
       }
     };
     PDFWidgetAnnotation.fromDict = (dict) => new PDFWidgetAnnotation(dict);
-    PDFWidgetAnnotation.create = (context, parent) => {
-      const dict = context.obj({
+    PDFWidgetAnnotation.create = (context2, parent) => {
+      const dict = context2.obj({
         Type: "Annot",
         Subtype: "Widget",
         Rect: [0, 0, 0, 0],
@@ -67414,12 +67414,12 @@ var init_PDFAcroCheckBox = __esm({
       }
     };
     PDFAcroCheckBox.fromDict = (dict, ref) => new PDFAcroCheckBox(dict, ref);
-    PDFAcroCheckBox.create = (context) => {
-      const dict = context.obj({
+    PDFAcroCheckBox.create = (context2) => {
+      const dict = context2.obj({
         FT: "Btn",
         Kids: []
       });
-      const ref = context.register(dict);
+      const ref = context2.register(dict);
       return new PDFAcroCheckBox(dict, ref);
     };
     PDFAcroCheckBox_default = PDFAcroCheckBox;
@@ -67580,13 +67580,13 @@ var init_PDFAcroComboBox = __esm({
     PDFAcroComboBox = class extends PDFAcroChoice_default {
     };
     PDFAcroComboBox.fromDict = (dict, ref) => new PDFAcroComboBox(dict, ref);
-    PDFAcroComboBox.create = (context) => {
-      const dict = context.obj({
+    PDFAcroComboBox.create = (context2) => {
+      const dict = context2.obj({
         FT: "Ch",
         Ff: AcroChoiceFlags.Combo,
         Kids: []
       });
-      const ref = context.register(dict);
+      const ref = context2.register(dict);
       return new PDFAcroComboBox(dict, ref);
     };
     PDFAcroComboBox_default = PDFAcroComboBox;
@@ -67614,9 +67614,9 @@ var init_PDFAcroNonTerminal = __esm({
       }
     };
     PDFAcroNonTerminal.fromDict = (dict, ref) => new PDFAcroNonTerminal(dict, ref);
-    PDFAcroNonTerminal.create = (context) => {
-      const dict = context.obj({});
-      const ref = context.register(dict);
+    PDFAcroNonTerminal.create = (context2) => {
+      const dict = context2.obj({});
+      const ref = context2.register(dict);
       return new PDFAcroNonTerminal(dict, ref);
     };
     PDFAcroNonTerminal_default = PDFAcroNonTerminal;
@@ -67688,12 +67688,12 @@ var init_PDFAcroText = __esm({
       }
     };
     PDFAcroText.fromDict = (dict, ref) => new PDFAcroText(dict, ref);
-    PDFAcroText.create = (context) => {
-      const dict = context.obj({
+    PDFAcroText.create = (context2) => {
+      const dict = context2.obj({
         FT: "Tx",
         Kids: []
       });
-      const ref = context.register(dict);
+      const ref = context2.register(dict);
       return new PDFAcroText(dict, ref);
     };
     PDFAcroText_default = PDFAcroText;
@@ -67709,13 +67709,13 @@ var init_PDFAcroPushButton = __esm({
     PDFAcroPushButton = class extends PDFAcroButton_default {
     };
     PDFAcroPushButton.fromDict = (dict, ref) => new PDFAcroPushButton(dict, ref);
-    PDFAcroPushButton.create = (context) => {
-      const dict = context.obj({
+    PDFAcroPushButton.create = (context2) => {
+      const dict = context2.obj({
         FT: "Btn",
         Ff: AcroButtonFlags.PushButton,
         Kids: []
       });
-      const ref = context.register(dict);
+      const ref = context2.register(dict);
       return new PDFAcroPushButton(dict, ref);
     };
     PDFAcroPushButton_default = PDFAcroPushButton;
@@ -67762,13 +67762,13 @@ var init_PDFAcroRadioButton = __esm({
       }
     };
     PDFAcroRadioButton.fromDict = (dict, ref) => new PDFAcroRadioButton(dict, ref);
-    PDFAcroRadioButton.create = (context) => {
-      const dict = context.obj({
+    PDFAcroRadioButton.create = (context2) => {
+      const dict = context2.obj({
         FT: "Btn",
         Ff: AcroButtonFlags.Radio,
         Kids: []
       });
-      const ref = context.register(dict);
+      const ref = context2.register(dict);
       return new PDFAcroRadioButton(dict, ref);
     };
     PDFAcroRadioButton_default = PDFAcroRadioButton;
@@ -67783,12 +67783,12 @@ var init_PDFAcroListBox = __esm({
     PDFAcroListBox = class extends PDFAcroChoice_default {
     };
     PDFAcroListBox.fromDict = (dict, ref) => new PDFAcroListBox(dict, ref);
-    PDFAcroListBox.create = (context) => {
-      const dict = context.obj({
+    PDFAcroListBox.create = (context2) => {
+      const dict = context2.obj({
         FT: "Ch",
         Kids: []
       });
-      const ref = context.register(dict);
+      const ref = context2.register(dict);
       return new PDFAcroListBox(dict, ref);
     };
     PDFAcroListBox_default = PDFAcroListBox;
@@ -67972,8 +67972,8 @@ var init_PDFAcroForm = __esm({
       }
     };
     PDFAcroForm.fromDict = (dict) => new PDFAcroForm(dict);
-    PDFAcroForm.create = (context) => {
-      const dict = context.obj({ Fields: [] });
+    PDFAcroForm.create = (context2) => {
+      const dict = context2.obj({ Fields: [] });
       return new PDFAcroForm(dict);
     };
     PDFAcroForm_default = PDFAcroForm;
@@ -68467,8 +68467,8 @@ var init_ViewerPreferences = __esm({
       }
     };
     ViewerPreferences.fromDict = (dict) => new ViewerPreferences(dict);
-    ViewerPreferences.create = (context) => {
-      const dict = context.obj({});
+    ViewerPreferences.create = (context2) => {
+      const dict = context2.obj({});
       return new ViewerPreferences(dict);
     };
     ViewerPreferences_default = ViewerPreferences;
@@ -68554,14 +68554,14 @@ var init_OptionalContent = __esm({
         if (matched === 0) {
           throw new Error("No matching optional content group found");
         }
-        const { context } = this.dict;
+        const { context: context2 } = this.dict;
         let dDict = this.dict.lookupMaybe(PDFName_default.of("D"), PDFDict_default);
         if (!dDict) {
-          dDict = context.obj({});
+          dDict = context2.obj({});
           this.dict.set(PDFName_default.of("D"), dDict);
         }
-        const onArray = context.obj([]);
-        const offArray = context.obj([]);
+        const onArray = context2.obj([]);
+        const offArray = context2.obj([]);
         for (const group of groups) {
           (visibility.get(group.ref) ? onArray : offArray).push(group.ref);
         }
@@ -68651,13 +68651,13 @@ var init_PDFCatalog = __esm({
         this.Pages().removeLeafNode(index2);
       }
     };
-    PDFCatalog.withContextAndPages = (context, pages) => {
+    PDFCatalog.withContextAndPages = (context2, pages) => {
       const dict = /* @__PURE__ */ new Map();
       dict.set(PDFName_default.of("Type"), PDFName_default.of("Catalog"));
       dict.set(PDFName_default.of("Pages"), pages);
-      return new PDFCatalog(dict, context);
+      return new PDFCatalog(dict, context2);
     };
-    PDFCatalog.fromMapWithContext = (map2, context) => new PDFCatalog(map2, context);
+    PDFCatalog.fromMapWithContext = (map2, context2) => new PDFCatalog(map2, context2);
     PDFCatalog_default = PDFCatalog;
   }
 });
@@ -68806,16 +68806,16 @@ var init_PDFPageTree = __esm({
         Kids.remove(kidIdx);
       }
     };
-    PDFPageTree.withContext = (context, parent) => {
+    PDFPageTree.withContext = (context2, parent) => {
       const dict = /* @__PURE__ */ new Map();
       dict.set(PDFName_default.of("Type"), PDFName_default.of("Pages"));
-      dict.set(PDFName_default.of("Kids"), context.obj([]));
-      dict.set(PDFName_default.of("Count"), context.obj(0));
+      dict.set(PDFName_default.of("Kids"), context2.obj([]));
+      dict.set(PDFName_default.of("Count"), context2.obj(0));
       if (parent)
         dict.set(PDFName_default.of("Parent"), parent);
-      return new PDFPageTree(dict, context);
+      return new PDFPageTree(dict, context2);
     };
-    PDFPageTree.fromMapWithContext = (map2, context) => new PDFPageTree(map2, context);
+    PDFPageTree.fromMapWithContext = (map2, context2) => new PDFPageTree(map2, context2);
     PDFPageTree_default = PDFPageTree;
   }
 });
@@ -68927,9 +68927,9 @@ var init_PDFCrossRefStream = __esm({
         this.indexCache.invalidate();
         this.contentsCache.invalidate();
       }
-      clone(context) {
+      clone(context2) {
         const { dict, entries, encode: encode3 } = this;
-        return _PDFCrossRefStream.of(dict.clone(context), entries.slice(), encode3);
+        return _PDFCrossRefStream.of(dict.clone(context2), entries.slice(), encode3);
       }
       getContentsString() {
         const entryTuples = this.entryTuplesCache.access();
@@ -68983,9 +68983,9 @@ var init_PDFCrossRefStream = __esm({
         super.updateDict();
         const byteWidths = this.maxByteWidthsCache.access();
         const index2 = this.indexCache.access();
-        const { context } = this.dict;
-        this.dict.set(PDFName_default.of("W"), context.obj(byteWidths));
-        this.dict.set(PDFName_default.of("Index"), context.obj(index2));
+        const { context: context2 } = this.dict;
+        this.dict.set(PDFName_default.of("W"), context2.obj(byteWidths));
+        this.dict.set(PDFName_default.of("Index"), context2.obj(index2));
       }
     };
     PDFCrossRefStream.create = (dict, encode3 = true) => {
@@ -69020,8 +69020,8 @@ var init_PDFStreamWriter = __esm({
     init_snapshot();
     init_PDFDict();
     PDFStreamWriter = class extends PDFWriter_default {
-      constructor(context, objectsPerTick, snapshot, encodeStreams, objectsPerStream) {
-        super(context, objectsPerTick, snapshot);
+      constructor(context2, objectsPerTick, snapshot, encodeStreams, objectsPerStream) {
+        super(context2, objectsPerTick, snapshot);
         this._refToDeleteAfterSave = 0;
         this.encodeStreams = encodeStreams;
         this.objectsPerStream = objectsPerStream;
@@ -69120,8 +69120,8 @@ var init_PDFStreamWriter = __esm({
         });
       }
     };
-    PDFStreamWriter.forContext = (context, objectsPerTick, encodeStreams = true, objectsPerStream = 50) => new PDFStreamWriter(context, objectsPerTick, defaultDocumentSnapshot, encodeStreams, objectsPerStream);
-    PDFStreamWriter.forContextWithSnapshot = (context, objectsPerTick, snapshot, encodeStreams = true, objectsPerStream = 50) => new PDFStreamWriter(context, objectsPerTick, snapshot, encodeStreams, objectsPerStream);
+    PDFStreamWriter.forContext = (context2, objectsPerTick, encodeStreams = true, objectsPerStream = 50) => new PDFStreamWriter(context2, objectsPerTick, defaultDocumentSnapshot, encodeStreams, objectsPerStream);
+    PDFStreamWriter.forContextWithSnapshot = (context2, objectsPerTick, snapshot, encodeStreams = true, objectsPerStream = 50) => new PDFStreamWriter(context2, objectsPerTick, snapshot, encodeStreams, objectsPerStream);
     PDFStreamWriter_default = PDFStreamWriter;
   }
 });
@@ -69184,18 +69184,18 @@ var init_StandardFontEmbedder = __esm({
         const yBottom = Descender || FontBBox[1];
         return 1e3 * height / (yTop - yBottom);
       }
-      embedIntoContext(context, ref) {
-        const fontDict = context.obj({
+      embedIntoContext(context2, ref) {
+        const fontDict = context2.obj({
           Type: "Font",
           Subtype: "Type1",
           BaseFont: this.customName || this.fontName,
           Encoding: this.encoding === import_standard_fonts2.Encodings.WinAnsi ? "WinAnsiEncoding" : void 0
         });
         if (ref) {
-          context.assign(ref, fontDict);
+          context2.assign(ref, fontDict);
           return ref;
         } else {
-          return context.register(fontDict);
+          return context2.register(fontDict);
         }
       }
       widthOfGlyph(glyphName) {
@@ -69415,15 +69415,15 @@ var init_CustomFontEmbedder = __esm({
         const yBottom = (descent || bbox.minY) * this.scale;
         return 1e3 * height / (yTop - yBottom);
       }
-      embedIntoContext(context, ref) {
-        this.baseFontName = this.customName || context.addRandomSuffix(this.fontName);
-        return this.embedFontDict(context, ref);
+      embedIntoContext(context2, ref) {
+        this.baseFontName = this.customName || context2.addRandomSuffix(this.fontName);
+        return this.embedFontDict(context2, ref);
       }
-      embedFontDict(context, ref) {
+      embedFontDict(context2, ref) {
         return __awaiter(this, void 0, void 0, function* () {
-          const cidFontDictRef = yield this.embedCIDFontDict(context);
-          const unicodeCMapRef = this.embedUnicodeCmap(context);
-          const fontDict = context.obj({
+          const cidFontDictRef = yield this.embedCIDFontDict(context2);
+          const unicodeCMapRef = this.embedUnicodeCmap(context2);
+          const fontDict = context2.obj({
             Type: "Font",
             Subtype: "Type0",
             BaseFont: this.baseFontName,
@@ -69432,20 +69432,20 @@ var init_CustomFontEmbedder = __esm({
             ToUnicode: unicodeCMapRef
           });
           if (ref) {
-            context.assign(ref, fontDict);
+            context2.assign(ref, fontDict);
             return ref;
           } else {
-            return context.register(fontDict);
+            return context2.register(fontDict);
           }
         });
       }
       isCFF() {
         return this.font.cff;
       }
-      embedCIDFontDict(context) {
+      embedCIDFontDict(context2) {
         return __awaiter(this, void 0, void 0, function* () {
-          const fontDescriptorRef = yield this.embedFontDescriptor(context);
-          const cidFontDict = context.obj({
+          const fontDescriptorRef = yield this.embedFontDescriptor(context2);
+          const cidFontDict = context2.obj({
             Type: "Font",
             Subtype: this.isCFF() ? "CIDFontType0" : "CIDFontType2",
             CIDToGIDMap: "Identity",
@@ -69458,16 +69458,16 @@ var init_CustomFontEmbedder = __esm({
             FontDescriptor: fontDescriptorRef,
             W: this.computeWidths()
           });
-          return context.register(cidFontDict);
+          return context2.register(cidFontDict);
         });
       }
-      embedFontDescriptor(context) {
+      embedFontDescriptor(context2) {
         return __awaiter(this, void 0, void 0, function* () {
-          const fontStreamRef = yield this.embedFontStream(context);
+          const fontStreamRef = yield this.embedFontStream(context2);
           const { scale: scale2 } = this;
           const { italicAngle, ascent, descent, capHeight, xHeight } = this.font;
           const { minX, minY, maxX, maxY } = this.font.bbox;
-          const fontDescriptor = context.obj({
+          const fontDescriptor = context2.obj({
             Type: "FontDescriptor",
             FontName: this.baseFontName,
             Flags: deriveFontFlags(this.font),
@@ -69482,7 +69482,7 @@ var init_CustomFontEmbedder = __esm({
             StemV: 0,
             [this.isCFF() ? "FontFile3" : "FontFile2"]: fontStreamRef
           });
-          return context.register(fontDescriptor);
+          return context2.register(fontDescriptor);
         });
       }
       serializeFont() {
@@ -69490,18 +69490,18 @@ var init_CustomFontEmbedder = __esm({
           return this.fontData;
         });
       }
-      embedFontStream(context) {
+      embedFontStream(context2) {
         return __awaiter(this, void 0, void 0, function* () {
-          const fontStream = context.flateStream(yield this.serializeFont(), {
+          const fontStream = context2.flateStream(yield this.serializeFont(), {
             Subtype: this.isCFF() ? "CIDFontType0C" : void 0
           });
-          return context.register(fontStream);
+          return context2.register(fontStream);
         });
       }
-      embedUnicodeCmap(context) {
+      embedUnicodeCmap(context2) {
         const cmap = createCmap(this.glyphCache.access(), this.glyphId.bind(this));
-        const cmapStream = context.flateStream(cmap);
-        return context.register(cmapStream);
+        const cmapStream = context2.flateStream(cmap);
+        return context2.register(cmapStream);
       }
       glyphId(glyph) {
         return glyph ? glyph.id : -1;
@@ -69622,10 +69622,10 @@ var init_FileEmbedder = __esm({
         this.fileName = fileName;
         this.options = options;
       }
-      embedIntoContext(context, ref) {
+      embedIntoContext(context2, ref) {
         return __awaiter(this, void 0, void 0, function* () {
           const { mimeType, description, creationDate, modificationDate, afRelationship } = this.options;
-          const embeddedFileStream = context.flateStream(this.fileData, {
+          const embeddedFileStream = context2.flateStream(this.fileData, {
             Type: "EmbeddedFile",
             Subtype: mimeType !== null && mimeType !== void 0 ? mimeType : void 0,
             Params: {
@@ -69634,8 +69634,8 @@ var init_FileEmbedder = __esm({
               ModDate: modificationDate ? PDFString_default.fromDate(modificationDate) : void 0
             }
           });
-          const embeddedFileStreamRef = context.register(embeddedFileStream);
-          const fileSpecDict = context.obj({
+          const embeddedFileStreamRef = context2.register(embeddedFileStream);
+          const fileSpecDict = context2.obj({
             Type: "Filespec",
             F: PDFString_default.of(this.fileName),
             UF: PDFHexString_default.fromText(this.fileName),
@@ -69644,10 +69644,10 @@ var init_FileEmbedder = __esm({
             AFRelationship: afRelationship !== null && afRelationship !== void 0 ? afRelationship : void 0
           });
           if (ref) {
-            context.assign(ref, fileSpecDict);
+            context2.assign(ref, fileSpecDict);
             return ref;
           } else {
-            return context.register(fileSpecDict);
+            return context2.register(fileSpecDict);
           }
         });
       }
@@ -69730,9 +69730,9 @@ var init_JpegEmbedder = __esm({
         this.height = height;
         this.colorSpace = colorSpace;
       }
-      embedIntoContext(context, ref) {
+      embedIntoContext(context2, ref) {
         return __awaiter(this, void 0, void 0, function* () {
-          const xObject = context.stream(this.imageData, {
+          const xObject = context2.stream(this.imageData, {
             Type: "XObject",
             Subtype: "Image",
             BitsPerComponent: this.bitsPerComponent,
@@ -69751,10 +69751,10 @@ var init_JpegEmbedder = __esm({
             Decode: this.colorSpace === ColorSpace.DeviceCMYK ? [1, 0, 1, 0, 1, 0, 1, 0] : void 0
           });
           if (ref) {
-            context.assign(ref, xObject);
+            context2.assign(ref, xObject);
             return ref;
           } else {
-            return context.register(xObject);
+            return context2.register(xObject);
           }
         });
       }
@@ -75540,10 +75540,10 @@ var init_PngEmbedder = __esm({
         this.height = png.height;
         this.colorSpace = "DeviceRGB";
       }
-      embedIntoContext(context, ref) {
+      embedIntoContext(context2, ref) {
         return __awaiter(this, void 0, void 0, function* () {
-          const SMask = this.embedAlphaChannel(context);
-          const xObject = context.flateStream(this.image.rgbChannel, {
+          const SMask = this.embedAlphaChannel(context2);
+          const xObject = context2.flateStream(this.image.rgbChannel, {
             Type: "XObject",
             Subtype: "Image",
             BitsPerComponent: this.image.bitsPerComponent,
@@ -75553,17 +75553,17 @@ var init_PngEmbedder = __esm({
             SMask
           });
           if (ref) {
-            context.assign(ref, xObject);
+            context2.assign(ref, xObject);
             return ref;
           } else {
-            return context.register(xObject);
+            return context2.register(xObject);
           }
         });
       }
-      embedAlphaChannel(context) {
+      embedAlphaChannel(context2) {
         if (!this.image.alphaChannel)
           return void 0;
-        const xObject = context.flateStream(this.image.alphaChannel, {
+        const xObject = context2.flateStream(this.image.alphaChannel, {
           Type: "XObject",
           Subtype: "Image",
           Height: this.image.height,
@@ -75572,7 +75572,7 @@ var init_PngEmbedder = __esm({
           ColorSpace: "DeviceGray",
           Decode: [0, 1]
         });
-        return context.register(xObject);
+        return context2.register(xObject);
       }
     };
     PngEmbedder_default = PngEmbedder;
@@ -77075,14 +77075,14 @@ var init_PDFPageEmbedder = __esm({
         this.boundingBox = bb;
         this.transformationMatrix = transformationMatrix !== null && transformationMatrix !== void 0 ? transformationMatrix : boundingBoxAdjustedMatrix(bb);
       }
-      embedIntoContext(context, ref) {
+      embedIntoContext(context2, ref) {
         return __awaiter(this, void 0, void 0, function* () {
           const { Contents, Resources } = this.page.normalizedEntries();
           if (!Contents)
             throw new MissingPageContentsEmbeddingError();
           const decodedContents = this.decodeContents(Contents);
           const { left, bottom, right, top } = this.boundingBox;
-          const xObject = context.flateStream(decodedContents, {
+          const xObject = context2.flateStream(decodedContents, {
             Type: "XObject",
             Subtype: "Form",
             FormType: 1,
@@ -77091,10 +77091,10 @@ var init_PDFPageEmbedder = __esm({
             Resources
           });
           if (ref) {
-            context.assign(ref, xObject);
+            context2.assign(ref, xObject);
             return ref;
           } else {
-            return context.register(xObject);
+            return context2.register(xObject);
           }
         });
       }
@@ -77431,9 +77431,9 @@ var init_PDFObjectParser = __esm({
     init_Whitespace();
     init_utils();
     PDFObjectParser = class extends BaseParser_default {
-      constructor(byteStream, context, capNumbers = false, cryptoFactory) {
+      constructor(byteStream, context2, capNumbers = false, cryptoFactory) {
         super(byteStream, capNumbers);
-        this.context = context;
+        this.context = context2;
         this.cryptoFactory = cryptoFactory;
       }
       // TODO: Is it possible to reduce duplicate parsing for ref lookaheads?
@@ -77619,8 +77619,8 @@ var init_PDFObjectParser = __esm({
         return end;
       }
     };
-    PDFObjectParser.forBytes = (bytes2, context, capNumbers) => new PDFObjectParser(ByteStream_default.of(bytes2), context, capNumbers);
-    PDFObjectParser.forByteStream = (byteStream, context, capNumbers = false) => new PDFObjectParser(byteStream, context, capNumbers);
+    PDFObjectParser.forBytes = (bytes2, context2, capNumbers) => new PDFObjectParser(ByteStream_default.of(bytes2), context2, capNumbers);
+    PDFObjectParser.forByteStream = (byteStream, context2, capNumbers = false) => new PDFObjectParser(byteStream, context2, capNumbers);
     PDFObjectParser_default = PDFObjectParser;
   }
 });
@@ -77989,16 +77989,16 @@ var init_PDFParser = __esm({
           return;
         this.skipWhitespaceAndComments();
         const dict = this.parseDict();
-        const { context } = this;
-        context.trailerInfo = {
-          Size: dict.lookupMaybe(PDFName_default.of("Size"), PDFNumber_default) || context.trailerInfo.Size,
-          Root: dict.get(PDFName_default.of("Root")) || context.trailerInfo.Root,
-          Encrypt: dict.get(PDFName_default.of("Encrypt")) || context.trailerInfo.Encrypt,
-          Info: dict.get(PDFName_default.of("Info")) || context.trailerInfo.Info,
-          ID: dict.get(PDFName_default.of("ID")) || context.trailerInfo.ID
+        const { context: context2 } = this;
+        context2.trailerInfo = {
+          Size: dict.lookupMaybe(PDFName_default.of("Size"), PDFNumber_default) || context2.trailerInfo.Size,
+          Root: dict.get(PDFName_default.of("Root")) || context2.trailerInfo.Root,
+          Encrypt: dict.get(PDFName_default.of("Encrypt")) || context2.trailerInfo.Encrypt,
+          Info: dict.get(PDFName_default.of("Info")) || context2.trailerInfo.Info,
+          ID: dict.get(PDFName_default.of("ID")) || context2.trailerInfo.ID
         };
-        if (context.trailerInfo.Size && context.pdfFileDetails.originalBytes) {
-          context.largestObjectNumber = Math.max(context.largestObjectNumber, context.trailerInfo.Size.asNumber() - 1);
+        if (context2.trailerInfo.Size && context2.pdfFileDetails.originalBytes) {
+          context2.largestObjectNumber = Math.max(context2.largestObjectNumber, context2.trailerInfo.Size.asNumber() - 1);
         }
       }
       maybeParseTrailer() {
@@ -80857,14 +80857,14 @@ var init_PDFSecurity = __esm({
     DEFAULT_ALGORITHM = "AES-256";
     AES256_EXTENSION_LEVEL = 8;
     PDFSecurity = class _PDFSecurity {
-      static create(context, options) {
-        return new _PDFSecurity(context, options);
+      static create(context2, options) {
+        return new _PDFSecurity(context2, options);
       }
-      constructor(context, options) {
+      constructor(context2, options) {
         if (!options.ownerPassword && !options.userPassword) {
           throw new Error("Either an owner password or a user password must be specified.");
         }
-        this.context = context;
+        this.context = context2;
         this.initialize(options);
       }
       initialize(options) {
@@ -86790,10 +86790,10 @@ var init_image = __esm({
 });
 
 // node_modules/@cantoo/pdf-lib/es/api/PDFJavaScriptAction.js
-function extractAdditionalActions(aaDict, doc, context) {
+function extractAdditionalActions(aaDict, doc, context2) {
   const actions = {};
   let actionKeys;
-  switch (context) {
+  switch (context2) {
     case "page":
       actionKeys = PAGE_ACTION_KEYS;
       break;
@@ -87200,15 +87200,15 @@ var init_PDFField = __esm({
       //   Font.set(PDFName.of(font.name), font.ref);
       // }
       createAppearanceStream(widget, appearance, font) {
-        const { context } = this.acroField.dict;
+        const { context: context2 } = this.acroField.dict;
         const { width, height } = widget.getRectangle();
         const Resources = font && { Font: { [font.name]: font.ref } };
-        const stream2 = context.formXObject(appearance, {
+        const stream2 = context2.formXObject(appearance, {
           Resources,
-          BBox: context.obj([0, 0, width, height]),
-          Matrix: context.obj([1, 0, 0, 1, 0, 0])
+          BBox: context2.obj([0, 0, width, height]),
+          Matrix: context2.obj([1, 0, 0, 1, 0, 0])
         });
-        const streamRef = context.register(stream2);
+        const streamRef = context2.register(stream2);
         return streamRef;
       }
       /**
@@ -87222,7 +87222,7 @@ var init_PDFField = __esm({
        */
       createImageAppearanceStream(widget, image, alignment) {
         var _a3;
-        const { context } = this.acroField.dict;
+        const { context: context2 } = this.acroField.dict;
         const rectangle = widget.getRectangle();
         const ap = widget.getAppearanceCharacteristics();
         const bs = widget.getBorderStyle();
@@ -87251,18 +87251,18 @@ var init_PDFField = __esm({
         const imageName = this.doc.context.addRandomSuffix("Image", 10);
         const appearance = [...rotate, ...drawImage(imageName, options)];
         const Resources = { XObject: { [imageName]: image.ref } };
-        const stream2 = context.formXObject(appearance, {
+        const stream2 = context2.formXObject(appearance, {
           Resources,
-          BBox: context.obj([0, 0, rectangle.width, rectangle.height]),
-          Matrix: context.obj([1, 0, 0, 1, 0, 0])
+          BBox: context2.obj([0, 0, rectangle.width, rectangle.height]),
+          Matrix: context2.obj([1, 0, 0, 1, 0, 0])
         });
-        return context.register(stream2);
+        return context2.register(stream2);
       }
       createAppearanceDict(widget, appearance, onValue) {
-        const { context } = this.acroField.dict;
+        const { context: context2 } = this.acroField.dict;
         const onStreamRef = this.createAppearanceStream(widget, appearance.on);
         const offStreamRef = this.createAppearanceStream(widget, appearance.off);
-        const appearanceDict = context.obj({});
+        const appearanceDict = context2.obj({});
         appearanceDict.set(onValue, onStreamRef);
         appearanceDict.set(PDFName_default.of("Off"), offStreamRef);
         return appearanceDict;
@@ -89771,11 +89771,11 @@ var init_xfa = __esm({
     init_core();
     init_utils();
     readXfaTemplatePacket = (acroFormDict) => {
-      const context = acroFormDict.context;
+      const context2 = acroFormDict.context;
       const xfaObj = acroFormDict.get(PDFName_default.of("XFA"));
       if (!xfaObj)
         return null;
-      const xfa = xfaObj instanceof PDFRef_default ? context.lookup(xfaObj) : xfaObj;
+      const xfa = xfaObj instanceof PDFRef_default ? context2.lookup(xfaObj) : xfaObj;
       if (!(xfa instanceof PDFArray_default))
         return null;
       for (let idx = 0; idx < xfa.size(); idx += 2) {
@@ -89794,7 +89794,7 @@ var init_xfa = __esm({
         if (sectionName !== "template")
           continue;
         const streamRef = streamObj instanceof PDFRef_default ? streamObj : null;
-        const stream2 = streamRef ? context.lookup(streamRef) : streamObj;
+        const stream2 = streamRef ? context2.lookup(streamRef) : streamObj;
         if (!(stream2 instanceof PDFRawStream_default))
           continue;
         return {
@@ -90300,17 +90300,17 @@ var init_PDFForm = __esm({
         for (const entry of entries) {
           entry.scriptNode.set_content(encode2(newScript));
         }
-        const context = this.acroForm.dict.context;
+        const context2 = this.acroForm.dict.context;
         const newXmlBytes = new TextEncoder().encode(doc.toString());
         const filter = packet.stream.dict.get(PDFName_default.of("Filter"));
-        const newStream = filter !== void 0 ? context.flateStream(newXmlBytes) : context.stream(newXmlBytes);
+        const newStream = filter !== void 0 ? context2.flateStream(newXmlBytes) : context2.stream(newXmlBytes);
         if (packet.streamRef) {
-          context.assign(packet.streamRef, newStream);
-          if (context.snapshot) {
-            context.snapshot.markRefForSave(packet.streamRef);
+          context2.assign(packet.streamRef, newStream);
+          if (context2.snapshot) {
+            context2.snapshot.markRefForSave(packet.streamRef);
           }
         } else {
-          packet.xfa.set(packet.templateIndex, context.register(newStream));
+          packet.xfa.set(packet.templateIndex, context2.register(newStream));
         }
       }
       /**
@@ -91076,14 +91076,14 @@ var init_PDFJavaScript = __esm({
       embed() {
         return __awaiter(this, void 0, void 0, function* () {
           if (!this.alreadyEmbedded) {
-            const { catalog, context } = this.doc;
+            const { catalog, context: context2 } = this.doc;
             const ref = yield this.embedder.embedIntoContext(this.doc.context, this.ref);
             if (!catalog.has(PDFName_default.of("Names"))) {
-              catalog.set(PDFName_default.of("Names"), context.obj({}));
+              catalog.set(PDFName_default.of("Names"), context2.obj({}));
             }
             const Names = catalog.lookup(PDFName_default.of("Names"), PDFDict_default);
             if (!Names.has(PDFName_default.of("JavaScript"))) {
-              Names.set(PDFName_default.of("JavaScript"), context.obj({}));
+              Names.set(PDFName_default.of("JavaScript"), context2.obj({}));
             }
             const Javascript = Names.lookup(PDFName_default.of("JavaScript"), PDFDict_default);
             addNameTreeEntry(Javascript, PDFHexString_default.fromText(this.embedder.scriptName), ref);
@@ -91110,18 +91110,18 @@ var init_JavaScriptEmbedder = __esm({
         this.script = script;
         this.scriptName = scriptName;
       }
-      embedIntoContext(context, ref) {
+      embedIntoContext(context2, ref) {
         return __awaiter(this, void 0, void 0, function* () {
-          const jsActionDict = context.obj({
+          const jsActionDict = context2.obj({
             Type: "Action",
             S: "JavaScript",
             JS: PDFHexString_default.fromText(this.script)
           });
           if (ref) {
-            context.assign(ref, jsActionDict);
+            context2.assign(ref, jsActionDict);
             return ref;
           } else {
-            return context.register(jsActionDict);
+            return context2.register(jsActionDict);
           }
         });
       }
@@ -91439,17 +91439,17 @@ var init_PDFDocument = __esm({
           assertIs(password, "password", ["string", "undefined"]);
           assertIs(forIncrementalUpdate, "forIncrementalUpdate", ["boolean"]);
           const bytes2 = toUint8Array(pdf);
-          const context = yield PDFParser_default.forBytesWithOptions(bytes2, parseSpeed, throwOnInvalidObject, void 0, capNumbers, void 0, forIncrementalUpdate).parseDocument();
-          if (!!context.lookup(context.trailerInfo.Encrypt) && password !== void 0) {
-            const fileIds = context.lookup(context.trailerInfo.ID, PDFArray_default);
-            const encryptDict = context.lookup(context.trailerInfo.Encrypt, PDFDict_default);
+          const context2 = yield PDFParser_default.forBytesWithOptions(bytes2, parseSpeed, throwOnInvalidObject, void 0, capNumbers, void 0, forIncrementalUpdate).parseDocument();
+          if (!!context2.lookup(context2.trailerInfo.Encrypt) && password !== void 0) {
+            const fileIds = context2.lookup(context2.trailerInfo.ID, PDFArray_default);
+            const encryptDict = context2.lookup(context2.trailerInfo.Encrypt, PDFDict_default);
             const decryptedContext = yield PDFParser_default.forBytesWithOptions(bytes2, parseSpeed, throwOnInvalidObject, warnOnInvalidObjects, capNumbers, new CipherTransformFactory(encryptDict, fileIds.get(0).asBytes(), password), forIncrementalUpdate).parseDocument();
             const pdfDoc = new _PDFDocument(decryptedContext, true, updateMetadata, preserveXFA);
             if (forIncrementalUpdate)
               pdfDoc.takeSnapshot();
             return pdfDoc;
           } else {
-            const pdfDoc = new _PDFDocument(context, ignoreEncryption, updateMetadata, preserveXFA);
+            const pdfDoc = new _PDFDocument(context2, ignoreEncryption, updateMetadata, preserveXFA);
             if (forIncrementalUpdate)
               pdfDoc.takeSnapshot();
             return pdfDoc;
@@ -91463,15 +91463,15 @@ var init_PDFDocument = __esm({
       static create(options = {}) {
         return __awaiter(this, void 0, void 0, function* () {
           const { updateMetadata = true } = options;
-          const context = PDFContext_default.create();
-          const pageTree = PDFPageTree_default.withContext(context);
-          const pageTreeRef = context.register(pageTree);
-          const catalog = PDFCatalog_default.withContextAndPages(context, pageTreeRef);
-          context.trailerInfo.Root = context.register(catalog);
-          return new _PDFDocument(context, false, updateMetadata);
+          const context2 = PDFContext_default.create();
+          const pageTree = PDFPageTree_default.withContext(context2);
+          const pageTreeRef = context2.register(pageTree);
+          const catalog = PDFCatalog_default.withContextAndPages(context2, pageTreeRef);
+          context2.trailerInfo.Root = context2.register(catalog);
+          return new _PDFDocument(context2, false, updateMetadata);
         });
       }
-      constructor(context, ignoreEncryption, updateMetadata, preserveXFA = false) {
+      constructor(context2, ignoreEncryption, updateMetadata, preserveXFA = false) {
         this.defaultWordBreaks = [" "];
         this.managePDFAMetadata = false;
         this.computePages = () => {
@@ -91492,15 +91492,15 @@ var init_PDFDocument = __esm({
           const acroForm = this.catalog.getOrCreateAcroForm();
           return PDFForm.of(acroForm, this);
         };
-        assertIs(context, "context", [[PDFContext_default, "PDFContext"]]);
+        assertIs(context2, "context", [[PDFContext_default, "PDFContext"]]);
         assertIs(ignoreEncryption, "ignoreEncryption", ["boolean"]);
         assertIs(preserveXFA, "preserveXFA", ["boolean"]);
-        this.context = context;
-        this.catalog = context.lookup(context.trailerInfo.Root);
-        if (!!context.lookup(context.trailerInfo.Encrypt) && context.isDecrypted) {
-          delete context.trailerInfo.Encrypt;
+        this.context = context2;
+        this.catalog = context2.lookup(context2.trailerInfo.Root);
+        if (!!context2.lookup(context2.trailerInfo.Encrypt) && context2.isDecrypted) {
+          delete context2.trailerInfo.Encrypt;
         }
-        this.isEncrypted = !!context.lookup(context.trailerInfo.Encrypt);
+        this.isEncrypted = !!context2.lookup(context2.trailerInfo.Encrypt);
         this.pageCache = Cache_default.populatedBy(this.computePages);
         this.pageMap = /* @__PURE__ */ new Map();
         this.formCache = Cache_default.populatedBy(this.getOrCreateForm);
@@ -92814,8 +92814,8 @@ var init_PDFDocument = __esm({
               throw new PageEmbeddingMismatchedContextError();
             }
           }
-          const context = pages[0].node.context;
-          const maybeCopyPage = context === this.context ? (p2) => p2 : PDFObjectCopier_default.for(context, this.context).copy;
+          const context2 = pages[0].node.context;
+          const maybeCopyPage = context2 === this.context ? (p2) => p2 : PDFObjectCopier_default.for(context2, this.context).copy;
           const embeddedPages = new Array(pages.length);
           for (let idx = 0, len = pages.length; idx < len; idx++) {
             const page = maybeCopyPage(pages[idx].node);
@@ -93612,7 +93612,7 @@ var init_FontDecoder = __esm({
         this.codeByteLength = codeByteLength;
         this.simpleEncoding = simpleEncoding;
       }
-      static forFontDict(font, context) {
+      static forFontDict(font, context2) {
         const toUnicodeObj = font.lookup(PDFName_default.of("ToUnicode"));
         let toUnicode;
         let codeByteLength = 1;
@@ -93629,7 +93629,7 @@ var init_FontDecoder = __esm({
             codeByteLength = 2;
           }
         }
-        const simpleEncoding = buildSimpleEncoding(font, context);
+        const simpleEncoding = buildSimpleEncoding(font, context2);
         const baseFont = font.lookup(PDFName_default.of("BaseFont"));
         const rawName = baseFont instanceof PDFName_default ? baseFont.decodeText() : "Unknown";
         return new _FontDecoder(stripSubsetPrefix(rawName), toUnicode, codeByteLength, simpleEncoding);
@@ -94105,7 +94105,7 @@ var init_extractPageContents = __esm({
       }
       return stream2.getContents();
     };
-    walkOperations = (operations, resources, context, visitedForms, initialCtm) => {
+    walkOperations = (operations, resources, context2, visitedForms, initialCtm) => {
       var _a3;
       const assets = [];
       const fontCache = /* @__PURE__ */ new Map();
@@ -94159,10 +94159,10 @@ var init_extractPageContents = __esm({
         const cached2 = fontCache.get(name);
         if (cached2)
           return cached2;
-        const fontDict = lookupResource(resources, "Font", name, context);
+        const fontDict = lookupResource(resources, "Font", name, context2);
         if (!(fontDict instanceof PDFDict_default))
           return void 0;
-        const decoder = FontDecoder.forFontDict(fontDict, context);
+        const decoder = FontDecoder.forFontDict(fontDict, context2);
         fontCache.set(name, decoder);
         return decoder;
       };
@@ -94393,7 +94393,7 @@ var init_extractPageContents = __esm({
             const nameArg = op.args[0];
             if (!isName(nameArg))
               break;
-            const xObject = lookupResource(resources, "XObject", nameArg.value, context);
+            const xObject = lookupResource(resources, "XObject", nameArg.value, context2);
             if (!(xObject instanceof PDFStream_default))
               break;
             const subtype = xObject.dict.lookup(PDFName_default.of("Subtype"));
@@ -94414,7 +94414,7 @@ var init_extractPageContents = __esm({
                 });
               }
             } else if (subtype === PDFName_default.of("Form")) {
-              const refKey = formVisitKey(xObject, context);
+              const refKey = formVisitKey(xObject, context2);
               if (visitedForms.has(refKey))
                 break;
               visitedForms.add(refKey);
@@ -94423,7 +94423,7 @@ var init_extractPageContents = __esm({
               const formCtm = multiply(gs.ctm, formMatrix);
               const formBytes = decodeStreamBytes(xObject);
               const formOps = parseContentStream(formBytes);
-              assets.push(...walkOperations(formOps, formResources, context, visitedForms, formCtm));
+              assets.push(...walkOperations(formOps, formResources, context2, visitedForms, formCtm));
             }
             break;
           }
@@ -94454,7 +94454,7 @@ var init_extractPageContents = __esm({
       return values2;
     };
     isName = (value) => !!value && typeof value === "object" && !Array.isArray(value) && value.type === "name";
-    lookupResource = (resources, category, name, context) => {
+    lookupResource = (resources, category, name, context2) => {
       if (!resources)
         return void 0;
       const categoryDict = resources.lookup(PDFName_default.of(category));
@@ -94462,11 +94462,11 @@ var init_extractPageContents = __esm({
         return void 0;
       const value = categoryDict.get(PDFName_default.of(name));
       if (value instanceof PDFRef_default)
-        return context.lookup(value);
+        return context2.lookup(value);
       return value;
     };
-    formVisitKey = (stream2, context) => {
-      const entries = context.enumerateIndirectObjects();
+    formVisitKey = (stream2, context2) => {
+      const entries = context2.enumerateIndirectObjects();
       for (let i = 0; i < entries.length; i++) {
         const [ref, obj] = entries[i];
         if (obj === stream2)
@@ -102647,6 +102647,63 @@ function registerOfficeUploads(app2) {
   });
 }
 
+// server/training.ts
+import { AsyncLocalStorage as AsyncLocalStorage2 } from "node:async_hooks";
+init_db();
+var context = new AsyncLocalStorage2();
+var withTraining = (work) => context.run(true, work);
+var uuid3 = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function trainingRefusal() {
+  throw new HTTPException(409, { res: Response.json({ error: {
+    code: "TRAINING_ONLY",
+    message: "Training account: real payments, card storage and account credentials are disabled. You can practice changes and document uploads. Emails are suppressed."
+  } }, { status: 409 }) });
+}
+async function trainingTarget(id) {
+  if (!id || !uuid3.test(id)) return false;
+  const db = await getDb();
+  const rows = await db.query(`WITH owned AS (
+    SELECT id AS target, id AS client_id FROM clients
+    UNION ALL SELECT id,client_id FROM orders
+    UNION ALL SELECT id,client_id FROM service_orders
+    UNION ALL SELECT id,client_id FROM documents
+    UNION ALL SELECT r.id,o.client_id FROM ra_renewals r JOIN orders o ON o.id=r.order_id
+  ), targets AS (
+    SELECT client_id FROM owned WHERE target=$1::uuid
+    UNION ALL SELECT x.client_id FROM office_operations op JOIN owned x ON x.target=op.target_id WHERE op.id=$1::uuid
+  ) SELECT 1 FROM targets JOIN clients c ON c.id=targets.client_id WHERE c.is_training LIMIT 1`, [id]);
+  return rows.length > 0;
+}
+var trainingMiddleware = async (c, next) => {
+  const path = c.req.path;
+  let training = false;
+  if (path.startsWith("/api/admin/")) {
+    if (await getAdminSession(c)) {
+      const match2 = path.match(/^\/api\/admin\/(?:orders|services|clients|documents|office-operations)\/([0-9a-f-]{36})(?:\/|$)/i);
+      if (match2) training = await trainingTarget(match2[1]);
+      if (path === "/api/admin/documents" && c.req.method === "POST") {
+        const upload2 = c.req.header("x-office-upload");
+        if (upload2 && uuid3.test(upload2)) {
+          const [stage] = await (await getDb()).query("SELECT fields FROM office_upload_stages WHERE id=$1", [upload2]);
+          training = await trainingTarget(stage?.fields.find(([key]) => key === "clientId")?.[1]);
+        } else if (c.req.header("content-type")?.includes("multipart/form-data")) {
+          const body = await c.req.parseBody();
+          training = typeof body.clientId === "string" && await trainingTarget(body.clientId);
+        }
+      }
+    }
+  } else if (path.startsWith("/api/portal/") || path.startsWith("/api/auth/") || path.startsWith("/api/orders") || path === "/api/contact") {
+    const session = await getSession(c);
+    training = await trainingTarget(session?.clientId ?? void 0);
+  }
+  const capability = path.match(/^\/api\/(?:agent-checkout\/(?:order|renewal)|orders)\/([0-9a-f-]{36})(?:\/|$)/i);
+  if (capability) training ||= await trainingTarget(capability[1]);
+  if (!training) return next();
+  c.header("X-Training-Account", "true");
+  if (path.includes("/renewal-card") || path.startsWith("/api/agent-checkout/") || path.startsWith("/api/portal/account/") || /\/admin\/clients\/[^/]+\/email$/.test(path) || c.req.method === "POST" && (path === "/api/orders" || /^\/api\/portal\/services\/(ein|s-election|series|certificate)$/.test(path))) trainingRefusal();
+  return withTraining(next);
+};
+
 // server/app.ts
 init_office_operation();
 init_office_recovery_sources();
@@ -102663,7 +102720,7 @@ init_storage();
 init_encryption();
 init_backup_attention();
 init_backup();
-var uuid3 = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
+var uuid4 = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 function registerOfficeRecovery(app2) {
   app2.post("/admin/backups/restart-after-history-change", async (c) => {
     if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
@@ -102685,7 +102742,7 @@ function registerOfficeRecovery(app2) {
   });
   app2.get("/admin/orders/:id/office-recovery", async (c) => {
     if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!uuid3.test(c.req.param("id"))) return c.json(err("Not found", "NOT_FOUND"), 404);
+    if (!uuid4.test(c.req.param("id"))) return c.json(err("Not found", "NOT_FOUND"), 404);
     const db = await getDb(), tables = await officeRecoveryTables(db), order2 = tables.orders.find((o) => o.id === c.req.param("id") && ["paid", "filed", "formed"].includes(String(o.status)));
     if (!order2) return c.json(err("Not found", "NOT_FOUND"), 404);
     const rows = [...officeFileIdentities(tables, { includeUnknown: true }).values()].filter((i) => i.orderId === order2.id && i.clientId === order2.client_id);
@@ -102693,7 +102750,7 @@ function registerOfficeRecovery(app2) {
   });
   app2.post("/admin/orders/:id/office-recovery/:operationId/:slot", async (c) => {
     if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!uuid3.test(c.req.param("id")) || !uuid3.test(c.req.param("operationId"))) return c.json(err("Not found", "NOT_FOUND"), 404);
+    if (!uuid4.test(c.req.param("id")) || !uuid4.test(c.req.param("operationId"))) return c.json(err("Not found", "NOT_FOUND"), 404);
     if (!["articles", "statement", "upload"].includes(c.req.param("slot"))) return c.json(err("Invalid document slot", "INVALID_SLOT"), 400);
     const db = await getDb(), tables = await officeRecoveryTables(db);
     const order2 = tables.orders.find((o) => o.id === c.req.param("id") && ["paid", "filed", "formed"].includes(String(o.status)));
@@ -102725,7 +102782,7 @@ function registerOfficeRecovery(app2) {
   });
   app2.post("/admin/office-operations/:id/continue", async (c) => {
     if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    if (!uuid3.test(c.req.param("id"))) return c.json(err("Not found", "NOT_FOUND"), 404);
+    if (!uuid4.test(c.req.param("id"))) return c.json(err("Not found", "NOT_FOUND"), 404);
     const db = await getDb();
     const [op] = await db.query("SELECT * FROM office_operations WHERE id=$1", [c.req.param("id")]);
     if (!op) return c.json(err("Not found", "NOT_FOUND"), 404);
@@ -102743,7 +102800,7 @@ function registerOfficeRecovery(app2) {
   app2.get("/admin/backups/history-recovery", async (c) => {
     if (!await requireAdmin(c)) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const orderId = c.req.query("orderId"), historyId2 = c.req.query("historyId");
-    if (orderId && !uuid3.test(orderId) || historyId2 && !/^[a-f0-9]{64}$/.test(historyId2)) return c.json(err("Invalid history filter", "INVALID_FILTER"), 400);
+    if (orderId && !uuid4.test(orderId) || historyId2 && !/^[a-f0-9]{64}$/.test(historyId2)) return c.json(err("Invalid history filter", "INVALID_FILTER"), 400);
     const rows = (await enumerateOfficeHistory(await getDb())).filter((r) => (!orderId || r.orderId === orderId) && (!historyId2 || r.historyId === historyId2));
     let cursor = null;
     try {
@@ -114335,7 +114392,7 @@ var englishBusinessInput = async (c, next) => {
 
 // node_modules/hono/dist/compose.js
 var compose = (middleware, onError, onNotFound) => {
-  return (context, next) => {
+  return (context2, next) => {
     let index2 = -1;
     return dispatch(0);
     async function dispatch(i) {
@@ -114348,31 +114405,31 @@ var compose = (middleware, onError, onNotFound) => {
       let handler2;
       if (middleware[i]) {
         handler2 = middleware[i][0][0];
-        context.req.routeIndex = i;
+        context2.req.routeIndex = i;
       } else {
         handler2 = i === middleware.length && next || void 0;
       }
       if (handler2) {
         try {
-          res = await handler2(context, () => dispatch(i + 1));
+          res = await handler2(context2, () => dispatch(i + 1));
         } catch (err3) {
           if (err3 instanceof Error && onError) {
-            context.error = err3;
-            res = await onError(err3, context);
+            context2.error = err3;
+            res = await onError(err3, context2);
             isError2 = true;
           } else {
             throw err3;
           }
         }
       } else {
-        if (context.finalized === false && onNotFound) {
-          res = await onNotFound(context);
+        if (context2.finalized === false && onNotFound) {
+          res = await onNotFound(context2);
         }
       }
-      if (res && (context.finalized === false || isError2)) {
-        context.res = res;
+      if (res && (context2.finalized === false || isError2)) {
+        context2.res = res;
       }
-      return context;
+      return context2;
     }
   };
 };
@@ -114782,7 +114839,7 @@ var raw = (value, callbacks) => {
   escapedString.callbacks = callbacks;
   return escapedString;
 };
-var resolveCallback = async (str, phase, preserveCallbacks, context, buffer) => {
+var resolveCallback = async (str, phase, preserveCallbacks, context2, buffer) => {
   if (typeof str === "object" && !(str instanceof String)) {
     if (!(str instanceof Promise)) {
       str = str.toString();
@@ -114800,9 +114857,9 @@ var resolveCallback = async (str, phase, preserveCallbacks, context, buffer) => 
   } else {
     buffer = [str];
   }
-  const resStr = Promise.all(callbacks.map((c) => c({ phase, buffer, context }))).then(
+  const resStr = Promise.all(callbacks.map((c) => c({ phase, buffer, context: context2 }))).then(
     (res) => Promise.all(
-      res.filter(Boolean).map((str2) => resolveCallback(str2, phase, false, context, buffer))
+      res.filter(Boolean).map((str2) => resolveCallback(str2, phase, false, context2, buffer))
     ).then(() => buffer[0])
   );
   if (preserveCallbacks) {
@@ -115550,13 +115607,13 @@ var Hono = class _Hono {
     const composed = compose(matchResult[0], this.errorHandler, this.#notFoundHandler);
     return (async () => {
       try {
-        const context = await composed(c);
-        if (!context.finalized) {
+        const context2 = await composed(c);
+        if (!context2.finalized) {
           throw new Error(
             "Context is not finalized. Did you forget to return a Response object or `await next()`?"
           );
         }
-        return context.res;
+        return context2.res;
       } catch (err3) {
         return this.#handleError(err3, c);
       }
@@ -115680,7 +115737,7 @@ var Node = class _Node {
   #index;
   #varIndex;
   #children = createNullObject();
-  insert(tokens, index2, paramMap, context, isStatic) {
+  insert(tokens, index2, paramMap, context2, isStatic) {
     let node = this;
     for (let i = 0, len = tokens.length; i < len; i++) {
       const token = tokens[i];
@@ -115716,7 +115773,7 @@ var Node = class _Node {
           nextNode = node.#children[regexpStr] = new _Node();
         }
         if (name !== "") {
-          nextNode.#varIndex ??= context.varIndex++;
+          nextNode.#varIndex ??= context2.varIndex++;
           paramMap.push([name, nextNode.#varIndex]);
         }
       } else {
@@ -118331,6 +118388,7 @@ app.use("/admin/*", async (c, next) => {
   return next();
 });
 registerOfficeUploads(app);
+app.use("*", trainingMiddleware);
 registerPaymentRoutes(app);
 registerAgentCheckout(app);
 registerAgentOffice(app);
