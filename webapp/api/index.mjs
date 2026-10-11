@@ -51080,6 +51080,9 @@ BEGIN
   END LOOP;
   RETURN 0;
 END $$`
+      ] },
+      { id: 29, name: "interactive-training-clients", statements: [
+        `ALTER TABLE clients ADD COLUMN IF NOT EXISTS is_training boolean NOT NULL DEFAULT false`
       ] }
       // Append future migrations here with the next id. Never edit an entry.
     ];
