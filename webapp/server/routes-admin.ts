@@ -929,7 +929,7 @@ app.get("/admin/clients", async (c) => {
   // client who requested cancellation stays listed until we are replaced as
   // agent of record (the cancellation chip carries that state).
   const rows = await db.query(
-    `SELECT cl.id, cl.email, cl.name, cl.created_at,
+    `SELECT cl.id, cl.email, cl.name, cl.created_at, cl.is_training,
             (SELECT min(o.ra_cancellation_requested_at) FROM orders o WHERE o.client_id=cl.id AND o.paid_at IS NOT NULL AND o.payload->'registeredAgent'->>'choice'='SERVICE' AND (o.ra_ended_date IS NULL OR o.ra_ended_date > (now() AT TIME ZONE 'America/New_York')::date)) AS ra_cancellation_requested_at,
             (cl.password_hash IS NOT NULL) AS has_password,
             -- The name in parts, from the account's earliest paid order (the

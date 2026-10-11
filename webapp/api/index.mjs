@@ -117504,7 +117504,7 @@ function registerAdminRoutes(app2) {
     if (!admin) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
     const db = await getDb();
     const rows = await db.query(
-      `SELECT cl.id, cl.email, cl.name, cl.created_at,
+      `SELECT cl.id, cl.email, cl.name, cl.created_at, cl.is_training,
             (SELECT min(o.ra_cancellation_requested_at) FROM orders o WHERE o.client_id=cl.id AND o.paid_at IS NOT NULL AND o.payload->'registeredAgent'->>'choice'='SERVICE' AND (o.ra_ended_date IS NULL OR o.ra_ended_date > (now() AT TIME ZONE 'America/New_York')::date)) AS ra_cancellation_requested_at,
             (cl.password_hash IS NOT NULL) AS has_password,
             -- The name in parts, from the account's earliest paid order (the
