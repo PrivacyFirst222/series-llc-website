@@ -53869,7 +53869,7 @@ var init_training = __esm({
       if (capability) training ||= await trainingTarget(capability[1]);
       if (!training) return next();
       c.header("X-Training-Account", "true");
-      if (path.includes("/renewal-card") || path.startsWith("/api/agent-checkout/") || path.startsWith("/api/portal/account/") || /\/admin\/clients\/[^/]+\/email$/.test(path) || c.req.method === "POST" && (path === "/api/orders" || /^\/api\/portal\/services\/(ein|s-election|series|certificate)$/.test(path))) trainingRefusal();
+      if (path === "/api/contact" || path.endsWith("/resend-welcome") || path.includes("/renewal-card") || path.startsWith("/api/agent-checkout/") || path.startsWith("/api/portal/account/") || /\/admin\/clients\/[^/]+\/email$/.test(path) || c.req.method === "POST" && (path === "/api/orders" || /^\/api\/portal\/services\/(ein|s-election|series|certificate)$/.test(path))) trainingRefusal();
       return withTraining(next);
     };
   }

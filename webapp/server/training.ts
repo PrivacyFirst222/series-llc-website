@@ -82,7 +82,7 @@ export const trainingMiddleware: MiddlewareHandler = async (c, next) => {
   if (!training) return next();
   c.header('X-Training-Account', 'true');
   // Refuse before a purchase row, card attempt, or credential token is created.
-  if (path.includes('/renewal-card') || path.startsWith('/api/agent-checkout/') ||
+  if (path === '/api/contact' || path.endsWith('/resend-welcome') || path.includes('/renewal-card') || path.startsWith('/api/agent-checkout/') ||
       path.startsWith('/api/portal/account/') || /\/admin\/clients\/[^/]+\/email$/.test(path) ||
       (c.req.method === 'POST' && (path === '/api/orders' || /^\/api\/portal\/services\/(ein|s-election|series|certificate)$/.test(path)))) trainingRefusal();
   return withTraining(next);
