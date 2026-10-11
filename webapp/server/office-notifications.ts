@@ -52,7 +52,8 @@ async function sendDocumentNotice(id:string):Promise<boolean> {
    if(!order)throw new Error('Formation order is unavailable');
    mail={subject:'Your formation documents have been corrected',html:`<p>We corrected the formation documents for ${escape(order.llc_name)}. The updated documents are available in your client portal.</p><p><a href="${escape(portalUrl)}">View corrected documents</a></p>`};
   }
-  await sendMail({to:d.email,...mail,...(d.meta?.noticeKind==='formation-correction'?{idempotencyKey:`formation-correction/${d.meta.correctionId}`}:{})});
+  const providerId=await sendMail({to:d.email,...mail,...(d.meta?.noticeKind==='formation-correction'?{idempotencyKey:`formation-correction/${d.meta.correctionId}`}:{})});
+  if(providerId==='training-suppressed') {await db.query("UPDATE documents SET notice_status='suppressed',notice_sent_at=NULL,notice_error=NULL,notice_recipient=$2,notice_lock_until=NULL WHERE id=$1",[id,d.email]);return false;}
   await db.query("UPDATE documents SET notice_status='sent',notice_sent_at=now(),notice_error=NULL,notice_recipient=$2,notice_lock_until=NULL WHERE id=$1",[id,d.email]);return true;
  }catch(e){await db.query("UPDATE documents SET notice_status='failed',notice_error=$2,notice_recipient=$3,notice_lock_until=NULL WHERE id=$1",[id,String(e).slice(0,300),d.email]);return false;}
 }
@@ -68,7 +69,8 @@ export async function notifyContact(id:string):Promise<boolean> {
  if(!m)return false;
  try {
   if(!env.ADMIN_NOTIFY_EMAIL)throw new Error('Office notification address is not configured');
-  await sendMail({to:env.ADMIN_NOTIFY_EMAIL,replyTo:m.email,subject:`Contact form: ${m.name}`,html:`<p><strong>${escape(m.name)}</strong> &lt;${escape(m.email)}&gt; wrote:</p><p>${escape(m.message).replace(/\n/g,'<br>')}</p>`});
+  const providerId=await sendMail({to:env.ADMIN_NOTIFY_EMAIL,replyTo:m.email,subject:`Contact form: ${m.name}`,html:`<p><strong>${escape(m.name)}</strong> &lt;${escape(m.email)}&gt; wrote:</p><p>${escape(m.message).replace(/\n/g,'<br>')}</p>`});
+  if(providerId==='training-suppressed') {await db.query("UPDATE contact_messages SET notice_status='suppressed',notice_sent_at=NULL,notice_error=NULL,notice_lock_until=NULL WHERE id=$1",[id]);return false;}
   await db.query("UPDATE contact_messages SET notice_status='sent',notice_sent_at=now(),notice_error=NULL,notice_lock_until=NULL WHERE id=$1",[id]);return true;
  }catch(e){await db.query("UPDATE contact_messages SET notice_status='failed',notice_error=$2,notice_lock_until=NULL WHERE id=$1",[id,String(e).slice(0,300)]);return false;}
 }
