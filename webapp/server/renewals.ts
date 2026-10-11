@@ -1,3 +1,4 @@
+import { trainingTarget } from "./training";
 import { runCheckoutRecovery } from './checkout-recovery';
 import { ensureAgentPaymentLink, deliverAgentCorrespondence, retryAgentCorrespondence } from './agent-correspondence';
 import { obligationPurpose, lateNoticeFee } from './agent-obligations';
@@ -115,8 +116,8 @@ export async function runRenewals(today:string):Promise<{notices:number;charged:
  // Reconcile persisted attempts before appointment eligibility. This pass can
  // never create an attempt, including on resigned and ended appointments.
  const pending=await db.query<{target_id:string}>("SELECT DISTINCT a.target_id FROM ra_payment_attempts a JOIN ra_renewals r ON r.id=a.target_id WHERE a.kind='renewal' AND a.status IN ('pending','approved','completed') AND r.status NOT IN ('charged','paid_by_link','cancelled') UNION SELECT ra_payment_target AS target_id FROM orders WHERE ra_payment_target IS NOT NULL");
- for(const a of pending){try{await payAgentTarget('renewal',a.target_id,{resumeOnly:true,billingDate:today,actor:'daily job'});}catch(error){console.error('[renewal] reconciliation needs attention',a.target_id,error);}}
- const orders=await db.query<RenewalOrder>("SELECT * FROM orders WHERE status='formed' AND ra_renewal_date IS NOT NULL AND payload->'registeredAgent'->>'choice'='SERVICE'");
+ for(const a of pending){if(await trainingTarget(a.target_id))continue;try{await payAgentTarget('renewal',a.target_id,{resumeOnly:true,billingDate:today,actor:'daily job'});}catch(error){console.error('[renewal] reconciliation needs attention',a.target_id,error);}}
+ const orders=await db.query<RenewalOrder>("SELECT * FROM orders WHERE NOT EXISTS (SELECT 1 FROM clients c WHERE c.id=orders.client_id AND c.is_training) AND status='formed' AND ra_renewal_date IS NOT NULL AND payload->'registeredAgent'->>'choice'='SERVICE'");
  for(const o of orders) {
   if((o.ra_ended_date||o.ra_replaced_at||(o as RenewalOrder & {ra_resignation_submitted?:unknown}).ra_resignation_submitted)&&!lateNoticeFee({...o,renewal_date:o.ra_renewal_date}))continue;
   const date=isoOf(o.ra_renewal_date)!;const cancel=o.ra_cancellation_requested_at?easternDateIso(new Date(String(o.ra_cancellation_requested_at))):null;
@@ -167,6 +168,7 @@ export async function runRenewals(today:string):Promise<{notices:number;charged:
 /** Atomic fulfillment: never move an anniversary twice, including a replay
  * after payment succeeded but the client lost the HTTP response. */
 export async function fulfillPaidRenewal(renewalId:string,paymentId:string|null,simulate?:CardSimulation,cardAlreadySaved=false,automatic=false):Promise<void> {
+ if(await trainingTarget(renewalId))return;
  const db=await getDb();
  const [row]=await db.query<RenewalRow & RenewalOrder>(`SELECT r.*,o.contact_name,o.contact_email,o.llc_name,o.payload,o.ra_appointment_date,o.ra_resignation_submitted,o.ra_replaced_at,o.ra_ended_date,o.ra_cancellation_requested_at FROM ra_renewals r JOIN orders o ON o.id=r.order_id WHERE r.id=$1`,[renewalId]);
  if(!row||['charged','paid_by_link','cancelled'].includes(row.status))return;

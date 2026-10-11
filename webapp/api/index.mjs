@@ -103124,6 +103124,7 @@ async function squareRead(path) {
 }
 
 // server/checkout-recovery.ts
+init_training();
 init_db();
 init_env();
 init_email();
@@ -103151,7 +103152,7 @@ async function deliverPaymentAlerts() {
   }
 }
 async function checkCheckout(kind, id) {
-  if (!env.SQUARE_ACCESS_TOKEN) return;
+  if (!env.SQUARE_ACCESS_TOKEN || await trainingTarget(id)) return;
   const db = await getDb(), table = tableFor(kind), lease = crypto.randomUUID();
   const [row] = await db.query(`UPDATE ${table}
     SET payment_check_lease=$2,payment_check_until=now()+interval '3 minutes',payment_check_after=now()+interval '1 minute'
@@ -103201,6 +103202,7 @@ async function runCheckoutRecovery() {
     let checked = 0;
     const deadline = Date.now() + 18e4;
     const rows = await db.query(`SELECT id FROM ${tableFor(kind)} WHERE (status='pending_payment' ${kind === "order" ? "OR (paid_at IS NOT NULL AND fulfillment_completed_at IS NULL)" : ""})
+      AND NOT EXISTS (SELECT 1 FROM clients c WHERE c.id=${tableFor(kind)}.client_id AND c.is_training)
       AND (payment_check_after IS NULL OR payment_check_after<=now()) AND (payment_check_until IS NULL OR payment_check_until<now())
       ORDER BY payment_check_after NULLS FIRST,created_at,id LIMIT 25`);
     for (const row of rows) {

@@ -1,3 +1,4 @@
+import { trainingTarget } from "./training";
 import { getDb } from './db';
 import { env } from './env';
 import { squareRead, createCheckout, type AgentPayment } from './square';
@@ -28,7 +29,7 @@ export async function deliverPaymentAlerts():Promise<void> {
 
 /** Reads provider facts only. No replacement payment or new card authorization. */
 export async function checkCheckout(kind:Kind,id:string):Promise<void> {
-  if(!env.SQUARE_ACCESS_TOKEN)return;
+  if(!env.SQUARE_ACCESS_TOKEN || await trainingTarget(id))return;
   const db=await getDb(), table=tableFor(kind), lease=crypto.randomUUID();
   const [row]=await db.query<{id:string;square_order_id:string|null;checkout_request:Record<string,unknown>|null;total_cents:number;amount_cents:number;status:string;llc_name:string}>(`UPDATE ${table}
     SET payment_check_lease=$2,payment_check_until=now()+interval '3 minutes',payment_check_after=now()+interval '1 minute'
@@ -84,6 +85,7 @@ export async function runCheckoutRecovery():Promise<{checked:number}> {
   const counts=await Promise.all((['order','service'] as const).map(async kind => {
     let checked=0;const deadline=Date.now()+180000;
     const rows=await db.query<{id:string}>(`SELECT id FROM ${tableFor(kind)} WHERE (status='pending_payment' ${kind==='order'?"OR (paid_at IS NOT NULL AND fulfillment_completed_at IS NULL)":''})
+      AND NOT EXISTS (SELECT 1 FROM clients c WHERE c.id=${tableFor(kind)}.client_id AND c.is_training)
       AND (payment_check_after IS NULL OR payment_check_after<=now()) AND (payment_check_until IS NULL OR payment_check_until<now())
       ORDER BY payment_check_after NULLS FIRST,created_at,id LIMIT 25`);
     // A provider outage must not prevent the remaining cases or renewal job.
