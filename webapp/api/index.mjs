@@ -102915,6 +102915,7 @@ function registerOfficeRecovery(app2) {
 init_http_exception();
 
 // server/ra-checkout.ts
+init_training();
 init_db();
 init_env();
 init_crypto();
@@ -114142,6 +114143,7 @@ async function target(kind, id) {
   return (await db.query(kind === "order" ? `SELECT id,id AS order_id,status,total_cents AS amount,contact_email AS email,contact_name AS name,llc_name,payload,checkout_token FROM orders WHERE id=$1` : `SELECT r.id,r.order_id,r.status,r.amount_cents AS amount,o.contact_email AS email,o.contact_name AS name,o.llc_name,o.payload,r.checkout_token,r.purpose,r.renewal_date,(r.status NOT IN ('charged','paid_by_link','cancelled') AND EXISTS(SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed'))) AS "reconcilingPayment",o.ra_resignation_submitted,o.ra_replaced_at,o.ra_ended_date,o.ra_cancellation_requested_at FROM ra_renewals r JOIN orders o ON o.id=r.order_id WHERE r.id=$1`, [id]))[0];
 }
 async function agentCheckoutLink(kind, id) {
+  await blockTrainingPayment(id);
   const db = await getDb(), table = kind === "order" ? "orders" : "ra_renewals";
   const row = await target(kind, id);
   if (!row) throw new Error("Payment target missing");
@@ -114150,6 +114152,7 @@ async function agentCheckoutLink(kind, id) {
   return `${env.PUBLIC_BASE_URL}/agent-checkout?kind=${kind}&id=${id}&token=${saved.checkout_token}`;
 }
 async function payAgentTarget(kind, id, source) {
+  await blockTrainingPayment(id);
   if (!env.OFFLINE && !env.SQUARE_ACCESS_TOKEN || env.isProd && env.OFFLINE) return { ok: false, code: "UNAVAILABLE", message: "Card checkout is unavailable. Please contact support; no payment was taken." };
   const db = await getDb();
   let t = await target(kind, id);

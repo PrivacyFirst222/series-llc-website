@@ -1,3 +1,4 @@
+import { blockTrainingPayment } from "./training";
 import type { Hono } from 'hono';
 import { z } from 'zod';
 import { getDb } from './db';
@@ -19,6 +20,7 @@ async function target(kind:PaymentKind,id:string):Promise<Target|undefined> {
  return (await db.query<Target>(kind==='order' ? `SELECT id,id AS order_id,status,total_cents AS amount,contact_email AS email,contact_name AS name,llc_name,payload,checkout_token FROM orders WHERE id=$1` : `SELECT r.id,r.order_id,r.status,r.amount_cents AS amount,o.contact_email AS email,o.contact_name AS name,o.llc_name,o.payload,r.checkout_token,r.purpose,r.renewal_date,(r.status NOT IN ('charged','paid_by_link','cancelled') AND EXISTS(SELECT 1 FROM ra_payment_attempts a WHERE a.target_id=r.id AND a.status IN ('pending','approved','completed'))) AS "reconcilingPayment",o.ra_resignation_submitted,o.ra_replaced_at,o.ra_ended_date,o.ra_cancellation_requested_at FROM ra_renewals r JOIN orders o ON o.id=r.order_id WHERE r.id=$1`,[id]))[0];
 }
 export async function agentCheckoutLink(kind:PaymentKind,id:string):Promise<string> {
+ await blockTrainingPayment(id);
  const db=await getDb(), table=kind==='order'?'orders':'ra_renewals';
  const row=await target(kind,id); if(!row)throw new Error('Payment target missing');
  // Stable capability link. Tokens expose payment metadata only, never portal documents.
@@ -29,6 +31,7 @@ export async function agentCheckoutLink(kind:PaymentKind,id:string):Promise<stri
 interface Source { token?:string; cardId?:string; customerId?:string; automatic?:boolean; cardLast4?:string|null; resumeOnly?:boolean; billingDate?:string; actor?:string }
 interface Attempt { id:string;source_token:string;status:string;square_payment_id:string|null;failure_code:string|null }
 export async function payAgentTarget(kind:PaymentKind,id:string,source:Source):Promise<{ok:boolean; code?:string; message?:string; paymentId?:string; automatic?:boolean; declinedCardLast4?:string|null}> {
+ await blockTrainingPayment(id);
  if ((!env.OFFLINE && !env.SQUARE_ACCESS_TOKEN) || (env.isProd && env.OFFLINE)) return {ok:false,code:'UNAVAILABLE',message:'Card checkout is unavailable. Please contact support; no payment was taken.'};
  const db=await getDb();let t=await target(kind,id); if(!t)throw new Error('Payment target missing');
  let generation:string|null=null,protocol=0;
