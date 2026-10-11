@@ -16,6 +16,7 @@ export interface BoardOrder {
   work_stage: "pending" | "new" | "state" | "post-filing" | "completed" | "other";
   id: string;
   client_id: string | null;
+  is_training?: boolean;
   contact_name: string;
   contact_email: string;
   llc_name: string;
@@ -85,7 +86,12 @@ function Card({
     >
       <button type="button" onClick={onOpen} className="block w-full text-left">
         <div className="flex items-start justify-between gap-2">
-          <span className="font-medium leading-snug">{order.llc_name}</span>
+          <span className="min-w-0">
+            <span className="block font-medium leading-snug">{order.llc_name}</span>
+            {order.is_training ? (
+              <span className="mt-1 inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900" title="Practice account — real payments and emails are blocked.">Training</span>
+            ) : null}
+          </span>
           {freshWork ? (
             <span className="rounded-full bg-trust/10 px-2 py-0.5 text-xs font-medium text-trust">new order</span>
           ) : null}
@@ -223,6 +229,11 @@ export default function OrderBoard({ enabled, view = "active" }: { enabled: bool
   const q = search.trim();
   const [page, setPage] = useState(1);
 
+  const clientsQuery = useQuery({
+    queryKey: ["admin-clients"],
+    queryFn: () => api.get<{ id: string; is_training?: boolean }[]>("/api/admin/clients"),
+    enabled,
+  });
   const ordersQuery = useQuery({
     queryKey: ["admin", "orders", view, q, page],
     queryFn: () => api.get<BoardData>(`/api/admin/orders?view=${view}&page=${page}&q=${encodeURIComponent(q)}`),
@@ -248,7 +259,11 @@ export default function OrderBoard({ enabled, view = "active" }: { enabled: bool
     onError: (e: Error) => toast({ duration: Infinity, title: "Could not mark sent", description: e.message }),
   });
 
-  const orders = ordersQuery.data?.orders ?? [];
+  const trainingClientIds = new Set((clientsQuery.data ?? []).filter((client) => client.is_training).map((client) => client.id));
+  const orders = (ordersQuery.data?.orders ?? []).map((order) => ({
+    ...order,
+    is_training: order.client_id !== null && trainingClientIds.has(order.client_id),
+  }));
   const total = ordersQuery.data?.total ?? 0;
   const shown = ordersQuery.data?.shown ?? 0;
 
@@ -294,6 +309,13 @@ export default function OrderBoard({ enabled, view = "active" }: { enabled: bool
 
 
       {ordersQuery.isPending ? <p className="mt-4 text-sm" role="status">Loading orders…</p> : null}
+      {clientsQuery.isPending ? <p className="mt-3 text-sm" role="status">Checking training labels…</p> : null}
+      {clientsQuery.isError ? (
+        <div className="mt-3 text-sm" role="alert">
+          Could not check which orders are training accounts. Labels may be incomplete.{" "}
+          <Button type="button" variant="outline" size="sm" disabled={clientsQuery.isFetching} onClick={() => void clientsQuery.refetch()}>Retry training labels</Button>
+        </div>
+      ) : null}
       {ordersQuery.isSuccess && (view === "active" || servicesQuery.isSuccess) ? (
         <div className="mt-4 flex flex-col gap-4 xl:flex-row">
           {view === "completed" ? (
