@@ -597,6 +597,55 @@ const MIGRATIONS: { id: number; name: string; statements: string[] }[] = [
     )`,
     `CREATE INDEX IF NOT EXISTS office_upload_stages_cleanup ON office_upload_stages (cleanup_checked_at,expires_at)`,
   ]},
+  // F-S4-01: normalize only the owning company, never the series identifier.
+  { id: 28, name: "series-company-alias-identity", statements: [
+    `CREATE OR REPLACE FUNCTION purchase_company_identity(value text) RETURNS text
+LANGUAGE sql IMMUTABLE AS $$
+  SELECT COALESCE(string_agg(CASE WHEN length(token)>3 AND right(token,1)='s'
+    THEN left(token,length(token)-1) ELSE token END, '' ORDER BY position),'')
+  FROM regexp_split_to_table(
+    regexp_replace(replace(replace(replace(
+      regexp_replace(purchase_name(value),
+        '(professional[[:space:]]+)?limited[[:space:]]+liability[[:space:]]+company', 'llc', 'g'),
+      '&',' and '),'''',''),'’',''), '[^[:alnum:][:space:]]','','g'),
+    '[[:space:]]+') WITH ORDINALITY AS words(token,position)
+  WHERE token<>'' AND token NOT IN
+    ('the','a','an','and','llc','pllc','inc','incorporated','corp','corporation',
+     'co','company','ltd','limited','lp','llp','lllp','pa','pl','pc','chartered')
+$$`,
+    `CREATE OR REPLACE FUNCTION purchase_series_owner_end(value text, company_name text) RETURNS integer
+LANGUAGE plpgsql IMMUTABLE AS $$
+DECLARE name text := purchase_series_unwrap(value);
+  owner_key text := regexp_replace(purchase_name(company_name),'[^[:alnum:]]','','g');
+  prefix_key text := ''; ch text; suffix text; i integer; alias_key text; prefix text;
+BEGIN
+  -- Preserve the established literal/punctuation match and its exact boundary.
+  IF owner_key<>'' THEN
+    FOR i IN 1..length(name) LOOP
+      ch := substr(name,i,1);
+      IF ch ~ '[[:alnum:]]' THEN prefix_key := prefix_key || ch; END IF;
+      IF left(owner_key,length(prefix_key))<>prefix_key THEN EXIT; END IF;
+      IF prefix_key=owner_key THEN
+        suffix := substr(name,i+1);
+        IF suffix ~ '^[^[:alnum:]]' AND suffix ~ '[[:alnum:]]' THEN RETURN i; END IF;
+        EXIT;
+      END IF;
+    END LOOP;
+  END IF;
+  alias_key := purchase_company_identity(company_name);
+  IF alias_key='' THEN RETURN 0; END IF;
+  -- Only complete company endings qualify. Never fold words in the series label.
+  FOR i IN 1..length(name) LOOP
+    IF substr(name,i,1) !~ '[[:alnum:]]' THEN CONTINUE; END IF;
+    suffix := substr(name,i+1);
+    IF suffix !~ '^[^[:alnum:]]' OR suffix !~ '[[:alnum:]]' THEN CONTINUE; END IF;
+    prefix := left(name,i);
+    IF prefix ~ '(^|[^[:alnum:]])(p[.]?l[.]?l[.]?c|l[.]?l[.]?c|(professional[[:space:]]+)?limited[[:space:]]+liability[[:space:]]+company)$'
+       AND purchase_company_identity(prefix)=alias_key THEN RETURN i; END IF;
+  END LOOP;
+  RETURN 0;
+END $$`,
+  ]},
   // Append future migrations here with the next id. Never edit an entry.
 ];
 
