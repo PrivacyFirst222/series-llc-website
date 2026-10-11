@@ -895,6 +895,7 @@ app.get("/auth/me", async (c) => {
       email: rows[0]?.email ?? "",
       name: rows[0]?.name ?? "",
       pendingEmail: rows[0]?.pending_email ?? null,
+      isTraining: (await db.query<{is_training:boolean}>("SELECT is_training FROM clients WHERE id=$1",[session.clientId]))[0]?.is_training === true,
       // The portal shows a banner and an Exit when the admin is looking.
       viewingAsAdmin: session.viewingAsAdmin,
     },
@@ -909,7 +910,7 @@ app.post("/auth/forgot", async (c) => {
   // Always report success — never reveal whether an account exists.
   if (!body.success) return c.json({ data: { ok: true } });
   const db = await getDb();
-  const rows = await db.query<{ id: string }>("SELECT id FROM clients WHERE email = $1", [
+  const rows = await db.query<{ id: string }>("SELECT id FROM clients WHERE email = $1 AND NOT is_training", [
     body.data.email.toLowerCase(),
   ]);
   if (rows.length > 0) {
@@ -949,7 +950,7 @@ app.post("/auth/set-password", async (c) => {
   const rows = await db.query<{ client_id: string }>(`WITH changed AS (
     UPDATE clients c SET password_hash=$2,pending_email=NULL,
       auth_version=c.auth_version+1,password_version=c.password_version+1
-    FROM auth_tokens t WHERE t.token_hash=$1 AND t.client_id=c.id
+    FROM auth_tokens t WHERE t.token_hash=$1 AND t.client_id=c.id AND NOT c.is_training
       AND t.expires_at>now() AND t.used_at IS NULL
       AND t.purpose IN ('set_password','reset_password') AND t.account_version=c.auth_version
     RETURNING c.id,c.password_version
