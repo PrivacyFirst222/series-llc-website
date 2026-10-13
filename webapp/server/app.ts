@@ -41,7 +41,10 @@ app.use("/admin/*", async (c, next) => {
  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return c.json(err("Not found", "NOT_FOUND"), 404);
  const db = await getDb();
  const table = match[1] === "orders" ? "orders" : "service_orders";
- const [paid] = await db.query(`SELECT id FROM ${table} WHERE id=$1 AND paid_at IS NOT NULL AND status NOT IN ('pending_payment','duplicate_payment')`, [id]);
+ // A series request holding the included third series has no payment but is
+ // office work all the same.
+ const authorized = table === "service_orders" ? "(paid_at IS NOT NULL OR (type='series' AND credit_authorized_at IS NOT NULL))" : "paid_at IS NOT NULL";
+ const [paid] = await db.query(`SELECT id FROM ${table} WHERE id=$1 AND ${authorized} AND status NOT IN ('pending_payment','duplicate_payment')`, [id]);
  if (!paid) return c.json(err("Not found", "NOT_FOUND"), 404);
  return next();
 });

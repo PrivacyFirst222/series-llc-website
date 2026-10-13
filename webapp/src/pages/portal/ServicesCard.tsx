@@ -2,7 +2,7 @@ import { serviceQueryUrl } from "@/lib/serviceQueryUrl";
 import { formatDate } from "@/lib/datetime";
 import type { JointKind } from "@/lib/jointOwner";
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PlusCircle, Landmark, ShoppingBag, FileCheck2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,6 +64,8 @@ export interface ServicesData {
   dev: boolean;
   members: { name: string; address: string }[];
   pricing: { seriesCents: number; einCents: number; sElectionCents: number; certStatusCents: number; certifiedCopyCents: number };
+  /** A paid package formed with two series still holds its included third. */
+  includedSeriesRemaining?: boolean;
   sElection: {
     eligible: boolean;
     reason: "ok" | "no_new_formation" | "window_closed" | "already_ordered";
@@ -126,13 +128,31 @@ export function ServicesCard({ company }: { company?: string | null }) {
     queryFn: () => api.get<ServicesData>(serviceQueryUrl(company)),
   });
 
+  const queryClient = useQueryClient();
   const orderSeries = useMutation({
+    // The price shown goes with the request, so a stale dialog can never be
+    // charged a price the customer did not see.
     mutationFn: (body: { suffix: string; purpose?: string }) =>
-      api.post<{ checkoutUrl: string }>(`/api/portal/services/series${cq}`, body),
+      api.post<{ checkoutUrl: string | null }>(`/api/portal/services/series${cq}`, { ...body, expectedCents: servicesQuery.data?.pricing.seriesCents }),
     onSuccess: (res) => {
-      window.location.href = res.checkoutUrl;
+      if (res.checkoutUrl) {
+        window.location.href = res.checkoutUrl;
+        return;
+      }
+      // The included third series: no checkout. The request is already with the office.
+      setSeriesOpen(false);
+      void queryClient.invalidateQueries({ queryKey: ["portal-services", company ?? null] });
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : "Something went wrong."),
+    onError: (e) => {
+      // The price changed (another request took the credit): no message, the
+      // dialog simply shows the current price.
+      if (e instanceof ApiError && e.status === 409) {
+        void servicesQuery.refetch();
+        setError("");
+        return;
+      }
+      setError(e instanceof ApiError ? e.message : "Something went wrong.");
+    },
   });
 
   const orderEin = useMutation({
@@ -192,6 +212,8 @@ export function ServicesCard({ company }: { company?: string | null }) {
   const einAllCoveredText =
     "You already purchased a Federal EIN for the mothership LLC and every protected series. No further EINs are necessary or appropriate.";
   if (!data) return null;
+  // The included third series shows as $0.00 (Adam, 11 Oct 2026).
+  const seriesFree = data.pricing.seriesCents === 0;
 
   return (
     <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
@@ -200,6 +222,9 @@ export function ServicesCard({ company }: { company?: string | null }) {
         <h2 className="font-display text-lg">Order services</h2>
       </div>
 
+      {data.includedSeriesRemaining ? (
+        <p className="px-5 pt-4 text-sm font-medium text-trust">1 included series remaining</p>
+      ) : null}
       <div className="grid gap-3 px-5 py-4 sm:grid-cols-2">
         {/* Add a series */}
         <Dialog open={seriesOpen} onOpenChange={(v) => { setSeriesOpen(v); setError(""); }}>
@@ -215,15 +240,17 @@ export function ServicesCard({ company }: { company?: string | null }) {
               <p className="mt-1 text-xs text-muted-foreground">
                 We draft and file a new Protected Series Designation for {data.llcName || "your LLC"}.
               </p>
-              <p className="mt-2 font-display text-lg text-trust">{money(data.pricing.seriesCents)}</p>
+              <p className="mt-2 font-display text-lg text-trust">{seriesFree ? "$0.00" : money(data.pricing.seriesCents)}</p>
             </button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add a Protected Series</DialogTitle>
               <DialogDescription>
-                {money(data.pricing.seriesCents)} total — $25 preparation plus the $25 state filing
-                fee. The name must include "PS", "P.S.", or "protected series."
+                {seriesFree
+                  ? `$0.00 total. The name must include "PS", "P.S.", or "protected series."`
+                  : <>{money(data.pricing.seriesCents)} total — $25 preparation plus the $25 state filing
+                fee. The name must include "PS", "P.S.", or "protected series."</>}
               </DialogDescription>
             </DialogHeader>
             <form
@@ -256,7 +283,9 @@ export function ServicesCard({ company }: { company?: string | null }) {
               {error ? <p className="text-xs text-destructive">{error}</p> : null}
               <DialogFooter>
                 <Button type="submit" disabled={orderSeries.isPending} className="rounded-full">
-                  {orderSeries.isPending ? "Preparing checkout…" : "Continue to payment"}
+                  {seriesFree
+                    ? orderSeries.isPending ? "Submitting…" : "Submit request"
+                    : orderSeries.isPending ? "Preparing checkout…" : "Continue to payment"}
                 </Button>
               </DialogFooter>
             </form>

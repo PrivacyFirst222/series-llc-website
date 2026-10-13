@@ -6,7 +6,7 @@
  * runs this same harness against an earlier committed implementation.
  */
 import { execFileSync, spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -38,6 +38,8 @@ const ruling = (id: string, key?: string): Ruling => ({
 try {
   execFileSync("git", ["clone", "--quiet", "--no-hardlinks", ROOT, repo]);
   execFileSync("git", ["remote", "remove", "origin"], { cwd: repo });
+  // ledger-print.ts imports typescript from webapp/node_modules, which a clone does not carry.
+  symlinkSync(join(ROOT, "webapp/node_modules"), join(repo, "webapp/node_modules"));
   const at = process.argv.indexOf("--against");
   if (at >= 0) {
     if (!process.argv[at + 1]) throw new Error("--against needs a commit");

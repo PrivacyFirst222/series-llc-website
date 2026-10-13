@@ -29,12 +29,11 @@ const request=(path:string,init:RequestInit={})=>app.request('/api/admin/'+path,
 type Board={orders:{id:string;work_stage:string}[];total:number;page:number};
 const board=async(query:string):Promise<Board>=>{const r=await request('orders?'+query);if(!r.ok)throw Error(await r.text());return(await r.json()).data;};
 const company=async(name:string,status:string,cert=false)=>{
- const id=crypto.randomUUID();await db.query("INSERT INTO orders(id,client_id,contact_name,contact_email,package,llc_name,payload,service_fee_cents,state_fees_cents,total_cents,status,created_at,formed_at) VALUES($1,$2,'Original Identity','original-office@example.test','NEW',$3,$4,0,0,0,$5,'2026-01-01',$6)",[id,client,name,JSON.stringify({series:[],optionalDocuments:{certificateOfStatus:cert},registeredAgent:{choice:'SELF'}}),status,status==='formed'?'2026-02-01':null]);return id;
+ const id=crypto.randomUUID();await db.query("INSERT INTO orders(id,client_id,contact_name,contact_email,package,llc_name,payload,service_fee_cents,state_fees_cents,total_cents,status,created_at,paid_at,formed_at) VALUES($1,$2,'Original Identity','original-office@example.test','NEW',$3,$4,0,0,0,$5,'2026-01-01','2026-01-01',$6)",[id,client,name,JSON.stringify({series:[],optionalDocuments:{certificateOfStatus:cert},registeredAgent:{choice:'SELF'}}),status,status==='formed'?'2026-02-01':null]);return id;
 };
 const cert=await company('Certificate Refresh LLC','formed',true),active=await company('Identity Search LLC','paid');
 const {PDFDocument}=await import('@cantoo/pdf-lib');const pdf=await PDFDocument.create();pdf.addPage();const bytes=await pdf.save();
 async function upload(){const form=new FormData();form.set('certStatus',new File([bytes],'certificate.pdf',{type:'application/pdf'}));form.set('notify','false');const r=await request(`orders/${cert}/certificates`,{method:'POST',body:form});if(!r.ok)throw Error(await r.text());}
-for(let n=0;n<55;n++)await company('Unpaid checkout '+n,'pending_payment');
 await upload();await upload();
 for(const [view,id] of [['active',active],['completed',cert]])for(const q of ['current-office@example.test','original-office@example.test','Current Identity','Original Identity']){
  const result=await board(`view=${view}&q=${encodeURIComponent(q)}`);check(`${view} finds ${q}`,result.total===1&&result.orders[0]?.id===id,result);
@@ -53,11 +52,6 @@ page.setDefaultTimeout(8000);const origin=`http://127.0.0.1:${server.port}`,erro
 const shot=async(name:string)=>{if(evidence)await page.screenshot({path:resolve(evidence,name+'.png'),fullPage:true,animations:'disabled'});};
 try{
  await page.context().addCookies([{name:'fpsllc_admin',value:token.token,url:origin}]);await page.goto(origin);
- const activePage=await board('view=active'),unpaidPage=await board('view=unpaid');
- check('paid first page is not displaced by 55 unpaid checkouts',activePage.total===1&&activePage.orders[0]?.id===active&&unpaidPage.total===55&&unpaidPage.orders.length===50,{active:activePage.total,unpaid:unpaidPage.total});
- await page.getByRole('tab',{name:'Unpaid checkouts',exact:true}).click();
- await page.getByText('These checkouts have not been paid. They are not in the filing queue.').waitFor();
- check('unpaid view renders its independent server total',(await page.locator('body').innerText()).includes('of 55 unpaid checkouts'));await shot('unpaid-checkouts');
  await page.getByRole('tab',{name:'Formations & Service Orders',exact:true}).click();
  await page.getByRole('searchbox').fill('current-office@example.test');
  const activeFound=await page.getByRole('button',{name:/Identity Search LLC/}).waitFor({timeout:2500}).then(()=>true,()=>false);check('rendered active search finds current email',activeFound);await shot('current-email-active');

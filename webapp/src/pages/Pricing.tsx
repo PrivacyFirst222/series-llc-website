@@ -91,6 +91,11 @@ export default function Pricing() {
                   Additional Protected Series Designations cost $50 each — $25 to prepare plus the
                   $25 state filing fee.
                 </div>
+                <div className="mt-2 text-xs text-muted-foreground">
+                  If you initially form two series, your portal retains one credit toward forming the
+                  third. The credit never expires. An additional charge may apply if government filing
+                  fees increase.
+                </div>
               </div>
 
               <ul className="mt-8 space-y-3 text-sm">

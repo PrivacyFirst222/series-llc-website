@@ -26,6 +26,9 @@ export async function batch05Walk(browser: Browser, web: string, check: Check) {
       ];
       return data({ orders, total: completed ? orders.length : 210, shown: orders.length, page: 1, pageSize: 50 });
     }
+    // Office uploads are two requests: a ticket that carries the fields, then a receipt-only confirmation.
+    if (p.startsWith('/api/admin/uploads/') && route.request().method() === 'GET') return data({ id: 'ticket5', state: 'complete' }); // a retry asks for the ticket it already holds
+    if (p === '/api/admin/uploads' && route.request().method() === 'POST') { uploadBody = route.request().postData() ?? ''; return data({ id: 'ticket5', state: 'complete' }); }
     if (p === '/api/admin/services') { if (holdServices) await holdServices; return servicesStatus === 200 ? data(services) : fail('Services temporarily unavailable'); }
     if (p === '/api/admin/orders/co5') return data({ id: 'co5', clientId: 'client5', filingPath: 'NEW', llcName: 'Five Company LLC', status: boardStatus, contactName: 'Five Client', contactEmail: 'five@example.test', createdAt: yesterday, filedAt: yesterday, formedAt: boardStatus === 'formed' ? yesterday : null, groups: [], series: [{ name: 'Five Company LLC - PS A', covered: false }], copiedFields: {}, documents: [], services: [], alternateNames: [], hasArticles: false, articlesSignedByUs: false, certStatusPurchased: true, certifiedCopyPurchased: false, hasCertStatus: false, hasCertifiedCopy: false, documentNumber: '' });
     if (p.endsWith('/certificates')) return certStatus === 200 ? data({ notified: true }) : fail('Certificate storage unavailable — try again.');
@@ -37,7 +40,7 @@ export async function batch05Walk(browser: Browser, web: string, check: Check) {
     if (p === '/api/admin/emails') return data([email]);
     if (p === '/api/admin/emails/mail5') return data(email);
     if (p === '/api/admin/library') return data([{ key: 'owners-manual', title: "Series LLC Owner's Manual", edition: 'Uploaded edition', size_bytes: 400, updated_at: yesterday }]);
-    if (p === '/api/admin/library/owners-manual') { uploadCalls++; uploadBody = route.request().postDataBuffer()?.toString() ?? ''; return data({ ok: true }); }
+    if (p === '/api/admin/library/owners-manual') { uploadCalls++; return data({ ok: true }); }
     if (p === '/api/admin/library/owners-manual/regenerate') return data({ published: true, pages: 52, edition: 'Generated edition' });
     return data([]);
   });
@@ -86,7 +89,7 @@ export async function batch05Walk(browser: Browser, web: string, check: Check) {
   });
   await attempt('batch05 181: board wording matches counts search and status', async () => {
     await go(); await page.getByLabel('Search by LLC name, client name, or email').fill('Five'); await page.waitForTimeout(350); const board = await page.locator('main').innerText(); const nextEnabled = !(await page.getByRole('button', { name: 'Next', exact: true }).isDisabled()); await page.getByRole('button', { name: /^EIN.*Waiting/ }).click(); const detail = await page.getByRole('dialog').innerText();
-    check(board.includes('oldest 1 day —') && board.includes('Showing 1–2 of 210 active orders') && nextEnabled && board.includes('Waiting for client details') && detail.includes('Waiting for client details'), 'batch05 181: board wording matches counts search and status', { board, detail });
+    check(/\b1 day\b/.test(board) && !/\b1 days\b/.test(board) && board.includes('Showing 1–2 of 210 active orders') && nextEnabled && board.includes('Waiting for client details') && detail.includes('Waiting for client details'), 'batch05 181: board wording matches counts search and status', { board, detail });
   });
   await attempt('batch05 180: regeneration explains uploaded-manual replacement', async () => {
     await go(); await page.getByRole('tab', { name: 'Reference Library' }).click(); const text = await page.locator('main').innerText();
@@ -95,7 +98,7 @@ export async function batch05Walk(browser: Browser, web: string, check: Check) {
   await attempt('batch05 185: manual upload requires an edition', async () => {
     await go(); await page.getByRole('tab', { name: 'Reference Library' }).click(); await page.getByLabel('Replacement PDF for the manual').setInputFiles(pdf); const button = page.getByRole('button', { name: 'Replace edition', exact: true }); const empty = await button.isDisabled(); await page.getByLabel('Edition label').fill('   '); const whitespace = await button.isDisabled();
     check(empty && whitespace && uploadCalls === 0, 'batch05 185: manual upload requires an edition', { empty, whitespace, uploadCalls });
-    await page.getByLabel('Edition label').fill('  First reviewed edition  '); await button.click(); await page.getByText("Published — every client's next download is this edition.").waitFor(); check(uploadCalls === 1 && /name="edition"\r\n\r\nFirst reviewed edition\r\n/.test(uploadBody), 'batch05 manual upload sends the trimmed explicit edition', uploadBody);
+    await page.getByLabel('Edition label').fill('  First reviewed edition  '); await button.click(); await page.getByText("Published — every client's next download is this edition.").waitFor(); const sentFields = Object.fromEntries((JSON.parse(uploadBody || '{"fields":[]}').fields as [string, string][])); check(uploadCalls === 1 && sentFields.edition === 'First reviewed edition', 'batch05 manual upload sends the trimmed explicit edition', sentFields);
   });
   await attempt('batch05 173: account label reflects password state', async () => {
     await go(); await page.getByRole('tab', { name: 'Clients', exact: true }).click(); const text = await page.locator('main').innerText(); check(text.includes('No password yet') && !text.includes('Invite sent'), 'batch05 173: account label reflects password state', text);

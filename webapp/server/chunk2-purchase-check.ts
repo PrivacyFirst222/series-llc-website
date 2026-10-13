@@ -11,6 +11,7 @@ const proof=(await(await app.request('/api/dev/env-summary')).json()).data;
 if(!proof.offline||Object.values(proof.externals).some(Boolean))throw Error('Offline proof failed');
 console.log('PROOF:'+JSON.stringify({proof,temp}));
 const db:import('./db').Db=await getDb();
+env.ADMIN_NOTIFY_EMAIL=''; // the checks that need an office address set it themselves; never inherit this machine's
 const {newToken}=await import(R+'/server/crypto.ts'),{runRenewals}=await import(R+'/server/renewals.ts');
 const hostedLedger=new Map<string,any>(),links=new Map<string,any>();let lostLink=false;
 const checks:any[]=[],calls:any[]=[],mail:any[]=[],payments=new Map<string,any>();let failAction='',decline='',cardType='NOT_PREPAID',mailFail=false,mailLost=false;
@@ -54,7 +55,7 @@ const {defaultFormData}=await import(R+'/src/components/forms/florida-llc/defaul
   let ordn = 0;
   const orderData = (email: string, o: { ra?: 'SERVICE' | 'SELF'; convert?: boolean; series?: number; ein?: boolean; se?: boolean; cert?: boolean; copy?: boolean; consent?: boolean } = {}) => {
     const n = ordn++; const nm = `Audit ${words[n % 20]} ${words[Math.floor(n / 20) % 20]} Billing`;
-    const series = Array.from({ length: o.series ?? 1 }, (_, i) => ({ id: 's' + i, name: `${nm}, LLC, PS ${String.fromCharCode(65 + i)}` }));
+    const series = Array.from({ length: o.series ?? 2 }, (_, i) => ({ id: 's' + i, name: `${nm}, LLC, PS ${String.fromCharCode(65 + i)}` }));
     return { ...structuredClone(defaultFormData), filingPath: o.convert ? 'CONVERT' : 'NEW', ...(o.convert ? { existingLlcName: nm + ', LLC', sunbizDocumentNumber: 'L26000' + String(100000 + n).slice(-6), conversionAuthorityAcknowledgment: true } : {}), isFloridaDomesticEntityOnly: true, notLegalAdvice: true, publicRecordNotice: true,
       desiredLlcName: nm, llcDesignator: 'LLC', alternateName1: nm + ' Backup', nameSearchAcknowledgment: true, governmentAffiliationAcknowledgment: true, lawfulPurposeNameAcknowledgment: true,
       principalAddress: { address1: '100 Ocean Drive', address2: '', city: 'Miami', state: 'FL', zip: '33139', country: 'United States' },

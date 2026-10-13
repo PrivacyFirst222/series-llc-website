@@ -20,7 +20,7 @@ key rotation without invalidating earlier snapshot manifests. The keys are
 stored separately in the deployment's environment; keep a secure recovery copy
 of the key ring. Losing all copies of the required key makes recovery impossible.
 
-Current BACKUP_TABLES (22): `clients`, `orders`, `service_orders`, `documents`, `oa_profiles`, `oa_generations`, `library_documents`, `webhook_events`, `fl_sync_state`, `contact_messages`, `email_log`, `ra_renewals`, `ra_payment_attempts`, `document_deletions`, `staged_documents`, `renewal_card_attempts`, `launch_policy`, `payment_reconciliation_log`, `recovery_holds`, `checkout_payment_receipts`, `payment_alerts`, `office_operations`.
+Current BACKUP_TABLES (23): `clients`, `orders`, `service_orders`, `documents`, `oa_profiles`, `oa_generations`, `library_documents`, `webhook_events`, `fl_sync_state`, `contact_messages`, `email_log`, `ra_renewals`, `ra_payment_attempts`, `document_deletions`, `staged_documents`, `renewal_card_attempts`, `launch_policy`, `payment_reconciliation_log`, `recovery_holds`, `checkout_payment_receipts`, `payment_alerts`, `office_operations`, `included_series_credits`.
 
 Excluded: the reloadable Sunbiz entity dataset, sign-in sessions, one-time auth
 tokens, rate-limit windows and the schema-migration ledger (created by startup).

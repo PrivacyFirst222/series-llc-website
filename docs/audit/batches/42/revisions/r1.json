@@ -1,0 +1,295 @@
+{
+  "id": "42",
+  "revision": 1,
+  "title": "Third-series credit and two-series minimum",
+  "model": "Claude",
+  "base": "c0540506b39a41d8518fd1ec6392ef00d0c643c7",
+  "items": [
+    {
+      "id": "AUD-owner-third-series-credit-2026-10-12-third-series-credit",
+      "part": "all",
+      "scope": "One non-expiring credit toward a third series for a paid package whose formation completes with exactly two series; $0.00 in the add-series dialog and \"1 included series remaining\" in the portal; a credit-backed request has no payment and appears on the office board; the credit is used when the office fulfills the series; no credit for a training client.",
+      "assertions": [
+        {
+          "kind": "check",
+          "suite": "server",
+          "label": "included third series credit"
+        }
+      ]
+    },
+    {
+      "id": "AUD-owner-third-series-credit-2026-10-12-two-series-minimum",
+      "part": "all",
+      "scope": "Require at least two series in the order form and on the server, with the approved message \"Add at least two series to continue.\"",
+      "assertions": [
+        {
+          "kind": "replace",
+          "file": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+          "before": "Add at least one series to proceed.",
+          "after": "Add at least two series to continue."
+        },
+        {
+          "kind": "replace",
+          "file": "webapp/server/validation.ts",
+          "before": "Add at least one series.",
+          "after": "Add at least two series to continue."
+        }
+      ]
+    },
+    {
+      "id": "AUD-owner-third-series-credit-2026-10-12-joint-heading-lowercase",
+      "part": "all",
+      "scope": "Print the joint holding in the new-series consent heading exactly as entered, in lowercase.",
+      "assertions": [
+        {
+          "kind": "present",
+          "file": "webapp/server/new-series.ts",
+          "text": "${name}${m.jointHolding ? ` \u2014 ${m.jointHolding}` : \"\"}${suffix}"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "webapp/server/included-series-migration.ts",
+      "mode": "new",
+      "why": "Owner-requested third-series credit and two-series minimum (batch 42)."
+    },
+    {
+      "path": "webapp/server/included-series.ts",
+      "mode": "new",
+      "why": "Owner-requested third-series credit and two-series minimum (batch 42)."
+    },
+    {
+      "path": "webapp/server/db.ts",
+      "mode": "code",
+      "why": "Owner-requested third-series credit and two-series minimum (batch 42). Registers migration 30."
+    },
+    {
+      "path": "webapp/server/routes-portal.ts",
+      "mode": "code",
+      "why": "Owner-requested third-series credit and two-series minimum (batch 42)."
+    },
+    {
+      "path": "webapp/server/app.ts",
+      "mode": "code",
+      "why": "Owner-requested third-series credit and two-series minimum (batch 42). Office guard accepts a credit-backed series request."
+    },
+    {
+      "path": "webapp/server/routes-admin.ts",
+      "mode": "code",
+      "why": "Owner-requested third-series credit and two-series minimum (batch 42). Office service list accepts a credit-backed series request."
+    },
+    {
+      "path": "webapp/server/office-uploads.ts",
+      "mode": "code",
+      "why": "Owner-requested third-series credit and two-series minimum (batch 42). Direct office uploads accept a credit-backed series request."
+    },
+    {
+      "path": "webapp/server/backup.ts",
+      "mode": "code",
+      "why": "Owner-requested third-series credit and two-series minimum (batch 42). Backs up the credit table."
+    },
+    {
+      "path": "webapp/server/validation.ts",
+      "mode": "code",
+      "why": "Two-series minimum, approved wording."
+    },
+    {
+      "path": "webapp/server/new-series.ts",
+      "mode": "code",
+      "why": "Joint heading in lowercase, per the owner."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+      "mode": "code",
+      "why": "Two-series minimum, approved wording."
+    },
+    {
+      "path": "webapp/src/components/forms/florida-llc/sections/StepSeries.tsx",
+      "mode": "code",
+      "why": "Two-series explanation and intro, approved wording."
+    },
+    {
+      "path": "webapp/src/pages/Pricing.tsx",
+      "mode": "code",
+      "why": "Pricing page sentence about the third-series credit, approved wording."
+    },
+    {
+      "path": "webapp/src/pages/portal/ServicesCard.tsx",
+      "mode": "code",
+      "why": "Owner-requested third-series credit and two-series minimum (batch 42). Portal line, $0.00 price and dialog, approved wording."
+    },
+    {
+      "path": "docs/db-restore.md",
+      "mode": "code",
+      "why": "Table count is now 23 (credit table added to the backup)."
+    },
+    {
+      "path": "webapp/package.json",
+      "mode": "code",
+      "why": "Adds the script check:included-series-credit (a check entry point).",
+      "control": true
+    },
+    {
+      "path": "webapp/server/included-series-credit-check.ts",
+      "mode": "new",
+      "why": "The credit's own checks (39), offline, with a throwaway database.",
+      "control": true
+    },
+    {
+      "path": "webapp/server/included-series-check.ts",
+      "mode": "new",
+      "why": "Runs the credit checks from the end-to-end walk under one name: included third series credit.",
+      "control": true
+    },
+    {
+      "path": "webapp/server/e2e.ts",
+      "mode": "code",
+      "why": "Runs the named credit check; 15 order bodies get a second series; designation uploads and the title assertion cover both series.",
+      "control": true
+    },
+    {
+      "path": "webapp/server/chunk2-purchase-check.ts",
+      "mode": "code",
+      "why": "Test support: keeps the older checks in step with the two-series minimum and the credit. Default order has two series; admin notice address cleared.",
+      "control": true
+    },
+    {
+      "path": "webapp/scripts/batch36-walk.ts",
+      "mode": "code",
+      "why": "Test support: keeps the older checks in step with the two-series minimum and the credit. Fulfils the series through the real office route instead of the dialog upload.",
+      "control": true
+    },
+    {
+      "path": "docs/audit/expected-assertions.ts",
+      "mode": "code",
+      "why": "Lists the fourth assertion of the pending scenario (already in the check since 3 Oct 2026); list was stale.",
+      "control": true
+    },
+    {
+      "path": "docs/audit/ledger.json",
+      "mode": "code",
+      "why": "Records the three owner-requested items and batch 42.",
+      "control": true
+    },
+    {
+      "path": "docs/audit/intakes/owner-third-series-credit-2026-10-12.json",
+      "mode": "new",
+      "why": "The owner-requested intake: stated as a feature request, not an audit finding.",
+      "control": true
+    },
+    {
+      "path": "webapp/scripts/behavioral.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Order walk: every order adds two series; the Series-step text check follows the approved wording; the walk's pass-through to the server now forwards the upload header it was dropping; the refused-upload message match follows the server's current text (\"Choose a readable PDF.\"); installs the upload helper."
+    },
+    {
+      "path": "webapp/server/batch06-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Shared order fixture (agentFixture) now has two series, as the form and server require."
+    },
+    {
+      "path": "webapp/scripts/batch01-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Already flaky on the live site: the walk now gives its saved owners identities and reads the contributor shares until the page settles (the screen briefly shows them shifted after an owner is removed, then shows the right values). Test only."
+    },
+    {
+      "path": "webapp/scripts/batch02-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Already failing on the live site: the walk's fake server now answers the two-step office upload (ticket, then confirmation). Still asserts the company and legal-mail kind."
+    },
+    {
+      "path": "webapp/scripts/batch05-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Already failing on the live site: fake server answers the two-step upload and the retry lookup; manual-upload edition read from the ticket; board check asserts \"1 day\" not \"1 days\" (the removed unpaid-checkout line is no longer asserted)."
+    },
+    {
+      "path": "webapp/scripts/batch41-office-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Already failing on the live site: test orders get a payment date; steps for the held item A2 (Unpaid checkouts tab, 55 unpaid checkouts) removed, as Adam approved 12 Oct 2026 (\"Yes. Trim it\"). Batch 41 searches and certificate-refresh checks unchanged."
+    },
+    {
+      "path": "docs/audit/ruling-scope-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Already failing on the live site (ledger-controls): its temporary copy of the repository now links the installed packages, which ledger-print.ts needs. The check itself is unchanged."
+    },
+    {
+      "path": "webapp/scripts/offline-direct-upload.ts",
+      "mode": "new",
+      "control": true,
+      "why": "Test-only helper. The office upload now sends the file straight to private storage with a token; the offline review site has no token, so the browser sent nothing. This stores the walk's own file, encrypted as the browser would, where the offline server reads it. Production code unchanged."
+    },
+    {
+      "path": "webapp/scripts/browser-isolation.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Test infrastructure: lets a helper observe the server's answer to a request the isolation layer forwards (used by offline-direct-upload.ts). It observes only; answers are unchanged."
+    },
+    {
+      "path": "webapp/scripts/batch08-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Already failing on the live site: the walk's order is now paid (simulated payment) before the office reads it, because office screens show only paid orders since 2 Oct 2026."
+    },
+    {
+      "path": "webapp/scripts/batch09-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Already failing on the live site: same as batch08, the order is paid before the office reads it."
+    },
+    {
+      "path": "webapp/scripts/batch23-office-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Already failing on the live site: the fake server now answers the office recovery panel's backups-attention request."
+    },
+    {
+      "path": "webapp/scripts/batch28-portal-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Already failing on the live site: the fake server answers backups-attention, and supplies the portal's current late-notice sentence (the portal now shows a server-supplied message); the check asserts it."
+    },
+    {
+      "path": "webapp/scripts/chunk1-remaining-walk.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Already failing on the live site: the fake server answers the office recovery panel's backups-attention request."
+    },
+    {
+      "path": "webapp/scripts/batch25-manual-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Already failing on the live site: the Manual renderer draws the check mark as a shape since 3 Oct 2026 (ce8fac5), so the check no longer looks for it in the extracted text. The Manual's pages were inspected and are correct."
+    },
+    {
+      "path": "webapp/server/batch23-recovery-check.ts",
+      "mode": "code",
+      "control": true,
+      "why": "Already failing on the live site: a restored database sends nothing and refuses requests until an operator activates it. The check now follows that sequence (restore, check nothing was sent, activate, then check the notices) and adds a check for the activation rule. Expected rows 25 to 27."
+    },
+    {
+      "path": "docs/audit/findings-open.md",
+      "mode": "generated",
+      "why": "Normal generated output."
+    },
+    {
+      "path": "webapp/api/index.mjs",
+      "mode": "generated",
+      "why": "Normal generated output."
+    }
+  ],
+  "requiredChecks": [],
+  "testSupport": [
+    "webapp/server/included-series-check.ts",
+    "webapp/server/included-series-credit-check.ts",
+    "webapp/scripts/batch36-walk.ts"
+  ]
+}

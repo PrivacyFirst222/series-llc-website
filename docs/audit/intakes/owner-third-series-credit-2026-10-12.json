@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "run": "owner-third-series-credit-2026-10-12",
+  "commit": "c0540506b39a41d8518fd1ec6392ef00d0c643c7",
+  "completedAt": "2026-10-13T02:50:40.047Z",
+  "manifestSha": "f68bb09219cc0602a004f6fba2ed26072e1facb6aaaa7cecc6794b25d9252830",
+  "auditSha": "5a2b089ab76ec65051d8333d840531ed09fb3adf8ce71554db6459facf2bb001",
+  "findings": [
+    {
+      "key": "third-series-credit",
+      "relation": "new",
+      "where": "Client portal and office: adding a third series after formation",
+      "file": "webapp/server/routes-portal.ts",
+      "line": 1984,
+      "reads": "app.post(\"/portal/services/series\", async (c) => {",
+      "claims": "A client whose formation completes with two series pays the full price to add a third; there is no credit for it.",
+      "truth": "Owner, 12 Oct 2026: \"Forget the whole coupon code idea. Just make sure the third series credit works\". Owner-approved terms: a paid package whose formation completes with exactly two series gets one non-expiring, non-transferable credit toward a third; a training client gets none. Implement this.",
+      "replacement": "One credit per qualifying formation: the add-series dialog shows $0.00 and the portal shows \"1 included series remaining\"; a credit-backed request is $0, goes in progress with no payment, and the office sees it on the board; the credit is used when the office fulfills the series.",
+      "severity": "substantive",
+      "evidence": [],
+      "review": {
+        "reviewer": "Claude source comparison with owner-requested feature",
+        "evidence": "This is a new owner-requested feature, not an audit finding discovered by an independent audit. Compared routes-portal.ts, app.ts, routes-admin.ts and office-uploads.ts at c054050 with the owner's instruction.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "two-series-minimum",
+      "relation": "new",
+      "where": "Order form: Series step",
+      "file": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+      "line": 186,
+      "reads": "if (data.series.length === 0)",
+      "claims": "An order may be placed with one series; the form and the server accept it.",
+      "truth": "Owner approved the wording \"Add at least two series to continue.\" (12 Oct 2026, \"Approve 1\") for a two-series minimum, so that every paid package ends with two series and the third is the credit.",
+      "replacement": "Require at least two series in the form and on the server, with the approved message.",
+      "severity": "substantive",
+      "evidence": [],
+      "review": {
+        "reviewer": "Claude source comparison with owner-requested feature",
+        "evidence": "This is a new owner-requested feature, not an audit finding discovered by an independent audit. Compared stepValidation.ts and validation.ts at c054050 with the owner's approved wording.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    },
+    {
+      "key": "joint-heading-lowercase",
+      "relation": "new",
+      "where": "New-series consent: heading above joint signatures",
+      "file": "webapp/server/new-series.ts",
+      "line": 113,
+      "reads": "${name}${m.jointHolding ? ` — ${titleCaseHolding(m.jointHolding)}` : \"\"}${suffix}",
+      "claims": "The joint-ownership form of holding in a new-series consent heading is printed in title case.",
+      "truth": "Owner, 12 Oct 2026: \"Lower case. Go\" (about this heading).",
+      "replacement": "Print the joint holding exactly as the client entered it, in lowercase, in the heading.",
+      "severity": "substantive",
+      "evidence": [],
+      "review": {
+        "reviewer": "Claude source comparison with owner-requested feature",
+        "evidence": "This is a new owner-requested feature, not an audit finding discovered by an independent audit. Compared new-series.ts at c054050 with the owner's instruction.",
+        "priorCompared": true,
+        "replacement": "correct"
+      }
+    }
+  ]
+}

@@ -67,7 +67,7 @@ const extendedFormSchema = formationFormSchema
           name: z.string().min(1, "Series identifier is required.").max(300),
         }),
       )
-      .min(1, "Add at least one series."),
+      .min(2, "Add at least two series to continue."),
     seriesOwnershipAcknowledgment: z.literal(true, {
       errorMap: () => ({
         message:

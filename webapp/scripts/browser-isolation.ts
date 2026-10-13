@@ -69,8 +69,15 @@ async function forward(route: Route, options: Parameters<Route["continue"]>[0] =
   // Native fetch returns the decoded body, so encoded transport headers no
   // longer describe it. Playwright supplies the final length itself.
   for (const key of ["content-encoding", "content-length", "transfer-encoding"]) delete headers[key];
-  await route.fulfill({ status: response.status, headers, body: Buffer.from(await response.arrayBuffer()) });
+  const body = Buffer.from(await response.arrayBuffer());
+  for (const hook of forwardedResponseHooks) await hook(request, response.status, body);
+  await route.fulfill({ status: response.status, headers, body });
 }
+
+/** Test helpers that must see what the server answered to a forwarded request
+ *  (scripts/offline-direct-upload.ts). They observe; they never change the answer. */
+const forwardedResponseHooks: ((request: ReturnType<Route["request"]>, status: number, body: Buffer) => Promise<void> | void)[] = [];
+export const onForwardedResponse = (hook: (typeof forwardedResponseHooks)[number]): void => { forwardedResponseHooks.push(hook); };
 
 function guard(handler: RouteHandler | undefined, blocked: Set<string>): RouteHandler {
   return async route => {
@@ -92,6 +99,7 @@ function guard(handler: RouteHandler | undefined, blocked: Set<string>): RouteHa
         const headers = opts.headers ?? opts.response?.headers() ?? {};
         const location = Object.entries(headers).find(([k]) => k.toLowerCase() === "location")?.[1];
         if (status >= 300 && status < 400 && location) return refuse(new URL(location, url).href);
+        if (typeof opts.body === "string" || Buffer.isBuffer(opts.body)) for (const hook of forwardedResponseHooks) await hook(route.request(), status, Buffer.from(opts.body));
         await route.fulfill(opts);
       };
       const value = Reflect.get(target, key);

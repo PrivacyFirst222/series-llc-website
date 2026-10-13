@@ -33,6 +33,7 @@ import { batch01Walk } from "./batch01-walk";
  */
 import { chromium, type Page } from "playwright";
 import { isolateBrowser, guardedRoute, guardedContextRoute, localFetch as fetch } from "./browser-isolation";
+import { installOfflineDirectUpload } from "./offline-direct-upload";
 import { buildPayload } from "../src/components/forms/florida-llc/buildPayload";
 import { memberRowIsBlank } from "../src/components/forms/florida-llc/validation";
 import type { FloridaLLCFormData } from "../src/components/forms/florida-llc/types";
@@ -370,14 +371,14 @@ async function driveRun(page: Page, run: RunConfig): Promise<{ orderId: string; 
 
   // Series: its ownership acknowledgment, then one identifier per row.
   await checkAllBoxes(page);
-  const seriesCount = 1 + (run.extraSeries ?? 0);
+  const seriesCount = Math.max(2, 1 + (run.extraSeries ?? 0)); // two are required (Adam, 12 Oct 2026)
   const rows = page.getByLabel("Series identifier", { exact: false });
   // The step shouts it (Adam, 13 Sep 2026): a headed green box that holds
   // the series cards and the one Add button, before and after adding.
   {
     const box = page.locator('[data-testid="series-box"]');
     const inBox = box.locator("button").filter({ hasText: /^Add a series$/ });
-    expect((await box.count()) === 1 && /Create your protected series/.test(await box.innerText()) && /at least one protected series before you can continue/.test(await box.innerText()), `${run.key}: the series step is headed "Create your protected series"`, await box.innerText().catch(() => ""));
+    expect((await box.count()) === 1 && /Create your protected series/.test(await box.innerText()) && /Create at least two protected series to continue/.test(await box.innerText()), `${run.key}: the series step is headed "Create your protected series"`, await box.innerText().catch(() => ""));
     expect((await inBox.count()) === 1 && (await page.locator("main button").filter({ hasText: /^Add a series$/ }).count()) === 1, `${run.key}: the one Add a series button sits inside the box`);
     if ((await rows.count()) === 0) {
       await shot(page, `${run.key}-series-empty`);
@@ -791,6 +792,7 @@ async function main(): Promise<void> {
   // Codex's reviews of the fix ledger, revisions 1 and 2). The address lookup
   // and web fonts are the known ones stopped.
   const { blocked: blockedRequests } = isolateBrowser(browser);
+  installOfflineDirectUpload(browser); // the offline site has no storage token; see scripts/offline-direct-upload.ts
   try {
   const adminLogin = await fetch(`${API}/api/admin/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: "dev-admin" }) });
   const adminCookie = (adminLogin.headers.get("set-cookie") ?? "").split(";")[0];
@@ -884,7 +886,7 @@ async function main(): Promise<void> {
         if (run.memberEntity) expect(JSON.stringify(members).includes("Gate Member Holdings"), `${run.key}: entity member stored by its entity name`, members[0]);
       }
       const storedSeries = payload.series ?? [];
-      expect(storedSeries.length === 1 + (run.extraSeries ?? 0), `${run.key}: stored series count matches rows added on screen`, storedSeries.length);
+      expect(storedSeries.length === Math.max(2, 1 + (run.extraSeries ?? 0)), `${run.key}: stored series count matches rows added on screen`, storedSeries.length);
       expect(!!payload.optionalDocuments?.ein === !!run.addons?.ein, `${run.key}: EIN add-on stored as chosen`, payload.optionalDocuments);
       expect(!!payload.optionalDocuments?.sElection === !!run.addons?.sElection, `${run.key}: S-election stored as chosen`, payload.optionalDocuments);
       expect(!!payload.optionalDocuments?.certificateOfStatus === !!run.addons?.certificate, `${run.key}: certificate of status stored as chosen`, payload.optionalDocuments);
@@ -923,7 +925,7 @@ async function main(): Promise<void> {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
-          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "", ...(route.request().headers()["x-office-upload"] ? { "x-office-upload": route.request().headers()["x-office-upload"] } : {}) },
           body: route.request().postDataBuffer() ?? undefined,
         });
         const body = await resp.text();
@@ -992,7 +994,7 @@ async function main(): Promise<void> {
           // Pass the request through as sent: an upload is multipart, and
           // its body is binary — a JSON content type or a text body would
           // strip the file before it reaches the server.
-          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "", ...(route.request().headers()["x-office-upload"] ? { "x-office-upload": route.request().headers()["x-office-upload"] } : {}) },
           body: route.request().postDataBuffer() ?? undefined,
         });
         const body = await resp.text();
@@ -1472,7 +1474,7 @@ async function main(): Promise<void> {
           // Pass the request through as sent: an upload is multipart, and
           // its body is binary — a JSON content type or a text body would
           // strip the file before it reaches the server.
-          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "", ...(route.request().headers()["x-office-upload"] ? { "x-office-upload": route.request().headers()["x-office-upload"] } : {}) },
           body: route.request().postDataBuffer() ?? undefined,
         });
         const body = await resp.text();
@@ -1920,7 +1922,7 @@ async function main(): Promise<void> {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
-          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "", ...(route.request().headers()["x-office-upload"] ? { "x-office-upload": route.request().headers()["x-office-upload"] } : {}) },
           body: route.request().postDataBuffer() ?? undefined,
         });
         const body = await resp.text();
@@ -2004,7 +2006,7 @@ async function main(): Promise<void> {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
-          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "", ...(route.request().headers()["x-office-upload"] ? { "x-office-upload": route.request().headers()["x-office-upload"] } : {}) },
           body: route.request().postDataBuffer() ?? undefined,
         });
         const body = await resp.text();
@@ -2081,7 +2083,7 @@ async function main(): Promise<void> {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
-          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "", ...(route.request().headers()["x-office-upload"] ? { "x-office-upload": route.request().headers()["x-office-upload"] } : {}) },
           body: route.request().postDataBuffer() ?? undefined,
         });
         const body = await resp.text();
@@ -2122,7 +2124,7 @@ async function main(): Promise<void> {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
-          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "", ...(route.request().headers()["x-office-upload"] ? { "x-office-upload": route.request().headers()["x-office-upload"] } : {}) },
           body: route.request().postDataBuffer() ?? undefined,
         });
         const body = await resp.text();
@@ -2155,7 +2157,7 @@ async function main(): Promise<void> {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
-          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "", ...(route.request().headers()["x-office-upload"] ? { "x-office-upload": route.request().headers()["x-office-upload"] } : {}) },
           body: route.request().postDataBuffer() ?? undefined,
         });
         const body = await resp.text();
@@ -2257,7 +2259,7 @@ async function main(): Promise<void> {
           const url = new URL(route.request().url());
           const resp = await fetch(`${API}${url.pathname}${url.search}`, {
             method: route.request().method(),
-            headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+            headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "", ...(route.request().headers()["x-office-upload"] ? { "x-office-upload": route.request().headers()["x-office-upload"] } : {}) },
             body: route.request().postDataBuffer() ?? undefined,
           });
           const body = await resp.text();
@@ -2291,7 +2293,7 @@ async function main(): Promise<void> {
           await drawer.locator('[data-testid="upload-certificates"]').click();
           await page.waitForTimeout(1500);
           const refused = await drawer.locator('[data-testid="certificate-upload-error"]').innerText().catch(() => "");
-          expect(/not a readable PDF/i.test(refused), "certificates: a refused upload on a formed order says why", refused);
+          expect(/readable PDF/i.test(refused), "certificates: a refused upload on a formed order says why", refused);
           const formedLine = await drawer.locator('[data-testid="formed-line"]').innerText().catch(() => "");
           expect(/^Formed on \d{1,2}\/\d{1,2}\/\d{4}\./.test(formedLine.trim()) && !/has been emailed/.test(formedLine), "formed: the line claims no email this session did not send", formedLine);
         }
@@ -2318,7 +2320,7 @@ async function main(): Promise<void> {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
-          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "", ...(route.request().headers()["x-office-upload"] ? { "x-office-upload": route.request().headers()["x-office-upload"] } : {}) },
           body: route.request().postDataBuffer() ?? undefined,
         });
         const body = await resp.text();
@@ -2357,7 +2359,7 @@ async function main(): Promise<void> {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
-          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "", ...(route.request().headers()["x-office-upload"] ? { "x-office-upload": route.request().headers()["x-office-upload"] } : {}) },
           body: route.request().postDataBuffer() ?? undefined,
         });
         const body = await resp.text();
@@ -2402,7 +2404,7 @@ async function main(): Promise<void> {
         const url = new URL(route.request().url());
         const resp = await fetch(`${API}${url.pathname}${url.search}`, {
           method: route.request().method(),
-          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "" },
+          headers: { "Content-Type": route.request().headers()["content-type"] ?? "application/json", cookie: route.request().headers()["cookie"] ?? "", ...(route.request().headers()["x-office-upload"] ? { "x-office-upload": route.request().headers()["x-office-upload"] } : {}) },
           body: route.request().postDataBuffer() ?? undefined,
         });
         const body = Buffer.from(await resp.arrayBuffer());

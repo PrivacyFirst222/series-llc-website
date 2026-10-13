@@ -50,6 +50,7 @@ const server = Bun.serve({ hostname: '127.0.0.1', port: 0, async fetch(req) {
   if (p === '/api/address/verify') return json({ status: 'unverified', normalized: null });
   if (p === '/api/address/suggest') return json({ suggestions: [] });
   if (p === '/api/admin/me') return json({ ok: true });
+  if (p === '/api/admin/backups/attention') return json([]); // the office recovery panel asks for open backup problems
   if (p === '/api/admin/clients') return json([{ id: 'client-one', email: 'fixture@example.test', name: 'Fixture Client', created_at: '2026-09-20T12:00:00Z', ra_cancellation_requested_at: null, has_password: true, document_count: 0, ra_llcs: [], companies: [] }]);
   if (p === '/api/admin/orders') return json({ orders: [], total: 0, shown: 0 });
   if (p === '/api/admin/services') return json([]);

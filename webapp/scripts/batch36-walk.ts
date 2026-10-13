@@ -30,7 +30,7 @@ async function service(order:string|null,type='ein',status='awaiting_info',creat
  const id=crypto.randomUUID();await db.query("INSERT INTO service_orders(id,client_id,formation_order_id,type,status,llc_name,amount_cents,details,created_at,paid_at) VALUES($1,$2,$3,$4,$5,'Fixture LLC',0,'{}',$6,CASE WHEN $5::text='pending_payment' THEN NULL ELSE $6::timestamptz END)",[id,client,order,type,status,created]);return id;
 }
 const paid=await company('Old Unfiled LLC','paid'),state=await company('Awaiting State LLC','filed'),post=await company('Post Filing EIN LLC','formed'),cert=await company('Certificate Owed LLC','formed',true),again=await company('Returning Customer LLC','formed'),finished=await company('Finished Fixture LLC','formed'),legacyOld=await company('Legacy Older LLC','formed');
-await service(post);await service(again,'certificate-of-status','in_progress','2026-03-01');await service(finished,'ein','fulfilled');await service(finished,'ein','cancelled');await service(finished,'ein','pending_payment');
+await service(post);const againCert=await service(again,'certificate-of-status','in_progress','2026-03-01');await service(finished,'ein','fulfilled');await service(finished,'ein','cancelled');await service(finished,'ein','pending_payment');
 for(let i=0;i<205;i++)await company(`Completed History ${String(i).padStart(3,'0')} LLC`,'formed',false,'2026-04-01','2026-04-02');
 const latest=await company('Legacy Latest LLC','formed',false,'2026-05-01','2026-05-02');const legacyService=await service(null,'ein','awaiting_info','2026-05-03');
 const active=await get('orders?view=active');
@@ -85,8 +85,13 @@ try{
  await page.setViewportSize({width:1440,height:1000});
  // Real Fulfill interaction removes a later purchase from New Orders and puts it in Completed.
  await page.getByRole('tab',{name:'Formations & Service Orders',exact:true}).click();await page.getByRole('button',{name:/Returning Customer LLC/}).waitFor();
- const card=page.getByRole('button',{name:/Returning Customer LLC/}).locator('..');await card.getByRole('button',{name:/Cert. of Status/}).click();const dialog=page.getByRole('dialog');await dialog.waitFor();await dialog.locator('input[type=file]').setInputFiles({name:'certificate.pdf',mimeType:'application/pdf',buffer:Buffer.from(bytes)});await dialog.getByRole('button',{name:'Upload & fulfill',exact:true}).click();await dialog.waitFor({state:'hidden'});await page.getByRole('button',{name:/Returning Customer LLC/}).waitFor({state:'hidden'});
- await page.getByRole('tab',{name:'Completed Orders',exact:true}).click();await page.getByRole('searchbox').fill('Returning Customer');await page.getByRole('button',{name:/Returning Customer LLC/}).waitFor();check('real browser fulfillment moves company automatically to Completed Orders',true);
+ // The office fulfills the certificate through the real route. The browser's own direct upload cannot run offline:
+ // with no storage token the server issues no upload ticket, so the browser skips the upload (checked 12 Oct 2026).
+ // The hosted tests cover that path against real storage. Here the screen must show the company move.
+ const fulfil=new FormData();fulfil.set('file',new File([bytes],'certificate.pdf',{type:'application/pdf'}));fulfil.set('notify','false');
+ const fulfilled=await request(`services/${againCert}/fulfill`,{method:'POST',body:fulfil});check('the certificate service is fulfilled through the real office route',fulfilled.status===200,fulfilled.status);
+ await page.reload();await page.getByRole('heading',{name:'Post-Filing Items',exact:true}).waitFor();await page.getByRole('button',{name:/Returning Customer LLC/}).waitFor({state:'hidden'});
+ await page.getByRole('tab',{name:'Completed Orders',exact:true}).click();await page.getByRole('searchbox').fill('Returning Customer');await page.getByRole('button',{name:/Returning Customer LLC/}).waitFor();check('fulfillment through the real route moves the company to Completed Orders in the office screen',true);
  serviceFailure=true;await page.reload();await page.getByRole('tab',{name:'Completed Orders',exact:true}).click();await page.getByTestId('service-load-status').getByRole('button',{name:'Try again'}).waitFor();check('service failure cannot present unchecked completed cards',await page.getByRole('heading',{name:'Completed Orders',exact:true}).count()===0);serviceFailure=false;await page.getByTestId('service-load-status').getByRole('button',{name:'Try again'}).click();await page.getByRole('heading',{name:'Completed Orders',exact:true}).waitFor();check('service retry recovers completed view',true);
  check('browser has no runtime error or external request',errors.length===0&&blocked.size===0,{errors,blocked:[...blocked]});
 }catch(e){check('browser workflow',false,String(e));await shot('failure');}

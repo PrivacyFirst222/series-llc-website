@@ -13,7 +13,9 @@ export async function batch02Walk(browser:Browser,web:string,check:Check){
  let portalTarget='series',uploadBody='';
  await guardedRoute(page,'**/api/**',async route=>{
    const u=new URL(route.request().url()); const json=(data:unknown)=>route.fulfill({contentType:'application/json',body:JSON.stringify({data})});
-   if(u.pathname==='/api/admin/documents'&&route.request().method()==='POST'){uploadBody=route.request().postDataBuffer()?.toString()??'';const id=uploadBody.match(/name="submissionId"\r?\n\r?\n([^\r\n]+)/)?.[1];return json({id,notified:true});}
+   // The office upload is two requests: a ticket that carries the fields, then a receipt-only confirmation.
+   if(u.pathname==='/api/admin/uploads'&&route.request().method()==='POST'){uploadBody=route.request().postData()??'';return json({id:'ticket1',state:'complete'});}
+   if(u.pathname==='/api/admin/documents'&&route.request().method()==='POST'){const fields=Object.fromEntries((JSON.parse(uploadBody||'{"fields":[]}').fields as [string,string][]));return json({id:fields.submissionId,notified:true});}
    if(u.pathname==='/api/admin/clients')return json([{id:'client1',name:'Alice Example',email:'scope@example.test',created_at:'2026-09-01',orders:[],companies:[{id:'co1',llc_name:name},{id:'co2',llc_name:'Scope Beta, LLC'}],documents:[]}]);
    if(u.pathname==='/api/admin/me')return json({ok:true});
    if(u.pathname==='/api/auth/me')return json({name:'Alice Example',email:'scope@example.test'});
@@ -44,7 +46,8 @@ export async function batch02Walk(browser:Browser,web:string,check:Check){
   const dialog=page.getByRole('dialog');await dialog.getByRole('button',{name:'Legal mail',exact:true}).click();
   await dialog.getByLabel('Document title',{exact:true}).fill('Company-specific summons');await dialog.getByLabel('File',{exact:true}).setInputFiles({name:'mail.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4 fixture\n%%EOF')});await dialog.locator('input[type=date]').fill('2026-09-01');
   const disabled=await dialog.getByRole('button',{name:'Upload document',exact:true}).isDisabled();await dialog.getByLabel('Company',{exact:true}).selectOption('co1');await screenshot('upload-company');await dialog.getByRole('button',{name:'Upload document',exact:true}).click();await dialog.waitFor({state:'hidden'});
-  check(disabled&&/name="orderId"\r\n\r\nco1/.test(uploadBody)&&/name="kind"\r\n\r\nlegal_mail/.test(uploadBody),'batch02 office legal-mail upload selects and sends recipient company',{disabled,uploadBody});
+  const sent=Object.fromEntries((JSON.parse(uploadBody||'{"fields":[]}').fields as [string,string][]));
+  check(disabled&&sent.orderId==='co1'&&sent.kind==='legal_mail','batch02 office legal-mail upload selects and sends recipient company',{disabled,sent});
  }catch(e){check(false,'batch02 office legal-mail upload selects and sends recipient company',String(e));}
  await page.close();
  const observations:{kind:string;ok:boolean;entity?:unknown;individual?:unknown;error?:string;screen?:string}[]=[];

@@ -48,9 +48,10 @@ export const BACKUP_TABLES = [
   "checkout_payment_receipts",
   "payment_alerts",
   "office_operations",
+  "included_series_credits",
 ] as const;
 /** Introduced after the original sixteen-table backup format. */
-export const OPTIONAL_BACKUP_TABLES = new Set<string>(['launch_policy','payment_reconciliation_log','recovery_holds','checkout_payment_receipts','payment_alerts','office_operations']);
+export const OPTIONAL_BACKUP_TABLES = new Set<string>(['launch_policy','payment_reconciliation_log','recovery_holds','checkout_payment_receipts','payment_alerts','office_operations','included_series_credits']);
 
 const PREFIX = "backups/";
 

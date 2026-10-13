@@ -1,5 +1,6 @@
 import { checkCheckout } from './checkout-recovery';
 import { claimServicePurchase, seriesPurchaseIdentities } from './service-purchase';
+import { claimIncludedSeries, creditAvailable } from './included-series';
 import {hasRenewalCard, longDate} from './renewals';
 import { obligationPurpose, lateNoticeFee } from './agent-obligations';
 import { agreementSources, AGREEMENT_UNAVAILABLE } from "./agreement-source";
@@ -1901,6 +1902,7 @@ app.get("/portal/services", async (c) => {
   const seed = await oaSeed(session.clientId, svcCompanyId);
   const savedAgreement = await savedOaAnswers(session.clientId, svcCompanyId);
   const owners = effectiveOwners(seed?.members ?? [], savedAgreement);
+  const includedRemaining = await creditAvailable(session.clientId, svcCompanyId);
   const agreementForm = await db.query<{ version: string }>("SELECT inputs->>'version' AS version FROM oa_generations WHERE client_id = $1 AND order_id = $2 ORDER BY created_at DESC LIMIT 1", [session.clientId, svcCompanyId]);
   const oaSElection = agreementForm.length ? ["s", "member-s", "single-s", "member-single-s"].includes(agreementForm[0].version) : savedAgreement?.sElection === true;
   return c.json({
@@ -1909,8 +1911,10 @@ app.get("/portal/services", async (c) => {
       oaSElection,
       dev: !env.isProd && !env.SQUARE_ACCESS_TOKEN,
       members: owners,
+      // The included third series shows at $0.00 while the company holds it.
+      includedSeriesRemaining: includedRemaining,
       pricing: {
-        seriesCents: SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS,
+        seriesCents: includedRemaining ? 0 : SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS,
         einCents: EIN_FEE_CENTS,
         sElectionCents: S_ELECTION_FEE_CENTS,
         certStatusCents: CERT_STATUS_FEE_CENTS,
@@ -1985,7 +1989,7 @@ app.post("/portal/services/series", async (c) => {
   const session = await getSession(c);
   if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
   const body = z
-    .object({ suffix: z.string().min(1).max(60), purpose: z.string().max(300).optional() })
+    .object({ suffix: z.string().min(1).max(60), purpose: z.string().max(300).optional(), expectedCents: z.number().int().optional() })
     .safeParse(await c.req.json().catch(() => null));
   if (!body.success) {
     const issue = body.error.issues[0];
@@ -2011,6 +2015,19 @@ app.post("/portal/services/series", async (c) => {
     );
   }
   const amountCents = SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS;
+  // The included third series (Adam, 11–12 Oct 2026). A customer who saw $0.00
+  // gets the credit's request, or the one they already made for this same
+  // series; never a $50 checkout they did not see. No message: the dialog just
+  // refreshes to the current price.
+  const shown = body.data.expectedCents;
+  const priceChanged = () => c.json(err("The price is no longer available.", "PRICE_CHANGED"), 409);
+  if (purchaseCompanyId && ((await creditAvailable(session.clientId, purchaseCompanyId)) || shown === 0)) {
+    if (typeof shown === "number" && shown !== 0 && (await creditAvailable(session.clientId, purchaseCompanyId))) return priceChanged();
+    const claimed = await claimIncludedSeries(session.clientId, purchaseCompanyId, llcName, { seriesName, purpose: body.data.purpose ?? "" });
+    if (claimed === "PRICE_CHANGED") return priceChanged();
+    return c.json({ data: { serviceOrderId: claimed.id, checkoutUrl: null, totalCents: 0 } });
+  }
+  if (typeof shown === "number" && shown !== amountCents) return priceChanged();
   const db = await getDb();
   // Only a purchase that passed every check spends the allowance (Adam,
   // 14 Sep 2026: refusals do not count).

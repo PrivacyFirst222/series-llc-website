@@ -22,6 +22,7 @@
     "check:legal-mail": "bun run scripts/chunk1-legal-mail-check.ts",
     "check:chunk1-remaining": "bun run server/chunk1-remaining-check.ts && bun run scripts/chunk1-remaining-walk.ts && bun run check:chunk1-password",
     "check:chunk1-password": "E2E_OFFLINE=1 VERCEL= bun run server/chunk1-password-check.ts",
+    "check:included-series-credit": "bun run server/included-series-credit-check.ts",
     "check:chunk2-purchases": "bun run server/chunk2-purchase-check.ts",
     "check:chunk2-followup": "bun run server/chunk2-followup-check.ts",
     "check:chunk2-series-owner": "bun run server/chunk2-series-owner-check.ts",

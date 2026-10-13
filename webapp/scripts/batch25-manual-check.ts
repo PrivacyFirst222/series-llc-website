@@ -28,7 +28,8 @@ export async function batch25ManualCheck(check: (ok: boolean, label: string, det
   const tables = parseManual(md).blocks.filter(b => b.kind === "table");
   const missing: unknown[] = [], orphaned: unknown[] = [], withoutHeader: unknown[] = [];
   for (const [ti, table] of tables.entries()) {
-    const header = table.rows[0].map(plain).join(" ").trim();
+    // The renderer draws the check mark as a shape (ce8fac5, 3 Oct 2026), so it is not in the extracted text.
+    const header = table.rows[0].map(plain).join(" ").replace(/\*/g, "").replace(/\s+/g, " ").trim();
     const locations = table.rows.slice(1).map((r, ri) => {
       const row = r.map(plain).join(" ").trim();
       const hits = pages.flatMap((p, pi) => p.includes(row) ? [pi] : []);

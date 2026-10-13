@@ -2,7 +2,7 @@
 
 GENERATED from docs/audit/ledger.json by `bun run docs/audit/ledger-print.ts list`. Do not edit: the commit step refuses a copy that differs from the ledger. The auditors' original files are unchanged under docs/audit/sources/ and docs/audit/runs/.
 
-463 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 129 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Published (individual or combined receipt): 0 of 451.
+466 records: 267 from the 16 Sep working list and 67 from Codex's audit (N1.01–N4.11), plus 132 from later checked audit intakes. 12 dropped after Codex's review, 15 optional wording, 35 second sightings of another item's part. Published (individual or combined receipt): 0 of 454.
 
 Combined publication is shown separately from individual lifecycle states. A combined receipt does not invent separate historical acceptances.
 A status reads: open → assigned (to a batch) → implemented → accepted (by Adam, by exact commit) → released.
@@ -522,7 +522,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 rejected r4: Standing authorization for necessary revisions: the browser caller still expects the retired reminder-hold test; declare and update that caller before final review.
   - 2026-09-23 rejected r5: Standing revision authorization: declare exact approved Manual replacement so document preservation check can verify it.
 
-## Order form and payment — 88 open of 90
+## Order form and payment — 89 open of 91
 
 - **45. [A1]** — **optional — implemented**
   - Registered agent step, card tick (mine). Reads "…and I can cancel at any time in my portal." Terms 9(g) and the code stop the charge only on 30 days' notice. Replace: "…and I can cancel in my portal with at least 30 days' notice before the renewal date." (StepRegisteredAgent.tsx)
@@ -1322,8 +1322,17 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - Implementation evidence: commit 4754c5116dcc2a0105acd4a0adede646d3c6f41a, batch 31 revision 3, package aaeabc755635. This records implementation, not acceptance or publication.
   - 2026-09-22 rejected r1: Standing owner authorization to advance revisions: correct two source assertions to preserve Markdown bold markers; approved product wording unchanged.
   - 2026-09-22 rejected r2: Standing owner authorization for necessary revisions: update the API test's superseded Statement of Authority wording while retaining the Section 5.4(b) consent assertion.
+- **AUD-owner-third-series-credit-2026-10-12-two-series-minimum. [substantive]** — **implemented**
+  - Order form: Series step — `webapp/src/components/forms/florida-llc/stepValidation.ts:186`
+  - Reads: if (data.series.length === 0)
+  - Claims: An order may be placed with one series; the form and the server accept it.
+  - True: Owner approved the wording "Add at least two series to continue." (12 Oct 2026, "Approve 1") for a two-series minimum, so that every paid package ends with two series and the third is the credit.
+  - Proposed replacement (not approved): Require at least two series in the form and on the server, with the approved message.
+  - Rechecked by Claude source comparison with owner-requested feature: This is a new owner-requested feature, not an audit finding discovered by an independent audit. Compared stepValidation.ts and validation.ts at c054050 with the owner's approved wording.
+  - Implemented protections: batch 42 revision 1, release commit not recorded, by Claude; protected by 2 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
 
-## Client portal — 95 open of 95
+## Client portal — 96 open of 96
 
 - **115. [A47]** — **implemented**
   - Questionnaire and amendment error "We couldn't find a formed LLC on your account yet" where the check is for a paid order. Replace: "a paid order".
@@ -2198,6 +2207,15 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
   - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
+- **AUD-owner-third-series-credit-2026-10-12-third-series-credit. [substantive]** — **implemented**
+  - Client portal and office: adding a third series after formation — `webapp/server/routes-portal.ts:1984`
+  - Reads: app.post("/portal/services/series", async (c) => {
+  - Claims: A client whose formation completes with two series pays the full price to add a third; there is no credit for it.
+  - True: Owner, 12 Oct 2026: "Forget the whole coupon code idea. Just make sure the third series credit works". Owner-approved terms: a paid package whose formation completes with exactly two series gets one non-expiring, non-transferable credit toward a third; a training client gets none. Implement this.
+  - Proposed replacement (not approved): One credit per qualifying formation: the add-series dialog shows $0.00 and the portal shows "1 included series remaining"; a credit-backed request is $0, goes in progress with no payment, and the office sees it on the board; the credit is used when the office fulfills the series.
+  - Rechecked by Claude source comparison with owner-requested feature: This is a new owner-requested feature, not an audit finding discovered by an independent audit. Compared routes-portal.ts, app.ts, routes-admin.ts and office-uploads.ts at c054050 with the owner's instruction.
+  - Implemented protections: batch 42 revision 1, release commit not recorded, by Claude; protected by 1 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
 
 ## Office — 39 open of 39
 
@@ -3046,7 +3064,7 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
   - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
 
-## Agreements and guidance — 137 open of 140
+## Agreements and guidance — 138 open of 141
 
 - **229. [A80]** — **implemented**
   - Manager-managed forms (4), Indemnification: "an act exceeding the authority conferred by Section 5.4"; 5.4 is the approval list, 5.3 the authority. Replace: "an act taken without the approval Section 5.4 requires" (both places).
@@ -4701,6 +4719,15 @@ For the next whole-product audit, use docs/audit/AUDIT-WORKFLOW.md and audit-ses
   - 2026-09-23 rejected r2: Necessary scope revision under Adam standing authorization: include synthetic owner-record fixture and historical renderer fixture adapters; preserve all assertions and the same twelve approved repairs, excluding A2.
   - 2026-09-23 rejected r3: Necessary review-package revision under standing authorization: explicitly run the tracking check required by included Batches 39 and 40 in the complete release range. Same twelve approved repairs; no additional product scope.
   - 2026-09-24 rejected r4: Necessary Batch41 revision5 under the supplied standing authorization: declare isolated storage/mirror fixtures for existing Batch23 recovery checks, preserving all25 assertions; no new product decision or release acceptance.
+- **AUD-owner-third-series-credit-2026-10-12-joint-heading-lowercase. [substantive]** — **implemented**
+  - New-series consent: heading above joint signatures — `webapp/server/new-series.ts:113`
+  - Reads: ${name}${m.jointHolding ? ` — ${titleCaseHolding(m.jointHolding)}` : ""}${suffix}
+  - Claims: The joint-ownership form of holding in a new-series consent heading is printed in title case.
+  - True: Owner, 12 Oct 2026: "Lower case. Go" (about this heading).
+  - Proposed replacement (not approved): Print the joint holding exactly as the client entered it, in lowercase, in the heading.
+  - Rechecked by Claude source comparison with owner-requested feature: This is a new owner-requested feature, not an audit finding discovered by an independent audit. Compared new-series.ts at c054050 with the owner's instruction.
+  - Implemented protections: batch 42 revision 1, release commit not recorded, by Claude; protected by 1 assertion(s).
+  - Implementation receipt: not yet recorded; no commit identity is implied.
 
 ## Cross-review adjudications — informational, not repair tasks
 

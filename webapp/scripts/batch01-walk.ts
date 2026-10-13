@@ -15,8 +15,8 @@ const LABELS: Record<string, string> = {
 };
 const address = '100 Ocean Drive, Miami, FL 33139';
 function answers(): Answer { return { firstOrAmended: 'first', effectiveDate: '2026-09-01', authorized: true, sElection: false, multiOwner: true, borrowingThreshold: 20000, includeCapitalCalls: false, competition: 'A', includeShotgun: false, ownershipMode: 'percent',
-  members: ['Alice Example', 'Bob Example', 'Carol Example'].map((name,i) => ({ name, address, percentage: i===0?34:33 })),
-  couples: [], series: [{}], assets: [{ description: 'Saved equipment', value: 100.50, kind: 'other', contributedBy: { mode: 'shares', shares: [0,100,0] }, allocatedTo: 'company' }] }; }
+  members: ['Alice Example', 'Bob Example', 'Carol Example'].map((name,i) => ({ id: `owner-${i+1}`, name, address, percentage: i===0?34:33 })), // saved owners carry their identity, as every saved questionnaire does
+  couples: [], series: [{}], assets: [{ description: 'Saved equipment', value: 100.50, kind: 'other', contributedBy: { mode: 'shares', shares: [0,100,0], unitIds: ['owner-1','owner-2','owner-3'] }, allocatedTo: 'company' }] }; }
 
 async function fixture(browser: Browser, web: string, initial = answers()) {
   const page = await browser.newPage(); page.setDefaultTimeout(5000);
@@ -81,8 +81,14 @@ export async function batch01Walk(browser: Browser, web: string, check: Check) {
       await f.page.getByLabel('Share of asset 1 contributed by Bob Example',{exact:true}).fill('100');
     }
     await f.page.getByRole('button',{name:'Remove Alice Example',exact:true}).click();
-    const bob=await f.page.getByLabel('Share of asset 1 contributed by Bob Example',{exact:true}).inputValue().catch(()=>null);
-    const carol=await f.page.getByLabel('Share of asset 1 contributed by Carol Example',{exact:true}).inputValue().catch(()=>null);
+    // The page redraws the shares just after the click; read until they settle, then report what they settled on.
+    let bob:string|null=null,carol:string|null=null;
+    for(let waited=0;waited<4000;waited+=100){
+      bob=await f.page.getByLabel('Share of asset 1 contributed by Bob Example',{exact:true}).inputValue().catch(()=>null);
+      carol=await f.page.getByLabel('Share of asset 1 contributed by Carol Example',{exact:true}).inputValue().catch(()=>null);
+      if(bob==='100'&&carol==='0')break;
+      await f.page.waitForTimeout(100);
+    }
     const confirmation=await f.page.getByRole('button',{name:'Confirm contributors for asset 1',exact:true}).isVisible().catch(()=>false);
     return {ok:bob==='100'&&carol==='0'&&confirmation,detail:{bob,carol,confirmation}};
   });

@@ -113,7 +113,7 @@ const formData: FloridaLLCFormData = {
   correspondentName: "Casey Member, Jr.",
   correspondentEmail: testEmail,
   confirmCorrespondentEmail: testEmail,
-  series: [{ id: "s1", name: "E2E Coastal Holdings, LLC, PS A" }],
+  series: [{ id: "s1", name: "E2E Coastal Holdings, LLC, PS A" }, { id: "s2", name: "E2E Coastal Holdings, LLC, PS B" }],
   seriesOwnershipAcknowledgment: true,
   authorizedRepresentativeName: "Casey Member, Jr.",
   authorizedRepresentativeSignature: "Casey Member, Jr.",
@@ -468,7 +468,7 @@ check("service-RA order accepted with canonical details enforced", svc.status ==
       ...formData, filingPath: "CONVERT", desiredLlcName: "", llcDesignator: "", alternateName1: "",
       nameSearchAcknowledgment: false, governmentAffiliationAcknowledgment: false, lawfulPurposeNameAcknowledgment: false,
       existingLlcName: "E2E Converted Holdings, LLC", sunbizDocumentNumber: "", conversionAuthorityAcknowledgment: true,
-      series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }],
+      series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }, { id: "s2", name: "E2E Converted Holdings, LLC, PS B" }],
     }) });
     check("refused by the server: a conversion without its Sunbiz document number", convNoNumber.status === 400 && /Sunbiz document number is required/.test(JSON.stringify(convNoNumber.body)), convNoNumber.body);
   }
@@ -735,7 +735,7 @@ check("client account auto-created on payment", !!client && !client.has_password
     // fixture carrying them as true hid a real submit blocker (30 Aug 2026).
     nameSearchAcknowledgment: false, governmentAffiliationAcknowledgment: false, lawfulPurposeNameAcknowledgment: false,
     existingLlcName: "E2E Converted Holdings, LLC", sunbizDocumentNumber: "L24000999888",
-    series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }],
+    series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }, { id: "s2", name: "E2E Converted Holdings, LLC, PS B" }],
     // A conversion certifies authority for the company instead of choosing an
     // Articles signer, and never answers purpose or effective date
     // (Adam, 9 Sep 2026).
@@ -753,7 +753,7 @@ check("client account auto-created on payment", !!client && !client.has_password
       nameSearchAcknowledgment: false, governmentAffiliationAcknowledgment: false, lawfulPurposeNameAcknowledgment: false,
       existingLlcName: "E2E Converted Holdings, LLC", sunbizDocumentNumber: "L24000999888", conversionAuthorityAcknowledgment: true,
       purposeType: "", atLeastOneMemberAcknowledgment: false,
-      series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }],
+      series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }, { id: "s2", name: "E2E Converted Holdings, LLC, PS B" }],
       orderSElection: true, sElectionFilingAcknowledgment: false,
       registeredAgentAcceptanceName: "", registeredAgentElectronicSignature: "", registeredAgentAcceptanceCheckbox: false, registeredAgentSignatureAuthorizationCheckbox: false,
       clientEmail: uc("stray"), confirmClientEmail: uc("stray"), correspondentEmail: uc("stray"), confirmCorrespondentEmail: uc("stray"),
@@ -784,7 +784,7 @@ check("client account auto-created on payment", !!client && !client.has_password
     ...formData, filingPath: "CONVERT", desiredLlcName: "", llcDesignator: "", alternateName1: "",
     nameSearchAcknowledgment: false, governmentAffiliationAcknowledgment: false, lawfulPurposeNameAcknowledgment: false,
     existingLlcName: "E2E Converted Holdings, LLC", sunbizDocumentNumber: "L24000999888",
-    series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }],
+    series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }, { id: "s2", name: "E2E Converted Holdings, LLC, PS B" }],
     conversionAuthorityAcknowledgment: false,
     clientEmail: uc("uiconv2"), confirmClientEmail: uc("uiconv2"),
     correspondentEmail: uc("uiconv2"), confirmCorrespondentEmail: uc("uiconv2"),
@@ -837,7 +837,7 @@ check("client account auto-created on payment", !!client && !client.has_password
       { titles, ra: formData.registeredAgentChoice });
     const cfd = new FormData();
     cfd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 e2e conversion psd\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
-    cfd.append("psdSeries", JSON.stringify(["E2E Converted Holdings, LLC, PS A"]));
+    cfd.append("psdSeries", JSON.stringify(["E2E Converted Holdings, LLC, PS A", "E2E Converted Holdings, LLC, PS B"]));
     const cRes = await fetch(`${BASE}/api/admin/orders/${convId}/formation-documents`, { method: "POST", headers: { Cookie: admin.cookie }, body: cfd });
     check("a conversion is marked formed by its Designations alone, with no Articles PDF", cRes.ok, await cRes.clone().json().catch(() => null));
     const cStatus = await api(`/api/orders/${convId}/status`);
@@ -1241,7 +1241,7 @@ if (mint.status === 200) {
   const formFd = new FormData();
   formFd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 e2e articles\n%%EOF")], "articles.pdf", { type: "application/pdf" }));
   formFd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 e2e psd\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
-  formFd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+  formFd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A", "E2E Coastal Holdings, LLC, PS B"]));
   const formedRes = await fetch(`${BASE}/api/admin/orders/${orderId}/formation-documents`, {
     method: "POST", headers: { Cookie: adminLoginF.cookie }, body: formFd,
   });
@@ -1255,7 +1255,7 @@ if (mint.status === 200) {
     const fDet = (await api(`/api/admin/orders/${orderId}`, { cookies: adminLoginF.cookie })).body?.data as { filedAt: string | null; formedAt: string | null; raRenewalDate: string | null; documents: { kind: string; title: string; createdAt: string }[] } | undefined;
     check("an order formed without the Sent button carries no sent date (14 Sep 2026: one was invented)", fDet?.filedAt === null && !!fDet?.formedAt, fDet && { filedAt: fDet.filedAt, formedAt: fDet.formedAt });
     check("a client who is their own agent gets no renewal date", fDet?.raRenewalDate === null, fDet?.raRenewalDate);
-    check("the formation designation is titled by its series and the company", fDet?.documents.some((d) => d.kind === "psd" && d.title === "Protected Series Designation — E2E Coastal Holdings, LLC, PS A — E2E Coastal Holdings, LLC") === true, fDet?.documents.map((d) => d.title));
+    check("the formation designation is titled by its series and the company", fDet?.documents.some((d) => d.kind === "psd" && d.title === "Protected Series Designation — E2E Coastal Holdings, LLC, PS A, E2E Coastal Holdings, LLC, PS B — E2E Coastal Holdings, LLC") === true, fDet?.documents.map((d) => d.title));
     check("the office sees when each document went up", fDet?.documents.every((d) => !!d.createdAt) === true, fDet?.documents);
   }
   {
@@ -1270,7 +1270,7 @@ if (mint.status === 200) {
     const formFd2 = new FormData();
     formFd2.set("articles", new File([new TextEncoder().encode("%PDF-1.4 e2e articles retry\n%%EOF")], "articles.pdf", { type: "application/pdf" }));
     formFd2.append("psd", new File([new TextEncoder().encode("%PDF-1.4 e2e psd retry\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
-    formFd2.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+    formFd2.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A", "E2E Coastal Holdings, LLC, PS B"]));
     const retryRes = await fetch(`${BASE}/api/admin/orders/${orderId}/formation-documents`, {
       method: "POST", headers: { Cookie: adminLoginF.cookie }, body: formFd2,
     });
@@ -1294,7 +1294,7 @@ if (mint.status === 200) {
     const badFd = new FormData();
     badFd.set("articles", new File([new TextEncoder().encode("<html><body>504 Gateway Timeout</body></html>")], "articles.pdf", { type: "application/pdf" }));
     badFd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 psd fine\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
-    badFd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+    badFd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A", "E2E Coastal Holdings, LLC, PS B"]));
     const badRes = await fetch(`${BASE}/api/admin/orders/${orderId}/formation-documents`, {
       method: "POST", headers: { Cookie: adminLoginF.cookie }, body: badFd,
     });
@@ -1323,7 +1323,7 @@ if (mint.status === 200) {
     const midFd = new FormData();
     midFd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 replacement articles\n%%EOF")], "articles.pdf", { type: "application/pdf" }));
     midFd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 replacement psd\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
-    midFd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+    midFd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A", "E2E Coastal Holdings, LLC, PS B"]));
     const midRes = await fetch(`${BASE}/api/admin/orders/${orderId}/formation-documents`, {
       method: "POST", headers: { Cookie: adminLoginF.cookie }, body: midFd,
     });
@@ -1337,7 +1337,7 @@ if (mint.status === 200) {
     const againFd = new FormData();
     againFd.set("articles", new File([new TextEncoder().encode("%PDF-1.4 replacement articles 2\n%%EOF")], "articles.pdf", { type: "application/pdf" }));
     againFd.append("psd", new File([new TextEncoder().encode("%PDF-1.4 replacement psd 2\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
-    againFd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+    againFd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A", "E2E Coastal Holdings, LLC, PS B"]));
     const againRes = await fetch(`${BASE}/api/admin/orders/${orderId}/formation-documents`, {
       method: "POST", headers: { Cookie: adminLoginF.cookie }, body: againFd,
     });
@@ -1357,7 +1357,7 @@ if (mint.status === 200) {
       const fd = new FormData();
       fd.set("articles", new File([new TextEncoder().encode(`%PDF-1.4 concurrent articles ${tag}\n%%EOF`)], "articles.pdf", { type: "application/pdf" }));
       fd.append("psd", new File([new TextEncoder().encode(`%PDF-1.4 concurrent psd ${tag}\n%%EOF`)], "psd.pdf", { type: "application/pdf" }));
-      fd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+      fd.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A", "E2E Coastal Holdings, LLC, PS B"]));
       return fetch(`${BASE}/api/admin/orders/${orderId}/formation-documents`, {
         method: "POST", headers: { Cookie: adminLoginF.cookie }, body: fd,
       });
@@ -1907,7 +1907,7 @@ if (mint.status === 200) {
     const secondIp = { "X-Forwarded-For": `10.55.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` };
     const second = await api("/api/orders", { method: "POST", headers: secondIp, body: JSON.stringify({
       ...formData, desiredLlcName: "E2E Second Company", alternateName1: "E2E Second Company Backup",
-      series: [{ id: "s1", name: "E2E Second Company, LLC, PS A" }],
+      series: [{ id: "s1", name: "E2E Second Company, LLC, PS A" }, { id: "s2", name: "E2E Second Company, LLC, PS B" }],
     })});
     check("a second formation for the same email is accepted", second.status === 200, second.body?.error);
     const secondId = second.body?.data?.orderId as string;
@@ -2129,7 +2129,7 @@ mail.set("clientId", client!.id);
     const fd2 = new FormData();
     fd2.set("articles", new File([new TextEncoder().encode("%PDF-1.4 e2e articles couple\n%%EOF")], "articles.pdf", { type: "application/pdf" }));
     fd2.append("psd", new File([new TextEncoder().encode("%PDF-1.4 e2e psd couple\n%%EOF")], "psd.pdf", { type: "application/pdf" }));
-    fd2.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A"]));
+    fd2.append("psdSeries", JSON.stringify(["E2E Coastal Holdings, LLC, PS A", "E2E Coastal Holdings, LLC, PS B"]));
     const formed2 = await fetch(`${BASE}/api/admin/orders/${mOrderId}/formation-documents`, {
       method: "POST", headers: { Cookie: adminF2.cookie }, body: fd2,
     });
@@ -2464,7 +2464,7 @@ mail.set("clientId", client!.id);
     authorizedRepresentativeName: "Dana Reed",
     authorizedRepresentativeSignature: "Dana Reed",
     desiredLlcName: "E2E Member Managed Holdings",
-    series: [{ id: "s1", name: "E2E Member Managed Holdings, LLC, PS A" }],
+    series: [{ id: "s1", name: "E2E Member Managed Holdings, LLC, PS A" }, { id: "s2", name: "E2E Member Managed Holdings, LLC, PS B" }],
     orderEin: false,
     orderSElection: false,
   };
@@ -2621,7 +2621,7 @@ mail.set("clientId", client!.id);
     authorizedRepresentativeName: "Alex Vale",
     authorizedRepresentativeSignature: "Alex Vale",
     desiredLlcName: "E2E Harbor Single Manager",
-    series: [{ id: "s1", name: "E2E Harbor Single Manager, LLC, PS A" }],
+    series: [{ id: "s1", name: "E2E Harbor Single Manager, LLC, PS A" }, { id: "s2", name: "E2E Harbor Single Manager, LLC, PS B" }],
     orderEin: false,
     orderSElection: false,
   };
@@ -2778,7 +2778,7 @@ mail.set("clientId", client!.id);
     clientEmail: edEmail, confirmClientEmail: edEmail,
     confirmCorrespondentEmail: edEmail,
     desiredLlcName: "E2E Editable Owners",
-    series: [{ id: "s1", name: "E2E Editable Owners, LLC, PS A" }],
+    series: [{ id: "s1", name: "E2E Editable Owners, LLC, PS A" }, { id: "s2", name: "E2E Editable Owners, LLC, PS B" }],
     orderEin: false,
     orderSElection: false,
   };
@@ -2921,7 +2921,7 @@ mail.set("clientId", client!.id);
     correspondentEmail: acctEmail.replace("@", "+updates@"),
     confirmCorrespondentEmail: acctEmail.replace("@", "+updates@"),
     clientEmail: acctEmail, confirmClientEmail: acctEmail,
-    series: [{ id: "s1", name: "E2E Account Settings, LLC, PS A" }],
+    series: [{ id: "s1", name: "E2E Account Settings, LLC, PS A" }, { id: "s2", name: "E2E Account Settings, LLC, PS B" }],
     orderEin: false, orderSElection: false,
     // Our RA service, so the suite holds one PAID RA order — what the admin
     // Registered Agent Clients tab (ra_llcs) is asserted against.
@@ -3152,7 +3152,7 @@ mail.set("clientId", client!.id);
       purposeType: "SPECIFIC", businessPurposeText: "left over", effectiveDateOption: "SPECIFIC", requestedEffectiveDate: "2026-10-01",
       nameSearchAcknowledgment: false, governmentAffiliationAcknowledgment: false, lawfulPurposeNameAcknowledgment: false,
       existingLlcName: "E2E Converted Holdings, LLC", sunbizDocumentNumber: "L24000999888", conversionAuthorityAcknowledgment: true,
-      series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }],
+      series: [{ id: "s1", name: "E2E Converted Holdings, LLC, PS A" }, { id: "s2", name: "E2E Converted Holdings, LLC, PS B" }],
       clientEmail: convEmail, confirmClientEmail: convEmail, correspondentEmail: convEmail, confirmCorrespondentEmail: convEmail,
     }) });
     check("a conversion is not refused over a taken name it never uses", convTaken.status === 200, convTaken.body);
@@ -3426,7 +3426,7 @@ mail.set("clientId", client!.id);
       ...formData, desiredLlcName: "E2E Money Check", alternateName1: "E2E Money Check Backup",
       clientEmail: email, confirmClientEmail: email,
       correspondentEmail: email, confirmCorrespondentEmail: email,
-      series: [{ id: "s1", name: "E2E Money Check, LLC, PS A" }],
+      series: [{ id: "s1", name: "E2E Money Check, LLC, PS A" }, { id: "s2", name: "E2E Money Check, LLC, PS B" }],
       orderEin: false, orderSElection: false,
     }),
   });
@@ -3485,7 +3485,7 @@ mail.set("clientId", client!.id);
       ...formData, desiredLlcName: "E2E OA Revision", alternateName1: "E2E OA Revision Backup",
       clientEmail: oaEmail, confirmClientEmail: oaEmail,
       correspondentEmail: oaEmail, confirmCorrespondentEmail: oaEmail,
-      series: [{ id: "s1", name: "E2E OA Revision, LLC, PS A" }],
+      series: [{ id: "s1", name: "E2E OA Revision, LLC, PS A" }, { id: "s2", name: "E2E OA Revision, LLC, PS B" }],
       orderEin: false, orderSElection: false,
     }),
   });
@@ -3590,7 +3590,7 @@ mail.set("clientId", client!.id);
         ...formData, desiredLlcName: name, alternateName1: `${name} Backup`,
         clientEmail: email, confirmClientEmail: email,
         correspondentEmail: email, confirmCorrespondentEmail: email,
-        series: [{ id: "s1", name: `${name}, LLC, PS A` }],
+        series: [{ id: "s1", name: `${name}, LLC, PS A` }, { id: "s2", name: `${name}, LLC, PS B` }],
         orderEin: false, orderSElection: false,
       }),
     });
@@ -3913,7 +3913,7 @@ mail.set("clientId", client!.id);
       const giftEmail = testEmail.replace("@", "+gift@");
       const giftRes = await api("/api/orders", { method: "POST", headers: { "X-Forwarded-For": `10.91.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}` }, body: JSON.stringify({
         ...formData, registeredAgentChoice: "SERVICE", raRenewalCardConsent: true, desiredLlcName: "E2E Gift Card Holdings", alternateName1: "E2E Gift Card Backup",
-        series: [{ id: "s1", name: "E2E Gift Card Holdings, LLC, PS A" }],
+        series: [{ id: "s1", name: "E2E Gift Card Holdings, LLC, PS A" }, { id: "s2", name: "E2E Gift Card Holdings, LLC, PS B" }],
         clientEmail: giftEmail, confirmClientEmail: giftEmail, correspondentEmail: giftEmail, confirmCorrespondentEmail: giftEmail,
       }) });
       const giftId = giftRes.body?.data?.orderId as string;
@@ -4186,6 +4186,10 @@ const {batch37Checks}=await import("./batch37-check");
 const batch37Results=new Map<string,{ok:boolean;detail?:unknown}>();
 await batch37Checks((label,ok,detail)=>batch37Results.set(label,{ok,detail}));
 {const r=batch37Results.get("batch37 approved corrections");check("batch37 approved corrections",r?.ok===true,r?.detail);}
+const {includedSeriesChecks}=await import("./included-series-check");
+const includedSeriesResults=new Map<string,{ok:boolean;detail?:unknown}>();
+await includedSeriesChecks((label,ok,detail)=>includedSeriesResults.set(label,{ok,detail}));
+{const r=includedSeriesResults.get("included third series credit");check("included third series credit",r?.ok===true,r?.detail);}
 const {batch36Checks}=await import("./batch36-check");
 const batch36Results=new Map<string,{ok:boolean;detail?:unknown}>();
 await batch36Checks((label,ok,detail)=>batch36Results.set(label,{ok,detail}));

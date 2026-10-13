@@ -39,7 +39,7 @@ function slots(route:string):string[]|null {
 }
 async function authorizeTarget(route:string,fields:[string,string][]){
  const db=await getDb(),order=route.match(new RegExp(`^/api/admin/orders/(${uuid})/`)),service=route.match(new RegExp(`^/api/admin/services/(${uuid})/`)),document=route.match(new RegExp(`^/api/admin/documents/(${uuid})/replace$`));
- if(order||service){const table=order?'orders':'service_orders';const [r]=await db.query(`SELECT id FROM ${table} WHERE id=$1 AND paid_at IS NOT NULL AND status NOT IN ('pending_payment','duplicate_payment')`,[(order||service)![1]]);if(!r)reject('Target not found.','NOT_FOUND',404);}
+ if(order||service){const table=order?'orders':'service_orders';const authorized=order?'paid_at IS NOT NULL':"(paid_at IS NOT NULL OR (type='series' AND credit_authorized_at IS NOT NULL))";const [r]=await db.query(`SELECT id FROM ${table} WHERE id=$1 AND ${authorized} AND status NOT IN ('pending_payment','duplicate_payment')`,[(order||service)![1]]);if(!r)reject('Target not found.','NOT_FOUND',404);}
  if(document){const [r]=await db.query("SELECT id FROM documents WHERE id=$1 AND deleted_at IS NULL AND NOT EXISTS(SELECT 1 FROM recovery_holds WHERE id=documents.id AND status='held')",[document[1]]);if(!r)reject('Document not found.','NOT_FOUND',404);}
  if(route==='/api/admin/documents'){
   const values=Object.fromEntries(fields),[client]=await db.query('SELECT id FROM clients WHERE id=$1',[values.clientId]);if(!client)reject('Client not found.','NOT_FOUND',404);

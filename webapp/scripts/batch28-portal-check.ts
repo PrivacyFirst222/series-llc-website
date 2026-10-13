@@ -28,7 +28,7 @@ const entry=`import React from 'react';import{createRoot}from'react-dom/client';
 const js=await build({stdin:{contents:entry,resolveDir:root,loader:'tsx'},bundle:true,write:false,format:'esm',platform:'browser',jsx:'automatic',alias:{'@':resolve(root,'src')},define:{'import.meta.env':'{}','process.env.NODE_ENV':'"production"'},logLevel:'silent'});
 const css=(await postcss([tailwindcss({...tailwindConfig,content:[resolve(root,'src/**/*.{ts,tsx}')]})]).process(readFileSync(resolve(root,'src/index.css'),'utf8').replace(/^@import url\([^\n]+\);\n/m,''),{from:resolve(root,'src/index.css')})).css;
 const evidence=process.env.BATCH28_BROWSER_EVIDENCE_DIR;if(evidence)mkdirSync(evidence,{recursive:true});
-const companies=['First Company LLC','Second Company LLC'].map((name,i)=>({orderId:`company-${i}`,llcName:name,formed:true,raService:true,raAppointmentDate:'2026-01-01',raRenewalDate:'2027-01-01',raCancellationRequestedAt:i===0?'2026-12-20':null,raCancellationLate:i===0,cardStatus:'on_file',cardBrand:'VISA',cardLast4:i===0?'1111':'2222',renewals:i===0?[{date:'2027-01-01',amountCents:9900,status:'charged',chargedAt:'2026-12-17T12:00:00Z',purpose:'renewal'}]:[]}));
+const companies=['First Company LLC','Second Company LLC'].map((name,i)=>({orderId:`company-${i}`,llcName:name,formed:true,raService:true,raAppointmentDate:'2026-01-01',raRenewalDate:'2027-01-01',raCancellationRequestedAt:i===0?'2026-12-20':null,raCancellationLate:i===0,cardStatus:'on_file',cardBrand:'VISA',cardLast4:i===0?'1111':'2222',renewals:i===0?[{date:'2027-01-01',amountCents:9900,status:'charged',chargedAt:'2026-12-17T12:00:00Z',purpose:'renewal',lateNoticeMessage:'Your cancellation notice arrived less than 30 days before renewal. The $99 annual renewal fee for January 1, 2027 remains due, even though your replacement registered agent took effect before renewal.'}]:[]}));
 let agentNote:string|null=null;
 let mode='success',configError=false,noticeError=false,contactSent=false,mailSent=false;
 const posts:{path:string;body:Record<string,unknown>}[]=[],unexpected:string[]=[];
@@ -46,7 +46,7 @@ const server=Bun.serve({hostname:'127.0.0.1',port:0,async fetch(req){const p=new
  if(p.endsWith('/renewal-card')){if(req.method==='GET')return configError?fail():data({applicationId:'fixture',locationId:'fixture',sandbox:true,dev:mode!=='sdk',pendingAttemptId:null});
  const body=await req.json();posts.push({path:p,body});if(mode==='uncertain')return fail('We could not confirm the update. Your previous card remains on file. Retry this update.');if(mode==='decline')return Response.json({error:{message:'The card was refused. Your previous card remains unchanged; try another card.',code:'CARD_REFUSED'}},{status:400});companies[p.includes('company-0')?0:1].cardLast4='9876';return data({ok:true});}
  if(p==='/api/admin/orders/company-0/agent'){if(req.method==='POST'){const body=await req.json();posts.push({path:p,body});agentNote=body.note;return data({ok:true});}return data({ra_appointment_date:'2026-01-01',ra_renewal_date:'2027-01-01',ra_resignation_submitted:agentNote?'2026-09-21':null,ra_resignation_note:agentNote});}
- if(p==='/api/admin/me')return data({ok:true});
+ if(p==='/api/admin/me')return data({ok:true});if(p==='/api/admin/backups/attention')return data([]);
  if(p==='/api/admin/orders')return data({orders:[],total:0,shown:0});
  if(p==='/api/admin/clients')return data([{id:'client',name:'Fixture Client',email:'client@example.test',created_at:'2026-09-21',has_password:true,document_count:1,companies:[],ra_llcs:[],ra_cards:[]}]);
  if(p==='/api/admin/contact-messages')return noticeError?fail():data([{id:'contact',name:'Sender',email:'sender@example.test',message:'Retained customer message',notice_status:contactSent?'sent':'failed',notice_error:contactSent?null:'Fixture mail outage'}]);
@@ -61,7 +61,7 @@ try{
  await scenario('portal card update and receipts',async()=>{
   await page.goto(origin);await page.getByRole('button',{name:'Update renewal card',exact:true}).waitFor();
   check('batch28 browser receipt and stored card survive cancellation',await page.getByTestId('renewal-line').count()===1&&(await page.getByTestId('renewal-card').innerText()).includes('1111'));
-  check('batch28 browser late cancellation names annual fee',await page.getByText(/The full annual renewal fee remains due/).count()===1);
+  check('batch28 browser late cancellation names annual fee',await page.getByText(/The \$99 annual renewal fee for January 1, 2027 remains due/).count()===1);
   await page.getByRole('button',{name:'Update renewal card',exact:true}).click();await dialog.waitFor();
   check('batch28 browser consent required',await dialog.getByRole('button',{name:'Save renewal card',exact:true}).isDisabled());
   await shot('card-desktop');await page.setViewportSize({width:375,height:812});await shot('card-mobile');

@@ -34,6 +34,7 @@ const server=Bun.serve({hostname:'127.0.0.1',port:0,async fetch(req){const u=new
  if(p==='/api/auth/login')return failure(401);
  if(req.method!=='GET'){unexpected.push(req.method+' '+p);return failure();}
  if(p==='/api/auth/me')return json({email:'fixture@example.test',name:'Fixture Client',pendingEmail:null,viewingAsAdmin:viewing});
+ if(p==='/api/admin/backups/attention')return json([]);
  if(p==='/api/admin/me')return mode==='auth-error'?failure():mode==='auth-401'?failure(401):json({ok:true});
  if(p==='/api/admin/clients'){if(mode==='clients-pending')await new Promise<void>(r=>release=r);return mode==='clients-error'?failure():json(mode==='clients-empty'?[]:clients);}
  if(p.startsWith('/api/admin/orders'))return json({orders:[],total:0,page:1,pageSize:50});

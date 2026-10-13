@@ -57,6 +57,8 @@ export const recoveryExpected:Record<string,string[]>={
  'package '+mode+' restore succeeds',...['Plain','Live','Deleted'].map(n=>n==='Deleted'&&mode==='deleted'?'package later deletion defeats old snapshot':'package '+mode+' '+n+' latest retained package is usable'),
  ...['articles','psd'].map(k=>'filing '+mode+' '+k+' snapshot version restored'),
  'package client can delete recovered successor','package recovered system makes complete new backup']])),
- ...Object.fromEntries(['corrupt','pending','checkpoint'].map(mode=>[mode,[
+ ...Object.fromEntries(['corrupt','checkpoint'].map(mode=>[mode,[
  'package '+mode+' evidence refuses before rows','package '+mode+' refusal precedes primary-storage writes','package '+mode+' refusal is actionable']])),
+ // The pending scenario also asserts the typed owner identities (c8fddd2, 3 Oct 2026).
+ pending:['package pending evidence refuses before rows','package pending refusal precedes primary-storage writes','package pending refusal is actionable','package pending refusal reports typed complete owner identities and reasons'],
 };

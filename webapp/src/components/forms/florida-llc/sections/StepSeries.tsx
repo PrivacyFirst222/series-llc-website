@@ -160,13 +160,29 @@ export function StepSeries({ data, patch, errors }: StepProps) {
           the Add button live inside it ("Keep the add series dialog in that
           box"). The "$499" and "first three" facts are the Series pricing
           box's, above. */}
+      {/* Approved wording (Adam, 11 Oct 2026), above the series fields. */}
+      <div className="rounded-xl border border-border bg-card p-4 space-y-2 text-sm">
+        <p className="text-foreground/80 leading-relaxed">
+          Under our ownership structure, the parent (“mothership”) LLC owns the interests in each
+          protected series. Real estate, other liability-producing assets, and business activities
+          should be held or conducted in the appropriate protected series, rather than directly in the
+          mothership. Liabilities incurred by the mothership can expose its ownership interests in the
+          series to creditor remedies.
+        </p>
+        <p className="text-foreground/80 leading-relaxed">
+          Our standard package requires at least two series initially and includes three. If you
+          initially form two, your portal will retain one credit toward forming the third. That credit
+          never expires. An additional charge may apply if government filing fees increase.
+        </p>
+      </div>
+
       <div className="rounded-xl border-2 border-trust bg-trust/5 p-6 sm:p-8" data-testid="series-box">
         <div className="text-center">
           <Layers className="h-9 w-9 mx-auto mb-3 text-trust" />
           <h3 className="font-display text-2xl">Create your protected series</h3>
           <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
-            Your LLC needs at least one protected series before you can continue. The first three
-            are included in the $499 service fee.
+            Create at least two protected series to continue. Your $499 package includes three. If
+            you initially form two, one credit toward forming the third will remain in your portal.
           </p>
         </div>
 

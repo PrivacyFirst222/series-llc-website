@@ -2,6 +2,7 @@ import { PURCHASE_MIGRATION } from './purchase-migration';
 import { SERIES_IDENTITY_MIGRATION } from './series-identity-migration';
 import { SERIES_OWNER_MIGRATION } from './series-owner-migration';
 import { SERIES_FORMAT_MIGRATION } from './series-format-migration';
+import { INCLUDED_SERIES_MIGRATION } from './included-series-migration';
 import { createHash } from "node:crypto";
 import { env } from "./env";
 import {activeDeadline,checkDeadline,ioSignal} from './operation-deadline';
@@ -649,6 +650,7 @@ END $$`,
   { id: 29, name: "interactive-training-clients", statements: [
     `ALTER TABLE clients ADD COLUMN IF NOT EXISTS is_training boolean NOT NULL DEFAULT false`,
   ]},
+  { id: 30, name: "included-third-series-credit", statements: INCLUDED_SERIES_MIGRATION },
   // Append future migrations here with the next id. Never edit an entry.
 ];
 

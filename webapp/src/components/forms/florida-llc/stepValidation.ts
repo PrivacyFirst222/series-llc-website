@@ -183,8 +183,8 @@ export function validateStep(
   }
 
   if (step === "series") {
-    if (data.series.length === 0)
-      e.series = "Add at least one series to proceed.";
+    if (data.series.length < 2)
+      e.series = "Add at least two series to continue.";
     if (!data.seriesOwnershipAcknowledgment)
       e.seriesOwnershipAcknowledgment =
         "Please confirm you understand that your LLC will own every protected series.";

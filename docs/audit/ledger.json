@@ -37772,6 +37772,169 @@
           }
         }
       ]
+    },
+    {
+      "id": "AUD-owner-third-series-credit-2026-10-12-third-series-credit",
+      "tag": "substantive",
+      "area": "Client portal",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/owner-third-series-credit-2026-10-12.json finding third-series-credit",
+      "text": "Client portal and office: adding a third series after formation — `webapp/server/routes-portal.ts:1984`\nReads: app.post(\"/portal/services/series\", async (c) => {\nClaims: A client whose formation completes with two series pays the full price to add a third; there is no credit for it.\nTrue: Owner, 12 Oct 2026: \"Forget the whole coupon code idea. Just make sure the third series credit works\". Owner-approved terms: a paid package whose formation completes with exactly two series gets one non-expiring, non-transferable credit toward a third; a training client gets none. Implement this.\nProposed replacement (not approved): One credit per qualifying formation: the add-series dialog shows $0.00 and the portal shows \"1 included series remaining\"; a credit-backed request is $0, goes in progress with no payment, and the office sees it on the board; the credit is used when the office fulfills the series.\nRechecked by Claude source comparison with owner-requested feature: This is a new owner-requested feature, not an audit finding discovered by an independent audit. Compared routes-portal.ts, app.ts, routes-admin.ts and office-uploads.ts at c054050 with the owner's instruction.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-10-13T02:50:40.047Z",
+              "event": "recorded from verified audit",
+              "note": "owner-third-series-credit-2026-10-12 at c0540506b39a41d8518fd1ec6392ef00d0c643c7; audit 5a2b089ab76ec65051d8333d840531ed09fb3adf8ce71554db6459facf2bb001"
+            },
+            {
+              "at": "2026-10-13T02:50:43.354Z",
+              "event": "assigned",
+              "batch": "42",
+              "revision": 1
+            },
+            {
+              "at": "2026-10-13T02:50:43.459Z",
+              "event": "implemented",
+              "batch": "42",
+              "revision": 1,
+              "note": "by Claude"
+            }
+          ],
+          "batch": "42",
+          "fix": {
+            "batch": "42",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Claude",
+            "assertions": [
+              {
+                "kind": "check",
+                "suite": "server",
+                "label": "included third series credit"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-owner-third-series-credit-2026-10-12-two-series-minimum",
+      "tag": "substantive",
+      "area": "Order form and payment",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/owner-third-series-credit-2026-10-12.json finding two-series-minimum",
+      "text": "Order form: Series step — `webapp/src/components/forms/florida-llc/stepValidation.ts:186`\nReads: if (data.series.length === 0)\nClaims: An order may be placed with one series; the form and the server accept it.\nTrue: Owner approved the wording \"Add at least two series to continue.\" (12 Oct 2026, \"Approve 1\") for a two-series minimum, so that every paid package ends with two series and the third is the credit.\nProposed replacement (not approved): Require at least two series in the form and on the server, with the approved message.\nRechecked by Claude source comparison with owner-requested feature: This is a new owner-requested feature, not an audit finding discovered by an independent audit. Compared stepValidation.ts and validation.ts at c054050 with the owner's approved wording.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-10-13T02:50:40.047Z",
+              "event": "recorded from verified audit",
+              "note": "owner-third-series-credit-2026-10-12 at c0540506b39a41d8518fd1ec6392ef00d0c643c7; audit 5a2b089ab76ec65051d8333d840531ed09fb3adf8ce71554db6459facf2bb001"
+            },
+            {
+              "at": "2026-10-13T02:50:43.354Z",
+              "event": "assigned",
+              "batch": "42",
+              "revision": 1
+            },
+            {
+              "at": "2026-10-13T02:50:43.459Z",
+              "event": "implemented",
+              "batch": "42",
+              "revision": 1,
+              "note": "by Claude"
+            }
+          ],
+          "batch": "42",
+          "fix": {
+            "batch": "42",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Claude",
+            "assertions": [
+              {
+                "kind": "replace",
+                "file": "webapp/src/components/forms/florida-llc/stepValidation.ts",
+                "before": "Add at least one series to proceed.",
+                "after": "Add at least two series to continue."
+              },
+              {
+                "kind": "replace",
+                "file": "webapp/server/validation.ts",
+                "before": "Add at least one series.",
+                "after": "Add at least two series to continue."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AUD-owner-third-series-credit-2026-10-12-joint-heading-lowercase",
+      "tag": "substantive",
+      "area": "Agreements and guidance",
+      "housekeeping": false,
+      "source": "docs/audit/intakes/owner-third-series-credit-2026-10-12.json finding joint-heading-lowercase",
+      "text": "New-series consent: heading above joint signatures — `webapp/server/new-series.ts:113`\nReads: ${name}${m.jointHolding ? ` — ${titleCaseHolding(m.jointHolding)}` : \"\"}${suffix}\nClaims: The joint-ownership form of holding in a new-series consent heading is printed in title case.\nTrue: Owner, 12 Oct 2026: \"Lower case. Go\" (about this heading).\nProposed replacement (not approved): Print the joint holding exactly as the client entered it, in lowercase, in the heading.\nRechecked by Claude source comparison with owner-requested feature: This is a new owner-requested feature, not an audit finding discovered by an independent audit. Compared new-series.ts at c054050 with the owner's instruction.",
+      "verdict": "open",
+      "waitsOn": [],
+      "parts": [
+        {
+          "key": "all",
+          "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
+          "status": "implemented",
+          "waitsOn": [],
+          "history": [
+            {
+              "at": "2026-10-13T02:50:40.047Z",
+              "event": "recorded from verified audit",
+              "note": "owner-third-series-credit-2026-10-12 at c0540506b39a41d8518fd1ec6392ef00d0c643c7; audit 5a2b089ab76ec65051d8333d840531ed09fb3adf8ce71554db6459facf2bb001"
+            },
+            {
+              "at": "2026-10-13T02:50:43.354Z",
+              "event": "assigned",
+              "batch": "42",
+              "revision": 1
+            },
+            {
+              "at": "2026-10-13T02:50:43.459Z",
+              "event": "implemented",
+              "batch": "42",
+              "revision": 1,
+              "note": "by Claude"
+            }
+          ],
+          "batch": "42",
+          "fix": {
+            "batch": "42",
+            "revision": 1,
+            "commit": "",
+            "doneBy": "Claude",
+            "assertions": [
+              {
+                "kind": "present",
+                "file": "webapp/server/new-series.ts",
+                "text": "${name}${m.jointHolding ? ` — ${m.jointHolding}` : \"\"}${suffix}"
+              }
+            ]
+          }
+        }
+      ]
     }
   ],
   "rulings": [
@@ -40049,6 +40212,25 @@
           "event": "implemented"
         }
       ]
+    },
+    {
+      "id": "42",
+      "revision": 1,
+      "frozenHash": "b6e0aafb01dd71d1eaa2d7177bcf5cea2800c40fec47476ad240c714a761a139",
+      "status": "implemented",
+      "model": "Claude",
+      "base": "c0540506b39a41d8518fd1ec6392ef00d0c643c7",
+      "history": [
+        {
+          "at": "2026-10-13T02:50:43.354Z",
+          "event": "authorized",
+          "note": "Adam's Go; batch file frozen and its snapshot kept"
+        },
+        {
+          "at": "2026-10-13T02:50:43.459Z",
+          "event": "implemented"
+        }
+      ]
     }
   ],
   "auditImports": [
@@ -40111,6 +40293,10 @@
     {
       "path": "docs/audit/intakes/codex-focused-release-40-2026-09-23.json",
       "sha": "3b241f0b9c9dd59367652aba2820918528f18162054ecd5d54cbce5b3d8a2835"
+    },
+    {
+      "path": "docs/audit/intakes/owner-third-series-credit-2026-10-12.json",
+      "sha": "efcb2a5bdc9cb0b41e680a83166f198ea9066dfe04ab5c53d49e9dbcb801cf44"
     }
   ],
   "auditAdjudications": [

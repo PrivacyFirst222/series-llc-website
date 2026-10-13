@@ -21,7 +21,7 @@ import { documentInputs, decodeDocumentText, assertTemplateComplete } from "./do
  * what an owner — or their bank — actually wants.
  */
 import template from "./templates-new-series.md";
-import { resolveIf, titleCaseHolding, OA_TEMPLATE_VERSION } from "./oa";
+import { resolveIf, OA_TEMPLATE_VERSION } from "./oa";
 
 export interface NewSeriesInput {
   companyName: string;
@@ -110,7 +110,7 @@ export function assembleNewSeries(input: NewSeriesInput): { markdown: string; ti
     if (!m?.signatories || m.signatories.length < 2 || signerOf(name)) return block(name, suffix, dated);
     return `[[signature-group]]
 
-${name}${m.jointHolding ? ` — ${titleCaseHolding(m.jointHolding)}` : ""}${suffix}\n\n${m.signatories.map(n => block(n, "", dated)).join("\n\n")}
+${name}${m.jointHolding ? ` — ${m.jointHolding}` : ""}${suffix}\n\n${m.signatories.map(n => block(n, "", dated)).join("\n\n")}
 
 [[/signature-group]]`;
   };

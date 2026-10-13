@@ -45179,6 +45179,71 @@ var init_series_format_migration = __esm({
   }
 });
 
+// server/included-series-migration.ts
+var INCLUDED_SERIES_MIGRATION;
+var init_included_series_migration = __esm({
+  "server/included-series-migration.ts"() {
+    INCLUDED_SERIES_MIGRATION = [
+      `ALTER TABLE service_orders ADD COLUMN IF NOT EXISTS credit_authorized_at timestamptz`,
+      `CREATE TABLE IF NOT EXISTS included_series_credits (
+    order_id uuid PRIMARY KEY, service_order_id uuid UNIQUE, used_at timestamptz,
+    created_at timestamptz NOT NULL DEFAULT now())`,
+      // Granted once per paid package. A practice (training) client never receives
+      // one, and a credit that was already used is never recreated.
+      `CREATE OR REPLACE FUNCTION grant_included_series_credit() RETURNS trigger LANGUAGE plpgsql AS $$
+    BEGIN
+      -- An order whose series list is missing or not a list never gets a credit
+      -- and must never make marking it formed fail.
+      IF NEW.formed_at IS NOT NULL AND NEW.paid_at IS NOT NULL AND jsonb_typeof(NEW.payload->'series')='array' THEN
+        IF jsonb_array_length(NEW.payload->'series')=2
+          AND NOT EXISTS (SELECT 1 FROM clients c WHERE c.id=NEW.client_id AND c.is_training) THEN
+          INSERT INTO included_series_credits(order_id) VALUES(NEW.id) ON CONFLICT DO NOTHING;
+        END IF;
+      END IF;
+      RETURN NEW;
+    END $$`,
+      `DROP TRIGGER IF EXISTS grant_included_series_credit ON orders`,
+      `CREATE TRIGGER grant_included_series_credit AFTER UPDATE OF formed_at ON orders
+    FOR EACH ROW EXECUTE FUNCTION grant_included_series_credit()`,
+      // The credit is used when the office fulfills the series it was reserved for,
+      // and never returns to available afterwards.
+      `CREATE OR REPLACE FUNCTION use_included_series_credit() RETURNS trigger LANGUAGE plpgsql AS $$
+    BEGIN
+      IF NEW.status='fulfilled' THEN
+        UPDATE included_series_credits SET used_at=COALESCE(NEW.fulfilled_at,now())
+          WHERE service_order_id=NEW.id AND used_at IS NULL;
+      END IF;
+      RETURN NEW;
+    END $$`,
+      `DROP TRIGGER IF EXISTS use_included_series_credit ON service_orders`,
+      `CREATE TRIGGER use_included_series_credit AFTER UPDATE OF status ON service_orders
+    FOR EACH ROW EXECUTE FUNCTION use_included_series_credit()`,
+      // Reserve the credit for one add-series request, all or nothing. Locking the
+      // company row makes two requests for the one credit queue up. An identical
+      // retry (same series) returns the request that already holds the credit; a
+      // different series after that gets PRICE_CHANGED, never a $50 purchase.
+      `CREATE OR REPLACE FUNCTION claim_included_series(cid uuid, company uuid, company_name text, detail jsonb)
+    RETURNS TABLE(service_id uuid, created boolean) LANGUAGE plpgsql AS $$
+    DECLARE parent orders; existing service_orders; chosen service_orders; credit included_series_credits;
+    BEGIN
+      SELECT * INTO parent FROM orders WHERE id=company AND client_id=cid AND paid_at IS NOT NULL FOR UPDATE;
+      IF NOT FOUND THEN RAISE EXCEPTION 'A paid company is required'; END IF;
+      SELECT s.* INTO existing FROM included_series_credits c JOIN service_orders s ON s.id=c.service_order_id
+        WHERE c.order_id=company
+          AND purchase_target('series',s.details,parent.llc_name)=purchase_target('series',detail,parent.llc_name);
+      IF FOUND THEN service_id:=existing.id; created:=false; RETURN NEXT; RETURN; END IF;
+      SELECT * INTO credit FROM included_series_credits WHERE order_id=company AND service_order_id IS NULL AND used_at IS NULL;
+      IF NOT FOUND THEN RAISE EXCEPTION 'PRICE_CHANGED'; END IF;
+      SELECT * INTO chosen FROM claim_service_purchase(cid,company,'series',company_name,detail,0);
+      IF chosen.status<>'pending_payment' THEN RAISE EXCEPTION 'PURCHASE_ALREADY_EXISTS'; END IF;
+      UPDATE service_orders SET status='in_progress', credit_authorized_at=now(), amount_cents=0 WHERE id=chosen.id;
+      UPDATE included_series_credits SET service_order_id=chosen.id WHERE order_id=company;
+      service_id:=chosen.id; created:=true; RETURN NEXT;
+    END $$`
+    ];
+  }
+});
+
 // server/env.ts
 var OFFLINE, ext, env;
 var init_env = __esm({
@@ -50597,6 +50662,7 @@ var init_db = __esm({
     init_series_identity_migration();
     init_series_owner_migration();
     init_series_format_migration();
+    init_included_series_migration();
     init_env();
     init_operation_deadline();
     ready = null;
@@ -51121,7 +51187,8 @@ END $$`
       ] },
       { id: 29, name: "interactive-training-clients", statements: [
         `ALTER TABLE clients ADD COLUMN IF NOT EXISTS is_training boolean NOT NULL DEFAULT false`
-      ] }
+      ] },
+      { id: 30, name: "included-third-series-credit", statements: INCLUDED_SERIES_MIGRATION }
       // Append future migrations here with the next id. Never edit an entry.
     ];
   }
@@ -55113,9 +55180,10 @@ var init_backup = __esm({
       "recovery_holds",
       "checkout_payment_receipts",
       "payment_alerts",
-      "office_operations"
+      "office_operations",
+      "included_series_credits"
     ];
-    OPTIONAL_BACKUP_TABLES = /* @__PURE__ */ new Set(["launch_policy", "payment_reconciliation_log", "recovery_holds", "checkout_payment_receipts", "payment_alerts", "office_operations"]);
+    OPTIONAL_BACKUP_TABLES = /* @__PURE__ */ new Set(["launch_policy", "payment_reconciliation_log", "recovery_holds", "checkout_payment_receipts", "payment_alerts", "office_operations", "included_series_credits"]);
     PREFIX = "backups/";
     JOB = "backup-jobs/current.json";
     backupKey = (iso2) => `db-${iso2.slice(0, 10)}-${iso2.slice(11, 19).replace(/:/g, "")}.json.gz`;
@@ -102563,7 +102631,8 @@ async function authorizeTarget(route, fields2) {
   const db = await getDb(), order2 = route.match(new RegExp(`^/api/admin/orders/(${uuid3})/`)), service = route.match(new RegExp(`^/api/admin/services/(${uuid3})/`)), document2 = route.match(new RegExp(`^/api/admin/documents/(${uuid3})/replace$`));
   if (order2 || service) {
     const table = order2 ? "orders" : "service_orders";
-    const [r] = await db.query(`SELECT id FROM ${table} WHERE id=$1 AND paid_at IS NOT NULL AND status NOT IN ('pending_payment','duplicate_payment')`, [(order2 || service)[1]]);
+    const authorized = order2 ? "paid_at IS NOT NULL" : "(paid_at IS NOT NULL OR (type='series' AND credit_authorized_at IS NOT NULL))";
+    const [r] = await db.query(`SELECT id FROM ${table} WHERE id=$1 AND ${authorized} AND status NOT IN ('pending_payment','duplicate_payment')`, [(order2 || service)[1]]);
     if (!r) reject("Target not found.", "NOT_FOUND", 404);
   }
   if (document2) {
@@ -104203,7 +104272,7 @@ var extendedFormSchema = formationFormSchema.extend({
       id: external_exports.string().max(64),
       name: external_exports.string().min(1, "Series identifier is required.").max(300)
     })
-  ).min(1, "Add at least one series."),
+  ).min(2, "Add at least two series to continue."),
   seriesOwnershipAcknowledgment: external_exports.literal(true, {
     errorMap: () => ({
       message: "Please confirm you understand that your LLC will own every protected series."
@@ -105364,6 +105433,33 @@ async function claimServicePurchase(clientId, companyId, type, name, details, am
     throw new HTTPException(400, { res: Response.json(err("This purchase is already on your account \u2014 see Orders in progress.", "ALREADY_ORDERED"), { status: 400 }) });
   }
   return rows[0].id;
+}
+
+// server/included-series.ts
+init_http_exception();
+init_db();
+async function creditAvailable(clientId, companyId) {
+  if (!companyId) return false;
+  const db = await getDb();
+  const rows = await db.query(`SELECT 1 FROM included_series_credits c JOIN orders o ON o.id=c.order_id
+    WHERE o.id=$1 AND o.client_id=$2 AND c.service_order_id IS NULL AND c.used_at IS NULL`, [companyId, clientId]);
+  return rows.length > 0;
+}
+async function claimIncludedSeries(clientId, companyId, companyName, detail) {
+  const db = await getDb();
+  try {
+    const [row] = await db.query(
+      "SELECT service_id, created FROM claim_included_series($1,$2,$3,$4::jsonb)",
+      [clientId, companyId, companyName, JSON.stringify(detail)]
+    );
+    return { id: row.service_id, created: row.created };
+  } catch (e) {
+    if (String(e).includes("PRICE_CHANGED")) return "PRICE_CHANGED";
+    if (String(e).includes("PURCHASE_ALREADY_EXISTS")) {
+      throw new HTTPException(400, { res: Response.json(err("This purchase is already included or ordered for this company.", "ALREADY_ORDERED"), { status: 400 }) });
+    }
+    throw e;
+  }
 }
 
 // server/agreement-source.ts
@@ -111131,7 +111227,7 @@ ${n}${suffix}`) + (dated ? "\nDate: _____________________________" : "");
     if (!m2?.signatories || m2.signatories.length < 2 || signerOf(name)) return block(name, suffix, dated);
     return `[[signature-group]]
 
-${name}${m2.jointHolding ? ` \u2014 ${titleCaseHolding(m2.jointHolding)}` : ""}${suffix}
+${name}${m2.jointHolding ? ` \u2014 ${m2.jointHolding}` : ""}${suffix}
 
 ${m2.signatories.map((n) => block(n, "", dated)).join("\n\n")}
 
@@ -112729,6 +112825,7 @@ function registerPortalRoutes(app2) {
     const seed = await oaSeed(session.clientId, svcCompanyId);
     const savedAgreement = await savedOaAnswers(session.clientId, svcCompanyId);
     const owners = effectiveOwners(seed?.members ?? [], savedAgreement);
+    const includedRemaining = await creditAvailable(session.clientId, svcCompanyId);
     const agreementForm = await db.query("SELECT inputs->>'version' AS version FROM oa_generations WHERE client_id = $1 AND order_id = $2 ORDER BY created_at DESC LIMIT 1", [session.clientId, svcCompanyId]);
     const oaSElection = agreementForm.length ? ["s", "member-s", "single-s", "member-single-s"].includes(agreementForm[0].version) : savedAgreement?.sElection === true;
     return c.json({
@@ -112737,8 +112834,10 @@ function registerPortalRoutes(app2) {
         oaSElection,
         dev: !env.isProd && !env.SQUARE_ACCESS_TOKEN,
         members: owners,
+        // The included third series shows at $0.00 while the company holds it.
+        includedSeriesRemaining: includedRemaining,
         pricing: {
-          seriesCents: SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS,
+          seriesCents: includedRemaining ? 0 : SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS,
           einCents: EIN_FEE_CENTS,
           sElectionCents: S_ELECTION_FEE_CENTS,
           certStatusCents: CERT_STATUS_FEE_CENTS,
@@ -112803,7 +112902,7 @@ function registerPortalRoutes(app2) {
   app2.post("/portal/services/series", async (c) => {
     const session = await getSession(c);
     if (!session?.clientId) return c.json(err("Not signed in", "UNAUTHENTICATED"), 401);
-    const body = external_exports.object({ suffix: external_exports.string().min(1).max(60), purpose: external_exports.string().max(300).optional() }).safeParse(await c.req.json().catch(() => null));
+    const body = external_exports.object({ suffix: external_exports.string().min(1).max(60), purpose: external_exports.string().max(300).optional(), expectedCents: external_exports.number().int().optional() }).safeParse(await c.req.json().catch(() => null));
     if (!body.success) {
       const issue = body.error.issues[0];
       const message = issue.path[0] === "purpose" ? "The purpose can be at most 300 characters." : issue.path[0] === "suffix" && issue.code === "too_big" ? "The series identifier can be at most 60 characters." : "Enter a series identifier.";
@@ -112826,6 +112925,15 @@ function registerPortalRoutes(app2) {
       );
     }
     const amountCents = SERIES_ADDON_PREP_CENTS + SERIES_ADDON_STATE_CENTS;
+    const shown = body.data.expectedCents;
+    const priceChanged = () => c.json(err("The price is no longer available.", "PRICE_CHANGED"), 409);
+    if (purchaseCompanyId && (await creditAvailable(session.clientId, purchaseCompanyId) || shown === 0)) {
+      if (typeof shown === "number" && shown !== 0 && await creditAvailable(session.clientId, purchaseCompanyId)) return priceChanged();
+      const claimed = await claimIncludedSeries(session.clientId, purchaseCompanyId, llcName, { seriesName, purpose: body.data.purpose ?? "" });
+      if (claimed === "PRICE_CHANGED") return priceChanged();
+      return c.json({ data: { serviceOrderId: claimed.id, checkoutUrl: null, totalCents: 0 } });
+    }
+    if (typeof shown === "number" && shown !== amountCents) return priceChanged();
     const db = await getDb();
     const serviceOrderId = await claimServicePurchase(session.clientId, purchaseCompanyId, "series", llcName, { seriesName, purpose: body.data.purpose ?? "" }, amountCents);
     if (!await rateLimit(`svc:${session.clientId}`, 20, 36e5)) {
@@ -117693,7 +117801,7 @@ function registerAdminRoutes(app2) {
             (EXISTS(SELECT 1 FROM office_operations oo WHERE oo.kind='service' AND oo.target_id=so.id) OR (so.type='s-election' AND so.details->>'documentId' IS NOT NULL)) AS completion_available,
             cl.email AS client_email, cl.name AS client_name
      FROM service_orders so JOIN clients cl ON cl.id = so.client_id
-     WHERE so.paid_at IS NOT NULL AND so.status NOT IN ('pending_payment','duplicate_payment')
+     WHERE (so.paid_at IS NOT NULL OR (so.type='series' AND so.credit_authorized_at IS NOT NULL)) AND so.status NOT IN ('pending_payment','duplicate_payment')
      ${orderIds ? `AND (${SERVICE_COMPANY_SQL})::text = ANY($1::text[])` : ""}
      ORDER BY so.created_at DESC`,
       orderIds ? [orderIds] : []
@@ -118522,7 +118630,8 @@ app.use("/admin/*", async (c, next) => {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return c.json(err("Not found", "NOT_FOUND"), 404);
   const db = await getDb();
   const table = match2[1] === "orders" ? "orders" : "service_orders";
-  const [paid] = await db.query(`SELECT id FROM ${table} WHERE id=$1 AND paid_at IS NOT NULL AND status NOT IN ('pending_payment','duplicate_payment')`, [id]);
+  const authorized = table === "service_orders" ? "(paid_at IS NOT NULL OR (type='series' AND credit_authorized_at IS NOT NULL))" : "paid_at IS NOT NULL";
+  const [paid] = await db.query(`SELECT id FROM ${table} WHERE id=$1 AND ${authorized} AND status NOT IN ('pending_payment','duplicate_payment')`, [id]);
   if (!paid) return c.json(err("Not found", "NOT_FOUND"), 404);
   return next();
 });

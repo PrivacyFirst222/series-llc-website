@@ -1132,7 +1132,7 @@ app.get("/admin/services", async (c) => {
             (EXISTS(SELECT 1 FROM office_operations oo WHERE oo.kind='service' AND oo.target_id=so.id) OR (so.type='s-election' AND so.details->>'documentId' IS NOT NULL)) AS completion_available,
             cl.email AS client_email, cl.name AS client_name
      FROM service_orders so JOIN clients cl ON cl.id = so.client_id
-     WHERE so.paid_at IS NOT NULL AND so.status NOT IN ('pending_payment','duplicate_payment')
+     WHERE (so.paid_at IS NOT NULL OR (so.type='series' AND so.credit_authorized_at IS NOT NULL)) AND so.status NOT IN ('pending_payment','duplicate_payment')
      ${orderIds ? `AND (${SERVICE_COMPANY_SQL})::text = ANY($1::text[])` : ""}
      ORDER BY so.created_at DESC`,
     orderIds ? [orderIds] : [],
