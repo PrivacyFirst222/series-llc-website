@@ -37786,7 +37786,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "released",
           "waitsOn": [],
           "history": [
             {
@@ -37806,13 +37806,26 @@
               "batch": "42",
               "revision": 1,
               "note": "by Claude"
+            },
+            {
+              "at": "2026-10-13T04:02:38.258Z",
+              "event": "accepted by Adam",
+              "batch": "42",
+              "revision": 1,
+              "note": "commit ec539629f9693f1034fc10e2fd2fadae98a7ff2d, package 5d5672040f51, by chat"
+            },
+            {
+              "at": "2026-10-13T04:03:57.626Z",
+              "event": "released",
+              "batch": "42",
+              "revision": 1
             }
           ],
           "batch": "42",
           "fix": {
             "batch": "42",
             "revision": 1,
-            "commit": "",
+            "commit": "ec539629f9693f1034fc10e2fd2fadae98a7ff2d",
             "doneBy": "Claude",
             "assertions": [
               {
@@ -37838,7 +37851,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "released",
           "waitsOn": [],
           "history": [
             {
@@ -37858,13 +37871,26 @@
               "batch": "42",
               "revision": 1,
               "note": "by Claude"
+            },
+            {
+              "at": "2026-10-13T04:02:38.258Z",
+              "event": "accepted by Adam",
+              "batch": "42",
+              "revision": 1,
+              "note": "commit ec539629f9693f1034fc10e2fd2fadae98a7ff2d, package 5d5672040f51, by chat"
+            },
+            {
+              "at": "2026-10-13T04:03:57.626Z",
+              "event": "released",
+              "batch": "42",
+              "revision": 1
             }
           ],
           "batch": "42",
           "fix": {
             "batch": "42",
             "revision": 1,
-            "commit": "",
+            "commit": "ec539629f9693f1034fc10e2fd2fadae98a7ff2d",
             "doneBy": "Claude",
             "assertions": [
               {
@@ -37897,7 +37923,7 @@
         {
           "key": "all",
           "scope": "The verified audit finding; proposed repair still requires the owner workflow.",
-          "status": "implemented",
+          "status": "released",
           "waitsOn": [],
           "history": [
             {
@@ -37917,13 +37943,26 @@
               "batch": "42",
               "revision": 1,
               "note": "by Claude"
+            },
+            {
+              "at": "2026-10-13T04:02:38.258Z",
+              "event": "accepted by Adam",
+              "batch": "42",
+              "revision": 1,
+              "note": "commit ec539629f9693f1034fc10e2fd2fadae98a7ff2d, package 5d5672040f51, by chat"
+            },
+            {
+              "at": "2026-10-13T04:03:57.626Z",
+              "event": "released",
+              "batch": "42",
+              "revision": 1
             }
           ],
           "batch": "42",
           "fix": {
             "batch": "42",
             "revision": 1,
-            "commit": "",
+            "commit": "ec539629f9693f1034fc10e2fd2fadae98a7ff2d",
             "doneBy": "Claude",
             "assertions": [
               {
@@ -40217,7 +40256,7 @@
       "id": "42",
       "revision": 1,
       "frozenHash": "b6e0aafb01dd71d1eaa2d7177bcf5cea2800c40fec47476ad240c714a761a139",
-      "status": "implemented",
+      "status": "released",
       "model": "Claude",
       "base": "c0540506b39a41d8518fd1ec6392ef00d0c643c7",
       "history": [
@@ -40229,8 +40268,34 @@
         {
           "at": "2026-10-13T02:50:43.459Z",
           "event": "implemented"
+        },
+        {
+          "at": "2026-10-13T04:02:38.258Z",
+          "event": "accepted by Adam",
+          "note": "commit ec539629f9693f1034fc10e2fd2fadae98a7ff2d, package 5d5672040f51 (chat)"
+        },
+        {
+          "at": "2026-10-13T04:03:57.626Z",
+          "event": "released",
+          "note": "the remote's main is ec53962 and contains the accepted commit; live site: Vercel deployment dpl_BTiVxu9sSquQGcXy95N8yMnwQpRc, target production, status Ready, aliases myfloridaseriesllc.com and www; GET /api/health returned 200 with database true after the new code started; the live front-end bundle contains the new Pricing sentence. Checked 13 Oct 2026 00:05 EDT.; Dropbox copies: No document changed in this batch. The package check dropbox-unchanged found the 54 Dropbox copies identical."
         }
-      ]
+      ],
+      "release": {
+        "git": {
+          "at": "2026-10-13T04:03:57.626Z",
+          "remoteMain": "ec539629f9693f1034fc10e2fd2fadae98a7ff2d",
+          "commit": "ec539629f9693f1034fc10e2fd2fadae98a7ff2d",
+          "packageId": "5d5672040f51"
+        },
+        "deployment": {
+          "at": "2026-10-13T04:03:57.626Z",
+          "evidence": "Vercel deployment dpl_BTiVxu9sSquQGcXy95N8yMnwQpRc, target production, status Ready, aliases myfloridaseriesllc.com and www; GET /api/health returned 200 with database true after the new code started; the live front-end bundle contains the new Pricing sentence. Checked 13 Oct 2026 00:05 EDT."
+        },
+        "documents": {
+          "at": "2026-10-13T04:03:57.626Z",
+          "evidence": "No document changed in this batch. The package check dropbox-unchanged found the 54 Dropbox copies identical."
+        }
+      }
     }
   ],
   "auditImports": [
